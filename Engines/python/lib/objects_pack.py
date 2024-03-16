@@ -105,7 +105,14 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             fpk_destination = os.path.join(temp_path, f"{object_type}.fpk")
             fpk_source_path = os.path.join(temp_path, f"{object_type}_fpk")
             
-            fpktool.main(fpk_destination,[fpk_source_path],True)
+            # Prepare an array with the files to pack
+            file_path_list = []
+            for file_name in os.listdir(fpk_source_path):
+                file_path = os.path.join(fpk_source_path, file_name)
+                file_path_list.append(file_path)
+            
+            # Pack the fpk
+            fpktool.main(fpk_destination, file_path_list, True)
 
             # Make the final folder structure
             final_folder_path = os.path.join(object_destination_path, object_id, "#Win")

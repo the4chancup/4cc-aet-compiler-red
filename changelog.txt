@@ -1,0 +1,11 @@
+16/03/24 - Version R1.0.0
+- Converted almost all of the code to python
+  (Some bugs might be present, please report them with screenshots)
+- Merged the fox settings into a new pes version setting
+- Removed the setting for outputting compressed cpks
+- Removed the module for zlibbing all the textures
+- Removed the dpfl appender
+  (Please never modify your dpfl)
+- Updated the python version checker to have it check for 3.12+
+- Updated the texture checker to have it check for the DXT type and the ftex
+  version when the PES version is set to 18

@@ -1,5 +1,5 @@
 import os
-import subprocess
+import sys
 import shutil
 import lib.pes_cpk_pack as cpktool
 
@@ -144,8 +144,8 @@ if all_in_one:
         print('- No issues were found in the exports.')
         print('-')
 
-if all_in_one:
-    os.system("color")
+    if sys.platform == "win32":
+        os.system("color")
     print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + ' by Shakes')
     print('-')
     print('-')

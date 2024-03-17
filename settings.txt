@@ -5,15 +5,16 @@
 :: 
 :: 
 :: - PES Version -
-:: Set the destination version of Pro Evolution Soccer
+:: Set the destination version of Pro Evolution Soccer.
 :: Default: 19 :: Accepted values: 16 - 17 - 18 - 19 - 21
 set pes_version=19
 :: 
 :: 
 :: - Cpk Name -
-:: Write the package names you want without quotes (e.g. 4cc_79_midcup)
+:: Write the package names you want without quotes.
 :: The maximum filename length you can set here is 28 characters. Spaces are fine.
-set cpk_name=4cc_79_midcup
+:: Default: 4cc_69_midcup
+set cpk_name=4cc_69_midcup
 ::
 :: 
 :: - Move Cpks -

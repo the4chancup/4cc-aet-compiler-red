@@ -61,13 +61,21 @@ if multicpk_mode:
     print('- ')
     print('- Packing the Faces patch')
 
-    cpktool.main(f"./patches_output/{faces_cpk_name}.cpk",[f"./patches_contents/{faces_foldername}"],True)
+    source_path = os.path.join("patches_contents", f"{faces_foldername}")
+    source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
+    destination_path = os.path.join("patches_output", f"{faces_cpk_name}.cpk")
+    
+    cpktool.main(destination_path, source_contents_path_list, True)
 
     # Make the Uniform patch (kits, logos, boots, gloves, etc.)
     print('- ')
     print('- Packing the Uniform patch')
 
-    cpktool.main(f"./patches_output/{uniform_cpk_name}.cpk",[f"./patches_contents/{uniform_foldername}"],True)
+    source_path = os.path.join("patches_contents", f"{uniform_foldername}")
+    source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
+    destination_path = os.path.join("patches_output", f"{uniform_cpk_name}.cpk")
+    
+    cpktool.main(destination_path, source_contents_path_list, True)
 
 
     if bins_updating:
@@ -76,7 +84,11 @@ if multicpk_mode:
         print('- ')
         print('- Packing the Bins patch')
 
-        cpktool.main(f"./patches_output/{bins_cpk_name}.cpk",[f"./patches_contents/{bins_foldername}"],True)
+        source_path = os.path.join("patches_contents", f"{bins_foldername}")
+        source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
+        destination_path = os.path.join("patches_output", f"{bins_cpk_name}.cpk")
+        
+        cpktool.main(destination_path, source_contents_path_list, True)
     
 else:
 
@@ -88,8 +100,12 @@ else:
     # Make the single cpk patch
     print('- ')
     print('- Packing the patch')
-
-    cpktool.main(f"./patches_output/{cpk_name}.cpk",[f"./patches_contents/Singlecpk"],True)
+    
+    source_path = os.path.join("patches_contents", "Singlecpk")
+    source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
+    destination_path = os.path.join("patches_output", f"{cpk_name}.cpk")
+    
+    cpktool.main(destination_path, source_contents_path_list, True)
 
 
 # If Move Cpks mode is enabled

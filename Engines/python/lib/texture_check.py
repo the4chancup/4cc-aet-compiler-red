@@ -60,7 +60,7 @@ def texture_check(tex_path):
             if not (get_bytes_ascii(tex_check_path, 84, 4) == 'DX10'):
                 # Convert it to DXT5
                 #TODO: Avoid using texconv.exe if possible
-                os.system(f'texconv.exe -f DXT5 -nologo -y -o "{tex_folder_path}" "{tex_path}" >nul')
+                os.system(f'Engines\\texconv.exe -f DXT5 -nologo -y -o "{tex_folder_path}" "{tex_path}" >nul')
                 
         # If it was zlibbed
         if tex_zlibbed:
@@ -124,7 +124,7 @@ def texture_check(tex_path):
                 else:
                     # Convert the temp dds to DXT5
                     #TODO: Avoid using texconv.exe if possible
-                    os.system(f'texconv.exe -f DXT5 -nologo -y -o "{tex_folder_path}" "{tex_path_dds}" >nul')
+                    os.system(f'Engines\\texconv.exe -f DXT5 -nologo -y -o "{tex_folder_path}" "{tex_path_dds}" >nul')
                     
                     # Delete the original ftex
                     os.remove(tex_path)

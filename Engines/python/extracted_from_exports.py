@@ -5,11 +5,11 @@ import shutil
 import importlib
 import subprocess
 
-from lib.teamid_get import teamid_get
-from lib.portraits_move import portraits_move
-from lib.export_move import export_move
-from lib.dummy_kit_replace import dummy_kits_replace
-from lib.export_check import export_check
+from .lib.teamid_get import teamid_get
+from .lib.portraits_move import portraits_move
+from .lib.export_move import export_move
+from .lib.dummy_kit_replace import dummy_kits_replace
+from .lib.export_check import export_check
 
 
 # Read the necessary parameters
@@ -30,10 +30,9 @@ def py7zr_check():
         subprocess.check_call([sys.executable, "-m", "pip", "install", "py7zr"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         
         # Warn about the program having to be started again, then exit after pressing Enter
-        input("- ")
-        input("- Library installed. Please run this program again.")
-        input("- ")
-        input("Press Enter to exit...")
+        print("- ")
+        print("- Library installed. Please run this program again.")
+        print("- ")
         exit()
 
 

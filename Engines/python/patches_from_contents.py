@@ -1,8 +1,7 @@
 import os
 import sys
 import shutil
-import lib.pes_cpk_pack as cpktool
-
+from .lib import pes_cpk_pack as cpktool
 
 # Read the necessary parameters
 all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))

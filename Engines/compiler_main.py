@@ -2,10 +2,10 @@
 import os
 import sys
 import ctypes
-from lib.admin_check import admin_check
-from .extracted_from_exports import extracted_from_exports
-from .contents_from_extracted import contents_from_extracted
-from .patches_from_contents import patches_from_contents
+from python.lib.admin_check import admin_check
+from python.extracted_from_exports import extracted_from_exports
+from python.contents_from_extracted import contents_from_extracted
+from python.patches_from_contents import patches_from_contents
 
 
 # Read the necessary parameters

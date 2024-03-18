@@ -18,7 +18,7 @@ REM - Grab the first character from the running type
 set running_type_first=%running_type:~0,1%
 
 REM - Invoke the main compiler
-call py -3 .\Engines\python\compiler_main.py %running_type_first%
+call py -3 .\Engines\compiler_main.py %running_type_first%
 
 
 pause

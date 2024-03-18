@@ -1,8 +1,8 @@
 import os
 import shutil
-from lib.bins_update import bins_update
-from lib import pes_uniparam_edit as uniparamtool
-from lib.objects_pack import objects_packer
+from .lib.bins_update import bins_update
+from .lib import pes_uniparam_edit as uniparamtool
+from .lib.objects_pack import objects_packer
 
 
 # Read the necessary parameters

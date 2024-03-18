@@ -2,9 +2,10 @@
 import os
 import sys
 import ctypes
-from ExportsToExtracted import main as exports_to_extracted
-from ExtractedToContents import main as extracted_to_contents
-from ContentsToPatches import main as contents_to_patches
+from lib.admin_check import admin_check
+from .extracted_from_exports import extracted_from_exports
+from .contents_from_extracted import contents_from_extracted
+from .patches_from_contents import patches_from_contents
 
 
 # Read the necessary parameters
@@ -22,6 +23,24 @@ def admin_request():
             return False
 
     if not is_admin():
+        
+        print('-')
+        print('-')
+        print('Your PES is installed in a system folder and Move Cpks mode is enabled.')
+        print('Administrative privileges are needed to move the cpk directly to the download folder.')
+        print('-')
+        
+        warning_path = os.path.join("Engines","admin_warned.txt")
+        
+        if not os.path.exists(warning_path):
+            print('Either accept the incoming request or disable Move Cpks mode in the settings file.')
+            print('-')
+            
+            input('Press Enter to continue...')
+            
+            with open(warning_path, 'w') as f:
+                f.write('This file tells the compiler that you know why the request for admin privileges is needed.')
+  
         # Re-run the program with admin rights
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
 
@@ -87,7 +106,7 @@ def main(run_type):
             sys.exit()
 
         # If admin mode has been forced or is needed
-        if admin_mode or admin_check():
+        if sys.platform == "win32" and (admin_mode or admin_check(pes_download_folder_location)):
             # Ask for admin permissions if not obtained yet
             admin_request()
         
@@ -95,17 +114,20 @@ def main(run_type):
         # Set the working folder to the parent of the parent of this script
         os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         
+        # Save the all-in-one mode
+        os.environ['ALL_IN_ONE'] = str(all_in_one)
+        
         # Invoke the export extractor
         if extracted_from_exports_run:
-            exports_to_extracted()
+            extracted_from_exports()
         
         # Invoke the contents packer
         if contents_from_extracted_run:
-            extracted_to_contents()
+            contents_from_extracted()
         
         # Invoke the cpk packer
         if patches_from_contents_run:
-            contents_to_patches()
+            patches_from_contents()
     
 
 if __name__ == "__main__":

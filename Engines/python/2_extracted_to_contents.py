@@ -321,16 +321,16 @@ if os.path.exists('./extracted_exports'):
 
 if 'all_in_one' in os.environ:
 
-    print('- ')
+    print('-')
     print('- Patch contents folder prepared')
-    print('- ')
+    print('-')
 
 else:
 
-    print('- ')
+    print('-')
     print('- The patches_contents folder has been prepared')
-    print('- ')
+    print('-')
     print('- 4cc aet compiler by Shakes')
-    print('- ')
+    print('-')
 
 

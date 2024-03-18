@@ -58,7 +58,7 @@ if multicpk_mode:
 
 
     # Make the Faces patch (faces, portraits)
-    print('- ')
+    print('-')
     print('- Packing the Faces patch')
 
     source_path = os.path.join("patches_contents", f"{faces_foldername}")
@@ -68,7 +68,7 @@ if multicpk_mode:
     cpktool.main(destination_path, source_contents_path_list, True)
 
     # Make the Uniform patch (kits, logos, boots, gloves, etc.)
-    print('- ')
+    print('-')
     print('- Packing the Uniform patch')
 
     source_path = os.path.join("patches_contents", f"{uniform_foldername}")
@@ -81,7 +81,7 @@ if multicpk_mode:
     if bins_updating:
 
         # Make the Bins patch (unicolor, teamcolor)
-        print('- ')
+        print('-')
         print('- Packing the Bins patch')
 
         source_path = os.path.join("patches_contents", f"{bins_foldername}")
@@ -98,7 +98,7 @@ else:
 
 
     # Make the single cpk patch
-    print('- ')
+    print('-')
     print('- Packing the patch')
     
     source_path = os.path.join("patches_contents", "Singlecpk")

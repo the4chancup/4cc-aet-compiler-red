@@ -11,28 +11,30 @@ from lib.export_move import export_move
 from lib.dummy_kit_replace import dummy_kits_replace
 from lib.export_check import export_check
 
-# Check if py7zr is installed
-try:
-    importlib.import_module('py7zr')
-except ImportError:
-    print("- py7zr library not found. Installing...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "py7zr"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    
-    # Warn about the program having to be started again, then exit after pressing Enter
-    input("- ")
-    input("- Library installed. Please run this program again.")
-    input("- ")
-    input("Press Enter to exit...")
-    exit()
-
-import py7zr
-
 
 # Read the necessary parameters
 all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
 fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
 pass_through = int(os.environ.get('PASS_THROUGH', '0'))
 pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
+
+
+# Check if py7zr is installed
+def py7zr_check():
+    try:
+        importlib.import_module('py7zr')
+    except ImportError:
+        print("- py7zr library not found.")
+        print("- This library is needed to extract the 7z files.")
+        print("- Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "py7zr"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        
+        # Warn about the program having to be started again, then exit after pressing Enter
+        input("- ")
+        input("- Library installed. Please run this program again.")
+        input("- ")
+        input("Press Enter to exit...")
+        exit()
 
 
 print("- ")
@@ -92,6 +94,8 @@ for export_name in os.listdir(main_source_path):
         os.makedirs(export_destination_path)
         shutil.unpack_archive(export_source_path, export_destination_path, "zip", ignore=shutil.ignore_patterns("*.db", "*.ini"))
     elif export_type_7z:
+        py7zr_check()
+        import py7zr
         os.makedirs(export_destination_path)
         with py7zr.SevenZipFile(export_source_path, mode='r') as z:
             z.extractall(path=export_destination_path, wildcard="* !*.db !*.ini")

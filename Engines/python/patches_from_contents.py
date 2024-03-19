@@ -12,7 +12,7 @@ def patches_from_contents():
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
-    cpk_name = os.environ.get('CPK_NAME', '4cc_79_midcup')
+    cpk_name = os.environ.get('CPK_NAME', '4cc_69_midcup')
     faces_cpk_name = os.environ.get('FACES_CPK_NAME', '4cc_40_faces')
     uniform_cpk_name = os.environ.get('UNIFORM_CPK_NAME', '4cc_45_uniform')
     bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')

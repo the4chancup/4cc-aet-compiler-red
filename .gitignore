@@ -1,5 +1,9 @@
 teamnotes.txt
 memelist.txt
+extracted_exports
+patches_contents
+patches_output
 Engines/admin_warned.txt
+Engines/python/__pycache__
 Engines/python/lib/__pycache__
 Engines/python/lib/utils/__pycache__

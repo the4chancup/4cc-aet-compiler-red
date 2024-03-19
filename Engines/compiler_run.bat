@@ -1,9 +1,6 @@
 @echo off
 REM ^ Don't write everything to screen
 
-REM - Allow reading variables modified inside statements
-setlocal EnableDelayedExpansion
-
 REM - Check if python is installed and was added to the PATH
 call .\Engines\python_check
 

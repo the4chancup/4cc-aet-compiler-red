@@ -16,6 +16,7 @@ def patches_from_contents():
     faces_cpk_name = os.environ.get('FACES_CPK_NAME', '4cc_40_faces')
     uniform_cpk_name = os.environ.get('UNIFORM_CPK_NAME', '4cc_45_uniform')
     bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')
+    cache_clear = int(os.environ.get('CACHE_CLEAR', '0'))
     
     
     # Set the name for the folders to put stuff into
@@ -103,6 +104,11 @@ def patches_from_contents():
         destination_path = os.path.join("patches_output", f"{cpk_name}.cpk")
         
         cpktool.main(destination_path, source_contents_path_list, True)
+
+
+    # Delete the contents folder
+    if cache_clear:
+        shutil.rmtree("./patches_contents")
 
 
     # If Move Cpks mode is enabled

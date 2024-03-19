@@ -6,19 +6,21 @@ import shutil
 def settings_missing():
 
     # Check if all the necessary settings are set
-    required_settings = ['pes_version',
-                         'cpk_name',
-                         'move_cpks',
-                         'pes_download_folder_location',
-                         'bins_updating',
-                         'fmdl_id_editing',
-                         'multicpk_mode',
-                         'faces_cpk_name',
-                         'uniform_cpk_name',
-                         'bins_cpk_name',
-                         'pause_when_wrong',
-                         'pass_through',
-                         'admin_mode']
+    required_settings = [
+        'pes_version',
+        'cpk_name',
+        'move_cpks',
+        'pes_download_folder_location',
+        'bins_updating',
+        'fmdl_id_editing',
+        'multicpk_mode',
+        'faces_cpk_name',
+        'uniform_cpk_name',
+        'bins_cpk_name',
+        'pause_when_wrong',
+        'pass_through',
+        'admin_mode'
+    ]
 
     settings_missing = [setting for setting in required_settings if setting not in os.environ]
 

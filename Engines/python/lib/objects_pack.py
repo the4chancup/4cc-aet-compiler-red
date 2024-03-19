@@ -43,8 +43,9 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                 shutil.move(os.path.join("extracted_exports", object_source_folder, object_id), temp_path)
 
                 # Make a cpk and put it in the Faces folder
+                cpk_source = os.path.join("temp", object_id, "common")
                 cpk_destination = os.path.join(object_destination_path, f"{object_id}.cpk")
-                cpktool.main(cpk_destination,[temp_path],True)
+                cpktool.main(cpk_destination, [cpk_source], True)
 
             else:
                 # Delete the old folder if present

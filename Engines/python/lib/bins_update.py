@@ -1,9 +1,6 @@
 ## Reads team and kit color entries from Note files and adds them to bin files
 import os
 
-# Read the necessary parameters
-all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
-pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '0'))
 
 def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
     
@@ -182,7 +179,11 @@ def update_kit_bin(team_id, kitcols, kit_color_bin):
     
 
 def bins_update():
-  
+    
+    # Read the necessary parameters
+    all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
+    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '0'))
+    
     print("-")
     print("- Bins Updating is enabled")
     print("-")

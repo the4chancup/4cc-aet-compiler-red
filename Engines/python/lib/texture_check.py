@@ -5,12 +5,13 @@ from .utils.zlib_plus import unzlib_file
 from .utils.ftex import ftexToDds
 from .utils.ftex import ddsToFtex
 
-# Read the necessary parameters
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
 
 # Check if the texture is a proper dds or ftex and unzlib if needed
 def texture_check(tex_path):
+    
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     
     # Store the name of the parent folder
     tex_folder_name = os.path.basename(os.path.dirname(tex_path))

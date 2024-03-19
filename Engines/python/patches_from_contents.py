@@ -3,24 +3,20 @@ import sys
 import shutil
 from .lib import pes_cpk_pack as cpktool
 
-# Read the necessary parameters
-all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
-
-move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
-pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
-
-bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
-
-multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
-cpk_name = os.environ.get('CPK_NAME', '4cc_79_midcup')
-faces_cpk_name = os.environ.get('FACES_CPK_NAME', '4cc_40_faces')
-uniform_cpk_name = os.environ.get('UNIFORM_CPK_NAME', '4cc_45_uniform')
-bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')
-
-
 def patches_from_contents():
+    
+    # Read the necessary parameters
+    all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
+    move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
+    pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
+    bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
+
+    multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
+    cpk_name = os.environ.get('CPK_NAME', '4cc_79_midcup')
+    faces_cpk_name = os.environ.get('FACES_CPK_NAME', '4cc_40_faces')
+    uniform_cpk_name = os.environ.get('UNIFORM_CPK_NAME', '4cc_45_uniform')
+    bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')
+    
     
     # Set the name for the folders to put stuff into
     if not multicpk_mode:

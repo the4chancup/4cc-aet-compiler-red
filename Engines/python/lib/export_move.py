@@ -6,28 +6,25 @@ from .utils.ftex import ddsToFtex
 from .utils.zlib_plus import unzlib_file
 from .fmdl_id_change import transfer
 
-# Read the necessary parameters
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
-fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
-
-fmdl_id_editing = int(os.environ.get('FMDL_ID_EDITING', '1'))
-pass_through = int(os.environ.get('PASS_THROUGH', '0'))
-
 
 # Handles dds to ftex conversion of an entire folder
 def ftex_from_dds_multi(folder_path):
-    if fox_mode:
-        dds_files = [f for f in os.listdir(folder_path) if f.endswith('.dds')]
-        if dds_files:
-            for dds_file in dds_files:
-                dds_path = os.path.join(folder_path, dds_file)
-                ftex_path = os.path.splitext(dds_path)[0] + '.ftex'
-                ddsToFtex(dds_path, ftex_path, None)
-                os.remove(dds_path)
+    dds_files = [f for f in os.listdir(folder_path) if f.endswith('.dds')]
+    if dds_files:
+        for dds_file in dds_files:
+            dds_path = os.path.join(folder_path, dds_file)
+            ftex_path = os.path.splitext(dds_path)[0] + '.ftex'
+            ddsToFtex(dds_path, ftex_path, None)
+            os.remove(dds_path)
 
 
 def export_move(exportfolder_path, team_id, team_name):
+    
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
+    fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
+    fmdl_id_editing = int(os.environ.get('FMDL_ID_EDITING', '1'))
 
     # The main folder path is the parent of the export folder
     mainfolder_path = os.path.dirname(exportfolder_path)
@@ -81,7 +78,8 @@ def export_move(exportfolder_path, team_id, team_name):
                         transfer(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
                     
                 # Convert any dds textures to ftex if needed
-                ftex_from_dds_multi(subfolder_path)
+                if fox_mode:
+                    ftex_from_dds_multi(subfolder_path)
                     
                 # Replace the dummy team ID with the actual one
                 os.rename(subfolder_path, os.path.join(team_itemfolder_path, subfolder_id_withname))
@@ -136,7 +134,8 @@ def export_move(exportfolder_path, team_id, team_name):
         if team_itemfolder_name.lower() == "kit textures":
             
             # Convert any dds textures to ftex if needed
-            ftex_from_dds_multi(team_itemfolder_path)
+            if fox_mode:
+                ftex_from_dds_multi(team_itemfolder_path)
             
             # Set the texture file extension to ftex or dds
             file_ext = 'ftex' if fox_mode else 'dds'
@@ -226,7 +225,8 @@ def export_move(exportfolder_path, team_id, team_name):
                         transfer(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
                     
                 # Convert any dds textures to ftex if needed
-                ftex_from_dds_multi(subfolder_path)
+                if fox_mode:
+                    ftex_from_dds_multi(subfolder_path)
                 
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder)
@@ -251,7 +251,8 @@ def export_move(exportfolder_path, team_id, team_name):
                         transfer(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
                     
                 # Convert any dds textures to ftex if needed
-                ftex_from_dds_multi(subfolder_path)
+                if fox_mode:
+                    ftex_from_dds_multi(subfolder_path)
                 
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder)
@@ -289,7 +290,8 @@ def export_move(exportfolder_path, team_id, team_name):
                 os.makedirs(main_itemfolder_team_path)
 
                 # Convert any dds textures to ftex if needed
-                ftex_from_dds_multi(team_itemfolder_path)
+                if fox_mode:
+                    ftex_from_dds_multi(team_itemfolder_path)
                 
                 # Move everything to the team folder inside the main folder
                 for file in os.listdir(team_itemfolder_path):

@@ -4,14 +4,14 @@ import subprocess
 from . import pes_cpk_pack as cpktool
 from . import pes_fpk_pack as fpktool
 
-# Read the necessary parameters
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-
 
 def objects_packer(object_type, object_source_folder, object_destination_folder, faces_foldername, uniform_foldername):
     
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+
     # Pre-Fox mode
-    if fox_mode == 0:
+    if not fox_mode:
         
         # Set the destination path
         if object_type == "face":

@@ -12,13 +12,6 @@ from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
 
 
-# Read the necessary parameters
-all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-pass_through = int(os.environ.get('PASS_THROUGH', '0'))
-pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
-
-
 # Check if py7zr is installed
 def py7zr_check():
     try:
@@ -37,6 +30,13 @@ def py7zr_check():
 
 
 def extracted_from_exports():
+    
+    # Read the necessary parameters
+    all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    pass_through = int(os.environ.get('PASS_THROUGH', '0'))
+    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
+    
     
     print("- ")
     print("- Extracting and checking the exports")

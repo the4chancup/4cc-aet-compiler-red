@@ -84,7 +84,8 @@ def main(run_type):
     patches_from_contents_run = (run_type == "0" or run_type == "3")
     
     # Load the settings into the environment
-    settings_init("settings.ini")
+    settings_name = "settings.ini"
+    settings_init(settings_name)
     
     # Read the necessary parameters
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
@@ -100,13 +101,13 @@ def main(run_type):
             print("-")
             print("- PES download folder not found.")
             print("- Please set its correct path in the settings file and start again.")
-            print("- The script will restart automatically after you close notepad.")
+            print("- The script will restart automatically after you close the text editor.")
             print("-")
             print("-")
             input("Press Enter to continue...")
 
-            # Open settings.txt in an external text editor
-            os.startfile("settings.txt")
+            # Open the settings file in an external text editor
+            os.startfile(settings_name)
             
             # Exit the script
             sys.exit()

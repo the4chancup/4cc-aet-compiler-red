@@ -5,13 +5,6 @@ from .utils.zlib_plus import unzlib_file
 from .texture_check import texture_check
 from .txt_kits_count import txt_kits_count
 
-# Read the necessary parameters
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
-fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
-
-pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
-
 
 # Check for nested folders with repeating names
 def nested_folders_fix(exportfolder_path, team_name):
@@ -798,6 +791,13 @@ def other_check(exportfolder_path, team_name):
 
 # Function with all the checks
 def export_check(exportfolder_path, team_name):
+    
+    # Read the necessary parameters
+    global fox_mode, fox_19, fox_21, pause_when_wrong
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
+    fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
+    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
 
     nested_folders_fix(exportfolder_path, team_name)
     faces_check(exportfolder_path, team_name)

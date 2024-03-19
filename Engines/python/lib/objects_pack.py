@@ -4,14 +4,14 @@ import subprocess
 from . import pes_cpk_pack as cpktool
 from . import pes_fpk_pack as fpktool
 
-# Read the necessary parameters
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-
 
 def objects_packer(object_type, object_source_folder, object_destination_folder, faces_foldername, uniform_foldername):
     
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+
     # Pre-Fox mode
-    if fox_mode == 0:
+    if not fox_mode:
         
         # Set the destination path
         if object_type == "face":
@@ -43,8 +43,9 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                 shutil.move(os.path.join("extracted_exports", object_source_folder, object_id), temp_path)
 
                 # Make a cpk and put it in the Faces folder
+                cpk_source = os.path.join("temp", object_id, "common")
                 cpk_destination = os.path.join(object_destination_path, f"{object_id}.cpk")
-                cpktool.main(cpk_destination,[temp_path],True)
+                cpktool.main(cpk_destination, [cpk_source], True)
 
             else:
                 # Delete the old folder if present

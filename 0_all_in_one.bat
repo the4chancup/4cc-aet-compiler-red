@@ -8,6 +8,5 @@ cd /D "%~dp0"
 REM - Set the running type from the bat file's name
 set running_type=%~n0
 
-
 REM - Call the runner
-.\Engines\compiler_run
+.\Engines\compiler_run %running_type%

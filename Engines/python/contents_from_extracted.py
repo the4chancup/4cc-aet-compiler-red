@@ -5,17 +5,15 @@ from .lib import pes_uniparam_edit as uniparamtool
 from .lib.objects_pack import objects_packer
 
 
-# Read the necessary parameters
-all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
-
-fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
-
-multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
-bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
-
-
 def contents_from_extracted():
+    
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
+
+    multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
+    bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
+    
     
     # Set the name for the folders to put stuff into
     if not multicpk_mode:

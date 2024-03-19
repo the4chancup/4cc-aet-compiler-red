@@ -1,3 +1,12 @@
+19/03/24 - Version R2.0.0
+- Fixed some issues with packing fpk and cpk files
+- Converted the main compiler runner to python to allow move_cpks to work
+  properly when admin rights are needed
+- Converted the settings file to ini format to allow the above to work
+- Added new cache_clear setting (on by default) to allow deleting the
+  patches_contents folder every time a cpk is packed
+
+
 16/03/24 - Version R1.0.0
 - Converted almost all of the code to python
   (Some bugs might be present, please report them with screenshots)

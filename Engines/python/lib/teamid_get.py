@@ -1,13 +1,14 @@
 import os
 import shutil
 
-# Read the necessary parameters
-pass_through = int(os.environ.get('PASS_THROUGH', '0'))
-pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
 
 # Function for finding the team ID after receiving the foldername as parameter
 def teamid_get(exportfolder_path, team_name):
 
+    # Read the necessary parameters
+    pass_through = int(os.environ.get('PASS_THROUGH', '0'))
+    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
+    
     # Define team_raw as team_name without the slashes at the start and end
     team_raw = team_name[1:-1].upper()
     

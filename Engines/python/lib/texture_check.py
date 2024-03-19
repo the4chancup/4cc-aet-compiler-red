@@ -1,10 +1,27 @@
 import os
+import sys
 from .utils.zlib_plus import get_bytes_hex
 from .utils.zlib_plus import get_bytes_ascii
 from .utils.zlib_plus import unzlib_file
 from .utils.ftex import ftexToDds
 from .utils.ftex import ddsToFtex
 
+
+def dds_dxt5_conv(tex_path):
+    tex_folder_path = os.path.dirname(tex_path)
+    if sys.platform == "win32":
+        # Convert the texture and store into its parent folder
+        os.system(f'Engines\\texconv.exe -f DXT5 -nologo -y -o "{tex_folder_path}" "{tex_path}" >nul')
+    else:
+        # Prepare a dummy path to save the converted texture
+        dummy_tex_path = os.path.join(tex_folder_path, '_dummy_.dds')
+        # Convert the texture
+        os.system(f'convert -format dds -define dds:compression=dxt5 {tex_path} {dummy_tex_path}')
+        # Delete the original texture
+        os.remove(tex_path)
+        # Rename the dummy texture
+        os.rename(dummy_tex_path, tex_path)
+        
 
 # Check if the texture is a proper dds or ftex and unzlib if needed
 def texture_check(tex_path):
@@ -60,8 +77,7 @@ def texture_check(tex_path):
             # Check if it is a BC7 file (DX10 label starting from index 84)
             if not (get_bytes_ascii(tex_check_path, 84, 4) == 'DX10'):
                 # Convert it to DXT5
-                #TODO: Avoid using texconv.exe if possible
-                os.system(f'Engines\\texconv.exe -f DXT5 -nologo -y -o "{tex_folder_path}" "{tex_path}" >nul')
+                dds_dxt5_conv(tex_check_path)
                 
         # If it was zlibbed
         if tex_zlibbed:
@@ -124,8 +140,7 @@ def texture_check(tex_path):
                     print(f'- Converting {tex_name} failed - 2.04 or BC7 texture')
                 else:
                     # Convert the temp dds to DXT5
-                    #TODO: Avoid using texconv.exe if possible
-                    os.system(f'Engines\\texconv.exe -f DXT5 -nologo -y -o "{tex_folder_path}" "{tex_path_dds}" >nul')
+                    dds_dxt5_conv(tex_path_dds)
                     
                     # Delete the original ftex
                     os.remove(tex_path)

@@ -2,16 +2,11 @@
 import os
 import sys
 import ctypes
-from python.lib.admin_check import admin_check
+from python.admin_check import admin_check
+from python.settings_init import settings_init
 from python.extracted_from_exports import extracted_from_exports
 from python.contents_from_extracted import contents_from_extracted
 from python.patches_from_contents import patches_from_contents
-
-
-# Read the necessary parameters
-move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
-pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
-admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
 
 
 def admin_request():
@@ -43,6 +38,9 @@ def admin_request():
   
         # Re-run the program with admin rights
         ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+        
+        # Exit the program
+        sys.exit()
 
 
 def intro_print():
@@ -85,8 +83,16 @@ def main(run_type):
     contents_from_extracted_run = (run_type == "0" or run_type == "2")
     patches_from_contents_run = (run_type == "0" or run_type == "3")
     
+    # Load the settings into the environment
+    settings_init("settings.ini")
+    
+    # Read the necessary parameters
+    move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
+    pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
+    admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
+    
     # If move_cpks mode is enabled
-    if move_cpks == "1":
+    if move_cpks:
 
         # Check the PES download folder
         if not os.path.exists(pes_download_folder_location):
@@ -111,24 +117,27 @@ def main(run_type):
             admin_request()
         
         
-        # Set the working folder to the parent of the parent of this script
-        os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        
-        # Save the all-in-one mode
-        os.environ['ALL_IN_ONE'] = str(all_in_one)
-        
-        # Invoke the export extractor
-        if extracted_from_exports_run:
-            extracted_from_exports()
-        
-        # Invoke the contents packer
-        if contents_from_extracted_run:
-            contents_from_extracted()
-        
-        # Invoke the cpk packer
-        if patches_from_contents_run:
-            patches_from_contents()
+    # Set the working folder to the parent of the parent of this script
+    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     
+    # Save the all-in-one mode
+    os.environ['ALL_IN_ONE'] = str(all_in_one)
+    
+    # Invoke the export extractor
+    if extracted_from_exports_run:
+        extracted_from_exports()
+    
+    # Invoke the contents packer
+    if contents_from_extracted_run:
+        contents_from_extracted()
+    
+    # Invoke the cpk packer
+    if patches_from_contents_run:
+        patches_from_contents()
+        
+    # Exit the script
+    input("Press Enter to exit...")
+
 
 if __name__ == "__main__":
     run_type = None

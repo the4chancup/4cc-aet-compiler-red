@@ -121,7 +121,7 @@ def main(run_type):
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     
     # Save the all-in-one mode
-    os.environ['ALL_IN_ONE'] = str(all_in_one)
+    os.environ['ALL_IN_ONE'] = str(int(all_in_one))
     
     # Invoke the export extractor
     if extracted_from_exports_run:

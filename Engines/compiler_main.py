@@ -77,6 +77,9 @@ def run_type_request():
 
 def main(run_type):
     
+    # Set the working folder to the parent of the folder of this script
+    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    
     # Check the running type
     all_in_one = (run_type == "0")
     extracted_from_exports_run = (run_type == "0" or run_type == "1")
@@ -117,10 +120,6 @@ def main(run_type):
             # Ask for admin permissions if not obtained yet
             admin_request()
         
-        
-    # Set the working folder to the parent of the parent of this script
-    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    
     # Save the all-in-one mode
     os.environ['ALL_IN_ONE'] = str(int(all_in_one))
     

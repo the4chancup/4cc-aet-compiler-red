@@ -436,11 +436,7 @@ def logo_check(exportfolder_path, team_name):
                 file_error = not file_name.lower().startswith("emblem_")
                 
                 # Check the suffix and increase the plus counter if present and correct
-                # Real teams
                 if (file_name.lower().endswith(("_r.png", "_r_l.png", "_r_ll.png"))):
-                    file_good_count += 1
-                # Fake teams
-                if (file_name.lower().endswith(("_f.png", "_f_l.png", "_f_ll.png"))):
                     file_good_count += 1
                 
                 file_count += 1

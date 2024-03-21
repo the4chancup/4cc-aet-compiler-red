@@ -92,8 +92,8 @@ def main(run_type):
     pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
     
-    # If move_cpks mode is enabled
-    if move_cpks:
+    # If patches_from_contents_run is active and move_cpks mode is enabled
+    if patches_from_contents_run and move_cpks:
 
         # Check the PES download folder
         if not os.path.exists(pes_download_folder_location):

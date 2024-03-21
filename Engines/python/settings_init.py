@@ -3,31 +3,33 @@ import configparser
 import shutil
 
 
-def settings_missing():
+def settings_missing_check(default_file_path):
 
-    # Check if all the necessary settings are set
+    # Prepare a list with the required settings
     required_settings = [
         'pes_version',
         'cpk_name',
-        'move_cpks',
         'pes_download_folder_location',
-        'bins_updating',
-        'fmdl_id_editing',
-        'multicpk_mode',
-        'faces_cpk_name',
-        'uniform_cpk_name',
-        'bins_cpk_name',
-        'pause_when_wrong',
-        'pass_through',
-        'admin_mode'
     ]
 
+    # Check if all the required settings have been loaded
     settings_missing = [setting for setting in required_settings if setting not in os.environ]
+
+    # Read the default settings file
+    config = configparser.ConfigParser()
+    config.read(default_file_path)
+
+    # Check if any non-required settings are missing
+    # and load them into the environment with the values from the default settings
+    for section in config.sections():
+        for key, value in config.items(section):
+            if key not in os.environ and key not in required_settings:
+                os.environ[key] = value
 
     return settings_missing
 
 
-def settings_default_init(file_path):
+def settings_default_path_get(file_path):
 
     # Grab the extension of the file
     file_extension = os.path.splitext(file_path)[1]
@@ -37,6 +39,11 @@ def settings_default_init(file_path):
 
     # Prepare the path to the default settings file inside the Engines folder
     default_file_path = os.path.join(os.path.dirname(file_path), "Engines", default_file_name)
+
+    return default_file_path
+
+
+def settings_default_init(file_path, default_file_path):
 
     # If there already is a main settings file, rename it by appending "_old" to it
     if os.path.isfile(file_path):
@@ -53,7 +60,7 @@ def settings_default_init(file_path):
 
         # Rename the main settings file
         os.rename(file_path, old_file_name)
-        
+
         # Open it in an external text editor
         os.startfile(old_file_name)
 
@@ -69,6 +76,9 @@ def settings_default_init(file_path):
 
 def settings_init(file_name):
 
+    # Prepare the name of the default settings file
+    default_file_path = settings_default_path_get(file_name)
+
     # Check if the file exists
     if not os.path.isfile(file_name):
 
@@ -80,7 +90,7 @@ def settings_init(file_name):
         print("-")
         input("Press Enter to continue...")
 
-        settings_default_init(file_name)
+        settings_default_init(file_name, default_file_path)
 
     else:
 
@@ -92,13 +102,14 @@ def settings_init(file_name):
             for key, value in config.items(section):
                 os.environ[key] = value
 
-        # Check if any settings are missing
-        if settings_missing():
+        # Check if any required settings are missing
+        settings_missing = settings_missing_check(default_file_path)
+        if settings_missing:
 
             print("- Warning:")
-            print(f"- Some settings are missing from the {file_name} file:")
-            # Print the list of missing settings
-            print("- " + "\n- ".join(settings_missing()))
+            print(f"- The following required settings are missing from the {file_name} file:")
+            # Print the list of missing required settings
+            print("- " + "\n- ".join(settings_missing))
             print("-")
             print("- A clean settings file will be generated and opened.")
             print("- The old file will be renamed with _old at the end and opened too.")
@@ -106,4 +117,4 @@ def settings_init(file_name):
             print("-")
             input("Press Enter to continue...")
 
-            settings_default_init(file_name)
+            settings_default_init(file_name, default_file_path)

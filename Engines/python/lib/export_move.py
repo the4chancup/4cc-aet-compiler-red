@@ -65,11 +65,12 @@ def export_move(exportfolder_path, team_id, team_name):
         if team_itemfolder_name.lower() == "faces":
             
             # For each subfolder
-            for subfolder in os.listdir(team_itemfolder_path):
-                subfolder_path = os.path.join(team_itemfolder_path, subfolder)
+            for subfolder_name in [subfolder for subfolder in os.listdir(team_itemfolder_path)
+                                   if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]:
+                subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Replace the dummy team ID with the actual one
-                subfolder_id_withname = team_id + subfolder[3:]
+                subfolder_id_withname = team_id + subfolder_name[3:]
                 subfolder_id = subfolder_id_withname[:5]
                 
                 if fox_mode:
@@ -213,11 +214,12 @@ def export_move(exportfolder_path, team_id, team_name):
         if team_itemfolder_name.lower() == "boots":
             
             # For each subfolder
-            for subfolder in os.listdir(team_itemfolder_path):
-                subfolder_path = os.path.join(team_itemfolder_path, subfolder)
+            for subfolder_name in [subfolder for subfolder in os.listdir(team_itemfolder_path)
+                                   if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]:
+                subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Get the ID
-                subfolder_id = subfolder[:5]
+                subfolder_id = subfolder_name[:5]
                 
                 if fox_mode:
                     # Change the texture IDs inside each fmdl file
@@ -228,7 +230,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     ftex_from_dds_multi(subfolder_path)
                 
                 # Delete the destination folder if already present
-                subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder)
+                subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)
                 if os.path.exists(subfolder_destination_path):
                     shutil.rmtree(subfolder_destination_path)
                     
@@ -239,11 +241,12 @@ def export_move(exportfolder_path, team_id, team_name):
         if team_itemfolder_name.lower() == "gloves":
             
             # For each subfolder
-            for subfolder in os.listdir(team_itemfolder_path):
-                subfolder_path = os.path.join(team_itemfolder_path, subfolder)
+            for subfolder_name in [subfolder for subfolder in os.listdir(team_itemfolder_path)
+                                   if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]:
+                subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Get the ID
-                subfolder_id = subfolder[:5] if fox_mode else subfolder[:4]
+                subfolder_id = subfolder_name[:5] if fox_mode else subfolder_name[:4]
                 
                 if fox_mode:
                     # Change the texture IDs inside each fmdl file
@@ -254,12 +257,12 @@ def export_move(exportfolder_path, team_id, team_name):
                     ftex_from_dds_multi(subfolder_path)
                 
                 # Delete the destination folder if already present
-                subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder)
+                subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)
                 if os.path.exists(subfolder_destination_path):
                     shutil.rmtree(subfolder_destination_path)
                 
                 # Move the folder to the main folder
-                shutil.move(os.path.join(team_itemfolder_path, subfolder), main_itemfolder_path)
+                shutil.move(os.path.join(team_itemfolder_path, subfolder_name), main_itemfolder_path)
         
         # Collars folder
         if team_itemfolder_name.lower() == "collars":

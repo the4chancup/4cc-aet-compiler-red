@@ -84,7 +84,8 @@ def faces_check(exportfolder_path, team_name):
             folder_error_any = None
 
             # For every subfolder
-            for subfolder_name in os.listdir(itemfolder_path):
+            for subfolder_name in [subfolder for subfolder in os.listdir(itemfolder_path)
+                                   if os.path.isdir(os.path.join(itemfolder_path, subfolder))]:
                 
                 subfolder_path = os.path.join(itemfolder_path, subfolder_name)
                 
@@ -604,7 +605,8 @@ def boots_check(exportfolder_path, team_name):
             folder_error_any = None
             
             # For every subfolder
-            for subfolder_name in os.listdir(itemfolder_path):
+            for subfolder_name in [subfolder for subfolder in os.listdir(itemfolder_path)
+                                   if os.path.isdir(os.path.join(itemfolder_path, subfolder))]:
                 
                 subfolder_path = os.path.join(itemfolder_path, subfolder_name)
                 
@@ -694,7 +696,8 @@ def gloves_check(exportfolder_path, team_name):
             folder_error_any = None
             
             # For every subfolder
-            for subfolder_name in os.listdir(itemfolder_path):
+            for subfolder_name in [subfolder for subfolder in os.listdir(itemfolder_path)
+                                   if os.path.isdir(os.path.join(itemfolder_path, subfolder))]:
                 
                 subfolder_path = os.path.join(itemfolder_path, subfolder_name)
                 

@@ -141,13 +141,13 @@ def main(run_type):
 
 
 if __name__ == "__main__":
-    run_type = None
 
     intro_print()
 
-    run_type = sys.argv[1]
-
-    if run_type is None:
-        run_type_request()
+    # Check if an argument has been passed and its value is between 0 and 3
+    if len(sys.argv) > 1 and sys.argv[1] in ["0", "1", "2", "3"]:
+        run_type = sys.argv[1]
+    else:
+        run_type = run_type_request()
 
     main(run_type)

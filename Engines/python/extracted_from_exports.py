@@ -109,36 +109,40 @@ def extracted_from_exports():
         # If the teamID was found
         if team_id:
 
+            export_deleted = False
+            
             # If the export has a Faces folder
             if os.path.exists(os.path.join(export_destination_path, "Faces")):
 
                 # Move the portraits out of the Faces folder
-                portraits_move(export_destination_path, team_id)
+                export_deleted = portraits_move(export_destination_path, team_id)
 
-            # Check the export for all kinds of errors
-            if not pass_through:
-                export_check(export_destination_path, team_name)
-            
-            # If the export has a Note.txt file
-            note_path = os.path.join(export_destination_path, f"{team_raw} Note.txt")
-            if os.path.exists(note_path):
-                # Append the contents of the txt file to teamnotes.txt for quick reading
-                with open("teamnotes.txt", "a") as f2:
-                    f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
-                with open(note_path, "r") as f:
-                    teamnotes = f.read()
+            if not export_deleted:
+                
+                # Check the export for all kinds of errors
+                if not pass_through:
+                    export_check(export_destination_path, team_name)
+                
+                # If the export has a Note.txt file
+                note_path = os.path.join(export_destination_path, f"{team_raw} Note.txt")
+                if os.path.exists(note_path):
+                    # Append the contents of the txt file to teamnotes.txt for quick reading
                     with open("teamnotes.txt", "a") as f2:
-                        f2.write(f"{teamnotes}\n")
-            
-            # Move the contents of the export to the root of extracted_exports
-            export_move(export_destination_path, team_id, team_name)
+                        f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
+                    with open(note_path, "r") as f:
+                        teamnotes = f.read()
+                        with open("teamnotes.txt", "a") as f2:
+                            f2.write(f"{teamnotes}\n")
+                
+                # Move the contents of the export to the root of extracted_exports
+                export_move(export_destination_path, team_id, team_name)
 
-            # If fox mode is enabled and the team has a common folder replace the dummy textures with the kit 1 textures
-            if fox_mode and os.path.exists(os.path.join(os.path.dirname(export_destination_path), "Common", team_id)):
-                dummy_kits_replace(team_id, team_name)
+                # If fox mode is enabled and the team has a common folder replace the dummy textures with the kit 1 textures
+                if fox_mode and os.path.exists(os.path.join(os.path.dirname(export_destination_path), "Common", team_id)):
+                    dummy_kits_replace(team_id, team_name)
 
-            # Delete the now empty export folder
-            shutil.rmtree(export_destination_path)
+                # Delete the now empty export folder
+                shutil.rmtree(export_destination_path)
 
         print("- ")
 

@@ -3,6 +3,7 @@ memelist.txt
 extracted_exports
 patches_contents
 patches_output
+sideload
 Engines/admin_warned.txt
 Engines/python/__pycache__
 Engines/python/lib/__pycache__

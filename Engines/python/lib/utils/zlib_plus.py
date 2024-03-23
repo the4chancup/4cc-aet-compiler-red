@@ -82,7 +82,7 @@ def unzlib_file(source_file_path, destination_file_path = None):
 
         # Unzlib it
         with open(source_file_path, 'rb') as f:
-            data = zlib.decompress(f.read())
+            data = decompress(f.read())
 
         with open(destination_file_path, 'wb') as f:
             f.write(data)

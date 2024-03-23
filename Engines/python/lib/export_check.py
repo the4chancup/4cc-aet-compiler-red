@@ -152,14 +152,14 @@ def faces_check(exportfolder_path, team_name):
                             log.write(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded\n')
                             print(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded')
                         if folder_error_nofpkxml:
-                            log.write(f'- (no face.fpk.xml file inside) - Folder discarded)\n')
-                            print(f'- (no face.fpk.xml file inside) - Folder discarded')
+                            log.write('- (no face.fpk.xml file inside) - Folder discarded)\n')
+                            print('- (no face.fpk.xml file inside) - Folder discarded')
                         if folder_error_noxml:
-                            log.write(f'- (no face.xml file inside) - Folder discarded)\n')
-                            print(f'- (no face.xml file inside) - Folder discarded')
+                            log.write('- (no face.xml file inside) - Folder discarded)\n')
+                            print('- (no face.xml file inside) - Folder discarded')
                         if folder_error_edithairxml:
-                            log.write(f'- (unsupported edithair face folder, needs updating) - Folder discarded)\n')
-                            print(f'- (unsupported edithair face folder, needs updating) - Folder discarded')
+                            log.write('- (unsupported edithair face folder, needs updating) - Folder discarded)\n')
+                            print('- (unsupported edithair face folder, needs updating) - Folder discarded')
                         if folder_error_tex_format:
                             log.write(f'- ({file_name} is a bad texture) - Folder discarded)\n')
                             print(f'- ({file_name} is a bad texture) - Folder discarded')
@@ -518,8 +518,8 @@ def portraits_check(exportfolder_path, team_name):
                             log.write(f"- (player number {file_name[-6:-4]} out of the 01-23 range) - File discarded\n")
                             print(f"- (player number {file_name[-6:-4]} out of the 01-23 range)")
                         if file_error_tex_format:
-                            log.write(f"- (bad format) - File discarded\n")
-                            print(f"- (bad format)")
+                            log.write("- (bad format) - File discarded\n")
+                            print("- (bad format)")
                         
                     # And skip it
                     os.remove(os.path.join(itemfolder_path, file_name))

@@ -36,12 +36,9 @@ def texture_check(tex_path):
     # Store the name of the texture and its parent folder
     tex_name = os.path.join(tex_folder_name, os.path.basename(tex_path))
     
-    # Store the path to the parent folder
-    tex_folder_path = os.path.dirname(tex_path)
-    
     tex_zlibbed = None
     tex_reconvert_needed = None
-    tex_mips_none = None
+    #tex_mips_none = None
     
     tex_error_format = None
 

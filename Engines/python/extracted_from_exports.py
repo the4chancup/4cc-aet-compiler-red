@@ -1,6 +1,5 @@
 import os
 import sys
-import subprocess
 import shutil
 import importlib
 import subprocess
@@ -51,7 +50,7 @@ def extracted_from_exports():
     os.makedirs(main_destination_path, exist_ok=True)
 
     # Clear the flag for writing to file
-    memelist = ""
+    os.environ["LOG"] = "0"
 
     # Reset the files
     with open("memelist.txt", "w") as f:

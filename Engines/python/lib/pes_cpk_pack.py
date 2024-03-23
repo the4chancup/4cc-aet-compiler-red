@@ -1,6 +1,9 @@
 #! /usr/bin/env python3
 
-import datetime, os, sys
+import os
+import sys
+import datetime
+
 from .utils import cpk
 
 def addFile(cpk, realFilename, packedFilename):

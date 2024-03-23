@@ -1,6 +1,6 @@
 import os
 import shutil
-import subprocess
+
 from . import pes_cpk_pack as cpktool
 from . import pes_fpk_pack as fpktool
 

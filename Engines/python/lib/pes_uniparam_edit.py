@@ -1,6 +1,8 @@
 #! /usr/bin/env python3
 
-import os, sys
+import os
+import sys
+
 from .utils import uniparam
 
 def listFiles(filename):

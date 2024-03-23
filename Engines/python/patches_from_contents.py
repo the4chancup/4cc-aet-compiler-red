@@ -1,7 +1,9 @@
 import os
 import sys
 import shutil
+
 from .lib import pes_cpk_pack as cpktool
+
 
 def patches_from_contents():
     

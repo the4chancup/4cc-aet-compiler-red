@@ -1,6 +1,5 @@
 import struct
 import zlib
-import os
 
 class DecodeError(Exception):
 	pass

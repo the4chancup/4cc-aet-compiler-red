@@ -6,7 +6,7 @@ import re
 import logging
 
 def transfer(fn, id, teamid = "000"):
-    fs = os.stat(fn).st_size
+
     b = open(fn, 'rb')
     
     logging.debug("[MTLTools] Working on file " + fn)
@@ -77,9 +77,8 @@ def transfer(fn, id, teamid = "000"):
         b.seek(head + texoff)
         paths = [] #Store texture paths
         for i in range(texc):
-            tex = struct.unpack("<H", b.read(2))[0] #Texture filename
             texp = struct.unpack("<H", b.read(2))[0] #Texture path
-            if not(texp in paths):
+            if texp not in paths:
                 paths.append(texp)
                 
         #Close file for now, we're done reading

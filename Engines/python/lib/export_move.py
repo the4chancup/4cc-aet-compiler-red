@@ -1,7 +1,7 @@
 ## Edits Moves the contents of the export to the root of extracted_exports
 import os
 import shutil
-import zlib
+
 from .utils.ftex import ddsToFtex
 from .utils.zlib_plus import unzlib_file
 from .fmdl_id_change import transfer

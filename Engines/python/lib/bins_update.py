@@ -128,18 +128,18 @@ def update_kit_bin(team_id, kitcols, kit_color_bin):
     for kit in kitcols:
         
         # Check the kit type
-        if kit[0] == "Player:":
-            # If it is a player kit, prepare a number with the player kit number
-            kit_number = player_kits
-            
-            # Increment the player kit number
-            player_kits += 1
-        else:
+        if kit[0].lower() == "gk:":
             # If it is a GK kit, prepare a number with the GK kit number increased by 16
             kit_number = gk_kits + 16
             
             # Increment the GK kit number
             gk_kits += 1
+        else:
+            # If it is a player kit, prepare a number with the player kit number
+            kit_number = player_kits
+            
+            # Increment the player kit number
+            player_kits += 1
             
         # Convert the kit number to hexadecimal
         kit_number_hex = hex(kit_number).replace("0x", "").zfill(2).upper()

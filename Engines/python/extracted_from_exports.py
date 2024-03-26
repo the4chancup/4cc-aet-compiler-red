@@ -61,9 +61,6 @@ def extracted_from_exports():
 
     for export_name in os.listdir(main_source_path):
 
-        export_type_zip = False
-        export_type_7z = False
-
         team_raw = export_name.split(' ')[0]
         team_name = f"/{team_raw.lower()}/"
 
@@ -72,13 +69,14 @@ def extracted_from_exports():
 
         # If the foldername ends with .zip
         if export_name[-4:] == ".zip":
-            export_type_zip = True
+            export_type = "zip"
             export_name_clean = export_name[:-4]
         # If the foldername ends with .7z
         elif export_name[-3:] == ".7z":
-            export_type_7z = True
+            export_type = "7z"
             export_name_clean = export_name[:-3]
         else:
+            export_type = "folder"
             export_name_clean = export_name
 
         export_source_path = os.path.join(main_source_path, export_name)
@@ -90,15 +88,20 @@ def extracted_from_exports():
             shutil.rmtree(export_destination_path)
         
         # Extract or copy the export into a new export folder
-        if export_type_zip:
-            os.makedirs(export_destination_path)
-            shutil.unpack_archive(export_source_path, export_destination_path, "zip", ignore=shutil.ignore_patterns("*.db", "*.ini"))
-        elif export_type_7z:
-            py7zr_check()
-            import py7zr
-            os.makedirs(export_destination_path)
-            with py7zr.SevenZipFile(export_source_path, mode='r') as z:
-                z.extractall(path=export_destination_path, wildcard="* !*.db !*.ini")
+        if not export_type == "folder":
+            export_destination_path_temp = export_destination_path + "_temp"
+            os.makedirs(export_destination_path_temp, exist_ok=True)
+            
+            if export_type == "zip":
+                shutil.unpack_archive(export_source_path, export_destination_path_temp, "zip")
+            elif export_type == "7z":
+                py7zr_check()
+                import py7zr
+                with py7zr.SevenZipFile(export_source_path, mode='r') as z:
+                    z.extractall(export_destination_path_temp)
+                
+            shutil.copytree(export_destination_path_temp, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
+            shutil.rmtree(export_destination_path_temp)
         else:
             shutil.copytree(export_source_path, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
         
@@ -123,7 +126,8 @@ def extracted_from_exports():
                     export_check(export_destination_path, team_name)
                 
                 # If the export has a Note.txt file
-                note_path = os.path.join(export_destination_path, f"{team_raw} Note.txt")
+                team_name_clean = team_name.replace("/", "").replace("\\", "")
+                note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
                 if os.path.exists(note_path):
                     # Append the contents of the txt file to teamnotes.txt for quick reading
                     with open("teamnotes.txt", "a") as f2:

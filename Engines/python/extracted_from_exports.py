@@ -28,6 +28,23 @@ def py7zr_check():
         exit()
 
 
+# Append the contents of a txt file to teamnotes.txt for quick reading
+def note_txt_append(team_name, export_destination_path):
+    
+    team_name_clean = team_name.replace("/", "").replace("\\", "")
+    note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
+    teamnotes_name = "teamnotes.txt"
+    
+    if os.path.exists(note_path):
+        
+        with open(teamnotes_name, "a") as f2:
+            f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
+        with open(note_path, "r") as f:
+            teamnotes = f.read()
+            with open(teamnotes_name, "a") as f2:
+                f2.write(f"{teamnotes}\n")
+
+
 def extracted_from_exports():
     
     # Read the necessary parameters
@@ -108,44 +125,36 @@ def extracted_from_exports():
         # Get the team ID
         team_id = teamid_get(export_destination_path, team_name)
 
-        # If the teamID was found
-        if team_id:
-
-            export_deleted = False
+        # If the teamID was not found, proceed to the next export
+        if not team_id:
+            continue
             
-            # If the export has a Faces folder
-            if os.path.exists(os.path.join(export_destination_path, "Faces")):
+        # If the export has a Faces folder
+        if os.path.exists(os.path.join(export_destination_path, "Faces")):
 
-                # Move the portraits out of the Faces folder
-                export_deleted = portraits_move(export_destination_path, team_id)
+            # Move the portraits out of the Faces folder
+            export_deleted = portraits_move(export_destination_path, team_id)
+        
+            # If the export was deleted, proceed to the next export
+            if export_deleted:
+                continue
+        
+        # Check the export for all kinds of errors
+        if not pass_through:
+            export_check(export_destination_path, team_name)
+        
+        # If the export has a Note.txt file, append it to the teamnotes.txt file
+        note_txt_append(team_name, export_destination_path)
+        
+        # Move the contents of the export to the root of extracted_exports
+        export_move(export_destination_path, team_id, team_name)
 
-            if not export_deleted:
-                
-                # Check the export for all kinds of errors
-                if not pass_through:
-                    export_check(export_destination_path, team_name)
-                
-                # If the export has a Note.txt file
-                team_name_clean = team_name.replace("/", "").replace("\\", "")
-                note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
-                if os.path.exists(note_path):
-                    # Append the contents of the txt file to teamnotes.txt for quick reading
-                    with open("teamnotes.txt", "a") as f2:
-                        f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
-                    with open(note_path, "r") as f:
-                        teamnotes = f.read()
-                        with open("teamnotes.txt", "a") as f2:
-                            f2.write(f"{teamnotes}\n")
-                
-                # Move the contents of the export to the root of extracted_exports
-                export_move(export_destination_path, team_id, team_name)
+        # If fox mode is enabled and the team has a common folder replace the dummy textures with the kit 1 textures
+        if fox_mode and os.path.exists(os.path.join(os.path.dirname(export_destination_path), "Common", team_id)):
+            dummy_kits_replace(team_id, team_name)
 
-                # If fox mode is enabled and the team has a common folder replace the dummy textures with the kit 1 textures
-                if fox_mode and os.path.exists(os.path.join(os.path.dirname(export_destination_path), "Common", team_id)):
-                    dummy_kits_replace(team_id, team_name)
-
-                # Delete the now empty export folder
-                shutil.rmtree(export_destination_path)
+        # Delete the now empty export folder
+        shutil.rmtree(export_destination_path)
 
         print("- ")
 
@@ -172,4 +181,4 @@ def extracted_from_exports():
         print('-')
         if pause_when_wrong:
             input('Press Enter to continue...')
-            
+

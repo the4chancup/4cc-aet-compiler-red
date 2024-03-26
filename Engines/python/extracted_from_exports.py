@@ -68,6 +68,10 @@ def extracted_from_exports():
 
     # Clear the flag for writing to file
     os.environ["LOG"] = "0"
+    
+    # Define the mimumim and maximum team ids
+    team_id_min = 701
+    team_id_max = 920
 
     # Reset the files
     with open("memelist.txt", "w") as f:
@@ -123,7 +127,7 @@ def extracted_from_exports():
             shutil.copytree(export_source_path, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
         
         # Get the team ID
-        team_id = teamid_get(export_destination_path, team_name)
+        team_id = teamid_get(export_destination_path, team_name, team_id_min, team_id_max)
 
         # If the teamID was not found, proceed to the next export
         if not team_id:

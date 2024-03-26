@@ -9,8 +9,8 @@ def teamid_get(exportfolder_path, team_name):
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
     pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
     
-    # Define team_raw as team_name without the slashes at the start and end
-    team_raw = team_name[1:-1].upper()
+    # Prepare a clean version of the team name without slashes
+    team_name_clean = team_name.replace('/', '').replace('\\', '')
     
     root_found = None
     not_root = None
@@ -99,7 +99,7 @@ def teamid_get(exportfolder_path, team_name):
         for file in os.listdir(exportfolder_path):
             if file.endswith(".txt") and "Note" in file:
                 note_found = True
-                note_name = f"{team_raw} Note.txt"
+                note_name = f"{team_name_clean} Note.txt"
                 os.rename(f"{exportfolder_path}/{file}", f"{exportfolder_path}/{note_name}")
     
         # If there's a Note file try to get the team name from it

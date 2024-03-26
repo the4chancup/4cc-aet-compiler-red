@@ -28,6 +28,9 @@ def export_move(exportfolder_path, team_id, team_name):
     # The main folder path is the parent of the export folder
     mainfolder_path = os.path.dirname(exportfolder_path)
     
+    # Prepare a clean version of the team name without slashes
+    team_name_clean = team_name.replace('/', '').replace('\\', '')
+    
     itemfolder_unknown_pres = False
 
     # Move all the files which are not in a folder
@@ -305,7 +308,7 @@ def export_move(exportfolder_path, team_id, team_name):
             # First check that it isn't empty
             if any(os.listdir(team_itemfolder_path)):
                 
-                otherfolder_team_path = os.path.join(main_itemfolder_path, f"{team_id} - {team_name}")
+                otherfolder_team_path = os.path.join(main_itemfolder_path, f"{team_id} - {team_name_clean}")
 
                 # Make a team folder with the team ID and name after deleting it if already present
                 if os.path.exists(otherfolder_team_path):
@@ -331,7 +334,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 if any(os.scandir(team_itemfolder_path)):
 
                     # Make a team folder in Other for the team
-                    otherfolder_team_path = os.path.join(exportfolder_path, "Other", f"{team_id} - {team_name}")
+                    otherfolder_team_path = os.path.join(exportfolder_path, "Other", f"{team_id} - {team_name_clean}")
                     os.makedirs(otherfolder_team_path, exist_ok=True)
                     
                     # Delete the subfolder if already present

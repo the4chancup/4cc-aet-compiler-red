@@ -250,11 +250,11 @@ def kitconfigs_check(exportfolder_path, team_name):
                     input("Press Enter to continue...")
             
             else:
-                # Store the team name without the slashes at the ends
-                team_name_raw = team_name[1:-1].upper()
+                # Prepare a clean version of the team name without slashes
+                team_name_clean = team_name.replace('/', '').replace('\\', '')
                 
                 # Path to the txt file with the team's name
-                note_path = os.path.join(exportfolder_path, f"{team_name_raw} Note.txt")
+                note_path = os.path.join(exportfolder_path, f"{team_name_clean} Note.txt")
                 
                 # Check if the txt file exists
                 if os.path.exists(note_path):

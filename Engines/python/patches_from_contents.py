@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+import subprocess
 
 from .lib import pes_cpk_pack as cpktool
 
@@ -9,8 +10,10 @@ def patches_from_contents():
     
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
+    pes_version = int(os.environ.get('PES_VERSION', '19'))
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
+    run_pes = int(os.environ.get('RUN_PES', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
@@ -111,12 +114,15 @@ def patches_from_contents():
     # Delete the contents folder
     if cache_clear:
         shutil.rmtree("./patches_contents")
+    
+    print('-')
+    print('- The patches have been created')
+    print('-')
 
 
     # If Move Cpks mode is enabled
     if move_cpks:
 
-        print('-')
         print('- Move Cpks mode is enabled')
         print('-')
         print('- Moving the cpks to the download folder')
@@ -147,11 +153,26 @@ def patches_from_contents():
 
             # Move the cpk to the destination folder
             shutil.move(f"patches_output/{cpk_name}.cpk", pes_download_folder_location)
+        
+        print('- Done')
+        print('-')
+        
+        # If Run PES mode is enabled, start the pes exe from PES_EXE_PATH
+        if run_pes:
+            
+            pes_exe_path = os.environ.get('PES_EXE_PATH', 'null')
+            pes_exe_folder = os.path.dirname(pes_download_folder_location)
+            
+            if os.path.exists(pes_exe_path):
+                print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
+                print('-')
+                subprocess.Popen([pes_exe_path], cwd=pes_exe_folder)
+            else:
+                print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
+                print(f"- in the {pes_exe_folder} folder.")
+                print("- PES won't be started")
+                print('-')
 
-
-    print('-')
-    print('- The patches have been created')
-    print('-')
 
     log = int(os.environ.get('LOG', '0'))
 

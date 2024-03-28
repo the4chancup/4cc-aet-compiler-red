@@ -170,7 +170,7 @@ def patches_from_contents():
             else:
                 print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
                 print(f"- in the {pes_exe_folder} folder.")
-                print("- PES won't be started")
+                print("- PES won't be started.")
                 print('-')
 
 

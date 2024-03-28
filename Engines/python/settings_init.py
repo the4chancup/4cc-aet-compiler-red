@@ -7,9 +7,9 @@ def settings_missing_check(default_file_path):
 
     # Prepare a list with the required settings
     required_settings = [
-        'pes_version',
-        'cpk_name',
-        'pes_download_folder_location',
+        'PES_VERSION',
+        'CPK_NAME',
+        'PES_DOWNLOAD_FOLDER_LOCATION',
     ]
 
     # Check if all the required settings have been loaded
@@ -24,7 +24,7 @@ def settings_missing_check(default_file_path):
     for section in config.sections():
         for key, value in config.items(section):
             if key not in os.environ and key not in required_settings:
-                os.environ[key] = value
+                os.environ[key.upper()] = value
 
     return settings_missing
 
@@ -100,7 +100,7 @@ def settings_init(file_name):
 
         for section in config.sections():
             for key, value in config.items(section):
-                os.environ[key] = value
+                os.environ[key.upper()] = value
 
         # Check if any required settings are missing
         settings_missing = settings_missing_check(default_file_path)

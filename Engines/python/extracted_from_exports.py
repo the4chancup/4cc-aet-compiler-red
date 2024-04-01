@@ -170,18 +170,18 @@ def extracted_from_exports():
     if not all_in_one:
         if log:
             # Warn about there being some issues and about having to open memelist.txt
-            print("- Warning: There were some issues in the exports.")
-            print("- Please check the memelist.txt file for a log.")
+            print("- Warning: There were some issues in the exports")
+            print("- Please check the memelist.txt file for a log")
             print('-')
         else:
-            print('- No issues were found.')
+            print('- No issues were found')
             print('-')
         
 
     # Check if the Other folder exists and there are files in it, if there are print a warning
     if os.path.exists("./extracted_exports/Other") and len(os.listdir("./extracted_exports/Other")) > 0:
-        print("- Warning: There are files in the Other folder.")
-        print("- Please open it and check its contents.")
+        print("- Warning: There are files in the Other folder")
+        print("- Please open it and check its contents")
         print('-')
         if pause_when_wrong:
             input('Press Enter to continue...')

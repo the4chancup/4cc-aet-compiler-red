@@ -169,8 +169,8 @@ def patches_from_contents():
                 subprocess.Popen([pes_exe_path], cwd=pes_exe_folder)
             else:
                 print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
-                print(f"- in the {pes_exe_folder} folder.")
-                print("- PES won't be started.")
+                print(f"- in the {pes_exe_folder} folder")
+                print("- PES won't be started")
                 print('-')
 
 
@@ -179,11 +179,11 @@ def patches_from_contents():
     if all_in_one:
         if log:
             # Warn about there being some issues and about having to open memelist.txt
-            print("- Warning: There were some issues in the exports.")
-            print("- Please check the memelist.txt file for a log.")
+            print("- Warning: There were some issues in the exports")
+            print("- Please check the memelist.txt file for a log")
             print('-')
         else:
-            print('- No issues were found in the exports.')
+            print('- No issues were found in the exports')
             print('-')
 
         if sys.platform == "win32":

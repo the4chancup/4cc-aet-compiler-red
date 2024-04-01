@@ -236,22 +236,16 @@ thing is that you have as many kit lines as the amount of kits your team has.
 
 Q: Why is the script crashing?
 
-A: Make sure that the folder you extracted the script to doesn't have a (1) or
-similar in its name. That's the only thing that testing has found out which
-could make the script crash, but if you get into trouble for any other reason
-don't hesitate to ask for help on the /4ccg/ thread.
+A: There could be many reasons. Please post the log file you can find in the
+compiler's folder to the /4ccg/ thread or the /aesco/ discord
 
 
 Q: Why wasn't the cpk created at all? It's not in the /downloads folder.
 
 A: You probably have PES installed in a system folder not listed in the
 admin_check file. Enable Force admin mode in the settings file and try again.
-
-
-Q: Why is it telling me that some of the face folders are bad? They look fine.
-
-A: Make sure that the folder names don't have any symbols or special characters
-and try again.
+If that still doesn't help, disable Move Cpks and copy it yourself from the
+patches_output folder.
 
 
 Q: I've got some other problem/question.

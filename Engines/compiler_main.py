@@ -2,6 +2,11 @@
 import os
 import sys
 import ctypes
+import logging
+import traceback
+import importlib
+import subprocess
+
 from python.admin_check import admin_check
 from python.settings_init import settings_init
 from python.extracted_from_exports import extracted_from_exports
@@ -9,7 +14,31 @@ from python.contents_from_extracted import contents_from_extracted
 from python.patches_from_contents import patches_from_contents
 
 
-def admin_request():
+# Check if the dependencies are installed
+def dependency_check():
+    # Prepare a list of dependencies
+    dependencies = [
+        "py7zr",
+        "traceback_with_variables",
+    ]
+    
+    try:
+        for dependency in dependencies:
+            importlib.import_module(dependency)
+    except ImportError:
+        print("- Some of the new dependencies were not found.")
+        print("- Installing...")
+        subprocess.check_call([sys.executable, "-m", "pip", "install"] + dependencies, stdout=subprocess.DEVNULL, stderr=sys.stderr)
+        
+        # Warn about the program having to be started again, then exit after pressing Enter
+        print("-")
+        print("- Libraries installed. Please run this program again.")
+        print("-")
+        input("Press Enter to continue...")
+        exit()
+
+
+def admin_request(run_type):
 
     def is_admin():
         try:
@@ -35,9 +64,13 @@ def admin_request():
             
             with open(warning_path, 'w') as f:
                 f.write('This file tells the compiler that you know why the request for admin privileges is needed.')
-  
+
+        # Prepare the path to the compiler_run.bat file in the same folder
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        compiler_run_path = os.path.join(current_dir, "compiler_run.bat")
+        
         # Re-run the program with admin rights
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", compiler_run_path, run_type, None, 1)
         
         # Exit the program
         sys.exit()
@@ -51,6 +84,31 @@ def intro_print():
     print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m')
     print('-')
     print('-')
+
+
+def logger_init(__name__):
+    
+    # If a log file already exists, add .old to it
+    LOG_NAME = "error.log"
+    LOG_NAME_OLD = LOG_NAME + ".old"
+    if os.path.exists(LOG_NAME):
+        if os.path.exists(LOG_NAME_OLD):
+            os.remove(LOG_NAME_OLD)
+        os.rename(LOG_NAME, LOG_NAME_OLD)
+    
+    # Create a logger
+    logger = logging.getLogger(__name__)
+    
+    # Create a file handler which will only create a file when an exception occurs
+    handler = logging.FileHandler(LOG_NAME, delay=True)
+    
+    # Create a formatter and add it to the handler
+    formatter = logging.Formatter('%(asctime)-15s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    
+    # Add the handler to the logger
+    logger.addHandler(handler)
+    return logger
 
 
 def run_type_request():
@@ -118,7 +176,7 @@ def main(run_type):
         # If admin mode has been forced or is needed
         if sys.platform == "win32" and (admin_mode or admin_check(pes_download_folder_location)):
             # Ask for admin permissions if not obtained yet
-            admin_request()
+            admin_request(run_type)
         
     # Save the all-in-one mode
     os.environ['ALL_IN_ONE'] = str(int(all_in_one))
@@ -142,11 +200,27 @@ def main(run_type):
 if __name__ == "__main__":
 
     intro_print()
-
+    
+    # Make the terminal not close on error on linux systems
+    if not sys.platform == "win32":
+        sys.excepthook = lambda *args: (traceback.print_exception(*args), input())
+    
+    # Check if all the dependencies are installed
+    dependency_check()
+    
+    # Enable the advanced traceback handler
+    from traceback_with_variables import activate_by_import  # noqa: F401
+    from traceback_with_variables import printing_exc, LoggerAsFile
+    
+    # Enable the logger
+    logger = logger_init(__name__)
+    
     # Check if an argument has been passed and its value is between 0 and 3
     if len(sys.argv) > 1 and sys.argv[1] in ["0", "1", "2", "3"]:
         run_type = sys.argv[1]
     else:
         run_type = run_type_request()
 
-    main(run_type)
+    # Run the main function with the logger
+    with printing_exc(file_=LoggerAsFile(logger)):
+        main(run_type)

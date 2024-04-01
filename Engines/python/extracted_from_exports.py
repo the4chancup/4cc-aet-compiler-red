@@ -1,31 +1,12 @@
 import os
-import sys
 import shutil
-import importlib
-import subprocess
+import py7zr
 
 from .lib.teamid_get import teamid_get
 from .lib.portraits_move import portraits_move
 from .lib.export_move import export_move
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
-
-
-# Check if py7zr is installed
-def py7zr_check():
-    try:
-        importlib.import_module('py7zr')
-    except ImportError:
-        print("- py7zr library not found.")
-        print("- This library is needed to extract the 7z files.")
-        print("- Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "py7zr"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        
-        # Warn about the program having to be started again, then exit after pressing Enter
-        print("- ")
-        print("- Library installed. Please run this program again.")
-        print("- ")
-        exit()
 
 
 # Append the contents of a txt file to teamnotes.txt for quick reading
@@ -116,8 +97,6 @@ def extracted_from_exports():
             if export_type == "zip":
                 shutil.unpack_archive(export_source_path, export_destination_path_temp, "zip")
             elif export_type == "7z":
-                py7zr_check()
-                import py7zr
                 with py7zr.SevenZipFile(export_source_path, mode='r') as z:
                     z.extractall(export_destination_path_temp)
                 

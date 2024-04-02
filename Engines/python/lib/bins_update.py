@@ -203,7 +203,7 @@ def bins_update():
     for file_name in [f for f in os.listdir(extracted_exports_dir) if f.endswith(".txt")]:
       
         file_path = os.path.join(extracted_exports_dir, file_name)
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding="utf8") as file:
 
             # Initialize variables
             stop = None

@@ -162,13 +162,15 @@ def main(run_type):
             print("-")
             print("- PES download folder not found.")
             print("- Please set its correct path in the settings file and start again.")
-            print("- The script will restart automatically after you close the text editor.")
+            if sys.platform == "win32":
+                print("- The script will restart automatically after you close the text editor.")
             print("-")
             print("-")
             input("Press Enter to continue...")
 
-            # Open the settings file in an external text editor
-            os.startfile(settings_name)
+            if sys.platform == "win32":
+                # Open the settings file in an external text editor
+                os.startfile(settings_name)
             
             # Exit the script
             sys.exit()

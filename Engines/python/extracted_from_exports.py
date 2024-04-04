@@ -50,7 +50,7 @@ def extracted_from_exports():
     # Clear the flag for writing to file
     os.environ["LOG"] = "0"
     
-    # Define the mimumim and maximum team ids
+    # Define the minimum and maximum team ids
     team_id_min = 701
     team_id_max = 920
 

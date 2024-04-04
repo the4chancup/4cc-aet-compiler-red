@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import py7zr
 
@@ -63,8 +64,9 @@ def extracted_from_exports():
 
     for export_name in os.listdir(main_source_path):
 
-        team_raw = export_name.split(' ')[0]
-        team_name = f"/{team_raw.lower()}/"
+        # Get the team name from the first word of the export name
+        team_name_raw = (re.findall(r"^[^\s\_\-\.\+\\]+", export_name))[0]
+        team_name = f"/{team_name_raw.lower()}/"
 
         # Print team without a new line
         print(f"- {team_name} ", end='')

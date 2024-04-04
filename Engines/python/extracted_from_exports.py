@@ -64,8 +64,14 @@ def extracted_from_exports():
 
     for export_name in os.listdir(main_source_path):
 
+        # Try to get the first word of the export name
+        if re.findall(r"^[^\W\_]+", "".join(re.split(r"^[\W\_]+", export_name)))[0]:
+            pass
+        else:
+            raise ValueError
+        
         # Get the team name from the first word of the export name
-        team_name_raw = (re.findall(r"^[^\s\_\-\.\+\\]+", export_name))[0]
+        team_name_raw = re.findall(r"^[^\W\_]+", "".join(re.split(r"^[\W\_]+", export_name)))[0]
         team_name = f"/{team_name_raw.lower()}/"
 
         # Print team without a new line

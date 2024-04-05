@@ -4,7 +4,7 @@ from .bins_update import bytes_from_color_entry
 
 def txt_kits_count(file_path):
   
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding="utf8") as file:
 
         # Initialize variables
         stop = None

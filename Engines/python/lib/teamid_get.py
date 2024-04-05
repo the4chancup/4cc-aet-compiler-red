@@ -92,7 +92,7 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
     # Look for a txt file with Note in the filename
     note_found = None
     for file in os.listdir(exportfolder_path):
-        if file.endswith(".txt") and "Note" in file:
+        if file.endswith(".txt") and "note" in file.lower():
             note_found = True
             note_name = f"{team_name_clean} Note.txt"
             os.rename(f"{exportfolder_path}/{file}", f"{exportfolder_path}/{note_name}")

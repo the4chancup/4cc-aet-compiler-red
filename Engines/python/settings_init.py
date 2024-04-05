@@ -23,7 +23,7 @@ def settings_missing_check(default_file_path):
     # and load them into the environment with the values from the default settings
     for section in config.sections():
         for key, value in config.items(section):
-            if key not in os.environ and key not in required_settings:
+            if key.upper() not in os.environ and key not in required_settings:
                 os.environ[key.upper()] = value
 
     return settings_missing

@@ -1,4 +1,5 @@
 import os
+import re
 import shutil
 import py7zr
 
@@ -50,7 +51,7 @@ def extracted_from_exports():
     # Clear the flag for writing to file
     os.environ["LOG"] = "0"
     
-    # Define the mimumim and maximum team ids
+    # Define the minimum and maximum team ids
     team_id_min = 701
     team_id_max = 920
 
@@ -63,8 +64,15 @@ def extracted_from_exports():
 
     for export_name in os.listdir(main_source_path):
 
-        team_raw = export_name.split(' ')[0]
-        team_name = f"/{team_raw.lower()}/"
+        # Try to get the first word of the export name
+        if re.findall(r"^[^\W\_]+", "".join(re.split(r"^[\W\_]+", export_name)))[0]:
+            pass
+        else:
+            raise ValueError
+        
+        # Get the team name from the first word of the export name
+        team_name_raw = re.findall(r"^[^\W\_]+", "".join(re.split(r"^[\W\_]+", export_name)))[0]
+        team_name = f"/{team_name_raw.lower()}/"
 
         # Print team without a new line
         print(f"- {team_name} ", end='')

@@ -162,8 +162,6 @@ def main(run_type):
             print("-")
             print("- PES download folder not found.")
             print("- Please set its correct path in the settings file and start again.")
-            if sys.platform == "win32":
-                print("- The script will restart automatically after you close the text editor.")
             print("-")
             print("-")
             input("Press Enter to continue...")

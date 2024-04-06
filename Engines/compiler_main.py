@@ -1,11 +1,11 @@
 ## Main script for the compiler
 import os
 import sys
+import runpy
 import ctypes
 import logging
 import traceback
 import importlib
-import subprocess
 
 from python.admin_check import admin_check
 from python.settings_init import settings_init
@@ -26,16 +26,17 @@ def dependency_check():
         for dependency in dependencies:
             importlib.import_module(dependency)
     except ImportError:
-        print("- Some of the new dependencies were not found.")
-        print("- Installing...")
-        subprocess.check_call([sys.executable, "-m", "pip", "install"] + dependencies, stdout=subprocess.DEVNULL, stderr=sys.stderr)
-        
-        # Warn about the program having to be started again, then exit after pressing Enter
-        print("-")
-        print("- Libraries installed. Please run this program again.")
+        print("- Some of the new dependencies were not found. They will be installed now.")
+        print("- Once the installation is complete, the program will be closed automatically.")
+        print("- Please run it again after that.")
         print("-")
         input("Press Enter to continue...")
-        exit()
+        
+        print("- Installing...")
+        
+        # Install the dependencies (closes the program automatically after the installation)
+        sys.argv = ["pip", "install", "-q"] + dependencies
+        runpy.run_module("pip", run_name="__main__")
 
 
 def admin_request(run_type):
@@ -126,7 +127,7 @@ def run_type_request():
     
     # Check if run_type is between 0 and 3, ask again otherwise
     while run_type not in ["0", "1", "2", "3"]:
-        print("Invalid run type, please try again")
+        print("Invalid run type, please try again or close the program.")
         print("")
         run_type = input("Choose a type: ")
         

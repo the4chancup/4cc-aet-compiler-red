@@ -35,7 +35,7 @@ def dependency_check():
         print("- Installing...")
         
         # Install the dependencies (closes the program automatically after the installation)
-        sys.argv = ["pip", "install", "-q"] + dependencies
+        sys.argv = ["pip", "install"] + dependencies
         runpy.run_module("pip", run_name="__main__")
 
 

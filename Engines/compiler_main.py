@@ -26,11 +26,17 @@ def dependency_check():
         for dependency in dependencies:
             importlib.import_module(dependency)
     except ImportError:
-        print("- Some of the new dependencies were not found. They will be installed now.")
-        print("- Once the installation is complete, the program will be closed automatically.")
-        print("- Please run it again after that.")
+        print("- The following new dependencies were not found:")
+        # List the missing dependencies, one per line
+        missing_dependencies = [f"{dependency}" for dependency in dependencies if not importlib.util.find_spec(dependency)]
+        print("-", "\n- ".join(missing_dependencies))
         print("-")
-        input("Press Enter to continue...")
+        
+        print("- They will be installed now (or you can close the program now and install them manually).")
+        print("- Once the installation is complete, the program will be closed automatically.")
+        print("- Please run it again afterwards.")
+        print("-")
+        input("Press Enter to install...")
         
         print("- Installing...")
         

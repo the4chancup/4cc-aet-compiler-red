@@ -101,7 +101,7 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
     if note_found:
 
         team_name_found = None
-        with open(f"{exportfolder_path}/{note_name}", 'r') as file:
+        with open(f"{exportfolder_path}/{note_name}", 'r', encoding="utf8") as file:
             for line in file:
                 if not team_name_found:
                     if "Team:" in line:

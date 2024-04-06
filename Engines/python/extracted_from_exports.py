@@ -20,9 +20,9 @@ def note_txt_append(team_name, export_destination_path):
         
         with open(teamnotes_name, "a") as f2:
             f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
-        with open(note_path, "r") as f:
+        with open(note_path, "r", encoding="utf8") as f:
             teamnotes = f.read()
-            with open(teamnotes_name, "a") as f2:
+            with open(teamnotes_name, "a", encoding="utf8") as f2:
                 f2.write(f"{teamnotes}\n")
 
 

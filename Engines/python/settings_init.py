@@ -15,18 +15,23 @@ def settings_missing_check(default_file_path):
     # Check if all the required settings have been loaded
     settings_missing = [setting for setting in required_settings if setting not in os.environ]
 
+    # If any required settings are missing, there is no need to continue
+    if settings_missing:
+        return settings_missing
+
     # Read the default settings file
     config = configparser.ConfigParser()
     config.read(default_file_path)
 
-    # Check if any non-required settings are missing
-    # and load them into the environment with the values from the default settings
+    # Check if any settings are missing and load them into the environment
+    # with the values from the default settings file
     for section in config.sections():
         for key, value in config.items(section):
-            if key.upper() not in os.environ and key not in required_settings:
-                os.environ[key.upper()] = value
+            setting_name = key.upper()
+            if setting_name not in os.environ:
+                os.environ[setting_name] = value
 
-    return settings_missing
+    return False
 
 
 def settings_default_path_get(file_path):

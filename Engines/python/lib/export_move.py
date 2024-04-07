@@ -1,9 +1,10 @@
-## Edits Moves the contents of the export to the root of extracted_exports
+## Moves the contents of the export to the root of extracted_exports
 import os
 import shutil
 
 from .utils.ftex import ddsToFtex
 from .utils.zlib_plus import unzlib_file
+from .mtl_id_change import mtl_id_change
 from .fmdl_id_change import transfer
 
 
@@ -83,7 +84,12 @@ def export_move(exportfolder_path, team_id, team_name):
                     
                     # Convert any dds textures to ftex if needed
                     ftex_from_dds_multi(subfolder_path)
-                    
+
+                else:
+                    # Change the texture IDs inside each mtl file
+                    for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
+                        mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+
                 # Replace the dummy team ID with the actual one
                 os.rename(subfolder_path, os.path.join(team_itemfolder_path, subfolder_id_withname))
                     
@@ -232,6 +238,11 @@ def export_move(exportfolder_path, team_id, team_name):
                     # Convert any dds textures to ftex if needed
                     ftex_from_dds_multi(subfolder_path)
                 
+                else:
+                    # Change the texture IDs inside each mtl file
+                    for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
+                        mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+                
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)
                 if os.path.exists(subfolder_destination_path):
@@ -258,6 +269,11 @@ def export_move(exportfolder_path, team_id, team_name):
                     
                     # Convert any dds textures to ftex if needed
                     ftex_from_dds_multi(subfolder_path)
+                
+                else:
+                    # Change the texture IDs inside each mtl file
+                    for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
+                        mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
                 
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)

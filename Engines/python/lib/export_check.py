@@ -706,8 +706,8 @@ def gloves_check(exportfolder_path, team_name):
                 folder_error_nofpkxml = False
                 folder_error_tex_format = False
                 
-                # Check that its name starts with a g and that the 3 characters after it are digits
-                folder_error_name = not (subfolder_name.startswith('g') and subfolder_name[1:4].isdigit())
+                # Check that its name starts with a g and that the 4 characters after it are digits
+                folder_error_name = not (subfolder_name.startswith('g') and subfolder_name[1:5].isdigit())
                 
                 if fox_mode:
                     # Check that the folder has the essential glove.fpk.xml file

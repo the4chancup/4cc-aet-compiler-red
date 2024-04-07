@@ -249,7 +249,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Get the ID
-                subfolder_id = subfolder_name[:5] if fox_mode else subfolder_name[:4]
+                subfolder_id = subfolder_name[:5]
                 
                 if fox_mode:
                     # Change the texture IDs inside each fmdl file

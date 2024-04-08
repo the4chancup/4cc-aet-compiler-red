@@ -1,5 +1,7 @@
-import xml.etree.ElementTree as ET
 import re
+import xml.etree.ElementTree as ET
+
+from .utils.zlib_plus import unzlib_file
 
 def mtl_id_change(mtl_path, team_id = "000"):
     """
@@ -13,7 +15,17 @@ def mtl_id_change(mtl_path, team_id = "000"):
     where XXX is any sequence of three digits, and replaces XXX with the team ID provided as parameter.
     """
 
-    tree = ET.parse(mtl_path)
+    # Try to unzlib the file
+    unzlib_file(mtl_path)
+    
+    # Parse the file
+    try:
+        tree = ET.parse(mtl_path)
+    except:
+        print(f"- ERROR: {mtl_path} is not a valid .mtl file")
+        input('Press Enter to continue...')
+        return True
+    
     root = tree.getroot()
 
     for sampler in root.findall('.//sampler'):

@@ -3,6 +3,7 @@ import os
 import shutil
 from .utils.zlib_plus import unzlib_file
 from .texture_check import texture_check
+from .mtl_check import mtl_check
 from .txt_kits_count import txt_kits_count
 
 
@@ -95,6 +96,7 @@ def faces_check(exportfolder_path, team_name):
                 folder_error_noxml = False
                 folder_error_nofpkxml = False
                 folder_error_tex_format = False
+                folder_error_mtl_format = False
                 
                 # Check that the player number is within the 01-23 range
                 folder_error_num = not (subfolder_name[3:5].isdigit() and '01' <= subfolder_name[3:5] <= '23')
@@ -123,12 +125,23 @@ def faces_check(exportfolder_path, team_name):
                     if folder_error_tex_format:
                         break
                 
+                # Check every mtl file
+                if not fox_mode:
+                    for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
+                        mtl_path = os.path.join(subfolder_path, mtl_name)
+                        
+                        if mtl_check(mtl_path):
+                            folder_error_mtl_format = True
+                
                 # Set the main flag if any of the checks failed
-                folder_error = (folder_error_num or
-                                folder_error_edithairxml or
-                                folder_error_noxml or
-                                folder_error_nofpkxml or
-                                folder_error_tex_format)
+                folder_error = (
+                    folder_error_num or
+                    folder_error_edithairxml or
+                    folder_error_noxml or
+                    folder_error_nofpkxml or
+                    folder_error_tex_format or
+                    folder_error_mtl_format
+                )
             
                 # If the face folder has something wrong
                 if folder_error:
@@ -163,6 +176,9 @@ def faces_check(exportfolder_path, team_name):
                         if folder_error_tex_format:
                             log.write(f'- ({file_name} is a bad texture) - Folder discarded)\n')
                             print(f'- ({file_name} is a bad texture) - Folder discarded')
+                        if folder_error_mtl_format:
+                            log.write('- (broken mtl files) - Folder discarded)\n')
+                            print('- (broken mtl files) - Folder discarded')
 
                     # And skip it
                     shutil.rmtree(subfolder_path)
@@ -614,6 +630,7 @@ def boots_check(exportfolder_path, team_name):
                 folder_error_name = False
                 folder_error_nofpkxml = False
                 folder_error_tex_format = False
+                folder_error_mtl_format = False
                 
                 # Check that its name starts with a k and that the 4 characters after it are digits
                 folder_error_name = not (subfolder_name.startswith('k') and subfolder_name[1:5].isdigit())
@@ -631,10 +648,21 @@ def boots_check(exportfolder_path, team_name):
                     if folder_error_tex_format:
                         break
                 
+                # Check every mtl file
+                if not fox_mode:
+                    for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
+                        mtl_path = os.path.join(subfolder_path, mtl_name)
+                        
+                        if mtl_check(mtl_path):
+                            folder_error_mtl_format = True
+                
                 # Set the main flag if any of the checks failed
-                folder_error = (folder_error_name or
-                                folder_error_nofpkxml or
-                                folder_error_tex_format)
+                folder_error = (
+                    folder_error_name or
+                    folder_error_nofpkxml or
+                    folder_error_tex_format or
+                    folder_error_mtl_format
+                )
                 
                 # If the folder has something wrong
                 if folder_error:
@@ -663,6 +691,9 @@ def boots_check(exportfolder_path, team_name):
                         if folder_error_tex_format:
                             log.write(f"- ({file_name} is a bad texture)\n")
                             print(f"- ({file_name} is a bad texture)")
+                        if folder_error_mtl_format:
+                            log.write("- (broken mtl files)\n")
+                            print("- (broken mtl files)")
                         
                     # And skip it
                     shutil.rmtree(subfolder_path)
@@ -722,10 +753,21 @@ def gloves_check(exportfolder_path, team_name):
                     if folder_error_tex_format:
                         break
                 
+                # Check every mtl file
+                if not fox_mode:
+                    for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
+                        mtl_path = os.path.join(subfolder_path, mtl_name)
+                        
+                        if mtl_check(mtl_path):
+                            folder_error_mtl_format = True
+                
                 # Set the main flag if any of the checks failed
-                folder_error = (folder_error_name or
-                                folder_error_nofpkxml or
-                                folder_error_tex_format)
+                folder_error = (
+                    folder_error_name or
+                    folder_error_nofpkxml or
+                    folder_error_tex_format or
+                    folder_error_mtl_format
+                )
                 
                 # If the folder has something wrong
                 if folder_error:
@@ -754,6 +796,9 @@ def gloves_check(exportfolder_path, team_name):
                         if folder_error_tex_format:
                             log.write(f"- ({file_name} is a bad texture)\n")
                             print(f"- ({file_name} is a bad texture)")
+                        if folder_error_mtl_format:
+                            log.write("- (broken mtl files)\n")
+                            print("- (broken mtl files)")
                         
                     # And skip it
                     shutil.rmtree(subfolder_path)

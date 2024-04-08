@@ -1,1 +1,2 @@
-This is just a placeholder file so that svn doesn't complain about me uploading empty folders. Please delete this.
+This is just a placeholder file needed to keep this folder on the git repo.
+Please delete this file before using the compiler.

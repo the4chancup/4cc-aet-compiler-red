@@ -26,7 +26,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
         # For every folder in the source directory
         for object_name in os.listdir(os.path.join("extracted_exports", object_source_folder)):
             
-            object_id = object_name[:4] if object_type == "gloves" else object_name[:5]
+            object_id = object_name[:5]
             print(f"- {object_name}")
 
             # Rename it with the proper id

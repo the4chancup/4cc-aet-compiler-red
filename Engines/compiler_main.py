@@ -157,14 +157,16 @@ def main(run_type):
     
     # Read the necessary parameters
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
-    pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
+    pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
+    
+    pes_download_path = os.path.join(pes_folder_path, "download")
     
     # If patches_from_contents_run is active and move_cpks mode is enabled
     if patches_from_contents_run and move_cpks:
 
         # Check the PES download folder
-        if not os.path.exists(pes_download_folder_location):
+        if not os.path.exists(pes_download_path):
             print("-")
             print("-")
             print("- PES download folder not found.")
@@ -181,7 +183,7 @@ def main(run_type):
             sys.exit()
 
         # If admin mode has been forced or is needed
-        if sys.platform == "win32" and (admin_mode or admin_check(pes_download_folder_location)):
+        if sys.platform == "win32" and (admin_mode or admin_check(pes_download_path)):
             # Ask for admin permissions if not obtained yet
             admin_request(run_type)
         

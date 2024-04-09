@@ -12,7 +12,7 @@ def patches_from_contents():
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     pes_version = int(os.environ.get('PES_VERSION', '19'))
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
-    pes_download_folder_location = os.environ.get('PES_DOWNLOAD_FOLDER_LOCATION', 'unknown')
+    pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     run_pes = int(os.environ.get('RUN_PES', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
@@ -23,6 +23,7 @@ def patches_from_contents():
     bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')
     cache_clear = int(os.environ.get('CACHE_CLEAR', '0'))
     
+    pes_download_path = os.path.join(pes_folder_path, "download")
     
     # Set the name for the folders to put stuff into
     if not multicpk_mode:
@@ -131,28 +132,28 @@ def patches_from_contents():
         if multicpk_mode:
 
             # Remove the cpks from the destination folder if present
-            if os.path.exists(f"{pes_download_folder_location}/{faces_cpk_name}.cpk"):
-                os.remove(f"{pes_download_folder_location}/{faces_cpk_name}.cpk")
-            if os.path.exists(f"{pes_download_folder_location}/{uniform_cpk_name}.cpk"):
-                os.remove(f"{pes_download_folder_location}/{uniform_cpk_name}.cpk")
+            if os.path.exists(f"{pes_download_path}/{faces_cpk_name}.cpk"):
+                os.remove(f"{pes_download_path}/{faces_cpk_name}.cpk")
+            if os.path.exists(f"{pes_download_path}/{uniform_cpk_name}.cpk"):
+                os.remove(f"{pes_download_path}/{uniform_cpk_name}.cpk")
             if bins_updating:
-                if os.path.exists(f"{pes_download_folder_location}/{bins_cpk_name}.cpk"):
-                    os.remove(f"{pes_download_folder_location}/{bins_cpk_name}.cpk")
+                if os.path.exists(f"{pes_download_path}/{bins_cpk_name}.cpk"):
+                    os.remove(f"{pes_download_path}/{bins_cpk_name}.cpk")
 
             # Move the cpks to the destination folder
-            shutil.move(f"patches_output/{faces_cpk_name}.cpk", pes_download_folder_location)
-            shutil.move(f"patches_output/{uniform_cpk_name}.cpk", pes_download_folder_location)
+            shutil.move(f"patches_output/{faces_cpk_name}.cpk", pes_download_path)
+            shutil.move(f"patches_output/{uniform_cpk_name}.cpk", pes_download_path)
             if bins_updating:
-                shutil.move(f"patches_output/{bins_cpk_name}.cpk", pes_download_folder_location)
+                shutil.move(f"patches_output/{bins_cpk_name}.cpk", pes_download_path)
 
         else:
 
             # Remove the cpk from the destination folder if present
-            if os.path.exists(f"{pes_download_folder_location}/{cpk_name}.cpk"):
-                os.remove(f"{pes_download_folder_location}/{cpk_name}.cpk")
+            if os.path.exists(f"{pes_download_path}/{cpk_name}.cpk"):
+                os.remove(f"{pes_download_path}/{cpk_name}.cpk")
 
             # Move the cpk to the destination folder
-            shutil.move(f"patches_output/{cpk_name}.cpk", pes_download_folder_location)
+            shutil.move(f"patches_output/{cpk_name}.cpk", pes_download_path)
         
         print('- Done')
         print('-')
@@ -161,15 +162,14 @@ def patches_from_contents():
         if run_pes:
             
             pes_exe_path = os.environ.get('PES_EXE_PATH', 'null')
-            pes_exe_folder = os.path.dirname(pes_download_folder_location)
             
             if os.path.exists(pes_exe_path):
                 print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
                 print('-')
-                subprocess.Popen([pes_exe_path], cwd=pes_exe_folder)
+                subprocess.Popen([pes_exe_path], cwd=pes_folder_path)
             else:
                 print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
-                print(f"- in the {pes_exe_folder} folder")
+                print(f"- in the {pes_folder_path} folder")
                 print("- PES won't be started")
                 print('-')
 

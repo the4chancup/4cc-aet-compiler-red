@@ -11,13 +11,13 @@ from .fmdl_id_change import transfer
 
 # Handles dds to ftex conversion of an entire folder
 def ftex_from_dds_multi(folder_path):
-    dds_files = [f for f in os.listdir(folder_path) if f.endswith('.dds')]
-    if dds_files:
-        for dds_file in dds_files:
-            dds_path = os.path.join(folder_path, dds_file)
-            ftex_path = os.path.splitext(dds_path)[0] + '.ftex'
-            ddsToFtex(dds_path, ftex_path, None)
-            os.remove(dds_path)
+    for dds_file in [f for f in os.listdir(folder_path) if f.endswith('.dds')]:
+        
+        dds_path = os.path.join(folder_path, dds_file)
+        ftex_path = os.path.splitext(dds_path)[0] + '.ftex'
+        
+        ddsToFtex(dds_path, ftex_path, None)
+        os.remove(dds_path)
 
 
 # Replaces the dummy team ID with the actual one in any kit-dependent textures found in the folder

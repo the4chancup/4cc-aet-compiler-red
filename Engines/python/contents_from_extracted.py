@@ -44,8 +44,8 @@ def contents_from_extracted():
     if bins_updating and os.path.exists("extracted_exports"):
         
         # Set the paths
-        common_etc_path = os.path.join("extracted_exports", bins_foldername, "common", "etc")
-        uniform_team_path = os.path.join("./patches_contents", bins_foldername, "common", "character0", "model", "character", "uniform", "team")
+        common_etc_path = os.path.join("patches_contents", bins_foldername, "common", "etc")
+        uniform_team_path = os.path.join("patches_contents", bins_foldername, "common", "character0", "model", "character", "uniform", "team")
         
         # Create the folders
         os.makedirs(common_etc_path, exist_ok=True)

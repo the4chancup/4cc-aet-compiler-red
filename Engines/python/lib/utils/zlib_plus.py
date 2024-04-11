@@ -1,5 +1,6 @@
-import struct
+import os
 import zlib
+import struct
 
 class DecodeError(Exception):
 	pass
@@ -70,8 +71,16 @@ def get_bytes_ascii(file_path, start, length):
 		bytes_data = file.read(length)
 	return ''.join(chr(byte) for byte in bytes_data)
 
-# Unzlibs a file if it was zlibbed
+
 def unzlib_file(source_file_path, destination_file_path = None):
+    """
+    A function to unzlib a file if needed and copy it to a destination file path.
+    
+    :param source_file_path: str - the file path of the source file to unzlib
+    :param destination_file_path: str (optional) - the file path to save the unzlibbed file, defaults to None
+    
+    :return: bool - True if the file needed to be unzlibbed, False otherwise
+    """
     
     unzlib_needed = False
     if destination_file_path is None:
@@ -90,3 +99,48 @@ def unzlib_file(source_file_path, destination_file_path = None):
         unzlib_needed = True
 
     return unzlib_needed
+
+
+def zlib_file(source_file_path, destination_file_path = None):
+    """
+    A function to zlib a file if needed and copy it to a destination file path.
+    
+    :param source_file_path: str - the file path of the source file to zlib
+    :param destination_file_path: str (optional) - the file path to save the zlibbed file, defaults to None
+    
+    :return: bool - True if the file needed to be zlibbed, False otherwise
+    """
+    
+    zlib_needed = False
+    if destination_file_path is None:
+        destination_file_path = source_file_path
+
+    # Check if it is zlibbed (WESYS label starting from index 3)
+    if get_bytes_ascii(source_file_path, 3, 5) == 'WESYS':
+        pass # File is already zlibbed, don't do anything
+    else:
+        # Zlib it
+        with open(source_file_path, 'rb') as f:
+            data = compress(f.read())
+
+        with open(destination_file_path, 'wb') as f:
+            f.write(data)
+
+        zlib_needed = True
+
+    return zlib_needed
+
+
+def zlib_files_in_folder(path, extension):
+	"""
+	A function that walks through a folder specified by 'path' and compresses files with the given 'extension' using zlib compression.
+
+	:param path: The path of the folder to search for files.
+	:param extension: The file extension to filter files for compression.
+	"""
+
+	for root, dirs, files in os.walk(path):
+		for file in files:
+			if file.endswith(extension):
+				file_path = os.path.join(root, file)
+				zlib_file(file_path)

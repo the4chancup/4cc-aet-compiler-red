@@ -7,6 +7,7 @@ from .lib.portraits_move import portraits_move
 from .lib.export_move import export_move
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
+from .lib.utils.zlib_plus import zlib_files_in_folder
 
 
 # Append the contents of a txt file to teamnotes.txt for quick reading
@@ -31,8 +32,9 @@ def extracted_from_exports():
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    pass_through = int(os.environ.get('PASS_THROUGH', '0'))
+    dds_compression = int(os.environ.get('DDS_COMPRESSION', '0'))
     pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
+    pass_through = int(os.environ.get('PASS_THROUGH', '0'))
     
     
     print("- ")
@@ -148,6 +150,10 @@ def extracted_from_exports():
         shutil.rmtree(export_destination_path)
 
         print("- ")
+    
+    if dds_compression and not fox_mode:
+        # zlib compress all the dds files
+        zlib_files_in_folder(main_destination_path, "dds")
 
     print("- Done")
     print('-')

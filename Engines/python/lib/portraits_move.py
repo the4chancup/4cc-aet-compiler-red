@@ -9,7 +9,7 @@ def portraits_move(exportfolder_path, team_id):
     portrait_conflicts = []
 
     faces_path = os.path.join(exportfolder_path, "Faces")
-    for face_name in os.listdir(faces_path):
+    for face_name in [f for f in os.listdir(faces_path) if os.path.isdir(os.path.join(faces_path, f))]:
 
         # Check that the player number is a number within the 01-23 range
         if face_name[3:5].isdigit() and '01' <= face_name[3:5] <= '23':

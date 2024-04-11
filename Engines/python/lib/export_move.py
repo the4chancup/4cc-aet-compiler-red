@@ -112,7 +112,9 @@ def export_move(exportfolder_path, team_id, team_name):
                 textures_id_change(subfolder_path, team_id)
 
                 # Replace the dummy team ID with the actual one
-                os.rename(subfolder_path, os.path.join(team_itemfolder_path, subfolder_id_withname))
+                subfolder_path_withname = os.path.join(team_itemfolder_path, subfolder_id_withname)
+                if subfolder_path_withname != subfolder_path:
+                    os.rename(subfolder_path, subfolder_path_withname)
                     
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_id_withname)

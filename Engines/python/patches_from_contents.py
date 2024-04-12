@@ -179,10 +179,12 @@ def patches_from_contents():
     if all_in_one:
         if log:
             # Warn about there being some issues and about having to open memelist.txt
+            print('-')
             print("- Warning: There were some issues in the exports")
             print("- Please check the memelist.txt file for a log")
             print('-')
         else:
+            print('-')
             print('- No issues were found in the exports')
             print('-')
 

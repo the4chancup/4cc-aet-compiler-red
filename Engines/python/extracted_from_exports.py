@@ -1,5 +1,6 @@
 import os
 import re
+import stat
 import shutil
 
 from .lib.teamid_get import teamid_get
@@ -8,6 +9,19 @@ from .lib.export_move import export_move
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
 from .lib.utils.zlib_plus import zlib_files_in_folder
+
+
+def readonlybit_remove_tree(path):
+    "Clear the readonly bit on an entire tree"
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            filename = os.path.join(root, name)
+            os.chmod(filename, stat.S_IWRITE)
+        for name in dirs:
+            filename = os.path.join(root, name)
+            os.chmod(filename, stat.S_IWRITE)
+        for dir in dirs:
+            readonlybit_remove_tree(os.path.join(root, dir))
 
 
 # Append the contents of a txt file to teamnotes.txt for quick reading
@@ -114,6 +128,9 @@ def extracted_from_exports():
             shutil.rmtree(export_destination_path_temp)
         else:
             shutil.copytree(export_source_path, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
+        
+        # Remove the read-only flag from every item inside the export folder
+        readonlybit_remove_tree(export_destination_path)
         
         # Get the team ID
         team_id = teamid_get(export_destination_path, team_name, team_id_min, team_id_max)

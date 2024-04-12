@@ -273,7 +273,7 @@ def contents_from_extracted():
         shutil.rmtree(main_dir)
 
 
-    # - If there's a Logo folder, move its stuff
+    # If there's a Logo folder, move its stuff
     main_dir = os.path.join('extracted_exports', 'Logo')
     if os.path.exists(main_dir):
 
@@ -283,12 +283,12 @@ def contents_from_extracted():
             print('-')
             print('- Moving the other stuff')
 
-        # - Create a "flag" folder if needed
+        # Create a "flag" folder if needed
         items_folder_path_full = os.path.join('patches_contents', uniform_foldername, 'common/render/symbol/flag')
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
-        # - Move the logos to the Uniform cpk folder
+        # Move the logos to the Uniform cpk folder
         for item in os.listdir(main_dir):
             # First delete if it already exists
             if os.path.exists(os.path.join(items_folder_path_full, item)):
@@ -296,7 +296,7 @@ def contents_from_extracted():
                 
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
-        # . Then delete the main folder
+        # Then delete the main folder
         shutil.rmtree(main_dir)
 
 

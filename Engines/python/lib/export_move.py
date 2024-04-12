@@ -48,7 +48,7 @@ def export_move(exportfolder_path, team_id, team_name):
     mainfolder_path = os.path.dirname(exportfolder_path)
     
     # Prepare a clean version of the team name without slashes
-    team_name_clean = team_name.replace('/', '').replace('\\', '')
+    team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
     
     itemfolder_unknown_pres = False
 

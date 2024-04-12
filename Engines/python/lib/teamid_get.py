@@ -9,7 +9,7 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
     pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
     
     # Prepare a clean version of the team name without slashes
-    team_name_clean = team_name.replace('/', '').replace('\\', '')
+    team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
     
     root_found = None
     not_root = None

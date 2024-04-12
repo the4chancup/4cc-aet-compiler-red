@@ -267,7 +267,7 @@ def kitconfigs_check(exportfolder_path, team_name):
             
             else:
                 # Prepare a clean version of the team name without slashes
-                team_name_clean = team_name.replace('/', '').replace('\\', '')
+                team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
                 
                 # Path to the txt file with the team's name
                 note_path = os.path.join(exportfolder_path, f"{team_name_clean} Note.txt")

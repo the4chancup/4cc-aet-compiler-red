@@ -13,7 +13,7 @@ from .lib.utils.zlib_plus import zlib_files_in_folder
 # Append the contents of a txt file to teamnotes.txt for quick reading
 def note_txt_append(team_name, export_destination_path):
     
-    team_name_clean = team_name.replace("/", "").replace("\\", "")
+    team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
     note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
     teamnotes_name = "teamnotes.txt"
     

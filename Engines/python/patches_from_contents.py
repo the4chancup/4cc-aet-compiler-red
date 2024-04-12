@@ -130,15 +130,19 @@ def patches_from_contents():
         print('-')
 
         if multicpk_mode:
-
+            
+            faces_cpk_path = os.path.join(pes_download_path, f"{faces_cpk_name}.cpk")
+            uniform_cpk_path = os.path.join(pes_download_path, f"{uniform_cpk_name}.cpk")
+            bins_cpk_path = os.path.join(pes_download_path, f"{bins_cpk_name}.cpk")
+            
             # Remove the cpks from the destination folder if present
-            if os.path.exists(f"{pes_download_path}/{faces_cpk_name}.cpk"):
-                os.remove(f"{pes_download_path}/{faces_cpk_name}.cpk")
-            if os.path.exists(f"{pes_download_path}/{uniform_cpk_name}.cpk"):
-                os.remove(f"{pes_download_path}/{uniform_cpk_name}.cpk")
+            if os.path.exists(faces_cpk_path):
+                os.remove(faces_cpk_path)
+            if os.path.exists(uniform_cpk_path):
+                os.remove(uniform_cpk_path)
             if bins_updating:
-                if os.path.exists(f"{pes_download_path}/{bins_cpk_name}.cpk"):
-                    os.remove(f"{pes_download_path}/{bins_cpk_name}.cpk")
+                if os.path.exists(bins_cpk_path):
+                    os.remove(bins_cpk_path)
 
             # Move the cpks to the destination folder
             shutil.move(f"patches_output/{faces_cpk_name}.cpk", pes_download_path)
@@ -148,9 +152,11 @@ def patches_from_contents():
 
         else:
 
+            cpk_path = os.path.join(pes_download_path, f"{cpk_name}.cpk")
+            
             # Remove the cpk from the destination folder if present
-            if os.path.exists(f"{pes_download_path}/{cpk_name}.cpk"):
-                os.remove(f"{pes_download_path}/{cpk_name}.cpk")
+            if os.path.exists(cpk_path):
+                os.remove(cpk_path)
 
             # Move the cpk to the destination folder
             shutil.move(f"patches_output/{cpk_name}.cpk", pes_download_path)

@@ -1,6 +1,7 @@
 ## Moves the contents of the export to the root of extracted_exports
 import os
 import re
+import time
 import shutil
 
 from .utils.ftex import ddsToFtex
@@ -114,7 +115,13 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Replace the dummy team ID with the actual one
                 subfolder_path_withname = os.path.join(team_itemfolder_path, subfolder_id_withname)
                 if subfolder_path_withname != subfolder_path:
-                    os.rename(subfolder_path, subfolder_path_withname)
+                    try:
+                        os.rename(subfolder_path, subfolder_path_withname)
+                    except OSError:
+                        print("- Could not rename " + subfolder_path + " to " + subfolder_path_withname)
+                        print("- Trying again in 1 second...")
+                        time.sleep(1)
+                        os.rename(subfolder_path, subfolder_path_withname)
                     
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_id_withname)

@@ -4,6 +4,7 @@ import shutil
 from .lib.bins_update import bins_update
 from .lib import pes_uniparam_edit as uniparamtool
 from .lib.objects_pack import objects_packer
+from .lib.cpk_tools import files_fetch_from_cpks
 
 
 def contents_from_extracted():
@@ -35,37 +36,72 @@ def contents_from_extracted():
     os.makedirs(f"./patches_contents/{uniform_foldername}", exist_ok=True)
 
 
-    print("- ")
+    print("-")
     print("- Preparing the patch folders")
-    print("- ")
+    print("-")
 
 
     # If Bins Updating is enabled and there's an extracted_exports folder
     if bins_updating and os.path.exists("extracted_exports"):
         
+        print("-")
+        print("- Bins Updating is enabled")
+        print("-")
+
         # Set the paths
-        common_etc_path = os.path.join("patches_contents", bins_foldername, "common", "etc")
-        uniform_team_path = os.path.join("patches_contents", bins_foldername, "common", "character0", "model", "character", "uniform", "team")
+        common_root_path = os.path.join("patches_contents", bins_foldername, "common")
+        common_etc_path = os.path.join(common_root_path, "etc")
+        uniform_team_path = os.path.join(common_root_path, "character0", "model", "character", "uniform", "team")
+        
+        # Prepare a list of sources and destination paths for the bin files
+        bins_folder_path = "Engines/bins/temp"
+        
+        teamcolor_bin_path = os.path.join(bins_folder_path, "TeamColor.bin")
+        kitcolor_bin_path = os.path.join(bins_folder_path, "UniColor.bin")
+        
+        bin_info_list = [
+            {
+                'source_path': "common/etc/TeamColor.bin",
+                'destination_path': teamcolor_bin_path
+            },
+            {
+                'source_path': "common/character0/model/character/uniform/team/UniColor.bin",
+                'destination_path': kitcolor_bin_path
+            },
+        ]
+
+        if fox_mode:
+            # Set the filename depending on pes version
+            uniparam_name = "UniformParameter19.bin" if fox_19 else "UniformParameter18.bin"
+            
+            uniparam_bin_path = os.path.join(bins_folder_path, uniparam_name)
+            
+            bin_info_list.append(
+                {
+                    'source_path': "common/character0/model/character/uniform/team/UniformParameter.bin",
+                    'destination_path': uniparam_bin_path
+                }
+            )
         
         # Create the folders
         os.makedirs(common_etc_path, exist_ok=True)
         os.makedirs(uniform_team_path, exist_ok=True)
+        os.makedirs(bins_folder_path, exist_ok=True)
 
-        # Update the relevant bin files
-        bins_update()
+        # Fetch the bin files from the cpks in the download folder and update their values
+        files_fetch_from_cpks(bin_info_list)
+        
+        bins_update(teamcolor_bin_path, kitcolor_bin_path)
 
         # And copy them to the Bins cpk folder
-        shutil.copy("./Bin Files/TeamColor.bin", common_etc_path)
-        shutil.copy("./Bin Files/UniColor.bin", uniform_team_path)
+        shutil.copy(teamcolor_bin_path, common_etc_path)
+        shutil.copy(kitcolor_bin_path, uniform_team_path)
 
         # If fox mode is enabled and there's a Kit Configs folder
         itemfolder_path = os.path.join("extracted_exports", "Kit Configs")
         if fox_mode and os.path.exists(itemfolder_path):
 
             print("- \n- Compiling the kit config files into the UniformParameter bin")
-
-            # Set the filename depending on pes version
-            uniparam_filename = "UniformParameter19" if fox_19 else "UniformParameter18"
 
             # Prepare an array with all the kit config files inside each team folder in the Kit Configs folder
             kit_config_path_list = []
@@ -78,13 +114,15 @@ def contents_from_extracted():
                     kit_config_path_list.append(kit_config_path)
             
             # Compile the UniformParameter file
-            uniparamtool.main(f"./Bin Files/{uniparam_filename}.bin", kit_config_path_list, [], f"./Bin Files/{uniparam_filename}.bin", True)
+            uniparamtool.main(uniparam_bin_path, kit_config_path_list, [], uniparam_bin_path, True)
             
             # Copy the uniparam to the the Bins cpk folder with the proper filename
-            shutil.copy(f"./Bin Files/{uniparam_filename}.bin", 
-                        f"{uniform_team_path}/UniformParameter.bin")
+            shutil.copy(uniparam_bin_path, f"{uniform_team_path}/UniformParameter.bin")
 
-            print("- ")
+            print("-")
+        
+        # Delete the bins folder
+        shutil.rmtree(bins_folder_path)
 
 
     # Packing the face folders if 'Faces' directory exists

@@ -7,6 +7,7 @@ patches_contents
 patches_output
 sideload
 Engines/admin_warned.txt
+Engines/bins/temp
 Engines/python/__pycache__
 Engines/python/lib/__pycache__
 Engines/python/lib/utils/__pycache__

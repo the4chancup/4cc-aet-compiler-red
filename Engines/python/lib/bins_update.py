@@ -72,7 +72,7 @@ def bytes_from_color_entry(color_entry,type_kits = False):
         return color1
 
 
-def update_team_bin(team_id, teamcols, team_color_bin):
+def teamcolor_bin_update(team_id, teamcols, teamcolor_bin):
     
     # Compute the starting hexadecimal position in the TeamColor.bin file to write to
     position = "0x0" + (int(team_id) - 100).to_bytes(2, byteorder='big').hex().upper() + "0"
@@ -87,8 +87,8 @@ def update_team_bin(team_id, teamcols, team_color_bin):
         color_bytes = bytes.fromhex(f"{teamcol[0]+teamcol[1]+teamcol[2]}")
         
         # Write the color to the file
-        team_color_bin.seek(int(position, 16))
-        team_color_bin.write(color_bytes)
+        teamcolor_bin.seek(int(position, 16))
+        teamcolor_bin.write(color_bytes)
         
         # Increment the position by 3
         position = hex(int(position, 16) + 3).replace("0x", "").upper()
@@ -96,7 +96,7 @@ def update_team_bin(team_id, teamcols, team_color_bin):
     return
 
 
-def update_kit_bin(team_id, kitcols, kit_color_bin):
+def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
     
     # Initialize the number of player and GK kits to 0
     player_kits = 0
@@ -118,8 +118,8 @@ def update_kit_bin(team_id, kitcols, kit_color_bin):
     kits_number_bytes = int(kits_number).to_bytes(1, byteorder='big')
     
     # Write the number of kits
-    kit_color_bin.seek(int(position, 16))
-    kit_color_bin.write(kits_number_bytes)
+    kitcolor_bin.seek(int(position, 16))
+    kitcolor_bin.write(kits_number_bytes)
     
     # Increment the position by 1 to get to the first kit entry of the team
     position = hex(int(position, 16) + 1).replace("0x", "").upper()
@@ -156,8 +156,8 @@ def update_kit_bin(team_id, kitcols, kit_color_bin):
         kit_bytes = bytes.fromhex(f"{kit_number_hex}{kit_icon_hex}{kit[1][0]}{kit[1][1]}{kit[1][2]}{kit[2][0]}{kit[2][1]}{kit[2][2]}")
         
         # Write the kit to the file
-        kit_color_bin.seek(int(position, 16))
-        kit_color_bin.write(kit_bytes)
+        kitcolor_bin.seek(int(position, 16))
+        kitcolor_bin.write(kit_bytes)
         
         # Increment the position by 8
         position = hex(int(position, 16) + 8).replace("0x", "").upper()
@@ -169,8 +169,8 @@ def update_kit_bin(team_id, kitcols, kit_color_bin):
         kit_bytes = bytes.fromhex("FF00000000000000")
         
         # Write the kit to the file
-        kit_color_bin.seek(int(position, 16))
-        kit_color_bin.write(kit_bytes)
+        kitcolor_bin.seek(int(position, 16))
+        kitcolor_bin.write(kit_bytes)
         
         # Increment the position by 8
         position = hex(int(position, 16) + 8).replace("0x", "").upper()
@@ -178,14 +178,12 @@ def update_kit_bin(team_id, kitcols, kit_color_bin):
     return
     
 
-def bins_update():
+def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '0'))
     
-    print("-")
-    print("- Bins Updating is enabled")
     print("-")
     print("- Adding the color entries to the bin files")
     print("- Working on team:")
@@ -194,10 +192,10 @@ def bins_update():
     teams_list_file = "./teams_list.txt"
     
     # Open the TeamColor.bin file in binary mode for writing
-    team_color_bin = open("./Bin Files/TeamColor.bin", 'rb+')
+    teamcolor_bin = open(teamcolor_bin_path, 'rb+')
     
     # Open the UniColor.bin file in binary mode for writing
-    kit_color_bin = open("./Bin Files/UniColor.bin", 'rb+')
+    kitcolor_bin = open(kitcolor_bin_path, 'rb+')
 
     # For every Note txt file
     for file_name in [f for f in os.listdir(extracted_exports_dir) if f.endswith(".txt")]:
@@ -306,7 +304,7 @@ def bins_update():
         # If there are team colors
         if teamcols:
             # Update the team bin
-            update_team_bin(team_id, teamcols, team_color_bin)
+            teamcolor_bin_update(team_id, teamcols, teamcolor_bin)
             
             # Store the number of team colors
             teamcols_cnt = len(teamcols)
@@ -314,7 +312,7 @@ def bins_update():
         # If there are kit colors
         if kitcols:
             # Update the kits bin
-            update_kit_bin(team_id, kitcols, kit_color_bin)
+            kitcolor_bin_update(team_id, kitcols, kitcolor_bin)
             
             # Store the number of kit colors
             kitcols_cnt = len(kitcols)
@@ -348,10 +346,10 @@ def bins_update():
     
     
     # Close the TeamColor.bin file
-    team_color_bin.close()
+    teamcolor_bin.close()
 
     # Close the UniColor.bin file
-    kit_color_bin.close()
+    kitcolor_bin.close()
     
     print("- Done")
     print("- ")

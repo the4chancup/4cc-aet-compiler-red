@@ -68,7 +68,7 @@ def nested_folders_fix(exportfolder_path, team_name):
         print("- An attempt to automatically fix those folders has just been done.")
         print("- Nothing has been discarded, though problems may still arise.")
 
-        if pause_when_wrong:
+        if pause_on_error:
             print("- ")
             input("Press any key to continue...")
 
@@ -191,7 +191,7 @@ def faces_check(exportfolder_path, team_name):
                 
                 os.environ["LOG"] = "1"
 
-                if pause_when_wrong:
+                if pause_on_error:
                     input('Press Enter to continue...')
 
         # If the folder exists but is empty, delete it
@@ -262,7 +262,7 @@ def kitconfigs_check(exportfolder_path, team_name):
                 print("- Closing the script's window and fixing it is recommended.")
 
                 # Pause if needed
-                if pause_when_wrong:
+                if pause_on_error:
                     input("Press Enter to continue...")
             
             else:
@@ -290,7 +290,7 @@ def kitconfigs_check(exportfolder_path, team_name):
                         print("- the amount of kit config files in the Note txt file.")
                         print("- Closing the script's window and fixing this is recommended.")
                         
-                        if pause_when_wrong:
+                        if pause_on_error:
                             input("Press Enter to continue...")
                             
         # If the folder exists but is empty
@@ -368,7 +368,7 @@ def kittextures_check(exportfolder_path, team_name):
                 print("- The Kit Textures folder will be discarded since it's unusable.")
                 print("- Closing the script's window and fixing it is recommended.")
 
-                if pause_when_wrong:
+                if pause_on_error:
                     input("Press Enter to continue...")
             
             else:
@@ -399,7 +399,7 @@ def kittextures_check(exportfolder_path, team_name):
                     print("- The kit textures mentioned above will be discarded since they're unusable.")
                     print("- Closing the script's window and fixing them is recommended.")
                     
-                    if pause_when_wrong:
+                    if pause_on_error:
                         input("Press Enter to continue...")
                         
         # If the folder exists but is empty
@@ -484,7 +484,7 @@ def logo_check(exportfolder_path, team_name):
                 print("- The Logo folder will be discarded since it's unusable.")
                 print("- Closing the script's window and fixing it is recommended.")
                 
-                if pause_when_wrong:
+                if pause_on_error:
                     input("Press Enter to continue...")
                     
         else:
@@ -548,7 +548,7 @@ def portraits_check(exportfolder_path, team_name):
                 
                 os.environ["LOG"] = "1"
                 
-                if pause_when_wrong:
+                if pause_on_error:
                     input("Press Enter to continue...")
                     
         else:
@@ -601,7 +601,7 @@ def common_check(exportfolder_path, team_name):
                 
                 os.environ["LOG"] = "1"
 
-                if pause_when_wrong:
+                if pause_on_error:
                     input("Press Enter to continue...")
 
         else:
@@ -707,7 +707,7 @@ def boots_check(exportfolder_path, team_name):
                 
                 os.environ["LOG"] = "1"
                 
-                if pause_when_wrong:
+                if pause_on_error:
                     input("Press Enter to continue...")
 
         # If the folder exists but is empty, delete it
@@ -812,7 +812,7 @@ def gloves_check(exportfolder_path, team_name):
                 
                 os.environ["LOG"] = "1"
                 
-                if pause_when_wrong:
+                if pause_on_error:
                     input("Press Enter to continue...")
 
         # If the folder exists but is empty, delete it
@@ -838,11 +838,11 @@ def other_check(exportfolder_path, team_name):
 def export_check(exportfolder_path, team_name):
     
     # Read the necessary parameters
-    global fox_mode, fox_19, fox_21, pause_when_wrong
+    global fox_mode, fox_19, fox_21, pause_on_error
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
-    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
+    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
 
     nested_folders_fix(exportfolder_path, team_name)
     faces_check(exportfolder_path, team_name)

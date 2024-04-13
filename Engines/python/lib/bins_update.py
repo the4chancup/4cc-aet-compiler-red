@@ -182,7 +182,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
-    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '0'))
+    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '0'))
     
     print("-")
     print("- Adding the color entries to the bin files")
@@ -337,8 +337,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     print('- Stopping the script and fixing it is recommended')
                     print('-')
                     
-                    # Pause if pause_when_wrong is not 0
-                    if not pause_when_wrong:
+                    if not pause_on_error:
                         input('Press Enter to continue...')
                     
         # Print the number of team and kit colors

@@ -47,7 +47,7 @@ def extracted_from_exports():
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     dds_compression = int(os.environ.get('DDS_COMPRESSION', '0'))
-    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
+    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
     
     
@@ -193,6 +193,6 @@ def extracted_from_exports():
         print("- Warning: There are files in the Other folder")
         print("- Please open it and check its contents")
         print('-')
-        if pause_when_wrong:
+        if pause_on_error:
             input('Press Enter to continue...')
 

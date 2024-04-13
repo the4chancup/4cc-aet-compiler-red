@@ -6,7 +6,7 @@ import shutil
 def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
 
     # Read the necessary parameters
-    pause_when_wrong = int(os.environ.get('PAUSE_WHEN_WRONG', '1'))
+    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
     
     # Prepare a clean version of the team name without slashes
     team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
@@ -61,17 +61,16 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
             file.write("- {}'s manager needs to get memed on (no files) - Export discarded.\n".format(team_name))
         memelist = 1
 
-        ##if pause_when_wrong != 0:
-
         print("-\n")
         print("- {}'s manager needs to get memed on (no files).".format(team_name))
         print("- This export will be discarded.\n")
         print("- Closing the script's window and fixing the export is recommended.\n")
 
-        input()
-
         # Skip the whole export
         shutil.rmtree(exportfolder_path)
+
+        if pause_on_error:
+            input("Press Enter to continue...")
 
         return None
     
@@ -145,7 +144,7 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
         print("- Adding the team name to the teams_list file and")
         print("- restarting the script is recommended.")
         
-        if pause_when_wrong:
+        if pause_on_error:
             input("Press Enter to continue...")
         
         # Skip the whole export

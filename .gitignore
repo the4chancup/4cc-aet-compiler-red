@@ -6,6 +6,8 @@ extracted_exports
 patches_contents
 patches_output
 sideload
+exports_to_add
+!exports_to_add/delete_me.txt
 Engines/admin_warned.txt
 Engines/bins/temp
 Engines/python/__pycache__

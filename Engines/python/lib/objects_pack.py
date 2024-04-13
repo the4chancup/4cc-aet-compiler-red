@@ -9,10 +9,13 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
     
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    
+    object_source_path = os.path.join("extracted_exports", object_source_folder)
+    temp_folder_path = os.path.join("temp")
 
     # Check if the temp folder exists and delete it
-    if os.path.exists("temp"):
-        shutil.rmtree("temp")
+    if os.path.exists(temp_folder_path):
+        shutil.rmtree(temp_folder_path)
     
     # Pre-Fox mode
     if not fox_mode:
@@ -28,26 +31,26 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             os.makedirs(object_destination_path)
 
         # For every folder in the source directory
-        for object_name in os.listdir(os.path.join("extracted_exports", object_source_folder)):
+        for object_name in os.listdir(object_source_path):
             
             object_id = object_name[:5]
             print(f"- {object_name}")
 
             # Rename it with the proper id
-            os.rename(os.path.join("extracted_exports", object_source_folder, object_name),
-                      os.path.join("extracted_exports", object_source_folder, object_id))
+            os.rename(os.path.join(object_source_path, object_name),
+                      os.path.join(object_source_path, object_id))
 
             if object_type == "face":
                 
                 # Make a properly structured temp folder
-                temp_path = os.path.join("temp", object_id, "common", "character0", "model", "character", "face", "real")
+                temp_path = os.path.join(temp_folder_path, object_id, "common", "character0", "model", "character", "face", "real")
                 os.makedirs(temp_path, exist_ok=True)
 
                 # Move the face folder to the temp folder
-                shutil.move(os.path.join("extracted_exports", object_source_folder, object_id), temp_path)
+                shutil.move(os.path.join(object_source_path, object_id), temp_path)
 
                 # Make a cpk and put it in the Faces folder
-                cpk_source = os.path.join("temp", object_id, "common")
+                cpk_source = os.path.join(temp_folder_path, object_id, "common")
                 cpk_destination = os.path.join(object_destination_path, f"{object_id}.cpk")
                 cpktool.main(cpk_destination, [cpk_source], True)
 
@@ -57,7 +60,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                     shutil.rmtree(os.path.join(object_destination_path, object_id))
 
                 # Move the folder
-                shutil.move(os.path.join("extracted_exports", object_source_folder, object_id), object_destination_path)
+                shutil.move(os.path.join(object_source_path, object_id), object_destination_path)
                 
     # Fox mode
     else:
@@ -70,25 +73,25 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             os.makedirs(object_destination_path)
 
         # For every folder in the source directory
-        for object_name in os.listdir(os.path.join("extracted_exports", object_source_folder)):
+        for object_name in os.listdir(object_source_path):
             
             object_id = object_name[:5]
             print(f"- {object_name}")
 
             # Rename it with the proper id
-            os.rename(os.path.join("extracted_exports", object_source_folder, object_name),
-                      os.path.join("extracted_exports", object_source_folder, object_id))
+            os.rename(os.path.join(object_source_path, object_name),
+                      os.path.join(object_source_path, object_id))
 
             # Delete the old folder if present
             if os.path.exists(os.path.join(object_destination_path, object_id)):
                 shutil.rmtree(os.path.join(object_destination_path, object_id))
 
             # Make a temp folder
-            temp_path = os.path.join("temp", object_id)
+            temp_path = os.path.join(temp_folder_path, object_id)
             os.makedirs(os.path.join(temp_path, "#windx11"), exist_ok=True)
 
             # Move the folder to the temp folder
-            shutil.move(os.path.join("extracted_exports", object_source_folder, object_id), temp_path)
+            shutil.move(os.path.join(object_source_path, object_id), temp_path)
 
             # If the folder has textures
             texture_path = os.path.join(temp_path, object_id)
@@ -145,11 +148,9 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             shutil.rmtree(temp_path)
             
     # Delete the source folder
-    source_folder_path = os.path.join("extracted_exports", object_source_folder)
-    if os.path.exists(source_folder_path):
-        shutil.rmtree(source_folder_path)
+    if os.path.exists(object_source_path):
+        shutil.rmtree(object_source_path)
 
     # Delete the temp folder
-    temp_folder_path = os.path.join("temp")
     if os.path.exists(temp_folder_path):
         shutil.rmtree(temp_folder_path)

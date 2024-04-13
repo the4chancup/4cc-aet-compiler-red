@@ -10,6 +10,10 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
 
+    # Check if the temp folder exists and delete it
+    if os.path.exists("temp"):
+        shutil.rmtree("temp")
+    
     # Pre-Fox mode
     if not fox_mode:
         

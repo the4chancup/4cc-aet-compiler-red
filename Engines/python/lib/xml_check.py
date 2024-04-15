@@ -97,8 +97,9 @@ def mtl_check(mtl_path):
 
         # Check if the name of the material is in the list of previous material names
         if material.get('name') in previous_material_name_list:
-            print(f"- ERROR - The material \"{material.get('name')}\" in {mtl_name}")
-            print("- is listed more than once")
+            print( "- ERROR - Material listed more than once")
+            print(f"- MTL name:    {mtl_name}")
+            print(f"- Material:    \"{material.get('name')}\"")
             print("-")
 
             error_conflict = True

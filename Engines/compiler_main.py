@@ -50,7 +50,7 @@ def admin_request(run_type):
     def is_admin():
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
-        except:
+        except PermissionError:
             return False
 
     if not is_admin():

@@ -21,7 +21,7 @@ def mtl_id_change(mtl_path, team_id = "000"):
     # Parse the file
     try:
         tree = ET.parse(mtl_path)
-    except:
+    except ET.ParseError:
         print(f"- ERROR: {mtl_path} is not a valid .mtl file")
         input('Press Enter to continue...')
         return True

@@ -1,7 +1,36 @@
 import os
+import re
 import xml.etree.ElementTree as ET
 
 from .utils.zlib_plus import unzlib_file
+
+
+def texture_exists(texture_path):
+    """
+    Check if the texture filename contains the u0XXXp pattern.
+    If it does, search for a u0XXXp1 file in the folder where the texture should be.
+    If it doesn't, check if the texture file exists.
+
+    Parameters:
+        texture_path (str): The path to the texture file.
+
+    Returns:
+        bool: True if the texture file exists, False otherwise.
+    """
+
+    # Check if the texture filename contains the u0XXXp pattern
+    if not re.search(r'u0[a-zA-Z0-9]{3}p', os.path.basename(texture_path)):
+
+        return (os.path.exists(texture_path))
+
+    else:
+        # Search for a u0XXXp1 file in the folder where the texture should be
+        for file in os.listdir(os.path.dirname(texture_path)):
+            if re.search(r'u0[a-zA-Z0-9]{3}p1', file):
+                return True
+
+        return False
+
 
 def mtl_check(mtl_path):
     """
@@ -180,11 +209,10 @@ def mtl_check(mtl_path):
                     texture_subpath = sampler_texture_path[2:]
                     texture_path = os.path.join(os.path.dirname(mtl_path), texture_subpath)
 
-                    if not os.path.exists(texture_path):
-                        # Remove "extracted_exports/" from the path
-                        texture_path_short = texture_path[18:]
+                    # Remove "extracted_exports/" from the path
+                    texture_path_short = texture_path[18:]
 
-                        error_texture_missing = True
+                    error_texture_missing = not texture_exists(texture_path)
 
                 # Check if the texture path points to the uniform common folder and the file exists in the Common folder of the export
                 elif sampler_texture_path.startswith('model/character/uniform/common/'):
@@ -193,11 +221,10 @@ def mtl_check(mtl_path):
                     common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(mtl_path))), "Common")
                     texture_path = os.path.join(common_folder_path, texture_subpath)
 
-                    if not os.path.exists(texture_path):
-                        # Remove "extracted_exports/" from the path
-                        texture_path_short = texture_path[18:]
+                    # Remove "extracted_exports/" from the path
+                    texture_path_short = texture_path[18:]
 
-                        error_texture_missing = True
+                    error_texture_missing = not texture_exists(texture_path)
 
                 # Check if the texture path points to the face common folder
                 elif sampler_texture_path.startswith('model/character/face/common/'):

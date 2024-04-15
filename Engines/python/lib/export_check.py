@@ -3,7 +3,7 @@ import os
 import shutil
 from .utils.zlib_plus import unzlib_file
 from .texture_check import texture_check
-from .mtl_check import mtl_check
+from .xml_check import mtl_check
 from .txt_kits_count import txt_kits_count
 
 

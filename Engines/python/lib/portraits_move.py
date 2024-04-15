@@ -5,7 +5,7 @@ import shutil
 def portraits_move(exportfolder_path, team_id):
 
     tex_name = "portrait.dds"
-    
+
     portrait_conflicts = []
 
     faces_path = os.path.join(exportfolder_path, "Faces")
@@ -28,13 +28,13 @@ def portraits_move(exportfolder_path, team_id):
 
                 # Rename the portrait with the player id
                 portrait_name = f"player_{player_id}.dds"
-                
+
                 # Check if a file with the same player number already exists in the portraits folder
                 if any(fname[-6:-4] == player_number for fname in os.listdir(portraits_path)):
-                    
+
                     # Add the face name to the list of conflicts
                     portrait_conflicts.append(face_name)
-                    
+
                 else:
                     # Move the portrait to the portraits folder
                     portrait_destination_path = os.path.join(portraits_path, portrait_name)
@@ -47,7 +47,7 @@ def portraits_move(exportfolder_path, team_id):
 
     # If there are any portrait conflicts
     if portrait_conflicts:
-        
+
         print("- The portraits for the following players are present both")
         print("- in their face folders and in the Portraits folder:")
         # Print the list of portrait conflicts
@@ -56,19 +56,19 @@ def portraits_move(exportfolder_path, team_id):
         print("- Closing the script's window and fixing it is recommended.")
         print("-")
         input("Press Enter to continue...")
-        
+
         exportfolder_name = os.path.basename(exportfolder_path)
-        
+
         with open("memelist.txt", "a") as log:
             log.write("- \n")
             log.write(f"- {exportfolder_name} Deleted (conflicting portraits) - Error\n")
-        
+
         os.environ["LOG"] = "1"
-        
+
         # Delete the entire export folder
         shutil.rmtree(exportfolder_path)
-        
+
         # Exit with error
         return True
-    
+
     return False

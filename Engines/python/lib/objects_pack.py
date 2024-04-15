@@ -6,33 +6,33 @@ from . import pes_fpk_pack as fpktool
 
 
 def objects_packer(object_type, object_source_folder, object_destination_folder, faces_foldername, uniform_foldername):
-    
+
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    
+
     object_source_path = os.path.join("extracted_exports", object_source_folder)
     temp_folder_path = os.path.join("temp")
 
     # Check if the temp folder exists and delete it
     if os.path.exists(temp_folder_path):
         shutil.rmtree(temp_folder_path)
-    
+
     # Pre-Fox mode
     if not fox_mode:
-        
+
         # Set the destination path
         if object_type == "face":
             object_destination_path = os.path.join("patches_contents",faces_foldername,"common","character0","model","character","face","real")
         else:
             object_destination_path = os.path.join("patches_contents",uniform_foldername,"common","character0","model","character",object_destination_folder)
-        
+
         # Create a destination folder if needed
         if not os.path.exists(object_destination_path):
             os.makedirs(object_destination_path)
 
         # For every folder in the source directory
         for object_name in os.listdir(object_source_path):
-            
+
             object_id = object_name[:5]
             print(f"- {object_name}")
 
@@ -41,7 +41,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                       os.path.join(object_source_path, object_id))
 
             if object_type == "face":
-                
+
                 # Make a properly structured temp folder
                 temp_path = os.path.join(temp_folder_path, object_id, "common", "character0", "model", "character", "face", "real")
                 os.makedirs(temp_path, exist_ok=True)
@@ -61,10 +61,10 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
 
                 # Move the folder
                 shutil.move(os.path.join(object_source_path, object_id), object_destination_path)
-                
+
     # Fox mode
     else:
-        
+
         # Set the destination path
         object_destination_path = os.path.join("patches_contents", faces_foldername, "Asset", "model", "character", object_destination_folder)
 
@@ -74,7 +74,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
 
         # For every folder in the source directory
         for object_name in os.listdir(object_source_path):
-            
+
             object_id = object_name[:5]
             print(f"- {object_name}")
 
@@ -112,13 +112,13 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             # Pack the fpk
             fpk_destination = os.path.join(temp_path, f"{object_type}.fpk")
             fpk_source_path = os.path.join(temp_path, f"{object_type}_fpk")
-            
+
             # Prepare an array with the files to pack
             file_path_list = []
             for file_name in os.listdir(fpk_source_path):
                 file_path = os.path.join(fpk_source_path, file_name)
                 file_path_list.append(file_path)
-            
+
             # Pack the fpk
             fpktool.main(fpk_destination, file_path_list, True)
 
@@ -146,7 +146,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
 
             # Delete the temp folder
             shutil.rmtree(temp_path)
-            
+
     # Delete the source folder
     if os.path.exists(object_source_path):
         shutil.rmtree(object_source_path)

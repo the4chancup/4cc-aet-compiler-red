@@ -8,7 +8,7 @@ import logging
 def transfer(fn, id, teamid = "000"):
 
     b = open(fn, 'rb')
-    
+
     logging.debug("[MTLTools] Working on file " + fn)
 
     #Grab actually important values from header
@@ -18,10 +18,10 @@ def transfer(fn, id, teamid = "000"):
     head = struct.unpack("<I", b.read(4))[0] #Header length
     b.seek(4, 1)
     sec1off = struct.unpack("<I", b.read(4))[0] #Sector 1 offset
-    
+
     #Then start working on the rest of the file
     b.seek(64, 0)
-    
+
     #Go through blockmap 0
     texoff = 0 #Texture offset
     texc = 0 #Texture count
@@ -40,7 +40,7 @@ def transfer(fn, id, teamid = "000"):
             stroff = struct.unpack("<I", off)[0]
             strc = struct.unpack("<H", items)[0]
             bcv = bcv + 1
-            
+
     #Go through blockmap 1
     strend = 0
     strlen = 0
@@ -51,20 +51,20 @@ def transfer(fn, id, teamid = "000"):
         if(struct.unpack("<I", dat)[0] == 3):
             strend = struct.unpack("<I", off)[0]
             strlen = struct.unpack("<I", blen)[0]
-    
+
     #Check if all required blocks were found.
     ##NOTE: Change this when a new block is added
     if(bcv == 2):
         #We have all the required offsets now, start building output
         b.seek(head+stroff)
-        
+
         #Store string lengths
         lens = []
         for i in range(strc):
             b.seek(2, 1)
             lens.append(struct.unpack('<H', b.read(2))[0])
             b.seek(4, 1)
-        
+
         #Then process MTL
         strs = [] #Store strings in a list
         b.seek(sec1off + strend)
@@ -72,7 +72,7 @@ def transfer(fn, id, teamid = "000"):
             ln = b.read(lens[i]+1).rstrip(b'\0').decode('utf-8')
             if(ln):
                 strs.append(ln)
-        
+
         #Scan textures
         b.seek(head + texoff)
         paths = [] #Store texture paths
@@ -80,16 +80,16 @@ def transfer(fn, id, teamid = "000"):
             texp = struct.unpack("<H", b.read(2))[0] #Texture path
             if texp not in paths:
                 paths.append(texp)
-                
+
         #Close file for now, we're done reading
         b.close()
-               
+
         #Texture Path Count, for error reporting
         tpc = 0
         #Process the paths
         for path in paths:
             spath = strs[path-1].split("/") #Split path to individual pieces
-            
+
             #Make sure our magic piece is the player ID and the path is the correct path
             #Faces path
             if(len(spath) == 10 and re.fullmatch("[0-9]{5}", spath[7])):
@@ -101,7 +101,7 @@ def transfer(fn, id, teamid = "000"):
                     tpc = tpc + 1
                 else:
                     logging.debug("[MTLTools] Incorrect player ID " + id + ", please make sure the ID is exactly 5 digits long", file=sys.stderr)
-            
+
             #Refs path
             if(len(spath) == 10 and re.fullmatch("referee[0-9]{3}", spath[7])):
                 if(re.fullmatch("referee[0-9]{3}", id)):
@@ -123,7 +123,7 @@ def transfer(fn, id, teamid = "000"):
                     tpc = tpc + 1
                 else:
                     logging.debug("[MTLTools] Incorrect boots ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'kXXXX' format", file=sys.stderr)
-            
+
             #Gloves path
             elif(len(spath) == 8 and re.fullmatch("g[0-9]{4}", spath[6])):
                 if(re.fullmatch("g[0-9]{4}", id)):
@@ -134,7 +134,7 @@ def transfer(fn, id, teamid = "000"):
                     tpc = tpc + 1
                 else:
                     logging.debug("[MTLTools] Incorrect gloves ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'gXXXX' format", file=sys.stderr)
-                
+
             #Balls path
             elif(len(spath) == 7 and re.fullmatch("ball[0-9]{3}", spath[5])):
                 if(re.fullmatch("ball[0-9]{3}", id)):
@@ -145,7 +145,7 @@ def transfer(fn, id, teamid = "000"):
                     tpc = tpc + 1
                 else:
                     logging.debug("[MTLTools] Incorrect ball ID " + id + ", please make sure the ID is exactly 7 characters long and follows the 'ballXXX' format", file=sys.stderr)
-            
+
             #Common path
             elif(len(spath) == 9 and re.fullmatch("[0-9]{3}", spath[6])):
                 if(re.fullmatch("[0-9]{3}", teamid)):
@@ -156,26 +156,26 @@ def transfer(fn, id, teamid = "000"):
                     tpc = tpc + 1
                 else:
                     logging.debug("[MTLTools] Incorrect Team ID " + teamid + ", please make sure the ID is exactly 3 characters long and follows the 'XXX' format", file=sys.stderr)
-            
+
             else:
                 logging.debug("[MTLTools] No ID found in path " + strs[path-1])
-            
+
         #Yell if there were no paths with IDs at all
         if(tpc == 0):
             logging.debug("[MTLTools] No paths with IDs found in file " + fn)
             print("[MTLTools] No paths with IDs found in file " + fn, file=sys.stderr)
-                
+
         #Re-open file for writing
         b = open(fn, "r+b")
-        
+
         #Seek to string block
         b.seek(sec1off + strend)
-        
+
         #Re-write FMDL strings
         for s in strs:
             b.write(struct.pack("B", 0))
             b.write(bytes(s, 'utf-8'))
-            
+
         #Done, close file for good and exit
         b.close()
 
@@ -193,6 +193,6 @@ def main():
         logging.debug("[MTLTools] Please make sure the file ends in \".fmdl\"", file=sys.stderr)
     else:
         transfer(sys.argv[1], sys.argv[2], sys.argv[3])
-                
+
 if __name__ == '__main__':
     main()

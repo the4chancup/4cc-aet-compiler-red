@@ -8,28 +8,28 @@ from .lib.cpk_tools import files_fetch_from_cpks
 
 
 def contents_from_extracted():
-    
+
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
 
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
-    
-    
+
+
     # Set the name for the folders to put stuff into
     if not multicpk_mode:
 
         faces_foldername = "Singlecpk"
         uniform_foldername = "Singlecpk"
         bins_foldername = "Singlecpk"
-        
+
     else:
 
         faces_foldername = "Facescpk"
         uniform_foldername = "Uniformcpk"
         bins_foldername = "Binscpk"
-        
+
 
     # Create folders just in case
     os.makedirs(f"./patches_contents/{faces_foldername}", exist_ok=True)
@@ -43,7 +43,7 @@ def contents_from_extracted():
 
     # If Bins Updating is enabled and there's an extracted_exports folder
     if bins_updating and os.path.exists("extracted_exports"):
-        
+
         print("-")
         print("- Bins Updating is enabled")
         print("-")
@@ -52,13 +52,13 @@ def contents_from_extracted():
         common_root_path = os.path.join("patches_contents", bins_foldername, "common")
         common_etc_path = os.path.join(common_root_path, "etc")
         uniform_team_path = os.path.join(common_root_path, "character0", "model", "character", "uniform", "team")
-        
+
         # Prepare a list of sources and destination paths for the bin files
         bins_folder_path = "Engines/bins/temp"
-        
+
         teamcolor_bin_path = os.path.join(bins_folder_path, "TeamColor.bin")
         kitcolor_bin_path = os.path.join(bins_folder_path, "UniColor.bin")
-        
+
         bin_info_list = [
             {
                 'source_path': "common/etc/TeamColor.bin",
@@ -73,16 +73,16 @@ def contents_from_extracted():
         if fox_mode:
             # Set the filename depending on pes version
             uniparam_name = "UniformParameter19.bin" if fox_19 else "UniformParameter18.bin"
-            
+
             uniparam_bin_path = os.path.join(bins_folder_path, uniparam_name)
-            
+
             bin_info_list.append(
                 {
                     'source_path': "common/character0/model/character/uniform/team/UniformParameter.bin",
                     'destination_path': uniparam_bin_path
                 }
             )
-        
+
         # Create the folders
         os.makedirs(common_etc_path, exist_ok=True)
         os.makedirs(uniform_team_path, exist_ok=True)
@@ -90,7 +90,7 @@ def contents_from_extracted():
 
         # Fetch the bin files from the cpks in the download folder and update their values
         files_fetch_from_cpks(bin_info_list)
-        
+
         bins_update(teamcolor_bin_path, kitcolor_bin_path)
 
         # And copy them to the Bins cpk folder
@@ -112,15 +112,15 @@ def contents_from_extracted():
                 for kit_config in [f for f in os.listdir(itemfolder_team_path) if f.endswith(".bin")]:
                     kit_config_path = os.path.join(itemfolder_team_path, kit_config)
                     kit_config_path_list.append(kit_config_path)
-            
+
             # Compile the UniformParameter file
             uniparamtool.main(uniparam_bin_path, kit_config_path_list, [], uniparam_bin_path, True)
-            
+
             # Copy the uniparam to the the Bins cpk folder with the proper filename
             shutil.copy(uniparam_bin_path, f"{uniform_team_path}/UniformParameter.bin")
 
             print("-")
-        
+
         # Delete the bins folder
         shutil.rmtree(bins_folder_path)
 
@@ -128,9 +128,9 @@ def contents_from_extracted():
     # Packing the face folders if 'Faces' directory exists
     main_dir = "./extracted_exports/Faces"
     if os.path.exists(main_dir):
-        
+
         print("- \n- Packing the face folders")
-        
+
         objects_packer('face', 'Faces', 'face/real', faces_foldername, uniform_foldername)
 
 
@@ -221,7 +221,7 @@ def contents_from_extracted():
     # If there's a Collars folder, move its stuff
     main_dir = "./extracted_exports/Collars"
     if os.path.exists(main_dir):
-        
+
         if not other_message:
             other_message = True
 
@@ -252,7 +252,7 @@ def contents_from_extracted():
 
         if not other_message:
             other_message = True
-            
+
             print('-')
             print('- Moving the other stuff')
 
@@ -266,7 +266,7 @@ def contents_from_extracted():
             # First delete if it already exists
             if os.path.exists(os.path.join(items_folder_path_full, item)):
                 os.remove(os.path.join(items_folder_path_full, item))
-                
+
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
@@ -279,7 +279,7 @@ def contents_from_extracted():
 
         if not other_message:
             other_message = True
-            
+
             print('-')
             print('- Moving the other stuff')
 
@@ -293,7 +293,7 @@ def contents_from_extracted():
             # First delete if it already exists
             if os.path.exists(os.path.join(items_folder_path_full, item)):
                 os.remove(os.path.join(items_folder_path_full, item))
-                
+
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
@@ -345,7 +345,7 @@ def contents_from_extracted():
                     # First delete if it already exists
                     if os.path.exists(os.path.join(subfolder, subitem)):
                         os.remove(os.path.join(subfolder, subitem))
-                        
+
                     shutil.move(os.path.join(main_dir, item, subitem), subfolder)
 
         # Then delete the main folder
@@ -370,4 +370,3 @@ def contents_from_extracted():
         print('-')
         print('- 4cc aet compiler by Shakes')
         print('-')
-        

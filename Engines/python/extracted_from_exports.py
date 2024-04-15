@@ -26,13 +26,13 @@ def readonlybit_remove_tree(path):
 
 # Append the contents of a txt file to teamnotes.txt for quick reading
 def note_txt_append(team_name, export_destination_path):
-    
+
     team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
     note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
     teamnotes_name = "teamnotes.txt"
-    
+
     if os.path.exists(note_path):
-        
+
         with open(teamnotes_name, "a") as f2:
             f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
         with open(note_path, "r", encoding="utf8") as f:
@@ -42,15 +42,15 @@ def note_txt_append(team_name, export_destination_path):
 
 
 def extracted_from_exports():
-    
+
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     dds_compression = int(os.environ.get('DDS_COMPRESSION', '0'))
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
-    
-    
+
+
     print("- ")
     print("- Extracting and checking the exports")
     print("- ")
@@ -65,7 +65,7 @@ def extracted_from_exports():
 
     # Clear the flag for writing to file
     os.environ["LOG"] = "0"
-    
+
     # Define the minimum and maximum team ids
     team_id_min = 701
     team_id_max = 920
@@ -81,10 +81,10 @@ def extracted_from_exports():
 
         # Split the words in the export
         export_name_words = re.findall(r"[^\W\_]+", export_name)
-        
+
         if not export_name_words:
             raise ValueError
-        
+
         # Get the team name from the first word of the export name
         team_name_raw = export_name_words[0]
         team_name = f"/{team_name_raw.lower()}/"
@@ -106,56 +106,56 @@ def extracted_from_exports():
 
         export_source_path = os.path.join(main_source_path, export_name)
         export_destination_path = os.path.join(main_destination_path, export_name_clean)
-        
-        
+
+
         # Delete the export destination folder if present
         if os.path.exists(export_destination_path):
             shutil.rmtree(export_destination_path)
-        
+
         # Extract or copy the export into a new export folder
         if not export_type == "folder":
             export_destination_path_temp = export_destination_path + "_temp"
             os.makedirs(export_destination_path_temp, exist_ok=True)
-            
+
             if export_type == "zip":
                 shutil.unpack_archive(export_source_path, export_destination_path_temp, "zip")
             elif export_type == "7z":
                 import py7zr
                 with py7zr.SevenZipFile(export_source_path, mode='r') as z:
                     z.extractall(export_destination_path_temp)
-                
+
             shutil.copytree(export_destination_path_temp, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
             shutil.rmtree(export_destination_path_temp)
         else:
             shutil.copytree(export_source_path, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
-        
+
         # Remove the read-only flag from every item inside the export folder
         readonlybit_remove_tree(export_destination_path)
-        
+
         # Get the team ID
         team_id = teamid_get(export_destination_path, team_name, team_id_min, team_id_max)
 
         # If the teamID was not found, proceed to the next export
         if not team_id:
             continue
-            
+
         # If the export has a Faces folder
         if os.path.exists(os.path.join(export_destination_path, "Faces")):
 
             # Move the portraits out of the Faces folder
             export_deleted = portraits_move(export_destination_path, team_id)
-        
+
             # If the export was deleted, proceed to the next export
             if export_deleted:
                 continue
-        
+
         # Check the export for all kinds of errors
         if not pass_through:
             export_check(export_destination_path, team_name)
-        
+
         # If the export has a Note.txt file, append it to the teamnotes.txt file
         note_txt_append(team_name, export_destination_path)
-        
+
         # Move the contents of the export to the root of extracted_exports
         export_move(export_destination_path, team_id, team_name)
 
@@ -167,7 +167,7 @@ def extracted_from_exports():
         shutil.rmtree(export_destination_path)
 
         print("- ")
-    
+
     if dds_compression and not fox_mode:
         # zlib compress all the dds files
         zlib_files_in_folder(main_destination_path, "dds")
@@ -186,7 +186,7 @@ def extracted_from_exports():
         else:
             print('- No issues were found')
             print('-')
-        
+
 
     # Check if the Other folder exists and there are files in it, if there are print a warning
     if os.path.exists("./extracted_exports/Other") and len(os.listdir("./extracted_exports/Other")) > 0:

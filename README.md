@@ -134,7 +134,7 @@ Portraits and Common folders to the proper folders in the Singlecpk, Facescpk
 or Uniformcpk folder inside the patches_contents folder.
 If fox mode is disabled, the contents of the Common folder will be moved to
   model/character/uniform/common/---/ (where --- is the team name),
-otherwise they will be moved to 
+otherwise they will be moved to
   Assets/model/character/common/XXX/sourceimages/#windx11 (where XXX is the
   team ID).
 

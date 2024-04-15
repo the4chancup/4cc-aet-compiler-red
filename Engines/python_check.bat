@@ -3,9 +3,9 @@ REM - Script to check if python is in the PATH and that its version is 3.12 or h
 setlocal EnableDelayedExpansion
 
 for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
-  
+
   set python_version_line=%%A
-  
+
   if "!python_version_line:~7,1!"=="3" (
     if "!python_version_line:~9,1!"=="1" (
       if "!python_version_line:~10,1!" GEQ "2" (
@@ -22,21 +22,21 @@ for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
 
 if not defined python_version_ok (
 
-  echo - 
+  echo -
   echo - Python 3.12+ is missing from your pc, please install it
-  echo - 
+  echo -
   echo - If it is already installed, run the installer again, choose Modify, click Next and make
   echo - sure to check the "Add Python to environment variables" checkbox, then click Install
-  echo - 
+  echo -
   echo Press any key to open the Python download webpage...
-  
+
   pause >nul
 
   start "" https://www.python.org/downloads/
 
   timeout /t 5 >nul
 
-  echo - 
+  echo -
   echo Press any key to resume the compiler after installing or fixing Python...
 
   pause >nul

@@ -7,10 +7,10 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
 
     # Read the necessary parameters
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
-    
+
     # Prepare a clean version of the team name without slashes
     team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
-    
+
     root_found = None
     not_root = None
     teamid = None
@@ -33,7 +33,7 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
 
     # If the folders aren't at the root
     if not root_found:
-    
+
         # Look in every folder for a faces or kit configs folder
         for foldername_test in os.listdir(exportfolder_path):
             if any([
@@ -52,10 +52,10 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
                 root_found = 1
                 not_root = 1
                 foldername_inside = foldername_test
-    
+
     # If there's no files anywhere
     if not root_found:
-      
+
         with open('memelist.txt', 'a') as file:
             file.write("-\n")
             file.write("- {}'s manager needs to get memed on (no files) - Export discarded.\n".format(team_name))
@@ -73,8 +73,8 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
             input("Press Enter to continue...")
 
         return None
-    
-    
+
+
     # Reset the flag for usable team name found
     team_name_good = None
 
@@ -137,35 +137,35 @@ def teamid_get(exportfolder_path, team_name, team_id_min, team_id_max):
 
         with open("memelist.txt", 'a') as memelist:
             memelist.write(f"\n- {team_name}'s manager needs to get memed on (unusable team name) - Export discarded.")
-        
+
         print(f"- {team_name}'s manager needs to get memed on (unusable team name).")
         print("- The team name was not found on the teams_list txt file.")
         print("- This export will be discarded to prevent conflicts.")
         print("- Adding the team name to the teams_list file and")
         print("- restarting the script is recommended.")
-        
+
         if pause_on_error:
             input("Press Enter to continue...")
-        
+
         # Skip the whole export
         shutil.rmtree(exportfolder_path)
 
         return None
-    
+
     print(f"(ID: {teamid})")
-    
+
     # Check if the team ID is in the range
     if not (teamid.isdigit() and int(teamid) in range(team_id_min, team_id_max + 1)):
-        
+
         with open("memelist.txt", 'a') as memelist:
             memelist.write(f"\n- {team_name}'s manager needs to get memed on (team id not in range) - Export discarded.")
-            
+
         print(f"- The team ID is not in the range {team_id_min} - {team_id_max}.")
         print("- This export will be discarded to prevent conflicts.")
-        
+
         # Skip the whole export
         shutil.rmtree(exportfolder_path)
 
         return None
-    
+
     return teamid

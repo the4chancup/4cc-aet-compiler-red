@@ -128,7 +128,7 @@ def settings_init(file_name):
         pes_folder_path = os.environ.get("PES_FOLDER_PATH")
         if "**" in pes_folder_path:
             os.environ["PES_FOLDER_PATH"] = pes_folder_path.replace("**", os.environ["PES_VERSION"])
-        
+
         # Prepare the path to the PES exe in the parent folder of the PES download folder
         pes_exe_name = "PES20" + os.environ["PES_VERSION"] + ".exe"
         os.environ["PES_EXE_PATH"] = os.path.join(os.environ["PES_FOLDER_PATH"], pes_exe_name)

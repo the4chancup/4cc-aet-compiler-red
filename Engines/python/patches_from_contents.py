@@ -7,7 +7,7 @@ from .lib import pes_cpk_pack as cpktool
 
 
 def patches_from_contents():
-    
+
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     pes_version = int(os.environ.get('PES_VERSION', '19'))
@@ -22,16 +22,16 @@ def patches_from_contents():
     uniform_cpk_name = os.environ.get('UNIFORM_CPK_NAME', '4cc_45_uniform')
     bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')
     cache_clear = int(os.environ.get('CACHE_CLEAR', '0'))
-    
+
     pes_download_path = os.path.join(pes_folder_path, "download")
-    
+
     # Set the name for the folders to put stuff into
     if not multicpk_mode:
 
         faces_foldername = "Singlecpk"
         uniform_foldername = "Singlecpk"
         bins_foldername = "Singlecpk"
-        
+
     else:
 
         faces_foldername = "Facescpk"
@@ -47,11 +47,11 @@ def patches_from_contents():
         (not os.path.exists(f"./patches_contents/{bins_foldername}") and bins_updating)):
         input("Input folder not found. Exiting...")
         exit()
-        
+
 
     # Make the patches
     if multicpk_mode:
-    
+
         # Make sure that the folders are not empty to avoid errors
         if not os.listdir(f"./patches_contents/{faces_foldername}"):
             open(f"./patches_contents/{faces_foldername}/placeholder", 'w').close()
@@ -68,7 +68,7 @@ def patches_from_contents():
         source_path = os.path.join("patches_contents", f"{faces_foldername}")
         source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
         destination_path = os.path.join("patches_output", f"{faces_cpk_name}.cpk")
-        
+
         cpktool.main(destination_path, source_contents_path_list, True)
 
         # Make the Uniform patch (kits, logos, boots, gloves, etc.)
@@ -78,7 +78,7 @@ def patches_from_contents():
         source_path = os.path.join("patches_contents", f"{uniform_foldername}")
         source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
         destination_path = os.path.join("patches_output", f"{uniform_cpk_name}.cpk")
-        
+
         cpktool.main(destination_path, source_contents_path_list, True)
 
 
@@ -91,9 +91,9 @@ def patches_from_contents():
             source_path = os.path.join("patches_contents", f"{bins_foldername}")
             source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
             destination_path = os.path.join("patches_output", f"{bins_cpk_name}.cpk")
-            
+
             cpktool.main(destination_path, source_contents_path_list, True)
-        
+
     else:
 
         # Make sure that the folder is not empty to avoid errors
@@ -104,18 +104,18 @@ def patches_from_contents():
         # Make the single cpk patch
         print('-')
         print('- Packing the patch')
-        
+
         source_path = os.path.join("patches_contents", "Singlecpk")
         source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
         destination_path = os.path.join("patches_output", f"{cpk_name}.cpk")
-        
+
         cpktool.main(destination_path, source_contents_path_list, True)
 
 
     # Delete the contents folder
     if cache_clear:
         shutil.rmtree("./patches_contents")
-    
+
     print('-')
     print('- The patches have been created')
     print('-')
@@ -130,11 +130,11 @@ def patches_from_contents():
         print('-')
 
         if multicpk_mode:
-            
+
             faces_cpk_path = os.path.join(pes_download_path, f"{faces_cpk_name}.cpk")
             uniform_cpk_path = os.path.join(pes_download_path, f"{uniform_cpk_name}.cpk")
             bins_cpk_path = os.path.join(pes_download_path, f"{bins_cpk_name}.cpk")
-            
+
             # Remove the cpks from the destination folder if present
             if os.path.exists(faces_cpk_path):
                 os.remove(faces_cpk_path)
@@ -153,22 +153,22 @@ def patches_from_contents():
         else:
 
             cpk_path = os.path.join(pes_download_path, f"{cpk_name}.cpk")
-            
+
             # Remove the cpk from the destination folder if present
             if os.path.exists(cpk_path):
                 os.remove(cpk_path)
 
             # Move the cpk to the destination folder
             shutil.move(f"patches_output/{cpk_name}.cpk", pes_download_path)
-        
+
         print('- Done')
         print('-')
-        
+
         # If Run PES mode is enabled, start the pes exe from PES_EXE_PATH
         if run_pes:
-            
+
             pes_exe_path = os.environ.get('PES_EXE_PATH', 'null')
-            
+
             if os.path.exists(pes_exe_path):
                 print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
                 print('-')
@@ -202,4 +202,3 @@ def patches_from_contents():
 
         # Reset the all_in_one mode flag
         os.environ['ALL_IN_ONE'] = '0'
-        

@@ -75,13 +75,13 @@ def get_bytes_ascii(file_path, start, length):
 def unzlib_file(source_file_path, destination_file_path = None):
     """
     A function to unzlib a file if needed and copy it to a destination file path.
-    
+
     :param source_file_path: str - the file path of the source file to unzlib
     :param destination_file_path: str (optional) - the file path to save the unzlibbed file, defaults to None
-    
+
     :return: bool - True if the file needed to be unzlibbed, False otherwise
     """
-    
+
     unzlib_needed = False
     if destination_file_path is None:
         destination_file_path = source_file_path
@@ -104,13 +104,13 @@ def unzlib_file(source_file_path, destination_file_path = None):
 def zlib_file(source_file_path, destination_file_path = None):
     """
     A function to zlib a file if needed and copy it to a destination file path.
-    
+
     :param source_file_path: str - the file path of the source file to zlib
     :param destination_file_path: str (optional) - the file path to save the zlibbed file, defaults to None
-    
+
     :return: bool - True if the file needed to be zlibbed, False otherwise
     """
-    
+
     zlib_needed = False
     if destination_file_path is None:
         destination_file_path = source_file_path

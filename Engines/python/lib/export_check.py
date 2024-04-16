@@ -4,6 +4,7 @@ import shutil
 from .utils.zlib_plus import unzlib_file
 from .texture_check import texture_check
 from .xml_check import mtl_check
+from .xml_check import xml_check
 from .txt_kits_count import txt_kits_count
 
 
@@ -93,8 +94,9 @@ def faces_check(exportfolder_path, team_name):
                 # Initialize error subflags
                 folder_error_num = False
                 folder_error_edithairxml = False
-                folder_error_noxml = False
-                folder_error_nofpkxml = False
+                folder_error_xml_missing = False
+                folder_error_xml_format = False
+                folder_error_fpkxml_missing = False
                 folder_error_tex_format = False
                 folder_error_mtl_format = False
 
@@ -108,13 +110,15 @@ def faces_check(exportfolder_path, team_name):
                     if os.path.isfile(face_edithair_xml_path):
                         folder_error_edithairxml = True
                     elif not os.path.isfile(face_xml_path):
-                        folder_error_noxml = True
+                        folder_error_xml_missing = True
+                    else:
+                        folder_error_xml_format = xml_check(face_xml_path)
 
                 else:
                     # Check that the folder has the essential face.fpk.xml file
                     face_fpk_xml_path = os.path.join(subfolder_path, "face.fpk.xml")
                     if not os.path.isfile(face_fpk_xml_path):
-                        folder_error_nofpkxml = True
+                        folder_error_fpkxml_missing = True
 
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
@@ -137,8 +141,9 @@ def faces_check(exportfolder_path, team_name):
                 folder_error = (
                     folder_error_num or
                     folder_error_edithairxml or
-                    folder_error_noxml or
-                    folder_error_nofpkxml or
+                    folder_error_xml_missing or
+                    folder_error_xml_format or
+                    folder_error_fpkxml_missing or
                     folder_error_tex_format or
                     folder_error_mtl_format
                 )
@@ -164,10 +169,10 @@ def faces_check(exportfolder_path, team_name):
                         if folder_error_num:
                             log.write(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded\n')
                             print(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded')
-                        if folder_error_nofpkxml:
+                        if folder_error_fpkxml_missing:
                             log.write('- (no face.fpk.xml file inside) - Folder discarded)\n')
                             print('- (no face.fpk.xml file inside) - Folder discarded')
-                        if folder_error_noxml:
+                        if folder_error_xml_missing:
                             log.write('- (no face.xml file inside) - Folder discarded)\n')
                             print('- (no face.xml file inside) - Folder discarded')
                         if folder_error_edithairxml:

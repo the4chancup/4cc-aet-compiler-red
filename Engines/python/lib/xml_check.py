@@ -3,7 +3,7 @@ import re
 import shutil
 import xml.etree.ElementTree as ET
 
-from utils.zlib_plus import unzlib_file
+from .utils.zlib_plus import unzlib_file
 
 
 # Read the necessary parameters
@@ -213,11 +213,11 @@ def xml_check(xml_path):
             model_type_list.append(model_type)
 
         # Check that the model path corresponds to a file in the folder indicated
-        model_path_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model")
+        model_path_error = not listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model")
 
         # Check that the mtl path corresponds to a file in the folder indicated, if not checked previously
         if (not model_material_path) or (model_material_path not in model_material_path_list):
-            model_material_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_material_path, "Mtl")
+            model_material_error = not listed_file_check(xml_path, xml_name, xml_folder_name, model_material_path, "Mtl")
 
             if model_material_path:
                 model_material_path_list.append(model_material_path)
@@ -452,7 +452,7 @@ def mtl_check(mtl_path):
                 error = True
             else:
 
-                texture_path_error = listed_file_check(mtl_path, mtl_name, mtl_folder_name, sampler_texture_path, "Texture", material_name, sampler_name)
+                texture_path_error = not listed_file_check(mtl_path, mtl_name, mtl_folder_name, sampler_texture_path, "Texture", material_name, sampler_name)
 
                 if texture_path_error:
                     ##error = True

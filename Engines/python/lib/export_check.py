@@ -175,6 +175,9 @@ def faces_check(exportfolder_path, team_name):
                         if folder_error_xml_missing:
                             log.write('- (no face.xml file inside) - Folder discarded)\n')
                             print('- (no face.xml file inside) - Folder discarded')
+                        if folder_error_xml_format:
+                            log.write('- (broken xml files) - Folder discarded)\n')
+                            print('- (broken xml files) - Folder discarded')
                         if folder_error_edithairxml:
                             log.write('- (unsupported edithair face folder, needs updating) - Folder discarded)\n')
                             print('- (unsupported edithair face folder, needs updating) - Folder discarded')

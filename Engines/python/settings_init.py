@@ -125,7 +125,7 @@ def settings_init(file_name):
             settings_default_init(file_name, default_file_path)
 
         # Check if the PES download folder location contains the magic number ** and replace it with the pes version
-        pes_folder_path = os.environ.get("PES_FOLDER_PATH")
+        pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')
         if "**" in pes_folder_path:
             os.environ["PES_FOLDER_PATH"] = pes_folder_path.replace("**", os.environ["PES_VERSION"])
 

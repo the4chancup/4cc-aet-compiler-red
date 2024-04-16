@@ -286,7 +286,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     if kitcols_search and data[0][0] == "-":
 
                         # Create a list to store the kit color entry
-                        kitcol = [None, None, None, None]
+                        kitcol = [[], [], [], None]
 
                         # Convert the color entry to bytes
                         kitcol[1], kitcol[2], kitcol[3] = bytes_from_color_entry(line, type_kits = True)
@@ -352,7 +352,3 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
     print("- Done")
     print("- ")
-
-
-if __name__ == '__main__':
-    bins_update()

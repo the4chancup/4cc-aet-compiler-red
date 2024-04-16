@@ -251,8 +251,7 @@ def xml_check(xml_path):
         root.append(dummy_model)
 
 
-    # Create a new tree
-    tree_new = ET.ElementTree()
+    # Create a new root
     root_new = ET.Element('config')
 
     # Add the original models to the new tree, then the dif block
@@ -264,7 +263,7 @@ def xml_check(xml_path):
         root_new.append(dif)
 
     # Write the modified .xml file
-    tree_new._setroot(root_new)
+    tree_new = ET.ElementTree(root_new)
     tree_new.write(xml_path, encoding='UTF-8', xml_declaration=True)
 
 

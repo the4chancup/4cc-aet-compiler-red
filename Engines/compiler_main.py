@@ -6,6 +6,7 @@ import ctypes
 import logging
 import traceback
 import importlib
+import importlib.util
 
 from python.admin_check import admin_check
 from python.settings_init import settings_init

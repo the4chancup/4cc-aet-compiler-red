@@ -79,6 +79,25 @@ def extracted_from_exports():
 
     for export_name in os.listdir(main_source_path):
 
+        export_source_path = os.path.join(main_source_path, export_name)
+
+        # Check the export type
+        if os.path.isdir(export_source_path):
+            export_type = "folder"
+            export_name_clean = export_name
+        elif export_source_path[-4:] == ".zip":
+            export_type = "zip"
+            export_name_clean = export_name[:-4]
+        elif export_source_path[-3:] == ".7z":
+            export_type = "7z"
+            export_name_clean = export_name[:-3]
+        else:
+            # If the export is neither a zip, 7z nor a folder, skip it
+            print(f"- \"{export_name}\" is unusable - Skipping")
+            continue
+
+        export_destination_path = os.path.join(main_destination_path, export_name_clean)
+
         # Split the words in the export
         export_name_words = re.findall(r"[^\W\_]+", export_name)
 
@@ -92,27 +111,12 @@ def extracted_from_exports():
         # Print team without a new line
         print(f"- {team_name} ", end='')
 
-        # If the foldername ends with .zip
-        if export_name[-4:] == ".zip":
-            export_type = "zip"
-            export_name_clean = export_name[:-4]
-        # If the foldername ends with .7z
-        elif export_name[-3:] == ".7z":
-            export_type = "7z"
-            export_name_clean = export_name[:-3]
-        else:
-            export_type = "folder"
-            export_name_clean = export_name
-
-        export_source_path = os.path.join(main_source_path, export_name)
-        export_destination_path = os.path.join(main_destination_path, export_name_clean)
-
 
         # Delete the export destination folder if present
         if os.path.exists(export_destination_path):
             shutil.rmtree(export_destination_path)
 
-        # Extract or copy the export into a new export folder
+        # Extract or copy the export into a new export folder, removing the .db and .ini files
         if not export_type == "folder":
             export_destination_path_temp = export_destination_path + "_temp"
             os.makedirs(export_destination_path_temp, exist_ok=True)
@@ -195,4 +199,3 @@ def extracted_from_exports():
         print('-')
         if pause_on_error:
             input('Press Enter to continue...')
-

@@ -51,11 +51,11 @@ formatBlockConfiguration = {
 def ddsMipmapSize(ftexFormat, width, height, depth, mipmapIndex):
 	(blockSizePixels, blockSizeBytes) = formatBlockConfiguration[ftexFormat]
 	scaleFactor = 2 ** mipmapIndex
-	
+
 	mipmapWidth = max(width // scaleFactor, 1)
 	mipmapHeight = max(height // scaleFactor, 1)
 	mipmapDepth = max(depth // scaleFactor, 1)
-	
+
 	widthBlocks = (mipmapWidth + blockSizePixels - 1) // blockSizePixels
 	heightBlocks = (mipmapHeight + blockSizePixels - 1) // blockSizePixels
 	return widthBlocks * heightBlocks * mipmapDepth * blockSizeBytes
@@ -63,7 +63,7 @@ def ddsMipmapSize(ftexFormat, width, height, depth, mipmapIndex):
 def ftexToDdsBuffer(ftexBuffer):
 	def readImageBuffer(stream, imageOffset, chunkCount, uncompressedSize, compressedSize):
 		stream.seek(imageOffset, 0)
-		
+
 		if chunkCount == 0:
 			if compressedSize == 0:
 				uncompressedBuffer = bytearray(uncompressedSize)
@@ -75,7 +75,7 @@ def ftexToDdsBuffer(ftexBuffer):
 				if stream.readinto(compressedBuffer) != len(compressedBuffer):
 					raise DecodeError("Unexpected end of stream")
 				return zlib.decompress(compressedBuffer)
-		
+
 		chunks = []
 		for i in range(chunkCount):
 			header = bytearray(8)
@@ -88,9 +88,9 @@ def ftexToDdsBuffer(ftexBuffer):
 			) = struct.unpack('< HH I', header)
 			isCompressed = (offset & (1 << 31)) == 0
 			offset &= ~(1 << 31)
-			
+
 			chunks.append((offset, compressedSize, isCompressed))
-		
+
 		imageBuffers = []
 		for (offset, compressedSize, isCompressed) in chunks:
 			stream.seek(imageOffset + offset, 0)
@@ -100,21 +100,21 @@ def ftexToDdsBuffer(ftexBuffer):
 			if isCompressed:
 				try:
 					decompressedBuffer = zlib.decompress(compressedBuffer)
-				except:
+				except Exception:
 					raise DecodeError("Decompression error")
 			else:
 				decompressedBuffer = compressedBuffer
 			imageBuffers.append(decompressedBuffer)
 		return b''.join(imageBuffers)
-	
-	
-	
+
+
+
 	inputStream = io.BytesIO(ftexBuffer)
-	
+
 	header = bytearray(64)
 	if inputStream.readinto(header) != len(header):
 		raise DecodeError("Incomplete ftex header")
-	
+
 	(
 		ftexMagic,
 		ftexVersion,
@@ -133,10 +133,10 @@ def ftexToDdsBuffer(ftexBuffer):
 		ftexHash1,
 		ftexHash2,
 	) = struct.unpack('< 4s f HHHH  BB HIII  BB 14x  8s 8s', header)
-	
+
 	if ftexMagic != b'FTEX':
 		raise DecodeError("Incorrect ftex signature")
-	
+
 	if ftexVersion < 2.025:
 		raise DecodeError("Unsupported ftex version")
 	if ftexVersion > 2.045:
@@ -145,9 +145,9 @@ def ftexToDdsBuffer(ftexBuffer):
 		raise DecodeError("Unsupported ftex variant")
 	if ftexMipmapCount == 0:
 		raise DecodeError("Unsupported ftex variant")
-	
-	
-	
+
+
+
 	ddsFlags = (
 		  0x1        # capabilities
 		| 0x2        # height
@@ -156,7 +156,7 @@ def ftexToDdsBuffer(ftexBuffer):
 	)
 	ddsCapabilities1 = 0x1000 # texture
 	ddsCapabilities2 = 0
-	
+
 	if (ftexTextureType & 4) != 0:
 		# Cube map, with six faces
 		if ftexDepth > 1:
@@ -165,7 +165,7 @@ def ftexToDdsBuffer(ftexBuffer):
 		ddsDepth = 1
 		ddsCapabilities1 |= 0x8    # complex
 		ddsCapabilities2 |= 0xfe00 # cube map with six faces
-		
+
 		ddsExtensionDimension = 3 # 2D
 		ddsExtensionFlags = 0x4 # cube map
 	elif ftexDepth > 1:
@@ -174,25 +174,25 @@ def ftexToDdsBuffer(ftexBuffer):
 		ddsDepth = ftexDepth
 		ddsFlags |= 0x800000      # depth
 		ddsCapabilities2 |= 0x200000 # volume texture
-		
+
 		ddsExtensionDimension = 4 # 3D
 		ddsExtensionFlags = 0
 	else:
 		# Regular 2D texture
 		imageCount = 1
 		ddsDepth = 1
-		
+
 		ddsExtensionDimension = 3 # 2D
 		ddsExtensionFlags = 0
-	
+
 	ddsMipmapCount = ftexMipmapCount
 	mipmapCount = ftexMipmapCount
 	ddsFlags |= 0x20000          # mipmapCount
 	ddsCapabilities1 |= 0x8      # complex
 	ddsCapabilities1 |= 0x400000 # mipmap
-	
-	
-	
+
+
+
 	#
 	# A frame is a byte array containing a single mipmap element of a single image.
 	# Cube maps have six images with mipmaps, and so 6 * $mipmapCount frames.
@@ -214,10 +214,10 @@ def ftexToDdsBuffer(ftexBuffer):
 			) = struct.unpack('< I I I BB H', mipmapHeader)
 			if index != j:
 				raise DecodeError("Unexpected mipmap")
-			
+
 			expectedFrameSize = ddsMipmapSize(ftexPixelFormat, ftexWidth, ftexHeight, ddsDepth, j)
 			frameSpecifications.append((offset, chunkCount, uncompressedSize, compressedSize, expectedFrameSize))
-	
+
 	frames = []
 	for (offset, chunkCount, uncompressedSize, compressedSize, expectedSize) in frameSpecifications:
 		frame = readImageBuffer(inputStream, offset, chunkCount, uncompressedSize, compressedSize)
@@ -226,15 +226,15 @@ def ftexToDdsBuffer(ftexBuffer):
 		elif len(frame) > expectedSize:
 			frame = frame[0:expectedSize]
 		frames.append(frame)
-	
-	
-	
+
+
+
 	ddsPitch = None
 	if ftexPixelFormat == 0:
 		ddsPitchOrLinearSize = 4 * ftexWidth
 		ddsFlags |= 0x8 # pitch
 		useExtensionHeader = False
-		
+
 		ddsFormatFlags = 0x41 # uncompressed rgba
 		ddsFourCC = b'\0\0\0\0'
 		ddsRgbBitCount = 32
@@ -245,17 +245,17 @@ def ftexToDdsBuffer(ftexBuffer):
 	else:
 		ddsPitchOrLinearSize = len(frames[0])
 		ddsFlags |= 0x80000 # linear size
-		
+
 		ddsFormatFlags = 0x4 # compressed
 		ddsRgbBitCount = 0
 		ddsRBitMask = 0
 		ddsGBitMask = 0
 		ddsBBitMask = 0
 		ddsABitMask = 0
-		
+
 		ddsFourCC = None
 		ddsExtensionFormat = None
-		
+
 		if ftexPixelFormat == 1:
 			ddsExtensionFormat = 61 # DXGI_FORMAT_R8_UNORM
 		elif ftexPixelFormat == 2:
@@ -282,19 +282,19 @@ def ftexToDdsBuffer(ftexBuffer):
 			ddsExtensionFormat = 26 # DXGI_FORMAT_R11G11B10_FLOAT
 		else:
 			raise DecodeError("Unsupported ftex codec")
-		
+
 		if ddsExtensionFormat is not None:
 			ddsFourCC = b'DX10'
 			useExtensionHeader = True
 		else:
 			useExtensionHeader = False
-	
-	
-	
+
+
+
 	outputStream = io.BytesIO()
 	outputStream.write(struct.pack('< 4s 7I 44x 2I 4s 5I 2I 12x',
 		b'DDS ',
-		
+
 		124, # header size
 		ddsFlags,
 		ftexHeight,
@@ -302,7 +302,7 @@ def ftexToDdsBuffer(ftexBuffer):
 		ddsPitchOrLinearSize,
 		ddsDepth,
 		ddsMipmapCount,
-		
+
 		32, # substructure size
 		ddsFormatFlags,
 		ddsFourCC,
@@ -311,11 +311,11 @@ def ftexToDdsBuffer(ftexBuffer):
 		ddsGBitMask,
 		ddsBBitMask,
 		ddsABitMask,
-		
+
 		ddsCapabilities1,
 		ddsCapabilities2,
 	))
-	
+
 	if useExtensionHeader:
 		outputStream.write(struct.pack('< 5I',
 			ddsExtensionFormat,
@@ -324,19 +324,19 @@ def ftexToDdsBuffer(ftexBuffer):
 			1, # array size
 			0, # flags
 		))
-	
+
 	for frame in frames:
 		outputStream.write(frame)
-	
+
 	return outputStream.getbuffer()
 
 def ftexToDds(ftexFilename, ddsFilename):
 	inputStream = open(ftexFilename, 'rb')
 	inputBuffer = inputStream.read()
 	inputStream.close()
-	
+
 	outputBuffer = ftexToDdsBuffer(inputBuffer)
-	
+
 	outputStream = open(ddsFilename, 'wb')
 	outputStream.write(outputBuffer)
 	outputStream.close()
@@ -345,11 +345,11 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 	def encodeImage(data):
 		chunkSize = 1 << 14 # Value known not to crash PES
 		chunkCount = (len(data) + chunkSize - 1) // chunkSize
-		
+
 		headerBuffer = bytearray()
 		chunkBuffer = bytearray()
 		chunkBufferOffset = chunkCount * 8
-		
+
 		for i in range(chunkCount):
 			chunk = data[chunkSize * i : chunkSize * (i + 1)]
 			compressedChunk = zlib.compress(chunk, level = 3)
@@ -360,19 +360,19 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 				len(chunk),
 				offset + chunkBufferOffset,
 			)
-		
+
 		output = headerBuffer + chunkBuffer
 		if len(output) % 8 > 0:
 			output += bytearray(8 - len(output) % 8)
-		
+
 		return (output, chunkCount)
-	
+
 	inputStream = io.BytesIO(ddsBuffer)
-	
+
 	header = bytearray(128)
 	if inputStream.readinto(header) != len(header):
 		raise DecodeError("Incomplete dds header")
-	
+
 	(
 		ddsMagic,
 		ddsHeaderSize,
@@ -383,7 +383,7 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		ddsDepth,
 		ddsMipmapCount,
 		# ddsReserved,
-		
+
 		ddsPixelFormatSize,
 		ddsFormatFlags,
 		ddsFourCC,
@@ -392,17 +392,17 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		ddsGBitMask,
 		ddsBBitMask,
 		ddsABitMask,
-		
+
 		ddsCapabilities1,
 		ddsCapabilities2,
 		# ddsReserved,
 	) = struct.unpack('< 4s 7I 44x 2I 4s 5I 2I 12x', header)
-	
+
 	if ddsMagic != b'DDS ':
 		raise DecodeError("Incorrect dds signature")
 	if ddsHeaderSize != 124:
 		raise DecodeError("Incorrect dds header")
-	
+
 	if (
 		    (ddsCapabilities1 & 0x400000) > 0 # mipmap
 		and (ddsMipmapCount > 1)
@@ -410,7 +410,7 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		mipmapCount = ddsMipmapCount
 	else:
 		mipmapCount = 1
-	
+
 	if ddsCapabilities2 & 0x200 > 0: #cubemap
 		if ddsCapabilities2 & 0xfe00 != 0xfe00:
 			raise DecodeError("Incomplete dds cube maps not supported")
@@ -419,15 +419,15 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 	else:
 		isCubeMap = False
 		cubeEntries = 1
-	
+
 	if ddsCapabilities2 & 0x200000 > 0: # volume texture
 		depth = ddsDepth
 	else:
 		depth = 1
-	
+
 	if isCubeMap and depth > 1:
 		raise DecodeError("Invalid dds combination: cube map and volume map both set")
-	
+
 	if colorSpace == 'LINEAR':
 		ftexTextureType = 0x1
 	elif colorSpace == 'SRGB':
@@ -438,9 +438,9 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		ftexTextureType = 0x9
 	if isCubeMap:
 		ftexTextureType |= 0x4
-	
-	
-	
+
+
+
 	if ddsFormatFlags & 0x4 == 0: # fourCC absent
 		if (
 			    (ddsFormatFlags & 0x40) > 0 # rgb
@@ -457,12 +457,12 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		extensionHeader = bytearray(20)
 		if inputStream.readinto(extensionHeader) != len(extensionHeader):
 			raise DecodeError("Incomplete dds extension header")
-		
+
 		(
 			ddsExtensionFormat,
 			# ddsOther,
 		) = struct.unpack('< I 16x', extensionHeader)
-		
+
 		if ddsExtensionFormat == 61: # DXGI_FORMAT_R8_UNORM
 			ftexPixelFormat = 1
 		elif ddsExtensionFormat == 71: # DXGI_FORMAT_BC1_UNORM ["DXT1"]
@@ -499,14 +499,14 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		ftexPixelFormat = 4
 	else:
 		raise DecodeError("Unsupported dds codec")
-	
+
 	if ftexPixelFormat > 4:
 		ftexVersion = 2.04
 	else:
 		ftexVersion = 2.03
-	
-	
-	
+
+
+
 	frameBuffer = bytearray()
 	mipmapEntries = []
 	for _ in range(cubeEntries):
@@ -515,12 +515,12 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 			frame = inputStream.read(length)
 			if len(frame) != length:
 				raise DecodeError("Unexpected end of dds stream")
-			
+
 			frameOffset = len(frameBuffer)
 			(compressedFrame, chunkCount) = encodeImage(frame)
 			frameBuffer += compressedFrame
 			mipmapEntries.append((frameOffset, len(frame), len(compressedFrame), mipmapIndex, chunkCount))
-	
+
 	mipmapBuffer = bytearray()
 	mipmapBufferOffset = 64
 	frameBufferOffset = mipmapBufferOffset + len(mipmapEntries) * 16
@@ -533,7 +533,7 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 			0, # ftexs number
 			chunkCount
 		)
-	
+
 	header = struct.pack('< 4s f HHHH  BB HIII  BB 14x  16x',
 		b'FTEX',
 		ftexVersion,
@@ -552,16 +552,16 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		# 14 bytes padding
 		# 16 bytes hashes
 	)
-	
+
 	return header + mipmapBuffer + frameBuffer
 
 def ddsToFtex(ddsFilename, ftexFilename, colorSpace):
 	inputStream = open(ddsFilename, 'rb')
 	inputBuffer = inputStream.read()
 	inputStream.close()
-	
+
 	outputBuffer = ddsToFtexBuffer(tryDecompress(inputBuffer), colorSpace)
-	
+
 	outputStream = open(ftexFilename, 'wb')
 	outputStream.write(outputBuffer)
 	outputStream.close()

@@ -41,7 +41,7 @@ def decompress(byteBuffer):
 		raise DecodeError()
 	try:
 		return zlib.decompress(compressedBuffer)
-	except:
+	except Exception:
 		raise DecodeError()
 
 def tryDecompress(byteBuffer):
@@ -50,7 +50,7 @@ def tryDecompress(byteBuffer):
 		return byteBuffer
 	try:
 		return zlib.decompress(compressedBuffer)
-	except:
+	except Exception:
 		raise DecodeError()
 
 def isCompressed(byteBuffer):

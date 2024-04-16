@@ -404,7 +404,7 @@ def mtl_check(mtl_path):
             print(f"- Material:       \"{material.get('name')}\"")
             # Print the list of missing required state names
             for missing_state_name in missing_state_names:
-                print(f"- State name:  \"{missing_state_name}\"")
+                print(f"- State name:     \"{missing_state_name}\"")
             print("-")
             ##error = True
             warning = True

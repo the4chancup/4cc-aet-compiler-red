@@ -147,7 +147,8 @@ def xml_check(xml_path):
 
     # Store the name of the file and its parent folder
     xml_name = os.path.basename(xml_path)
-    xml_folder_name = os.path.basename(os.path.dirname(xml_path))
+    xml_folder_path = os.path.dirname(xml_path)
+    xml_folder_name = os.path.basename(xml_folder_path)
 
     # Try to unzlib the file
     unzlib_file(xml_path)
@@ -237,9 +238,10 @@ def xml_check(xml_path):
         # Copy the oral_dummy_win32.model file from the template folder to the xml folder
         dummy_model_name = "oral_dummy_win32.model"
         dummy_model_source = os.path.join('Engines', 'template', dummy_model_name)
+        dummy_model_destination = os.path.join(xml_folder_path, dummy_model_name)
         dummy_model_path = f"./{dummy_model_name.replace('win32', '*')}"
 
-        shutil.copyfile(dummy_model_source, xml_folder_name)
+        shutil.copyfile(dummy_model_source, dummy_model_destination)
 
         # Then add a model entry to the .xml file, with the type "face_neck" and the first mtl path from the list
         dummy_model = ET.Element('model')

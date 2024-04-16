@@ -218,7 +218,7 @@ if __name__ == "__main__":
     dependency_check()
 
     # Enable the advanced traceback handler
-    from traceback_with_variables import activate_by_import  # noqa: F401
+    from traceback_with_variables import activate_by_import as activate_by_import
     from traceback_with_variables import printing_exc, LoggerAsFile
 
     # Enable the logger

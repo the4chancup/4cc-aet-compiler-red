@@ -229,7 +229,6 @@ def ftexToDdsBuffer(ftexBuffer):
 
 
 
-	ddsPitch = None
 	if ftexPixelFormat == 0:
 		ddsPitchOrLinearSize = 4 * ftexWidth
 		ddsFlags |= 0x8 # pitch

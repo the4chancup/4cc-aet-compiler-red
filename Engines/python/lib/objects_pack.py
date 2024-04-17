@@ -36,9 +36,11 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             object_id = object_name[:5]
             print(f"- {object_name}")
 
+            object_path = os.path.join(object_source_path, object_name)
+            object_path_new = os.path.join(object_source_path, object_id)
+
             # Rename it with the proper id
-            os.rename(os.path.join(object_source_path, object_name),
-                      os.path.join(object_source_path, object_id))
+            os.rename(object_path, object_path_new)
 
             if object_type == "face":
 
@@ -47,7 +49,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                 os.makedirs(temp_path, exist_ok=True)
 
                 # Move the face folder to the temp folder
-                shutil.move(os.path.join(object_source_path, object_id), temp_path)
+                shutil.move(object_path_new, temp_path)
 
                 # Make a cpk and put it in the Faces folder
                 cpk_source = os.path.join(temp_folder_path, object_id, "common")
@@ -60,7 +62,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                     shutil.rmtree(os.path.join(object_destination_path, object_id))
 
                 # Move the folder
-                shutil.move(os.path.join(object_source_path, object_id), object_destination_path)
+                shutil.move(object_path_new, object_destination_path)
 
     # Fox mode
     else:
@@ -78,9 +80,11 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             object_id = object_name[:5]
             print(f"- {object_name}")
 
+            object_path = os.path.join(object_source_path, object_name)
+            object_path_new = os.path.join(object_source_path, object_id)
+
             # Rename it with the proper id
-            os.rename(os.path.join(object_source_path, object_name),
-                      os.path.join(object_source_path, object_id))
+            os.rename(object_path, object_path_new)
 
             # Delete the old folder if present
             if os.path.exists(os.path.join(object_destination_path, object_id)):
@@ -91,7 +95,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             os.makedirs(os.path.join(temp_path, "#windx11"), exist_ok=True)
 
             # Move the folder to the temp folder
-            shutil.move(os.path.join(object_source_path, object_id), temp_path)
+            shutil.move(object_path_new, temp_path)
 
             # If the folder has textures
             texture_path = os.path.join(temp_path, object_id)

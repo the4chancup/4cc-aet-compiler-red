@@ -112,7 +112,7 @@ def faces_check(exportfolder_path, team_name):
                     elif not os.path.isfile(face_xml_path):
                         folder_error_xml_missing = True
                     else:
-                        folder_error_xml_format = xml_check(face_xml_path)
+                        folder_error_xml_format = xml_check(face_xml_path, face_neck_needed=True)
 
                 else:
                     # Check that the folder has the essential face.fpk.xml file

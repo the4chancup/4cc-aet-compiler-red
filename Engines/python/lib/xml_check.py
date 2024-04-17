@@ -131,7 +131,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     return not error
 
 
-def xml_check(xml_path):
+def xml_check(xml_path, face_neck_needed=False):
     """
     Checks the given .xml file.
 
@@ -233,7 +233,7 @@ def xml_check(xml_path):
     dummy_model = None
 
     # Check if any of the models has the "face_neck" type
-    if "face_neck" not in model_type_list:
+    if face_neck_needed and ("face_neck" not in model_type_list):
 
         # Copy the oral_dummy_win32.model file from the template folder to the xml folder
         dummy_model_name = "oral_dummy_win32.model"

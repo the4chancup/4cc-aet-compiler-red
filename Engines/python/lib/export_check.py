@@ -742,6 +742,7 @@ def gloves_check(exportfolder_path, team_name):
 
                 # Initialize error subflags
                 folder_error_name = False
+                folder_error_xml_format = False
                 folder_error_nofpkxml = False
                 folder_error_tex_format = False
                 folder_error_mtl_format = False
@@ -749,9 +750,16 @@ def gloves_check(exportfolder_path, team_name):
                 # Check that its name starts with a g and that the 4 characters after it are digits
                 folder_error_name = not (subfolder_name.startswith('g') and subfolder_name[1:5].isdigit())
 
-                if fox_mode:
+                if not fox_mode:
+                    # Check if the folder has a glove.xml
+                    glove_xml_path = os.path.join(subfolder_path, "glove.xml")
+                    if os.path.isfile(glove_xml_path):
+                        folder_error_xml_format = xml_check(glove_xml_path)
+
+                else:
                     # Check that the folder has the essential glove.fpk.xml file
-                    folder_error_nofpkxml = not os.path.isfile(os.path.join(subfolder_path, 'glove.fpk.xml'))
+                    glove_fpk_xml_path = os.path.join(subfolder_path, "glove.fpk.xml")
+                    folder_error_nofpkxml = not os.path.isfile(glove_fpk_xml_path)
 
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
@@ -773,6 +781,7 @@ def gloves_check(exportfolder_path, team_name):
                 # Set the main flag if any of the checks failed
                 folder_error = (
                     folder_error_name or
+                    folder_error_xml_format or
                     folder_error_nofpkxml or
                     folder_error_tex_format or
                     folder_error_mtl_format
@@ -799,6 +808,9 @@ def gloves_check(exportfolder_path, team_name):
                         if folder_error_name:
                             log.write("- (wrong gloves folder name)\n")
                             print("- (wrong gloves folder name)")
+                        if folder_error_xml_format:
+                            log.write("- (broken xml file)\n")
+                            print("- (broken xml file)")
                         if folder_error_nofpkxml:
                             log.write("- (no gloves.fpk.xml file inside)\n")
                             print("- (no gloves.fpk.xml file inside)")

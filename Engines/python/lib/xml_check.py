@@ -40,6 +40,11 @@ def file_exists(file_path):
 
 def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, listed_file_type, material_name=None, sampler_name=None):
 
+    FILE_NAME_EXCEPTION_LIST = [
+        'dummy_kit.dds',
+        'dummy_gk_kit.dds',
+    ]
+
     # Get the extension of the xml file
     xml_extension = os.path.splitext(xml_path)[1][1:].upper()
 
@@ -55,6 +60,10 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         print("-")
         error = True
     else:
+        # Check if the filename is in the list of exceptions
+        if os.path.basename(listed_file_path) in FILE_NAME_EXCEPTION_LIST:
+            return False
+
         file_path_check = False
         file_path_short = None
         error_file_missing = False

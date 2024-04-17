@@ -94,7 +94,6 @@ def faces_check(exportfolder_path, team_name):
                 # Initialize error subflags
                 folder_error_num = False
                 folder_error_edithairxml = False
-                folder_error_xml_missing = False
                 folder_error_xml_format = False
                 folder_error_fpkxml_missing = False
                 folder_error_tex_format = False
@@ -104,14 +103,12 @@ def faces_check(exportfolder_path, team_name):
                 folder_error_num = not (subfolder_name[3:5].isdigit() and '01' <= subfolder_name[3:5] <= '23')
 
                 if not fox_mode:
-                    # Check that the folder has the essential face.xml and not the unsupported face_edithair.xml file
+                    # Check if the folder has a face.xml and not the unsupported face_edithair.xml file
                     face_xml_path = os.path.join(subfolder_path, "face.xml")
                     face_edithair_xml_path = os.path.join(subfolder_path, "face_edithair.xml")
                     if os.path.isfile(face_edithair_xml_path):
                         folder_error_edithairxml = True
-                    elif not os.path.isfile(face_xml_path):
-                        folder_error_xml_missing = True
-                    else:
+                    elif os.path.isfile(face_xml_path):
                         folder_error_xml_format = xml_check(face_xml_path, face_neck_needed=True)
 
                 else:
@@ -141,7 +138,6 @@ def faces_check(exportfolder_path, team_name):
                 folder_error = (
                     folder_error_num or
                     folder_error_edithairxml or
-                    folder_error_xml_missing or
                     folder_error_xml_format or
                     folder_error_fpkxml_missing or
                     folder_error_tex_format or
@@ -172,9 +168,6 @@ def faces_check(exportfolder_path, team_name):
                         if folder_error_fpkxml_missing:
                             log.write('- (no face.fpk.xml file inside) - Folder discarded)\n')
                             print('- (no face.fpk.xml file inside) - Folder discarded')
-                        if folder_error_xml_missing:
-                            log.write('- (no face.xml file inside) - Folder discarded)\n')
-                            print('- (no face.xml file inside) - Folder discarded')
                         if folder_error_xml_format:
                             log.write('- (broken xml files) - Folder discarded)\n')
                             print('- (broken xml files) - Folder discarded')

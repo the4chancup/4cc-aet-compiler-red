@@ -22,3 +22,36 @@ def dummy_element(folder_path, mtl_path):
     dummy_model.set('material', mtl_path)
 
     return dummy_model
+
+
+def glove_element(folder_path, glove_side):
+
+    MTL_NAME_DEFAULT = "materials.mtl"
+
+    glove_name = f"glove_{glove_side}.model"
+    glove_path = os.path.join(folder_path, glove_name)
+
+    if os.path.isfile(glove_path):
+
+        glove_type = f"glove{glove_side.upper()}"
+        glove_path_xml = f"./{glove_name}"
+
+        mtl_name = glove_name.replace('.model', '.mtl')
+        mtl_path_xml_test = os.path.join(folder_path, mtl_name)
+
+        if os.path.isfile(mtl_path_xml_test):
+            mtl_path_xml = f"./{mtl_name}"
+        else:
+            mtl_path_xml = f"./{MTL_NAME_DEFAULT}"
+
+        # Add a model entry to the root
+        model = ET.Element('model')
+        model.set('level', '0')
+        model.set('type', glove_type)
+        model.set('path', glove_path_xml)
+        model.set('material', mtl_path_xml)
+
+        return model
+
+    else:
+        return None

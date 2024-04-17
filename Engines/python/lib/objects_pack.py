@@ -3,6 +3,7 @@ import shutil
 
 from . import pes_cpk_pack as cpktool
 from . import pes_fpk_pack as fpktool
+from .xml_create import xml_create
 
 
 def objects_packer(object_type, object_source_folder, object_destination_folder, faces_foldername, uniform_foldername):
@@ -38,6 +39,10 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
 
             object_path = os.path.join(object_source_path, object_name)
             object_path_new = os.path.join(object_source_path, object_id)
+
+            xml_path = os.path.join(object_path, f"{object_id}.xml")
+            if not object_type == "boots" and not os.path.exists(xml_path):
+                xml_create(object_path, object_type)
 
             # Rename it with the proper id
             os.rename(object_path, object_path_new)

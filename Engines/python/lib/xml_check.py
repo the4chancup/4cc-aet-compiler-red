@@ -1,9 +1,9 @@
 import os
 import re
-import shutil
 import xml.etree.ElementTree as ET
 
 from .utils.zlib_plus import unzlib_file
+from .utils.elements import dummy_element
 
 
 # Read the necessary parameters
@@ -244,21 +244,8 @@ def xml_check(xml_path, face_neck_needed=False):
     # Check if any of the models has the "face_neck" type
     if face_neck_needed and ("face_neck" not in model_type_list):
 
-        # Copy the oral_dummy_win32.model file from the template folder to the xml folder
-        dummy_model_name = "oral_dummy_win32.model"
-        dummy_model_source = os.path.join('Engines', 'template', dummy_model_name)
-        dummy_model_destination = os.path.join(xml_folder_path, dummy_model_name)
-        dummy_model_path = f"./{dummy_model_name.replace('win32', '*')}"
-
-        shutil.copyfile(dummy_model_source, dummy_model_destination)
-
-        # Then add a model entry to the .xml file, with the type "face_neck" and the first mtl path from the list
-        dummy_model = ET.Element('model')
-        dummy_model.set('level', '0')
-        dummy_model.set('type', 'face_neck')
-        dummy_model.set('path', dummy_model_path)
-        dummy_model.set('material', model_material_path_list[0])
-
+        # Create a dummy model element and add it to the root
+        dummy_model = dummy_element(xml_folder_path, model_material_path_list[0])
         root.append(dummy_model)
 
         # Create a new root

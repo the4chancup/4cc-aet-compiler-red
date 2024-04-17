@@ -252,21 +252,20 @@ def xml_check(xml_path, face_neck_needed=False):
 
         root.append(dummy_model)
 
+        # Create a new root
+        root_new = ET.Element('config')
 
-    # Create a new root
-    root_new = ET.Element('config')
+        # Add the original models to the new tree, then the dif block
+        for model in root.findall('model'):
+            root_new.append(model)
+        ET.indent(root_new, '   ')
 
-    # Add the original models to the new tree, then the dif block
-    for model in root.findall('model'):
-        root_new.append(model)
-    ET.indent(root_new, '   ')
+        for dif in root.findall('dif'):
+            root_new.append(dif)
 
-    for dif in root.findall('dif'):
-        root_new.append(dif)
-
-    # Write the modified .xml file
-    tree_new = ET.ElementTree(root_new)
-    tree_new.write(xml_path, encoding='UTF-8', xml_declaration=True)
+        # Write the modified .xml file
+        tree_new = ET.ElementTree(root_new)
+        tree_new.write(xml_path, encoding='UTF-8', xml_declaration=True)
 
 
     if error and pause_on_error:

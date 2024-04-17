@@ -174,6 +174,8 @@ def extracted_from_exports():
 
     if dds_compression and not fox_mode:
         # zlib compress all the dds files
+        print("- Compressing dds files...")
+        print('-')
         zlib_files_in_folder(main_destination_path, "dds")
 
     print("- Done")

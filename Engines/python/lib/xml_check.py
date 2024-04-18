@@ -140,6 +140,72 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     return not error
 
 
+def face_diff_xml_check(xml_path):
+    """
+    Checks the given face_diff.xml file.
+
+    Parameters:
+        xml_path (str): The path to the .xml file.
+
+    Returns:
+        bool: False if the .xml file is valid, True otherwise.
+    """
+
+    # Read the necessary parameters
+    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+
+    # Store the name of the file and its parent folder
+    xml_name = os.path.basename(xml_path)
+    xml_folder_path = os.path.dirname(xml_path)
+    xml_folder_name = os.path.basename(xml_folder_path)
+
+    # Try to unzlib the file
+    unzlib_file(xml_path)
+
+    # Parse the file
+    try:
+        tree = ET.parse(xml_path)
+    except ET.ParseError as e:
+        import xml.parsers.expat
+        error_string = xml.parsers.expat.ErrorString(e.code)
+        line, column = e.position
+        print( "- ERROR - Invalid .xml file")
+        print(f"- Folder:         {xml_folder_name}")
+        print(f"- xml name:       {xml_name}")
+        print(f"- Issue:          \"{error_string}\"")
+        print(f"- Location:       At or before line {line}, column {column}")
+        print("-")
+
+        if pause_on_error:
+            input('Press Enter to continue...')
+
+        os.environ["LOG"] = "1"
+        return True
+
+    root = tree.getroot()
+
+    error = False
+
+    # Check that the root tag is 'dif'
+    if root.tag != 'dif':
+        print( "- ERROR - Invalid root tag on the second line")
+        print(f"- Folder:         {xml_folder_name}")
+        print(f"- xml name:       {xml_name}")
+        print(f"- Root tag:       <{root.tag}>")
+        print( "- Must be:        <dif>")
+        print("-")
+
+        error = True
+
+    if error and pause_on_error:
+        input('Press Enter to continue...')
+
+    if error:
+        os.environ["LOG"] = "1"
+
+    return error
+
+
 def xml_check(xml_path, face_neck_needed=False):
     """
     Checks the given .xml file.

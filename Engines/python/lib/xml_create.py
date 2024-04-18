@@ -14,7 +14,7 @@ def xml_create(folder_path, folder_type):
 
     MTL_NAME_DEFAULT = "materials.mtl"
 
-    DIFF_NAME = "face_diff.bin"
+    DIFF_NAME = "face_diff"
     DIFF_PATH_DEFAULT = os.path.join("Engines", "template", DIFF_NAME)
 
     TYPES_LIST = [
@@ -97,17 +97,29 @@ def xml_create(folder_path, folder_type):
         ET.indent(root_new, '   ')
 
         # Decode the diff file and add it to the root
-        diff = ET.Element("dif")
 
-        diff_path_test = os.path.join(folder_path, DIFF_NAME)
-        if os.path.isfile(diff_path_test):
-            diff_path = diff_path_test
+        diff_bin_path_test = os.path.join(folder_path, f"{DIFF_NAME}.bin")
+        diff_xml_path = os.path.join(folder_path, f"{DIFF_NAME}.xml")
+
+        if os.path.isfile(diff_bin_path_test):
+            diff_bin_path = diff_bin_path_test
+            diff_type = "bin"
+        elif os.path.isfile(diff_xml_path):
+            diff_type = "xml"
         else:
-            diff_path = DIFF_PATH_DEFAULT
+            diff_bin_path = f"{DIFF_PATH_DEFAULT}.bin"
+            diff_type = "bin"
 
-        diff_file = open(diff_path, 'rb').read()
-        diff.text = "\n%s\n" % str(base64.b64encode(diff_file), 'utf-8')
-        diff.tail = "\n"
+        if diff_type == "xml":
+            diff_file = ET.ElementTree(file=diff_xml_path)
+            diff = diff_file.getroot()
+            os.remove(diff_xml_path)
+        else:
+            diff = ET.Element("dif")
+            diff_file = open(diff_bin_path, 'rb').read()
+            diff.text = "\n%s\n" % str(base64.b64encode(diff_file), 'utf-8')
+            diff.tail = "\n"
+
         root_new.append(diff)
 
     if folder_type == "glove":

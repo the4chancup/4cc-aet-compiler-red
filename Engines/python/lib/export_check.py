@@ -5,6 +5,7 @@ from .utils.zlib_plus import unzlib_file
 from .texture_check import texture_check
 from .xml_check import mtl_check
 from .xml_check import xml_check
+from .xml_check import face_diff_xml_check
 from .txt_kits_count import txt_kits_count
 
 
@@ -105,11 +106,14 @@ def faces_check(exportfolder_path, team_name):
                 if not fox_mode:
                     # Check if the folder has a face.xml and not the unsupported face_edithair.xml file
                     face_xml_path = os.path.join(subfolder_path, "face.xml")
+                    face_diff_xml_path = os.path.join(subfolder_path, "face_diff.xml")
                     face_edithair_xml_path = os.path.join(subfolder_path, "face_edithair.xml")
                     if os.path.isfile(face_edithair_xml_path):
                         folder_error_edithairxml = True
                     elif os.path.isfile(face_xml_path):
                         folder_error_xml_format = xml_check(face_xml_path, face_neck_needed=True)
+                    elif os.path.isfile(face_diff_xml_path):
+                        folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
 
                 else:
                     # Check that the folder has the essential face.fpk.xml file

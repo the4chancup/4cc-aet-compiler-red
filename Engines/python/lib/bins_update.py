@@ -103,7 +103,7 @@ def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
     gk_kits = 0
 
     # Compute the starting hexadecimal position in the UniColor.bin file to write to
-    position = "0x0" + ((int(team_id) - 100) * 85).to_bytes(2, byteorder='big').hex().upper()
+    position = "0x0" + ((int(team_id) - 100) * 85).to_bytes(4, byteorder='big').hex().upper()
 
     # Increment the position by 4 to get to the number of kits
     position = hex(int(position, 16) + 4).replace("0x", "").upper()

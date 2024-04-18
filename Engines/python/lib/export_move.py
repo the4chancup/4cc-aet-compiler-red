@@ -8,6 +8,7 @@ from .utils.ftex import ddsToFtex
 from .utils.zlib_plus import unzlib_file
 from .mtl_id_change import mtl_id_change
 from .fmdl_id_change import transfer
+from .xml_create import xml_create
 
 
 # Handles dds to ftex conversion of an entire folder
@@ -108,6 +109,12 @@ def export_move(exportfolder_path, team_id, team_name):
                     # Change the texture IDs inside each mtl file
                     for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
                         mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+
+                    # Create the .xml file if needed
+                    object_type = "face"
+                    xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
+                    if not os.path.exists(xml_path):
+                        xml_create(subfolder_path, object_type)
 
                 # Replace the dummy team ID with the actual one in any kit-dependent textures found
                 textures_id_change(subfolder_path, team_id)
@@ -308,6 +315,12 @@ def export_move(exportfolder_path, team_id, team_name):
                     for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
                         mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
 
+                    # Create the .xml file if needed
+                    object_type = "glove"
+                    xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
+                    if not os.path.exists(xml_path):
+                        xml_create(subfolder_path, object_type)
+
                 # Replace the dummy team ID with the actual one in any kit-dependent textures found
                 textures_id_change(subfolder_path, team_id)
 
@@ -396,5 +409,3 @@ def export_move(exportfolder_path, team_id, team_name):
 
                     # Move it
                     shutil.move(team_itemfolder_path, otherfolder_team_path)
-
-

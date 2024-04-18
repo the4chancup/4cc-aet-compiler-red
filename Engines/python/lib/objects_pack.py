@@ -40,7 +40,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             object_path = os.path.join(object_source_path, object_name)
             object_path_new = os.path.join(object_source_path, object_id)
 
-            xml_path = os.path.join(object_path, f"{object_id}.xml")
+            xml_path = os.path.join(object_path, f"{object_type}.xml")
             if not object_type == "boots" and not os.path.exists(xml_path):
                 xml_create(object_path, object_type)
 

@@ -120,7 +120,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
 
             ##TODO: Make error-only once the templates have been updated
             if listed_file_type == "Texture":
-                print(f"- WARNING - {listed_file_type} file does not exist in the path indicated")
+                print(f"- Warning - {listed_file_type} file does not exist in the path indicated")
             else:
                 print(f"- ERROR - {listed_file_type} file does not exist in the path indicated")
             print(f"- Folder:         {xml_folder_name}")

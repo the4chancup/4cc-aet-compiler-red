@@ -1,5 +1,7 @@
 import os
 import sys
+import struct
+
 from .utils.zlib_plus import get_bytes_hex
 from .utils.zlib_plus import get_bytes_ascii
 from .utils.zlib_plus import unzlib_file
@@ -21,6 +23,38 @@ def dds_dxt5_conv(tex_path):
         os.remove(tex_path)
         # Rename the dummy texture
         os.rename(dummy_tex_path, tex_path)
+
+
+def dimensions_check(dds_path):
+
+    dds_name = os.path.basename(dds_path)
+    dds_folder_path = os.path.dirname(dds_path)
+    dds_folder = os.path.basename(dds_folder_path)
+
+    inputStream = open(dds_path, 'rb')
+
+    inputStream.seek(12)
+    height = struct.unpack("<I", inputStream.read(4))[0]
+    inputStream.seek(16)
+    width = struct.unpack("<I", inputStream.read(4))[0]
+    inputStream.seek(28)
+    mips_count = struct.unpack("<I", inputStream.read(4))[0]
+
+    inputStream.close()
+
+    # Power of 2 check
+    # 2^n will always have exactly 1 bit set, (2^n)-1 will always have all but 1 bit set, & cancels them out
+    height_bad = not ((height & (height-1) == 0) and height != 0)
+    width_bad = not ((width & (width-1) == 0) and width != 0)
+
+    if (height_bad or width_bad) and not (mips_count == 0 or mips_count == 1):
+
+        print(f"- Warning - Texture file with invalid dimensions ({str(width)}x{str(height)})")
+        print(f"- Folder:         {dds_folder}")
+        print(f"- DDS name:       {dds_name}")
+        print( "- This texture will probably not work")
+        print( "- Resize it so that both sizes are powers of 2, or resave it without mipmaps")
+        print( "-")
 
 
 # Check if the texture is a proper dds or ftex and unzlib if needed
@@ -69,12 +103,17 @@ def texture_check(tex_path):
             print('- The file will be deleted, please save it properly')
             tex_error_format = True
 
-        if fox_mode and not fox_19:
+        if not tex_error_format:
 
-            # Check if it is a BC7 file (DX10 label starting from index 84)
-            if not (get_bytes_ascii(tex_check_path, 84, 4) == 'DX10'):
-                # Convert it to DXT5
-                dds_dxt5_conv(tex_check_path)
+            # Make sure the dimensions are powers of 2
+            dimensions_check(tex_check_path)
+
+            if fox_mode and not fox_19:
+
+                # Check if it is a BC7 file (DX10 label starting from index 84)
+                if not (get_bytes_ascii(tex_check_path, 84, 4) == 'DX10'):
+                    # Convert it to DXT5
+                    dds_dxt5_conv(tex_check_path)
 
         # If it was zlibbed
         if tex_zlibbed:

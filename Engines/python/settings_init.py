@@ -114,7 +114,8 @@ def settings_init(file_name):
             print("- Warning:")
             print(f"- The following required settings are missing from the {file_name} file:")
             # Print the list of missing required settings
-            print("- " + "\n- ".join(settings_missing))
+            for setting in settings_missing:
+                print(f"- {setting}")
             print("-")
             print("- A clean settings file will be generated and opened.")
             print("- The old file will be renamed with _old at the end and opened too.")

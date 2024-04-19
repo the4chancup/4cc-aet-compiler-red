@@ -51,7 +51,8 @@ def portraits_move(exportfolder_path, team_id):
         print("- The portraits for the following players are present both")
         print("- in their face folders and in the Portraits folder:")
         # Print the list of portrait conflicts
-        print("- " + "\n- ".join(portrait_conflicts))
+        for portrait in portrait_conflicts:
+            print(f"- {portrait}")
         print("- The entire export will be skipped.")
         print("- Closing the script's window and fixing it is recommended.")
         print("-")

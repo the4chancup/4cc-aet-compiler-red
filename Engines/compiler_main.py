@@ -29,8 +29,9 @@ def dependency_check():
     except ImportError:
         print("- The following new dependencies were not found:")
         # List the missing dependencies, one per line
-        missing_dependencies = [f"{dependency}" for dependency in dependencies if not importlib.util.find_spec(dependency)]
-        print("-", "\n- ".join(missing_dependencies))
+        dependencies_missing = [f"{dependency}" for dependency in dependencies if not importlib.util.find_spec(dependency)]
+        for dependency in dependencies_missing:
+            print(f"- {dependency}")
         print("-")
 
         print("- They will be installed now (or you can close the program now and install them manually).")
@@ -42,7 +43,7 @@ def dependency_check():
         print("- Installing...")
 
         # Install the dependencies (closes the program automatically after the installation)
-        sys.argv = ["pip", "install"] + missing_dependencies
+        sys.argv = ["pip", "install"] + dependencies_missing
         runpy.run_module("pip", run_name="__main__")
 
 

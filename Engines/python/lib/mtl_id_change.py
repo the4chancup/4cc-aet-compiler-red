@@ -35,4 +35,4 @@ def mtl_id_change(mtl_path, team_id = "000"):
             path = re.sub(r'u0([a-zA-Z0-9]){3}p', 'u0'+team_id+'p', path)
             sampler.set('path', path)
 
-    tree.write(mtl_path)
+    tree.write(mtl_path, "UTF-8")

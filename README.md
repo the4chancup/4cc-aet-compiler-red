@@ -78,9 +78,8 @@ before moving its content into folders shared by all the teams:
   folders down by one layer.
 - Checks that the 4th and 5th characters of each face folder is in the 01-23
   range for player numbers.
-- Checks that the face folders have the essential face.xml file inside, and
-  that none has the unsupported face_edithair.xml inside.
-  In fox mode, it checks for the presence of the face.fpk.xml file instead.
+- Checks that none of the face folders have the unsupported face_edithair.xml
+  inside.
 - Checks that the Faces folder doesn't have any extra non-folder files
   (like cpks) in it.
 - Checks that the kit config files and the kit texture files follow the proper

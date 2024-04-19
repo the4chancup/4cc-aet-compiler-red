@@ -96,7 +96,6 @@ def faces_check(exportfolder_path, team_name):
                 folder_error_num = False
                 folder_error_edithairxml = False
                 folder_error_xml_format = False
-                folder_error_fpkxml_missing = False
                 folder_error_tex_format = False
                 folder_error_mtl_format = False
 
@@ -114,12 +113,6 @@ def faces_check(exportfolder_path, team_name):
                         folder_error_xml_format = xml_check(face_xml_path, face_neck_needed=True)
                     elif os.path.isfile(face_diff_xml_path):
                         folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
-
-                else:
-                    # Check that the folder has the essential face.fpk.xml file
-                    face_fpk_xml_path = os.path.join(subfolder_path, "face.fpk.xml")
-                    if not os.path.isfile(face_fpk_xml_path):
-                        folder_error_fpkxml_missing = True
 
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
@@ -143,7 +136,6 @@ def faces_check(exportfolder_path, team_name):
                     folder_error_num or
                     folder_error_edithairxml or
                     folder_error_xml_format or
-                    folder_error_fpkxml_missing or
                     folder_error_tex_format or
                     folder_error_mtl_format
                 )
@@ -169,9 +161,6 @@ def faces_check(exportfolder_path, team_name):
                         if folder_error_num:
                             log.write(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded\n')
                             print(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded')
-                        if folder_error_fpkxml_missing:
-                            log.write('- (no face.fpk.xml file inside) - Folder discarded)\n')
-                            print('- (no face.fpk.xml file inside) - Folder discarded')
                         if folder_error_xml_format:
                             log.write('- (broken xml file) - Folder discarded)\n')
                             print('- (broken xml file) - Folder discarded')
@@ -633,16 +622,11 @@ def boots_check(exportfolder_path, team_name):
 
                 # Initialize error subflags
                 folder_error_name = False
-                folder_error_nofpkxml = False
                 folder_error_tex_format = False
                 folder_error_mtl_format = False
 
                 # Check that its name starts with a k and that the 4 characters after it are digits
                 folder_error_name = not (subfolder_name.startswith('k') and subfolder_name[1:5].isdigit())
-
-                if fox_mode:
-                    # Check that the folder has the essential boots.fpk.xml file
-                    folder_error_nofpkxml = not os.path.isfile(os.path.join(subfolder_path, 'boots.fpk.xml'))
 
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
@@ -664,7 +648,6 @@ def boots_check(exportfolder_path, team_name):
                 # Set the main flag if any of the checks failed
                 folder_error = (
                     folder_error_name or
-                    folder_error_nofpkxml or
                     folder_error_tex_format or
                     folder_error_mtl_format
                 )
@@ -690,9 +673,6 @@ def boots_check(exportfolder_path, team_name):
                         if folder_error_name:
                             log.write("- (wrong boots folder name)\n")
                             print("- (wrong boots folder name)")
-                        if folder_error_nofpkxml:
-                            log.write("- (no boots.fpk.xml file inside)\n")
-                            print("- (no boots.fpk.xml file inside)")
                         if folder_error_tex_format:
                             log.write(f"- ({file_name} is a bad texture)\n")
                             print(f"- ({file_name} is a bad texture)")
@@ -753,11 +733,6 @@ def gloves_check(exportfolder_path, team_name):
                     if os.path.isfile(glove_xml_path):
                         folder_error_xml_format = xml_check(glove_xml_path)
 
-                else:
-                    # Check that the folder has the essential glove.fpk.xml file
-                    glove_fpk_xml_path = os.path.join(subfolder_path, "glove.fpk.xml")
-                    folder_error_nofpkxml = not os.path.isfile(glove_fpk_xml_path)
-
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
                     file_path = os.path.join(subfolder_path, file_name)
@@ -808,9 +783,6 @@ def gloves_check(exportfolder_path, team_name):
                         if folder_error_xml_format:
                             log.write("- (broken xml file)\n")
                             print("- (broken xml file)")
-                        if folder_error_nofpkxml:
-                            log.write("- (no gloves.fpk.xml file inside)\n")
-                            print("- (no gloves.fpk.xml file inside)")
                         if folder_error_tex_format:
                             log.write(f"- ({file_name} is a bad texture)\n")
                             print(f"- ({file_name} is a bad texture)")

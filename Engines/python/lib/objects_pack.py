@@ -106,8 +106,10 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                         shutil.move(os.path.join(texture_path, texture_file),
                                     os.path.join(temp_path, "#windx11"))
 
-            # Move the xml outside
-            shutil.move(os.path.join(texture_path, f"{object_type}.fpk.xml"), temp_path)
+            # Delete the .fpk.xml file if it exists
+            fpkxml_path = os.path.join(temp_path, f"{object_type}.fpk.xml")
+            if os.path.exists(fpkxml_path):
+                os.remove(fpkxml_path)
 
             # Rename the folder for packing
             os.rename(os.path.join(temp_path, object_id),

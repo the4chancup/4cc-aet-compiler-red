@@ -62,7 +62,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     else:
         # Check if the filename is in the list of exceptions
         if os.path.basename(listed_file_path) in FILE_NAME_EXCEPTION_LIST:
-            return False
+            return True
 
         file_path_check = False
         file_path_short = None

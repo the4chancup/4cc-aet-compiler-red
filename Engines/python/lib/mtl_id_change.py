@@ -28,11 +28,22 @@ def mtl_id_change(mtl_path, team_id = "000"):
 
     root = tree.getroot()
 
+    modified = False
+
     for sampler in root.findall('.//sampler'):
         path = sampler.get('path')
         if path is not None:
-            path = re.sub(r'model/character/uniform/common/([a-zA-Z0-9]){3}/', 'model/character/uniform/common/'+team_id+'/', path)
-            path = re.sub(r'u0([a-zA-Z0-9]){3}p', 'u0'+team_id+'p', path)
+            new_path = re.sub(r'model/character/uniform/common/([a-zA-Z0-9]){3}/', 'model/character/uniform/common/'+team_id+'/', path)
+            if new_path != path:
+                modified = True
+                path = new_path
+
+            new_path = re.sub(r'u0([a-zA-Z0-9]){3}p', 'u0'+team_id+'p', path)
+            if new_path != path:
+                modified = True
+                path = new_path
+
             sampler.set('path', path)
 
-    tree.write(mtl_path, "UTF-8")
+    if modified:
+        tree.write(mtl_path, "UTF-8")

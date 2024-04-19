@@ -58,11 +58,11 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             print(f"- Material:       {material_name}")
             print(f"- Sampler:        {sampler_name}")
         print("-")
-        error = True
+        return True
     else:
         # Check if the filename is in the list of exceptions
         if os.path.basename(listed_file_path) in FILE_NAME_EXCEPTION_LIST:
-            return True
+            return False
 
         file_path_check = False
         file_path_short = None
@@ -87,7 +87,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
                 print(f"- {xml_extension} name:       {xml_name}")
                 print(f"- Model path:     {listed_file_path}")
                 print("-")
-                return False
+                return True
 
             # Remove the "file/character/uniform/common/XXX/" from the path
             file_subpath = listed_file_path[35:]
@@ -137,7 +137,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             if listed_file_type != "Texture":
                 error = True
 
-    return not error
+    return error
 
 
 def face_diff_xml_check(xml_path):
@@ -289,11 +289,11 @@ def xml_check(xml_path, face_neck_needed=False):
             model_type_list.append(model_type)
 
         # Check that the model path corresponds to a file in the folder indicated
-        model_path_error = not listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model")
+        model_path_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model")
 
         # Check that the mtl path corresponds to a file in the folder indicated, if not checked previously
         if (not model_material_path) or (model_material_path not in model_material_path_list):
-            model_material_error = not listed_file_check(xml_path, xml_name, xml_folder_name, model_material_path, "Mtl")
+            model_material_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_material_path, "Mtl")
 
             if model_material_path:
                 model_material_path_list.append(model_material_path)
@@ -514,7 +514,7 @@ def mtl_check(mtl_path):
                 error = True
             else:
 
-                texture_path_error = not listed_file_check(mtl_path, mtl_name, mtl_folder_name, sampler_texture_path, "Texture", material_name, sampler_name)
+                texture_path_error = listed_file_check(mtl_path, mtl_name, mtl_folder_name, sampler_texture_path, "Texture", material_name, sampler_name)
 
                 if texture_path_error:
                     ##error = True

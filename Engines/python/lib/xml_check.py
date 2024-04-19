@@ -13,8 +13,8 @@ pes_version = int(os.environ.get('PES_VERSION', '16'))
 
 def file_exists(file_path):
     """
-    Check if the filename contains the u0XXXp pattern.
-    If it does, search for a u0XXXp1 file in the folder where the file should be.
+    Check if the filename contains the u0XXXp or u0XXXg pattern.
+    If it does, search for a u0XXXp1 or u0XXXg1 file in the folder where the file should be.
     If it doesn't, check if the file exists.
 
     Parameters:
@@ -24,18 +24,29 @@ def file_exists(file_path):
         bool: True if the file exists, False otherwise.
     """
 
+    file_name = os.path.basename(file_path)
+    file_folder = os.path.dirname(file_path)
+
     # Check if the filename contains the u0XXXp pattern
-    if not re.search(r'u0[a-zA-Z0-9]{3}p', os.path.basename(file_path)):
+    if re.search(r'u0[a-zA-Z0-9]{3}p', file_name):
 
-        return (os.path.exists(file_path))
-
-    else:
         # Search for a u0XXXp1 file in the folder where the file should be
-        for file in os.listdir(os.path.dirname(file_path)):
+        for file in os.listdir(file_folder):
             if re.search(r'u0[a-zA-Z0-9]{3}p1', file):
                 return True
-
         return False
+
+    # Check if the filename contains the u0XXXg pattern
+    elif re.search(r'u0[a-zA-Z0-9]{3}g', file_name):
+
+        # Search for a u0XXXp1 file in the folder where the file should be
+        for file in os.listdir(file_folder):
+            if re.search(r'u0[a-zA-Z0-9]{3}g1', file):
+                return True
+        return False
+
+    else:
+        return (os.path.exists(file_path))
 
 
 def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, listed_file_type, material_name=None, sampler_name=None):

@@ -3,6 +3,7 @@ import xml.etree.ElementTree as ET
 
 from .utils.zlib_plus import unzlib_file
 
+
 def mtl_id_change(mtl_path, team_id = "000"):
     """
     Change the team ID in the given .mtl file.
@@ -11,7 +12,7 @@ def mtl_id_change(mtl_path, team_id = "000"):
         mtl_path (str): The path to the .mtl file.
         team_id (str, optional): The team ID to replace in the file. Defaults to "000".
 
-    This function looks for model/character/uniform/common/XXX/ or for u0XXXp inside the path of the samplers,
+    This function looks for model/character/uniform/common/XXX/, u0XXXp and u0XXXg inside the path of the samplers,
     where XXX is any sequence of three characters, and replaces XXX with the team ID provided as parameter.
     """
 
@@ -39,6 +40,11 @@ def mtl_id_change(mtl_path, team_id = "000"):
                 path = new_path
 
             new_path = re.sub(r'u0([a-zA-Z0-9]){3}p', 'u0'+team_id+'p', path)
+            if new_path != path:
+                modified = True
+                path = new_path
+
+            new_path = re.sub(r'u0([a-zA-Z0-9]){3}g', 'u0'+team_id+'g', path)
             if new_path != path:
                 modified = True
                 path = new_path

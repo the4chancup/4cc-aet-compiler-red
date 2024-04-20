@@ -28,9 +28,13 @@ def dds_dxt5_conv(tex_path):
 
 def dimensions_check(dds_path):
 
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+
     dds_name = os.path.basename(dds_path)
     dds_folder_path = os.path.dirname(dds_path)
     dds_folder = os.path.basename(dds_folder_path)
+
+    error = False
 
     inputStream = open(dds_path, 'rb')
 
@@ -43,12 +47,14 @@ def dimensions_check(dds_path):
 
     inputStream.close()
 
+    mips_missing = (mips_count == 0 or mips_count == 1)
+
     # Power of 2 check
     # 2^n will always have exactly 1 bit set, (2^n)-1 will always have all but 1 bit set, & cancels them out
     height_bad = not ((height & (height-1) == 0) and height != 0)
     width_bad = not ((width & (width-1) == 0) and width != 0)
 
-    if (height_bad or width_bad) and not (mips_count == 0 or mips_count == 1):
+    if (height_bad or width_bad) and not mips_missing:
 
         logging.warning( "-")
         logging.warning(f"- Warning: Texture file with invalid dimensions ({str(width)}x{str(height)})")
@@ -56,6 +62,27 @@ def dimensions_check(dds_path):
         logging.warning(f"- Texture name:   {dds_name}")
         logging.warning( "- This texture will probably not work")
         logging.warning( "- Resize it so that both sizes are powers of 2, or resave it without mipmaps")
+
+    if fox_mode and mips_missing and not (dds_name == "portrait.dds"):
+
+        logging.warning( "-")
+        logging.warning( "- Warning: Texture file without mipmaps")
+        logging.warning(f"- Folder:         {dds_folder}")
+        logging.warning(f"- Texture name:   {dds_name}")
+        logging.warning( "- This texture will probably not work, please resave it with mipmaps")
+
+    if height < 4 or width < 4:
+
+        logging.error( "-")
+        logging.error(f"- ERROR - Texture file with invalid dimensions ({str(width)}x{str(height)})")
+        logging.error(f"- Folder:         {dds_folder}")
+        logging.error(f"- Texture name:   {dds_name}")
+        logging.error( "- This texture will not work")
+        logging.error( "- Resize it so that both sizes are 4 or higher")
+
+        error = True
+
+    return error
 
 
 # Check if the texture is a proper dds or ftex and unzlib if needed

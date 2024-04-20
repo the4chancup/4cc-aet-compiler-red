@@ -1,5 +1,6 @@
 ## Reads team and kit color entries from Note files and adds them to bin files
 import os
+import logging
 
 
 def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
@@ -182,7 +183,6 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '0'))
 
     print("-")
     print("- Adding the color entries to the bin files")
@@ -237,7 +237,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     with open(teams_list_file, 'r') as teams_list:
 
                         for teams_list_line in teams_list:
-                             if teams_list_line.split()[1] == team_name.lower():
+                            if teams_list_line.split()[1] == team_name.lower():
                                 team_id = teams_list_line.split()[0]
                                 team_id_found = True
                                 break
@@ -327,18 +327,15 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                 kit_configs_cnt = len(os.listdir(kit_configs_folder_path))
 
                 if kit_configs_cnt != kitcols_cnt:
-                    # Print a warning
-                    print('- Warning -')
-                    if team_name:
-                        print(f"- The amount of {team_name}'s kit color entries is not")
-                    else:
-                        print(f"- The amount of {team_id}'s kit color entries is not")
-                    print('- equal to the amount of kit config files')
-                    print('- Stopping the script and fixing it is recommended')
-                    print('-')
 
-                    if not pause_on_error:
-                        input('Press Enter to continue...')
+                    logging.warning( "-")
+                    logging.warning( "- Warning - Missing kit configs or txt kit color entries")
+                    if team_name:
+                        logging.warning(f"- Team name:      {team_name}")
+                    else:
+                        logging.warning(f"- Team ID:        {team_id}")
+                    logging.warning(f"- The number of kit config files ({kit_configs_cnt}) is not equal to")
+                    logging.warning(f"- the number of kit color entries ({kitcols_cnt}) in the Note txt file")
 
         # Print the number of team and kit colors
         print(f"- Team colors: {teamcols_cnt} - Kits: {kitcols_cnt}")
@@ -351,4 +348,4 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     kitcolor_bin.close()
 
     print("- Done")
-    print("- ")
+    print("-")

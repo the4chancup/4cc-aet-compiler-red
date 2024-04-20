@@ -125,8 +125,6 @@ def export_move(exportfolder_path, team_id, team_name):
                     try:
                         os.rename(subfolder_path, subfolder_path_withname)
                     except OSError:
-                        print("- Could not rename " + subfolder_path + " to " + subfolder_path_withname)
-                        print("- Trying again in 1 second...")
                         time.sleep(1)
                         os.rename(subfolder_path, subfolder_path_withname)
 

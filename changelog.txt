@@ -1,4 +1,46 @@
-19/03/24 - Version R2.0.0
+20/04/24 - Version 3.0.0
+- Important
+  - New teams_list txt with support for the new unified database
+  - Generates an error.log file after crashing, which you should provide when
+    requesting support
+  - Generates an issues.log file after compiling, if any of the exports had any
+    issues, with the list of warnings and errors
+  - Now checks mtl and xml pre-fox files for consistency, duplicated materials,
+    and missing listed textures and model files
+  - Now allows pre-fox folders without an xml file (xml-less) and automatically
+    generates an xml with the contents of the folder, this is required for
+    properly compiling the exports converted by the 4cc-aet-converter tool
+- Fixes
+  - Fixed unzlibbing of zlibbed textures
+  - Fixed unzipping of zip and 7z exports
+  - Fixed recognition of team names on exports without a Note txt
+  - Fixed errors when unpacking exports with read-only files or folders
+- Other new stuff
+  - When a pre-fox face folder without a model set as "face_neck" is found, a
+    dummy model will be copied to the folder and added to the xml, to prevent
+    the default PES neck from showing up on the player
+  - Will give an error if any players have a portrait both in their face folder
+    and in the Portraits folder
+  - A few new texture checks have been added (powers of 2, mipmaps, too small)
+  - The Pes Path setting now accepts a ** magic number, which gets automatically
+    replaced with the Pes Version number, eliminating the need to change both
+    every time you switch versions
+  - New setting for opening PES automatically after packing the cpk, disabled by
+    default
+  - Now suppports Note txt files in UTF8 format, weird symbols are now allowed
+  - Team IDs now get replaced even in the texture paths inside mtl files,
+    necessary for supporting kit-dependent player-specific textures (u0XXXp0)
+  - Team IDs are also replaced in the textures' filenames themselves
+  - The DDS Compression feature has been reintroduced, useful for making a full
+    cup DLC that won't take 10GB on the drive
+  - For Bins Updating, it will automatically grab the bin files from the latest
+    midcup cpk (or the Bins cpk if none were found), eliminating the need to
+    share the bin files when someone else has to make some midcup cpks
+  - Now checks for updates straight from github every time it's started, with a
+    cooldown of 2 hours
+
+
+19/03/24 - Version 2.0.0
 - Fixed some issues with packing fpk and cpk files
 - Converted the main compiler runner to python to allow move_cpks to work
   properly when admin rights are needed
@@ -7,7 +49,7 @@
   patches_contents folder every time a cpk is packed
 
 
-16/03/24 - Version R1.0.0
+16/03/24 - Version 1.0.0
 - Converted almost all of the code to python
   (Some bugs might be present, please report them with screenshots)
 - Merged the fox settings into a new pes version setting

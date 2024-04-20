@@ -274,7 +274,8 @@ def kitconfigs_check(exportfolder_path, team_name):
     if folder_error:
 
         logging.warning( "-")
-        logging.warning(f"- {team_name}'s export doesn't have any Kit Configs")
+        logging.warning( "- Warning - No kit configs")
+        logging.warning(f"- Team name:      {team_name}")
 
 
 # If a Kit Textures folder exists and is not empty, check that the kit textures' filenames and type are correct
@@ -367,7 +368,8 @@ def kittextures_check(exportfolder_path, team_name):
     if folder_error:
 
         logging.warning( "-")
-        logging.warning(f"- {team_name}'s export doesn't have any Kit Textures")
+        logging.warning( "- Warning - No kit textures")
+        logging.warning(f"- Team name:      {team_name}")
 
 
 # If a Logo folder exists and is not empty, check that the three logo images' filenames are correct

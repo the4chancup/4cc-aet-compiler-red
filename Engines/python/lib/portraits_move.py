@@ -1,10 +1,24 @@
 import os
 import shutil
+import logging
 
-# Function for finding the team ID after receiving the foldername as parameter
+
 def portraits_move(exportfolder_path, team_id):
+    """
+    Move player portraits from the Faces folder to the Portraits folder based on specific conditions.
 
-    tex_name = "portrait.dds"
+    Parameters:
+    - exportfolder_path (str): The path to the main export folder.
+    - team_id (str): The team id used to generate player ids.
+
+    Returns:
+    - bool: True if there are conflicts in portrait names, False otherwise.
+    """
+
+    # Read the necessary parameters
+    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+
+    TEX_NAME = "portrait.dds"
 
     portrait_conflicts = []
 
@@ -15,7 +29,7 @@ def portraits_move(exportfolder_path, team_id):
         if face_name[3:5].isdigit() and '01' <= face_name[3:5] <= '23':
 
             # If the folder has a portrait
-            portrait_path = os.path.join(faces_path, face_name, tex_name)
+            portrait_path = os.path.join(faces_path, face_name, TEX_NAME)
             if os.path.exists(portrait_path):
 
                 player_number = face_name[3:5]
@@ -48,23 +62,20 @@ def portraits_move(exportfolder_path, team_id):
     # If there are any portrait conflicts
     if portrait_conflicts:
 
-        print("- The portraits for the following players are present both")
-        print("- in their face folders and in the Portraits folder:")
-        # Print the list of portrait conflicts
-        for portrait in portrait_conflicts:
-            print(f"- {portrait}")
-        print("- The entire export will be skipped.")
-        print("- Closing the script's window and fixing it is recommended.")
-        print("-")
-        input("Press Enter to continue...")
-
         exportfolder_name = os.path.basename(exportfolder_path)
 
-        with open("memelist.txt", "a") as log:
-            log.write("- \n")
-            log.write(f"- {exportfolder_name} Deleted (conflicting portraits) - Error\n")
+        logging.error( "-")
+        logging.error( "- ERROR - Conflicting portraits")
+        logging.error(f"- Export name:    {exportfolder_name}")
+        logging.error( "- The portraits for the following players are present both")
+        logging.error( "- in their face folders and in the Portraits folder:")
+        # logging.error the list of portrait conflicts
+        for portrait in portrait_conflicts:
+            logging.error(f"- {portrait}")
+        logging.error( "- The entire export will be skipped")
 
-        os.environ["LOG"] = "1"
+        if pause_on_error:
+            input("Press Enter to continue...")
 
         # Delete the entire export folder
         shutil.rmtree(exportfolder_path)

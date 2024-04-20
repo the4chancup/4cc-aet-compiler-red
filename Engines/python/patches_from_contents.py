@@ -180,22 +180,18 @@ def patches_from_contents():
                 print('-')
 
 
-    log = int(os.environ.get('LOG', '0'))
-
     if all_in_one:
-        if log:
-            # Warn about there being some issues and about having to open memelist.txt
+        if os.path.exists("issues.log"):
+            # Warn about there being some issues and about having to open the log
             print('-')
-            print("- Warning: There were some issues in the exports")
-            print("- Please check the memelist.txt file for a log")
+            print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some issues in the exports")
+            print("- Please check the issues.log file for a log")
             print('-')
         else:
             print('-')
             print('- No issues were found in the exports')
             print('-')
 
-        if sys.platform == "win32":
-            os.system("color")
         print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + ' by Shakes')
         print('-')
         print('-')

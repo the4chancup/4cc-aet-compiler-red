@@ -1,5 +1,6 @@
 import os
 import shutil
+import logging
 
 
 # Function for finding the team ID after receiving the foldername as parameter
@@ -57,15 +58,10 @@ def teamid_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
     # If there's no usable files anywhere
     if not root_found:
 
-        with open('memelist.txt', 'a') as file:
-            file.write("-\n")
-            file.write(f"- {team_name_folder}'s manager needs to get memed on (no files) - Export discarded.\n")
-        memelist = 1
-
-        print("-\n")
-        print(f"- {team_name_folder}'s manager needs to get memed on (no files).")
-        print("- This export will be discarded.\n")
-        print("- Closing the script's window and fixing the export is recommended.\n")
+        logging.error( "-")
+        logging.error( "- ERROR - No usable files found")
+        logging.error(f"- Team name:      {team_name_folder}")
+        logging.error( "- This export will be discarded")
 
         # Skip the whole export
         shutil.rmtree(exportfolder_path)
@@ -132,14 +128,12 @@ def teamid_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
     # If no usable team name was found even then
     if not team_id:
 
-        with open("memelist.txt", 'a') as memelist:
-            memelist.write(f"\n- {team_name}'s manager needs to get memed on (unusable team name) - Export discarded.")
-
-        print(f"- {team_name}'s manager needs to get memed on (unusable team name).")
-        print("- The team name was not found on the teams_list txt file.")
-        print("- This export will be discarded to prevent conflicts.")
-        print("- Adding the team name to the teams_list file and")
-        print("- restarting the script is recommended.")
+        logging.error( "-")
+        logging.error( "- ERROR - Unusable team name")
+        logging.error(f"- Team name:      {team_name}")
+        logging.error( "- The team name was not found on the teams_list txt file.")
+        logging.error( "- This export will be discarded to prevent conflicts.")
+        logging.error( "- Add the team name to the \"teams_list.txt\" file and restart")
 
         if pause_on_error:
             input("Press Enter to continue...")
@@ -154,11 +148,12 @@ def teamid_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
     # Check if the team ID is in the range
     if not (team_id.isdigit() and int(team_id) in range(team_id_min, team_id_max + 1)):
 
-        with open("memelist.txt", 'a') as memelist:
-            memelist.write(f"\n- {team_name}'s manager needs to get memed on (team id not in range) - Export discarded.")
-
-        print(f"- The team ID is not in the range {team_id_min} - {team_id_max}.")
-        print("- This export will be discarded to prevent conflicts.")
+        logging.error( "-")
+        logging.error( "- ERROR - Team ID out of range")
+        logging.error(f"- Team name:      {team_name}")
+        logging.error(f"- Team ID:        {team_id}")
+        logging.error(f"- The team ID is not in the range {team_id_min} - {team_id_max}")
+        logging.error( "- This export will be discarded to prevent conflicts")
 
         # Skip the whole export
         shutil.rmtree(exportfolder_path)

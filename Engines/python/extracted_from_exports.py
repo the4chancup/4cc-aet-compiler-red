@@ -63,16 +63,11 @@ def extracted_from_exports():
     os.makedirs(main_source_path, exist_ok=True)
     os.makedirs(main_destination_path, exist_ok=True)
 
-    # Clear the flag for writing to file
-    os.environ["LOG"] = "0"
-
     # Define the minimum and maximum team ids
     team_id_min = 701
     team_id_max = 920
 
-    # Reset the files
-    with open("memelist.txt", "w") as f:
-        f.write("--- 4cc aet compiler red - List of problems ---\n")
+    # Reset the notes compilation
     with open("teamnotes.txt", "w") as f:
         f.write("--- 4cc txt notes compilation ---\n")
 
@@ -181,22 +176,19 @@ def extracted_from_exports():
     print("- Done")
     print('-')
 
-    log = int(os.environ.get('LOG', '0'))
-
     if not all_in_one:
-        if log:
-            # Warn about there being some issues and about having to open memelist.txt
-            print("- Warning: There were some issues in the exports")
-            print("- Please check the memelist.txt file for a log")
+        if os.path.exists("issues.log"):
+            # Warn about there being some issues and about having to open the log
+            print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some issues in the exports")
+            print("- Please check the issues.log file for a log")
             print('-')
         else:
             print('- No issues were found')
             print('-')
 
-
     # Check if the Other folder exists and there are files in it, if there are print a warning
     if os.path.exists("./extracted_exports/Other") and len(os.listdir("./extracted_exports/Other")) > 0:
-        print("- Warning: There are files in the Other folder")
+        print('- \033[33m' + 'Warning' + '\033[0m' + ": There are files in the Other folder")
         print("- Please open it and check its contents")
         print('-')
         if pause_on_error:

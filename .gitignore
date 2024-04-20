@@ -1,7 +1,8 @@
 error.log
 error.log.old
+issues.log
+issues.log.old
 teamnotes.txt
-memelist.txt
 extracted_exports
 patches_contents
 patches_output

@@ -15,6 +15,26 @@ from python.contents_from_extracted import contents_from_extracted
 from python.patches_from_contents import patches_from_contents
 
 
+class ColorFilter(logging.Filter):
+    """
+    This is a filter which colorizes the words "ERROR" and "Warning".
+
+    "ERROR" gets turned into "\033[31mERROR\033[0m"
+    "Warning" gets turned into "\033[33mWarning\033[0m"
+    """
+
+    def filter(self, record):
+        ERROR_STRING = "ERROR"
+        ERROR_STRING_COLORED = "\033[31mERROR\033[0m"
+        record.msg = record.msg.replace(ERROR_STRING, ERROR_STRING_COLORED)
+
+        WARNING_STRING = "Warning"
+        WARNING_STRING_COLORED = "\033[33mWarning\033[0m"
+        record.msg = record.msg.replace(WARNING_STRING, WARNING_STRING_COLORED)
+
+        return True
+
+
 # Check if the dependencies are installed
 def dependency_check():
     # Prepare a list of dependencies
@@ -95,21 +115,52 @@ def intro_print():
     print('-')
 
 
+def log_store(log_name):
+    if os.path.exists(log_name):
+        log_name_old = log_name + ".old"
+        if os.path.exists(log_name_old):
+            os.remove(log_name_old)
+        try:
+            os.rename(log_name, log_name_old)
+        except OSError:
+            print(f"- An error occurred while trying to rename the {log_name} file")
+            print("- Please check if it's open in another program")
+            print("-")
+            input("Press Enter to continue after checking...")
+            os.rename(log_name, log_name_old)
+
+
 def logger_init(__name__):
 
-    # If a log file already exists, add .old to it
-    LOG_NAME = "error.log"
-    LOG_NAME_OLD = LOG_NAME + ".old"
-    if os.path.exists(LOG_NAME):
-        if os.path.exists(LOG_NAME_OLD):
-            os.remove(LOG_NAME_OLD)
-        os.rename(LOG_NAME, LOG_NAME_OLD)
+    # If an issues log file already exists, add .old to it
+    ISSUES_LOG_NAME = "issues.log"
+    log_store(ISSUES_LOG_NAME)
+
+    # Create a file handler which will only create a file when a WARNING or higher occurs
+    file_handler = logging.FileHandler(ISSUES_LOG_NAME, delay=True)
+    file_handler.setLevel(logging.WARNING)
+
+    # Add it to the root logger
+    logging.getLogger().addHandler(file_handler)
+
+    # Create a stream handler for outputting colored errors to stderr
+    stream_handler = logging.StreamHandler()
+    stream_handler.setLevel(logging.ERROR)
+    stream_handler.addFilter(ColorFilter())
+
+    # Add it to the root logger
+    logging.getLogger().addHandler(stream_handler)
+
+
+    # If an error log file already exists, add .old to it
+    ERROR_LOG_NAME = "error.log"
+    log_store(ERROR_LOG_NAME)
 
     # Create a logger
     logger = logging.getLogger(__name__)
 
     # Create a file handler which will only create a file when an exception occurs
-    handler = logging.FileHandler(LOG_NAME, delay=True)
+    handler = logging.FileHandler(ERROR_LOG_NAME, delay=True)
 
     # Create a formatter and add it to the handler
     formatter = logging.Formatter('%(asctime)-15s - %(name)s - %(levelname)s - %(message)s')
@@ -117,6 +168,7 @@ def logger_init(__name__):
 
     # Add the handler to the logger
     logger.addHandler(handler)
+
     return logger
 
 
@@ -223,7 +275,7 @@ if __name__ == "__main__":
     from traceback_with_variables import activate_by_import as activate_by_import
     from traceback_with_variables import printing_exc, LoggerAsFile
 
-    # Enable the logger
+    # Enable the exception logger
     logger = logger_init(__name__)
 
     # Check if an argument has been passed and its value is between 0 and 3
@@ -232,6 +284,6 @@ if __name__ == "__main__":
     else:
         run_type = run_type_request()
 
-    # Run the main function with the logger
+    # Run the main function with the exception logger
     with printing_exc(file_=LoggerAsFile(logger)):
         main(run_type)

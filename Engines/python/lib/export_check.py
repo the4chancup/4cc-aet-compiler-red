@@ -1,6 +1,8 @@
 ## Checks the export for all kinds of errors
 import os
 import shutil
+import logging
+
 from .utils.zlib_plus import unzlib_file
 from .texture_check import texture_check
 from .xml_check import mtl_check
@@ -34,12 +36,12 @@ def nested_folders_fix(exportfolder_path, team_name):
                 if os.path.isdir(subfolder_path) and subfolder_name == folder_name:
 
                     # Unless it's the 'Other' or 'Common' folders
-                    if subfolder_name not in ('Other', 'Common'):
+                    if subfolder_name not in ("Other", "Common"):
 
                         nested_error = True
 
                         # Create a temporary folder path in the main export folder
-                        temp_path = os.path.join(exportfolder_path, 'Temp')
+                        temp_path = os.path.join(exportfolder_path, "Temp")
                         os.makedirs(temp_path, exist_ok=True)
 
                         # Loop through each item in the subdirectory and move it to the temporary folder
@@ -59,20 +61,11 @@ def nested_folders_fix(exportfolder_path, team_name):
     # If some folders were nested, warn about it
     if nested_error:
 
-        with open("memelist.txt", "a") as log:
-            log.write("- \n")
-            log.write(f"- {team_name}'s manager needs to get memed on (nested folders) - Fix Attempted.\n")
-
-        os.environ["LOG"] = "1"
-
-        print("- ")
-        print(f"- {team_name}'s manager needs to get memed on (nested folders).")
-        print("- An attempt to automatically fix those folders has just been done.")
-        print("- Nothing has been discarded, though problems may still arise.")
-
-        if pause_on_error:
-            print("- ")
-            input("Press any key to continue...")
+        logging.warning( "-")
+        logging.warning( "- Warning - Nested folders")
+        logging.warning(f"- Team name:      {team_name}")
+        logging.warning( "- An attempt to automatically fix those folders has been made")
+        logging.warning( "- Nothing has been discarded, but problems may still arise")
 
 
 def faces_check(exportfolder_path, team_name):
@@ -86,9 +79,11 @@ def faces_check(exportfolder_path, team_name):
 
             folder_error_any = None
 
+            # Prepare a list of subfolders
+            subfolder_list = [subfolder for subfolder in os.listdir(itemfolder_path) if os.path.isdir(os.path.join(itemfolder_path, subfolder))]
+
             # For every subfolder
-            for subfolder_name in [subfolder for subfolder in os.listdir(itemfolder_path)
-                                   if os.path.isdir(os.path.join(itemfolder_path, subfolder))]:
+            for subfolder_name in subfolder_list:
 
                 subfolder_path = os.path.join(itemfolder_path, subfolder_name)
 
@@ -103,7 +98,7 @@ def faces_check(exportfolder_path, team_name):
                 folder_error_num = not (subfolder_name[3:5].isdigit() and '01' <= subfolder_name[3:5] <= '23')
 
                 if not fox_mode:
-                    # Check if the folder has a face.xml and not the unsupported face_edithair.xml file
+                    # Check if the folder has a face.xml or the unsupported face_edithair.xml file
                     face_xml_path = os.path.join(subfolder_path, "face.xml")
                     face_diff_xml_path = os.path.join(subfolder_path, "face_diff.xml")
                     face_edithair_xml_path = os.path.join(subfolder_path, "face_edithair.xml")
@@ -115,13 +110,11 @@ def faces_check(exportfolder_path, team_name):
                         folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
 
                 # Check every texture
-                for file_name in os.listdir(subfolder_path):
-                    file_path = os.path.join(subfolder_path, file_name)
+                for texture_name in os.listdir(subfolder_path):
+                    texture_path = os.path.join(subfolder_path, texture_name)
 
-                    folder_error_tex_format = texture_check(file_path)
-
-                    if folder_error_tex_format:
-                        break
+                    if texture_check(texture_path):
+                        folder_error_tex_format = True
 
                 # Check every mtl file
                 if not fox_mode:
@@ -143,36 +136,26 @@ def faces_check(exportfolder_path, team_name):
                 # If the face folder has something wrong
                 if folder_error:
 
-                    # Open memelist.txt for appending
-                    with open("memelist.txt", "a") as log:
+                    # Warn about the team having bad folders
+                    if not folder_error_any:
+                        logging.error( "-")
+                        logging.error( "- ERROR - Bad face folders")
+                        logging.error(f"- Team name:      {team_name}")
+                        folder_error_any = True
 
-                        # Warn about the team having bad folders
-                        if not folder_error_any:
-                            log.write("- \n")
-                            log.write(f'- {team_name}\'s manager needs to get memed on (bad face folders).\n')
-                            print("- ")
-                            print(f'- {team_name}\'s manager needs to get memed on (bad face folders).')
-                            folder_error_any = True
+                    logging.error(f"- Face folder:    {subfolder_name}")
 
-                        log.write(f'- The face folder {subfolder_name} is bad.\n')
-                        print(f'- The face folder {subfolder_name} is bad.')
-
-                        # Give an error depending on the particular problem
-                        if folder_error_num:
-                            log.write(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded\n')
-                            print(f'- (player number {subfolder_name[3:5]} out of the 01-23 range) - Folder discarded')
-                        if folder_error_xml_format:
-                            log.write('- (broken xml file) - Folder discarded)\n')
-                            print('- (broken xml file) - Folder discarded')
-                        if folder_error_edithairxml:
-                            log.write('- (unsupported edithair face folder, needs updating) - Folder discarded)\n')
-                            print('- (unsupported edithair face folder, needs updating) - Folder discarded')
-                        if folder_error_tex_format:
-                            log.write(f'- ({file_name} is a bad texture) - Folder discarded)\n')
-                            print(f'- ({file_name} is a bad texture) - Folder discarded')
-                        if folder_error_mtl_format:
-                            log.write('- (broken mtl files) - Folder discarded)\n')
-                            print('- (broken mtl files) - Folder discarded')
+                    # Give an error depending on the particular problem
+                    if folder_error_num:
+                        logging.error(f"- (player number {subfolder_name[3:5]} outside the 01-23 range)")
+                    if folder_error_xml_format:
+                        logging.error( "- (broken xml file)")
+                    if folder_error_edithairxml:
+                        logging.error( "- (unsupported edithair face folder, needs updating)")
+                    if folder_error_tex_format:
+                        logging.error( "- (bad textures)")
+                    if folder_error_mtl_format:
+                        logging.error( "- (broken mtl files)")
 
                     # And skip it
                     shutil.rmtree(subfolder_path)
@@ -180,13 +163,11 @@ def faces_check(exportfolder_path, team_name):
             # If there were any bad folders
             if folder_error_any:
 
-                print("- These face folders will be discarded to avoid problems.")
-                print("- Closing the script's window and fixing them is recommended.")
-
-                os.environ["LOG"] = "1"
+                logging.error( "-")
+                logging.error( "- These face folders will be discarded to avoid problems")
 
                 if pause_on_error:
-                    input('Press Enter to continue...')
+                    input("Press Enter to continue...")
 
         # If the folder exists but is empty, delete it
         else:
@@ -245,15 +226,10 @@ def kitconfigs_check(exportfolder_path, team_name):
                 shutil.rmtree(os.path.join(exportfolder_path, "Kit Configs"))
 
                 # Log the issue
-                with open("memelist.txt", "a") as log:
-                    log.write("- \n")
-                    log.write(f"- {team_name}'s manager needs to get memed on (wrong kit config names). - Kit Configs discarded\n")
-
-                # Print the issue
-                print("- ")
-                print(f"- {team_name}'s manager needs to get memed on (wrong kit config names).")
-                print("- The Kit Configs folder will be discarded since it's unusable.")
-                print("- Closing the script's window and fixing it is recommended.")
+                logging.error( "-")
+                logging.error( "- ERROR - Wrong kit config names")
+                logging.error(f"- Team name:      {team_name}")
+                logging.error( "- The Kit Configs folder will be discarded since it's unusable")
 
                 # Pause if needed
                 if pause_on_error:
@@ -263,26 +239,21 @@ def kitconfigs_check(exportfolder_path, team_name):
                 # Prepare a clean version of the team name without slashes
                 team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
 
-                # Path to the txt file with the team's name
+                # Path to the txt file with the team"s name
                 note_path = os.path.join(exportfolder_path, f"{team_name_clean} Note.txt")
 
                 # Check if the txt file exists
                 if os.path.exists(note_path):
 
-                    # Check that the amount of kit configs and kit color entries in the Note txt are the same
-                    if txt_kits_count(note_path) != config_count:
+                    # Check that the number of kit configs and kit color entries in the Note txt are the same
+                    config_count_note = txt_kits_count(note_path)
+                    if config_count_note != config_count:
 
-                        with open("memelist.txt", "a") as log:
-                            log.write("- \n")
-                            log.write(f"- {team_name}'s manager needs to get memed on (missing kit configs or txt kit color entries). - Warning\n")
-
-                        os.environ["LOG"] = "1"
-
-                        print("- ")
-                        print(f"- {team_name}'s manager needs to get memed on (missing kit configs or txt kit color entries).")
-                        print("- The amount of ", team_name, "'s kit color entries is not equal to")
-                        print("- the amount of kit config files in the Note txt file.")
-                        print("- Closing the script's window and fixing this is recommended.")
+                        logging.error( "-")
+                        logging.error( "- ERROR - Missing kit configs or txt kit color entries")
+                        logging.error(f"- Team name:      {team_name}")
+                        logging.error(f"- The number of kit config files ({config_count}) is not equal to")
+                        logging.error(f"- the number of kit color entries ({config_count_note}) in the Note txt file")
 
                         if pause_on_error:
                             input("Press Enter to continue...")
@@ -302,16 +273,11 @@ def kitconfigs_check(exportfolder_path, team_name):
         # Warn about it later
         folder_error = True
 
-    # If we need to warn about the folder
+    # Warn about the folder if needed
     if folder_error:
 
-        # Warn about it
-        with open("memelist.txt", "a") as log:
-            log.write(f"- {team_name}'s export doesn't have any Kit Configs - Warning\n")
-
-        os.environ["LOG"] = "1"
-
-        print(f"- {team_name}'s export doesn't have any Kit Configs.")
+        logging.warning( "-")
+        logging.warning(f"- {team_name}'s export doesn't have any Kit Configs")
 
 
 # If a Kit Textures folder exists and is not empty, check that the kit textures' filenames and type are correct
@@ -345,22 +311,11 @@ def kittextures_check(exportfolder_path, team_name):
                 # Skip the whole Kit Textures folder
                 shutil.rmtree(itemfolder_path)
 
-                # Write to log
-                with open("memelist.txt", "a") as log:
-                    log.write("- \n")
-                    log.write(f"- {team_name}'s manager needs to get memed on (bad kit textures) - Kit Textures discarded.\n")
-
-                os.environ["LOG"] = "1"
-
-                # Print to console
-                print("- ")
-                print(f"- {team_name}'s manager needs to get memed on (bad kit textures).")
-                print("- This is usually caused by png textures renamed to dds instead of saved as dds.")
-                if fox_mode:
-                    print("- Or by missing mipmaps.")
-                print(f"- First game-crashing texture found: {file_name}")
-                print("- The Kit Textures folder will be discarded since it's unusable.")
-                print("- Closing the script's window and fixing it is recommended.")
+                # Log the issue
+                logging.error( "-")
+                logging.error( "- ERROR - Bad kit textures")
+                logging.error(f"- Team name:      {team_name}")
+                logging.error( "- The Kit Textures folder will be discarded since it's unusable")
 
                 if pause_on_error:
                     input("Press Enter to continue...")
@@ -377,11 +332,12 @@ def kittextures_check(exportfolder_path, team_name):
 
                         # Warn about the team having bad texture names
                         if not file_error_any:
-                            print("- ")
-                            print(f"- {team_name}'s manager needs to get memed on (bad kit texture names).")
+                            logging.error( "-")
+                            logging.error( "- ERROR - Bad kit texture names")
+                            logging.error(f"- Team name:      {team_name}")
                             file_error_any = True
 
-                        print(f"- The kit texture {file_name} is bad. File discarded.")
+                        logging.error(f"- Texture name:   {file_name}")
 
                         # And skip it
                         file_path = os.path.join(itemfolder_path, file_name)
@@ -390,8 +346,7 @@ def kittextures_check(exportfolder_path, team_name):
                 # If the team has bad files close the previously opened message
                 if file_error_any:
 
-                    print("- The kit textures mentioned above will be discarded since they're unusable.")
-                    print("- Closing the script's window and fixing them is recommended.")
+                    logging.error( "- The kit textures mentioned above will be discarded since they're unusable")
 
                     if pause_on_error:
                         input("Press Enter to continue...")
@@ -411,18 +366,11 @@ def kittextures_check(exportfolder_path, team_name):
         # Warn about it later
         folder_error = True
 
-    # If we need to warn about the folder
+    # Warn about the folder if needed
     if folder_error:
 
-        # Warn about it
-        with open("memelist.txt", "a") as log:
-            log.write("- \n")
-            log.write(f"- {team_name}'s export doesn't have any Kit Textures - Warning\n")
-
-        os.environ["LOG"] = "1"
-
-        print("- ")
-        print(f"- {team_name}'s export doesn't have any Kit Textures.")
+        logging.warning( "-")
+        logging.warning(f"- {team_name}'s export doesn't have any Kit Textures")
 
 
 # If a Logo folder exists and is not empty, check that the three logo images' filenames are correct
@@ -465,18 +413,11 @@ def logo_check(exportfolder_path, team_name):
                 # Skip the whole folder
                 shutil.rmtree(itemfolder_path)
 
-                # Write to memelist.txt
-                with open("memelist.txt", "a") as log:
-                    log.write("- \n")
-                    log.write(f"- {team_name}'s manager needs to get memed on (wrong logo filenames)\n")
-
-                os.environ["LOG"] = "1"
-
-                # Warn user
-                print("- ")
-                print(f"- {team_name}'s manager needs to get memed on (wrong logo filenames)")
-                print("- The Logo folder will be discarded since it's unusable.")
-                print("- Closing the script's window and fixing it is recommended.")
+                # Log the issue
+                logging.error( "-")
+                logging.error( "- ERROR - Wrong logo filenames")
+                logging.error(f"- Team name:      {team_name}")
+                logging.error( "- The Logo folder will be discarded since it's unusable")
 
                 if pause_on_error:
                     input("Press Enter to continue...")
@@ -512,24 +453,19 @@ def portraits_check(exportfolder_path, team_name):
 
                 # If the file is bad
                 if file_error:
-                    with open("memelist.txt", "a") as log:
-                        if not file_error_any:
-                            file_error_any = True
-                            log.write("- \n")
-                            log.write(f"- {team_name}'s manager needs to get memed on (bad portraits)\n")
-                            print("- ")
-                            print(f"- {team_name}'s manager needs to get memed on (bad portraits)")
+                    if not file_error_any:
+                        file_error_any = True
+                        logging.error( "-")
+                        logging.error( "- ERROR - Bad portrait")
+                        logging.error(f"- Team name:      {team_name}")
 
-                        # Give an error depending on the particular problem
-                        log.write(f"- The portrait {file_name} is bad.")
-                        print(f"- The portrait {file_name} is bad.")
+                    # Give an error depending on the particular problem
+                    logging.error(f"- Portrait name:  {file_name} ")
 
-                        if file_error_id:
-                            log.write(f"- (player number {file_name[-6:-4]} out of the 01-23 range) - File discarded\n")
-                            print(f"- (player number {file_name[-6:-4]} out of the 01-23 range)")
-                        if file_error_tex_format:
-                            log.write("- (bad format) - File discarded\n")
-                            print("- (bad format)")
+                    if file_error_id:
+                        logging.error(f"- (player number {file_name[-6:-4]} out of the 01-23 range)")
+                    if file_error_tex_format:
+                        logging.error( "- (bad format)")
 
                     # And skip it
                     os.remove(os.path.join(itemfolder_path, file_name))
@@ -537,10 +473,7 @@ def portraits_check(exportfolder_path, team_name):
             # If the team has bad files close the previously opened message
             if file_error_any:
 
-                print("- These portraits will be discarded since they're unusable.")
-                print("- Closing the script's window and fixing them is recommended.")
-
-                os.environ["LOG"] = "1"
+                logging.error( "- These portraits will be discarded since they're unusable")
 
                 if pause_on_error:
                     input("Press Enter to continue...")
@@ -572,16 +505,13 @@ def common_check(exportfolder_path, team_name):
                 if file_error_tex_format:
 
                     # Warn about the team having bad common textures
-                    with open("memelist.txt", "a") as log:
-                        if not file_error_any:
-                            file_error_any = True
-                            log.write("- \n")
-                            log.write(f"- {team_name}'s manager needs to get memed on (bad common textures)\n")
-                            print("- ")
-                            print(f"- {team_name}'s manager needs to get memed on (bad common textures)")
+                    if not file_error_any:
+                        file_error_any = True
+                        logging.error( "-")
+                        logging.error( "- ERROR - Bad common textures")
+                        logging.error(f"- Team name:      {team_name}")
 
-                        log.write(f"- The common texture {file_name} is bad.\n")
-                        print(f"- The common texture {file_name} is bad.")
+                    logging.error(f"- Texture name:   {file_name}")
 
                     # And skip it
                     os.remove(os.path.join(itemfolder_path, file_name))
@@ -589,11 +519,7 @@ def common_check(exportfolder_path, team_name):
             # If the team has bad common textures close the previously opened message
             if file_error_any:
 
-                print("- The textures mentioned above will be discarded since they're unusable.")
-                print("- Closing the script's window and fixing them is recommended.")
-                print("- ")
-
-                os.environ["LOG"] = "1"
+                logging.error( "- The textures mentioned above will be discarded since they're unusable")
 
                 if pause_on_error:
                     input("Press Enter to continue...")
@@ -614,9 +540,11 @@ def boots_check(exportfolder_path, team_name):
 
             folder_error_any = None
 
+            # Prepare a list of subfolders
+            subfolder_list = [subfolder for subfolder in os.listdir(itemfolder_path) if os.path.isdir(os.path.join(itemfolder_path, subfolder))]
+
             # For every subfolder
-            for subfolder_name in [subfolder for subfolder in os.listdir(itemfolder_path)
-                                   if os.path.isdir(os.path.join(itemfolder_path, subfolder))]:
+            for subfolder_name in subfolder_list:
 
                 subfolder_path = os.path.join(itemfolder_path, subfolder_name)
 
@@ -655,30 +583,22 @@ def boots_check(exportfolder_path, team_name):
                 # If the folder has something wrong
                 if folder_error:
 
-                    # Open memelist.txt for appending
-                    with open("memelist.txt", "a") as log:
+                    # Warn about the team having bad folders
+                    if not folder_error_any:
+                        folder_error_any = True
+                        logging.error( "-")
+                        logging.error( "- ERROR - Bad boots folders" )
+                        logging.error(f"- Team name:      {team_name}")
 
-                        # Warn about the team having bad folders
-                        if not folder_error_any:
-                            folder_error_any = True
-                            log.write("- \n")
-                            log.write(f"- {team_name}'s manager needs to get memed on.\n")
-                            print("- ")
-                            print(f"- {team_name}'s manager needs to get memed on.")
+                    logging.error(f"- Folder:   {subfolder_name}")
 
-                        log.write(f"- The boots folder {subfolder_name} is bad.\n")
-                        print(f"- The boots folder {subfolder_name} is bad.")
-
-                        # Give an error depending on the particular problem
-                        if folder_error_name:
-                            log.write("- (wrong boots folder name)\n")
-                            print("- (wrong boots folder name)")
-                        if folder_error_tex_format:
-                            log.write(f"- ({file_name} is a bad texture)\n")
-                            print(f"- ({file_name} is a bad texture)")
-                        if folder_error_mtl_format:
-                            log.write("- (broken mtl files)\n")
-                            print("- (broken mtl files)")
+                    # Give an error depending on the particular problem
+                    if folder_error_name:
+                        logging.error( "- (wrong folder name)")
+                    if folder_error_tex_format:
+                        logging.error(f"- ({file_name} is a bad texture)")
+                    if folder_error_mtl_format:
+                        logging.error( "- (broken mtl files)")
 
                     # And skip it
                     shutil.rmtree(subfolder_path)
@@ -686,11 +606,7 @@ def boots_check(exportfolder_path, team_name):
             # If there were any bad folders
             if folder_error_any:
 
-                print("- The boots folders mentioned above will be discarded since they're unusable.")
-                print("- Closing the script's window and fixing them is recommended.")
-                print("- ")
-
-                os.environ["LOG"] = "1"
+                logging.error( "- The boots folders mentioned above will be discarded since they're unusable")
 
                 if pause_on_error:
                     input("Press Enter to continue...")
@@ -711,16 +627,17 @@ def gloves_check(exportfolder_path, team_name):
 
             folder_error_any = None
 
+            # Prepare a list of subfolders
+            subfolder_list = [subfolder for subfolder in os.listdir(itemfolder_path) if os.path.isdir(os.path.join(itemfolder_path, subfolder))]
+
             # For every subfolder
-            for subfolder_name in [subfolder for subfolder in os.listdir(itemfolder_path)
-                                   if os.path.isdir(os.path.join(itemfolder_path, subfolder))]:
+            for subfolder_name in subfolder_list:
 
                 subfolder_path = os.path.join(itemfolder_path, subfolder_name)
 
                 # Initialize error subflags
                 folder_error_name = False
                 folder_error_xml_format = False
-                folder_error_nofpkxml = False
                 folder_error_tex_format = False
                 folder_error_mtl_format = False
 
@@ -754,7 +671,6 @@ def gloves_check(exportfolder_path, team_name):
                 folder_error = (
                     folder_error_name or
                     folder_error_xml_format or
-                    folder_error_nofpkxml or
                     folder_error_tex_format or
                     folder_error_mtl_format
                 )
@@ -762,33 +678,24 @@ def gloves_check(exportfolder_path, team_name):
                 # If the folder has something wrong
                 if folder_error:
 
-                    # Open memelist.txt for appending
-                    with open("memelist.txt", "a") as log:
+                    # Warn about the team having bad folders
+                    if not folder_error_any:
+                        folder_error_any = True
+                        logging.error( "-")
+                        logging.error( "- ERROR - Bad gloves folders")
+                        logging.error(f"- Team name:      {team_name}")
 
-                        # Warn about the team having bad folders
-                        if not folder_error_any:
-                            folder_error_any = True
-                            log.write("- \n")
-                            log.write(f"- {team_name}'s manager needs to get memed on.\n")
-                            print("- ")
-                            print(f"- {team_name}'s manager needs to get memed on.")
+                    logging.error(f"- Folder:   {subfolder_name}")
 
-                        log.write(f"\nThe gloves folder {subfolder_name} is bad.")
-                        print(f"\nThe gloves folder {subfolder_name} is bad.")
-
-                        # Give an error depending on the particular problem
-                        if folder_error_name:
-                            log.write("- (wrong gloves folder name)\n")
-                            print("- (wrong gloves folder name)")
-                        if folder_error_xml_format:
-                            log.write("- (broken xml file)\n")
-                            print("- (broken xml file)")
-                        if folder_error_tex_format:
-                            log.write(f"- ({file_name} is a bad texture)\n")
-                            print(f"- ({file_name} is a bad texture)")
-                        if folder_error_mtl_format:
-                            log.write("- (broken mtl files)\n")
-                            print("- (broken mtl files)")
+                    # Give an error depending on the particular problem
+                    if folder_error_name:
+                        logging.error( "- (wrong folder name)")
+                    if folder_error_xml_format:
+                        logging.error( "- (broken xml file)")
+                    if folder_error_tex_format:
+                        logging.error(f"- ({file_name} is a bad texture)")
+                    if folder_error_mtl_format:
+                        logging.error( "- (broken mtl files)")
 
                     # And skip it
                     shutil.rmtree(subfolder_path)
@@ -796,10 +703,7 @@ def gloves_check(exportfolder_path, team_name):
             # If there were any bad folders
             if folder_error_any:
 
-                print("- The gloves folders mentioned above will be discarded since they're unusable.\n")
-                print("- Closing the script's window and fixing them is recommended.\n")
-
-                os.environ["LOG"] = "1"
+                logging.error( "- The gloves folders mentioned above will be discarded since they're unusable")
 
                 if pause_on_error:
                     input("Press Enter to continue...")

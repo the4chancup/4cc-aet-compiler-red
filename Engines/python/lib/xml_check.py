@@ -1,6 +1,8 @@
 import os
 import re
+import logging
 import xml.etree.ElementTree as ET
+import xml.parsers.expat
 
 from .utils.zlib_plus import unzlib_file
 from .utils.elements import dummy_element
@@ -62,14 +64,16 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     error = False
 
     if not listed_file_path:
-        print(f"- ERROR - Missing {listed_file_type.lower()} path")
-        print(f"- Folder:         {xml_folder_name}")
-        print(f"- {xml_extension} name:       {xml_name}")
+        logging.error( "-")
+        logging.error(f"- ERROR - Missing {listed_file_type.lower()} path")
+        logging.error(f"- Folder:         {xml_folder_name}")
+        logging.error(f"- {xml_extension} name:       {xml_name}")
         if listed_file_type == "Texture":
-            print(f"- Material:       {material_name}")
-            print(f"- Sampler:        {sampler_name}")
-        print("-")
+            logging.error(f"- Material:       {material_name}")
+            logging.error(f"- Sampler:        {sampler_name}")
+
         return True
+
     else:
         # Check if the filename is in the list of exceptions
         if os.path.basename(listed_file_path) in FILE_NAME_EXCEPTION_LIST:
@@ -93,11 +97,12 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
 
             # If the PES version is 16 and the file is a model file, throw an error
             if pes_version == 16 and listed_file_type == "Model":
-                print(f"- ERROR - {listed_file_type} files cannot be loaded from the Common folder on PES16")
-                print(f"- Folder:         {xml_folder_name}")
-                print(f"- {xml_extension} name:       {xml_name}")
-                print(f"- Model path:     {listed_file_path}")
-                print("-")
+                logging.error( "-")
+                logging.error(f"- ERROR - {listed_file_type} files cannot be loaded from the Common folder on PES16")
+                logging.error(f"- Folder:         {xml_folder_name}")
+                logging.error(f"- {xml_extension} name:       {xml_name}")
+                logging.error(f"- Model path:     {listed_file_path}")
+
                 return True
 
             # Remove the "file/character/uniform/common/XXX/" from the path
@@ -129,23 +134,26 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
                 # Remove "extracted_exports/" from the path
                 file_path_short = file_path[18:]
 
-            ##TODO: Make error-only once the templates have been updated
-            if listed_file_type == "Texture":
-                print(f"- Warning - {listed_file_type} file does not exist in the path indicated")
-            else:
-                print(f"- ERROR - {listed_file_type} file does not exist in the path indicated")
-            print(f"- Folder:         {xml_folder_name}")
-            print(f"- {xml_extension} name:       {xml_name}")
-            if listed_file_type == "Texture":
-                print(f"- Material:       {material_name}")
-                print(f"- Sampler:        {sampler_name}")
+            ##TODO: Make error-only and merge once the templates have been updated
             type_string_raw = f"{listed_file_type} path:"
             type_string = type_string_raw + " " * (16 - len(type_string_raw))
-            print(f"- {type_string}{listed_file_path}")
-            print(f"- Full path:      {file_path_short}")
-            print("-")
+            if listed_file_type == "Texture":
+                logging.warning( "-")
+                logging.warning(f"- Warning - {listed_file_type} file does not exist in the path indicated")
+                logging.warning(f"- Folder:         {xml_folder_name}")
+                logging.warning(f"- {xml_extension} name:       {xml_name}")
+                logging.warning(f"- Material:       {material_name}")
+                logging.warning(f"- Sampler:        {sampler_name}")
+                logging.warning(f"- {type_string}{listed_file_path}")
+                logging.warning(f"- Full path:      {file_path_short}")
+            else:
+                logging.error( "-")
+                logging.error(f"- ERROR - {listed_file_type} file does not exist in the path indicated")
+                logging.error(f"- Folder:         {xml_folder_name}")
+                logging.error(f"- {xml_extension} name:       {xml_name}")
+                logging.error(f"- {type_string}{listed_file_path}")
+                logging.error(f"- Full path:      {file_path_short}")
 
-            if listed_file_type != "Texture":
                 error = True
 
     return error
@@ -177,20 +185,19 @@ def face_diff_xml_check(xml_path):
     try:
         tree = ET.parse(xml_path)
     except ET.ParseError as e:
-        import xml.parsers.expat
+
         error_string = xml.parsers.expat.ErrorString(e.code)
         line, column = e.position
-        print( "- ERROR - Invalid .xml file")
-        print(f"- Folder:         {xml_folder_name}")
-        print(f"- xml name:       {xml_name}")
-        print(f"- Issue:          \"{error_string}\"")
-        print(f"- Location:       At or before line {line}, column {column}")
-        print("-")
+        logging.error( "-")
+        logging.error( "- ERROR - Invalid .xml file")
+        logging.error(f"- Folder:         {xml_folder_name}")
+        logging.error(f"- xml name:       {xml_name}")
+        logging.error(f"- Issue:          \"{error_string}\"")
+        logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
-            input('Press Enter to continue...')
+            input("Press Enter to continue...")
 
-        os.environ["LOG"] = "1"
         return True
 
     root = tree.getroot()
@@ -199,20 +206,17 @@ def face_diff_xml_check(xml_path):
 
     # Check that the root tag is 'dif'
     if root.tag != 'dif':
-        print( "- ERROR - Invalid root tag on the second line")
-        print(f"- Folder:         {xml_folder_name}")
-        print(f"- xml name:       {xml_name}")
-        print(f"- Root tag:       <{root.tag}>")
-        print( "- Must be:        <dif>")
-        print("-")
+        logging.error( "-")
+        logging.error( "- ERROR - Invalid root tag on the second line")
+        logging.error(f"- Folder:         {xml_folder_name}")
+        logging.error(f"- xml name:       {xml_name}")
+        logging.error(f"- Root tag:       <{root.tag}>")
+        logging.error( "- Must be:        <dif>")
 
         error = True
 
     if error and pause_on_error:
-        input('Press Enter to continue...')
-
-    if error:
-        os.environ["LOG"] = "1"
+        input("Press Enter to continue...")
 
     return error
 
@@ -243,35 +247,33 @@ def xml_check(xml_path, face_neck_needed=False):
     try:
         tree = ET.parse(xml_path)
     except ET.ParseError as e:
-        import xml.parsers.expat
+
         error_string = xml.parsers.expat.ErrorString(e.code)
         line, column = e.position
-        print( "- ERROR - Invalid .xml file")
-        print(f"- Folder:         {xml_folder_name}")
-        print(f"- xml name:       {xml_name}")
-        print(f"- Issue:          \"{error_string}\"")
-        print(f"- Location:       At or before line {line}, column {column}")
-        print("-")
+        logging.error( "-")
+        logging.error( "- ERROR - Invalid .xml file")
+        logging.error(f"- Folder:         {xml_folder_name}")
+        logging.error(f"- xml name:       {xml_name}")
+        logging.error(f"- Issue:          \"{error_string}\"")
+        logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
-            input('Press Enter to continue...')
+            input("Press Enter to continue...")
 
-        os.environ["LOG"] = "1"
         return True
 
     root = tree.getroot()
 
     error = False
-    warning = False
 
     # Check that the root tag is 'config'
     if root.tag != 'config':
-        print( "- ERROR - Invalid root tag on the second line")
-        print(f"- Folder:         {xml_folder_name}")
-        print(f"- xml name:       {xml_name}")
-        print(f"- Root tag:       <{root.tag}>")
-        print( "- Must be:        <config>")
-        print("-")
+        logging.error( "-")
+        logging.error( "- ERROR - Invalid root tag on the second line")
+        logging.error(f"- Folder:         {xml_folder_name}")
+        logging.error(f"- xml name:       {xml_name}")
+        logging.error(f"- Root tag:       <{root.tag}>")
+        logging.error( "- Must be:        <config>")
 
         error = True
 
@@ -287,12 +289,12 @@ def xml_check(xml_path, face_neck_needed=False):
         model_type_error = False
 
         if not model_type:
-            print( "- ERROR - Missing model type")
-            print(f"- Folder:         {xml_folder_name}")
-            print(f"- xml name:       {xml_name}")
+            logging.error( "- ERROR - Missing model type")
+            logging.error(f"- Folder:         {xml_folder_name}")
+            logging.error(f"- xml name:       {xml_name}")
             if model_path:
-                print(f"- Model path:     {model_path}")
-            print("-")
+                logging.error(f"- Model path:     {model_path}")
+            logging.error( "-")
 
             model_type_error = True
 
@@ -309,12 +311,13 @@ def xml_check(xml_path, face_neck_needed=False):
             if model_material_path:
                 model_material_path_list.append(model_material_path)
 
-        error = (
-            error or
+        if (
             model_type_error or
             model_path_error or
             model_material_error
-        )
+        ):
+            error = True
+
 
     dummy_model = None
 
@@ -342,10 +345,7 @@ def xml_check(xml_path, face_neck_needed=False):
 
 
     if error and pause_on_error:
-        input('Press Enter to continue...')
-
-    if error or warning:
-        os.environ["LOG"] = "1"
+        input("Press Enter to continue...")
 
     return error
 
@@ -375,20 +375,19 @@ def mtl_check(mtl_path):
     try:
         tree = ET.parse(mtl_path)
     except ET.ParseError as e:
-        import xml.parsers.expat
+
         error_string = xml.parsers.expat.ErrorString(e.code)
         line, column = e.position
-        print( "- ERROR - Invalid .mtl file")
-        print(f"- Folder:         {mtl_folder_name}")
-        print(f"- MTL name:       {mtl_name}")
-        print(f"- Issue:          \"{error_string}\"")
-        print(f"- Location:       At or before line {line}, column {column}")
-        print("-")
+        logging.error( "-")
+        logging.error( "- ERROR - Invalid .mtl file")
+        logging.error(f"- Folder:         {mtl_folder_name}")
+        logging.error(f"- MTL name:       {mtl_name}")
+        logging.error(f"- Issue:          \"{error_string}\"")
+        logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
-            input('Press Enter to continue...')
+            input("Press Enter to continue...")
 
-        os.environ["LOG"] = "1"
         return True
 
     root = tree.getroot()
@@ -405,25 +404,24 @@ def mtl_check(mtl_path):
     ]
 
     error = False
-    warning = False
 
     material_name_list = []
 
     for material in root.findall('material'):
 
-        error_conflict = False
-
         # Check if the name of the material is in the list of material names
-        if material.get('name') in material_name_list:
-            print( "- ERROR - Material listed more than once")
-            print(f"- MTL name:       {mtl_name}")
-            print(f"- Material:       \"{material.get('name')}\"")
-            print("-")
+        material_name = material.get('name')
+        error_conflict = (material_name in material_name_list)
+
+        if error_conflict:
+            logging.error( "-")
+            logging.error( "- ERROR - Material listed more than once")
+            logging.error(f"- MTL name:       {mtl_name}")
+            logging.error(f"- Material:       \"{material_name}\"")
 
             error_conflict = True
 
         # Add the name of the material to the list
-        material_name = material.get('name')
         material_name_list.append(material_name)
 
         if error_conflict:
@@ -439,29 +437,29 @@ def mtl_check(mtl_path):
 
             # Check that the value of ztest is 1
             if state_name == 'ztest' and state_value != '1':
-                print("- ERROR - Value of state \"ztest\" must be 1")
-                print(f"- MTL name:       {mtl_name}")
-                print(f"- Material:       \"{material.get('name')}\"")
-                print(f"- State value:    {state_value}")
-                print("-")
+                logging.error( "-")
+                logging.error( "- ERROR - Value of state \"ztest\" must be 1")
+                logging.error(f"- MTL name:       {mtl_name}")
+                logging.error(f"- Material:       \"{material_name}\"")
+                logging.error(f"- State value:    {state_value}")
                 error = True
 
             # Check that the value of blendmode is 0
             if state_name == 'blendmode' and state_value != '0':
-                print("- ERROR - Value of state \"blendmode\" must be 0")
-                print(f"- MTL name:       {mtl_name}")
-                print(f"- Material:       \"{material.get('name')}\"")
-                print(f"- State value:    {state_value}")
-                print("-")
+                logging.error( "-")
+                logging.error( "- ERROR - Value of state \"blendmode\" must be 0")
+                logging.error(f"- MTL name:       {mtl_name}")
+                logging.error(f"- Material:       \"{material_name}\"")
+                logging.error(f"- State value:    {state_value}")
                 error = True
 
             # Check that the value of alphablend is 0 or 1
             if state_name == 'alphablend' and state_value not in ['0', '1']:
-                print("- ERROR - Value of state \"alphablend\" must be 0 or 1")
-                print(f"- MTL name:       {mtl_name}")
-                print(f"- Material:       \"{material.get('name')}\"")
-                print(f"- State value:    {state_value}")
-                print("-")
+                logging.error( "-")
+                logging.error( "- ERROR - Value of state \"alphablend\" must be 0 or 1")
+                logging.error(f"- MTL name:       {mtl_name}")
+                logging.error(f"- Material:       \"{material_name}\"")
+                logging.error(f"- State value:    {state_value}")
                 error = True
 
         # Make a list of state names missing from the list of required state names
@@ -470,16 +468,15 @@ def mtl_check(mtl_path):
         if missing_state_names:
             ##TODO: Convert to error once the templates have been updated
             ##print("- ERROR - Missing state names")
-            print("- Warning - Missing state names")
-            print(f"- Folder:         {mtl_folder_name}")
-            print(f"- MTL name:       {mtl_name}")
-            print(f"- Material:       \"{material.get('name')}\"")
-            # Print the list of missing required state names
+            logging.warning( "-")
+            logging.warning( "- Warning - Missing state names")
+            logging.warning(f"- Folder:         {mtl_folder_name}")
+            logging.warning(f"- MTL name:       {mtl_name}")
+            logging.warning(f"- Material:       \"{material_name}\"")
+            # Log the list of missing required state names
             for missing_state_name in missing_state_names:
-                print(f"- State name:     \"{missing_state_name}\"")
-            print("-")
+                logging.warning(f"- State name:     \"{missing_state_name}\"")
             ##error = True
-            warning = True
 
         else:
             warning_nonrecvals = False
@@ -499,14 +496,13 @@ def mtl_check(mtl_path):
                 warning_nonrecvals = True
 
             if warning_nonrecvals:
-                print("- Warning - Non-recommended values for states \"alphablend\" and \"zwrite\"")
-                print(f"- Folder:         {mtl_folder_name}")
-                print(f"- MTL name:       {mtl_name}")
-                print(f"- Material:       \"{material.get('name')}\"")
-                print(f"- alphablend:     {state_name_dict['alphablend']} ({alphablend_recommended_string})")
-                print(f"- zwrite:         {state_name_dict['zwrite']} ({zwrite_recommended_string})")
-                print("-")
-                warning = True
+                logging.warning( "-")
+                logging.warning( "- Warning - Non-recommended values for states \"alphablend\" and \"zwrite\"")
+                logging.warning(f"- Folder:         {mtl_folder_name}")
+                logging.warning(f"- MTL name:       {mtl_name}")
+                logging.warning(f"- Material:       \"{material_name}\"")
+                logging.warning(f"- alphablend:     {state_name_dict['alphablend']} ({alphablend_recommended_string})")
+                logging.warning(f"- zwrite:         {state_name_dict['zwrite']} ({zwrite_recommended_string})")
 
         # Check, for each sampler, that the texture path corresponds to a texture file in the folder indicated
         for sampler in material.findall('sampler'):
@@ -514,28 +510,24 @@ def mtl_check(mtl_path):
             sampler_name = sampler.get('name')
             sampler_texture_path = sampler.get('path')
 
-            ##TODO: Unify once the templates have been updated
+            ##TODO: Unify and remove this section once the templates have been updated
             if not sampler_texture_path:
-                print("- ERROR - Missing texture path")
-                print(f"- Folder:         {mtl_folder_name}")
-                print(f"- MTL name:       {mtl_name}")
-                print(f"- Material:       \"{material_name}\"")
-                print(f"- Sampler:        \"{sampler_name}\"")
-                print("-")
+                logging.error( "-")
+                logging.error( "- ERROR - Missing texture path")
+                logging.error(f"- Folder:         {mtl_folder_name}")
+                logging.error(f"- MTL name:       {mtl_name}")
+                logging.error(f"- Material:       \"{material_name}\"")
+                logging.error(f"- Sampler:        \"{sampler_name}\"")
                 error = True
             else:
 
                 texture_path_error = listed_file_check(mtl_path, mtl_name, mtl_folder_name, sampler_texture_path, "Texture", material_name, sampler_name)
 
                 if texture_path_error:
-                    ##error = True
-                    warning = True
+                    error = True
 
 
     if error and pause_on_error:
-        input('Press Enter to continue...')
-
-    if error or warning:
-        os.environ["LOG"] = "1"
+        input("Press Enter to continue...")
 
     return error

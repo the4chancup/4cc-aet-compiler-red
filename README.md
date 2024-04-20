@@ -64,7 +64,7 @@ A thorough description of the four main scripts follows.
 This script extracts the exports located in the exports_to_add folder into the
 extracted_exports folder, then checks them for typical issues, discarding the
 whole export or parts of it if it finds any.
-It also makes a log file named memelist.txt with the list of problems it found,
+It also saves a log file named issues.log with the list of problems it found,
 and pauses at every error unless the pause_on_error setting has been disabled
 in the settings file.
 

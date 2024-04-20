@@ -1,6 +1,7 @@
 import os
-import configparser
 import shutil
+import logging
+import configparser
 
 
 def settings_missing_check(default_file_path):
@@ -87,11 +88,11 @@ def settings_init(file_name):
     # Check if the file exists
     if not os.path.isfile(file_name):
 
-        print("- Warning:")
-        print(f"- The {file_name} file is missing.")
-        print("-")
-        print("- A clean settings file will be generated and opened.")
-        print("- Please edit the settings as needed and restart the program.")
+        logging.warning( "-")
+        logging.warning(f"- Warning - Missing {file_name} file")
+        logging.warning( "-")
+        logging.warning( "- A clean settings file will be generated and opened")
+        logging.warning( "- Please edit the settings as needed and restart the program")
         print("-")
         input("Press Enter to continue...")
 
@@ -111,15 +112,16 @@ def settings_init(file_name):
         settings_missing = settings_missing_check(default_file_path)
         if settings_missing:
 
-            print("- Warning:")
-            print(f"- The following required settings are missing from the {file_name} file:")
-            # Print the list of missing required settings
+            logging.warning( "-")
+            logging.warning( "- Warning - Missing settings")
+            logging.warning(f"- The following required settings are missing from the {file_name} file:")
+            # Log the list of missing required settings
             for setting in settings_missing:
-                print(f"- {setting}")
-            print("-")
-            print("- A clean settings file will be generated and opened.")
-            print("- The old file will be renamed with _old at the end and opened too.")
-            print("- Please edit the settings as needed and restart the program.")
+                logging.warning(f"- {setting}")
+            logging.warning( "-")
+            logging.warning( "- A clean settings file will be generated and opened")
+            logging.warning( "- The old file will be renamed with _old at the end and opened too")
+            logging.warning( "- Please edit the settings as needed and restart the program")
             print("-")
             input("Press Enter to continue...")
 

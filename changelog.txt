@@ -1,3 +1,7 @@
+20/04/24 - Version 3.0.1
+- Fixed crash at start when certain libraries were missing from the user's PC
+
+
 20/04/24 - Version 3.0.0
 - Important
   - New teams_list txt with support for the new unified database

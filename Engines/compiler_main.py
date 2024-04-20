@@ -9,10 +9,17 @@ import importlib
 import importlib.util
 
 from python.admin_check import admin_check
+from python.update_check import update_check
 from python.settings_init import settings_init
 from python.extracted_from_exports import extracted_from_exports
 from python.contents_from_extracted import contents_from_extracted
 from python.patches_from_contents import patches_from_contents
+
+
+COMPILER_NAME = "4cc-aet-compiler-red"
+COMPILER_VERSION_MAJOR = 3
+COMPILER_VERSION_MINOR = 0
+COMPILER_VERSION_PATCH = 0
 
 
 class ColorFilter(logging.Filter):
@@ -42,6 +49,8 @@ def dependency_check():
         "py7zr",
         "traceback_with_variables",
     ]
+    if sys.platform == "win32":
+        dependencies.append("requests")
 
     try:
         for dependency in dependencies:
@@ -51,7 +60,7 @@ def dependency_check():
         # List the missing dependencies, one per line
         dependencies_missing = [f"{dependency}" for dependency in dependencies if not importlib.util.find_spec(dependency)]
         for dependency in dependencies_missing:
-            print(f"- {dependency}")
+            print(f"- \"{dependency}\"")
         print("-")
 
         print("- They will be installed now (or you can close the program now and install them manually).")
@@ -108,9 +117,10 @@ def admin_request(run_type):
 def intro_print():
     if sys.platform == "win32":
         os.system("color")
+    version_string = f'v{COMPILER_VERSION_MAJOR}.{COMPILER_VERSION_MINOR}.{COMPILER_VERSION_PATCH}'
     print('-')
     print('-')
-    print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m')
+    print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + f' {version_string}')
     print('-')
     print('-')
 
@@ -213,8 +223,13 @@ def main(run_type):
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
+    updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
 
     pes_download_path = os.path.join(pes_folder_path, "download")
+
+    # Check for updates
+    if updates_check and sys.platform == "win32":
+        update_check(COMPILER_NAME, COMPILER_VERSION_MAJOR, COMPILER_VERSION_MINOR, COMPILER_VERSION_PATCH)
 
     # If patches_from_contents_run is active and move_cpks mode is enabled
     if patches_from_contents_run and move_cpks:

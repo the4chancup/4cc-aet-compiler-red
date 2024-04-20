@@ -9,7 +9,7 @@ from .utils.elements import glove_element
 def xml_create(folder_path, folder_type):
 
     MODEL_NAME_EXCEPTION_LIST = [
-        'hair_high.model',
+        "hair_high_win32.model",
     ]
 
     MTL_NAME_DEFAULT = "materials.mtl"
@@ -43,14 +43,20 @@ def xml_create(folder_path, folder_type):
             if model in MODEL_NAME_EXCEPTION_LIST:
                 continue
 
-            # Check if the model filename starts with "oral_" and ends with "_win32"
-            if model.startswith("oral_") and model.endswith("_win32.model"):
-                model_name_pure = model.replace("_win32.model", "").replace("oral_", "")
+            # Check if the model is a face_high model
+            if model == "face_high_win32.model":
+                model_name_pure = "face_neck"
                 model_name = model
+
             else:
-                model_name_pure = model
-                model_name = "oral_" + model.replace(".model", "_win32.model")
-                os.rename(os.path.join(folder_path, model), os.path.join(folder_path, model_name))
+                # Check if the model filename starts with "oral_" and ends with "_win32"
+                if model.startswith("oral_") and model.endswith("_win32.model"):
+                    model_name_pure = model.replace("_win32.model", "").replace("oral_", "")
+                    model_name = model
+                else:
+                    model_name_pure = model
+                    model_name = "oral_" + model.replace(".model", "_win32.model")
+                    os.rename(os.path.join(folder_path, model), os.path.join(folder_path, model_name))
 
             model_path_xml = f"./{model_name.replace('win32', '*')}"
 

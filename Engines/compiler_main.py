@@ -81,7 +81,7 @@ def admin_request(run_type):
 def intro_print():
     if sys.platform == "win32":
         os.system("color")
-    version_string = f'v{COMPILER_VERSION_MAJOR}.{COMPILER_VERSION_MINOR}.{COMPILER_VERSION_PATCH}'
+    version_string = f'{COMPILER_VERSION_MAJOR}.{COMPILER_VERSION_MINOR}.{COMPILER_VERSION_PATCH}'
     print('-')
     print('-')
     print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + f' {version_string}')

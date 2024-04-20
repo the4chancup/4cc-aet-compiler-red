@@ -17,7 +17,7 @@ from python.patches_from_contents import patches_from_contents
 COMPILER_NAME = "4cc-aet-compiler-red"
 COMPILER_VERSION_MAJOR = 3
 COMPILER_VERSION_MINOR = 0
-COMPILER_VERSION_PATCH = 0
+COMPILER_VERSION_PATCH = 1
 
 
 class ColorFilter(logging.Filter):

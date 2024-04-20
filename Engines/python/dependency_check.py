@@ -5,7 +5,7 @@ import importlib.util
 
 
 # Check if the dependencies are installed
-def dependency_check():
+def dependency_check_on_import():
     # Prepare a list of dependencies
     dependencies = [
         "py7zr",
@@ -40,4 +40,4 @@ def dependency_check():
 
 # Run the module when imported
 if __name__.endswith("dependency_check"):
-    dependency_check()
+    dependency_check_on_import()

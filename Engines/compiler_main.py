@@ -5,7 +5,7 @@ import ctypes
 import logging
 import traceback
 
-from python.dependency_check import dependency_check as dependency_check
+from python.dependency_check import dependency_check_on_import as dependency_check_on_import
 from python.admin_check import admin_check
 from python.update_check import update_check
 from python.settings_init import settings_init

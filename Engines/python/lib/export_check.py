@@ -249,14 +249,11 @@ def kitconfigs_check(exportfolder_path, team_name):
                     config_count_note = txt_kits_count(note_path)
                     if config_count_note != config_count:
 
-                        logging.error( "-")
-                        logging.error( "- ERROR - Missing kit configs or txt kit color entries")
-                        logging.error(f"- Team name:      {team_name}")
-                        logging.error(f"- The number of kit config files ({config_count}) is not equal to")
-                        logging.error(f"- the number of kit color entries ({config_count_note}) in the Note txt file")
-
-                        if pause_on_error:
-                            input("Press Enter to continue...")
+                        logging.warning( "-")
+                        logging.warning( "- Warning - Missing kit configs or txt kit color entries")
+                        logging.warning(f"- Team name:      {team_name}")
+                        logging.warning(f"- The number of kit config files ({config_count}) is not equal to")
+                        logging.warning(f"- the number of kit color entries ({config_count_note}) in the Note txt file")
 
         # If the folder exists but is empty
         else:

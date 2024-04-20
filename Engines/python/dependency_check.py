@@ -36,3 +36,8 @@ def dependency_check():
         # Install the dependencies (closes the program automatically after the installation)
         sys.argv = ["pip", "install"] + dependencies_missing
         runpy.run_module("pip", run_name="__main__")
+
+
+# Run the module when imported
+if __name__.endswith("dependency_check"):
+    dependency_check()

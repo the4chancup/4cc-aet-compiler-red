@@ -5,7 +5,7 @@ import ctypes
 import logging
 import traceback
 
-from python.dependency_check import dependency_check
+from python.dependency_check import dependency_check as dependency_check
 from python.admin_check import admin_check
 from python.update_check import update_check
 from python.settings_init import settings_init
@@ -246,9 +246,6 @@ if __name__ == "__main__":
     # Make the terminal not close on error on linux systems
     if not sys.platform == "win32":
         sys.excepthook = lambda *args: (traceback.print_exception(*args), input())
-
-    # Check if all the dependencies are installed
-    dependency_check()
 
     # Enable the advanced traceback handler
     from traceback_with_variables import activate_by_import as activate_by_import

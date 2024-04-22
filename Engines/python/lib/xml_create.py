@@ -96,7 +96,7 @@ def xml_create(folder_path, folder_type):
         if "face_neck" not in model_type_list:
 
             # Create a dummy model element and add it to the root
-            dummy_model = dummy_element(folder_path, model_mtl_path_list[0])
+            dummy_model = dummy_element(folder_path, model_mtl_path_list)
             root_new.append(dummy_model)
 
         # Prettify the root

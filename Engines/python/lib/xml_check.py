@@ -325,7 +325,7 @@ def xml_check(xml_path, face_neck_needed=False):
     if face_neck_needed and ("face_neck" not in model_type_list):
 
         # Create a dummy model element and add it to the root
-        dummy_model = dummy_element(xml_folder_path, model_material_path_list[0])
+        dummy_model = dummy_element(xml_folder_path, model_material_path_list)
         root.append(dummy_model)
 
         # Create a new root

@@ -59,9 +59,12 @@ def extracted_from_exports():
     main_source_path = "exports_to_add"
     main_destination_path = "extracted_exports"
 
-    # Create folders just in case
+    # Create folders as needed
     os.makedirs(main_source_path, exist_ok=True)
-    os.makedirs(main_destination_path, exist_ok=True)
+
+    if os.path.exists(main_destination_path):
+        shutil.rmtree(main_destination_path)
+    os.makedirs(main_destination_path)
 
     # Define the minimum and maximum team ids
     team_id_min = 701

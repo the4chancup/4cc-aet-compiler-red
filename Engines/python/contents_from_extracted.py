@@ -89,7 +89,8 @@ def contents_from_extracted():
         os.makedirs(bins_folder_path, exist_ok=True)
 
         # Fetch the bin files from the cpks in the download folder and update their values
-        files_fetch_from_cpks(bin_info_list)
+        bin_cpk_names_list = ['midcup', 'bins']
+        files_fetch_from_cpks(bin_info_list, bin_cpk_names_list)
 
         bins_update(teamcolor_bin_path, kitcolor_bin_path)
 

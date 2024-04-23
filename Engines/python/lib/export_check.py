@@ -68,7 +68,7 @@ def nested_folders_fix(exportfolder_path, team_name):
         logging.warning( "- Nothing has been discarded, but problems may still arise")
 
 
-def faces_check(exportfolder_path, team_name):
+def faces_check(exportfolder_path, team_name, team_id):
     itemfolder_path = os.path.join(exportfolder_path, "Faces")
 
     # Check if the folder exists
@@ -105,7 +105,7 @@ def faces_check(exportfolder_path, team_name):
                     if os.path.isfile(face_edithair_xml_path):
                         folder_error_edithairxml = True
                     elif os.path.isfile(face_xml_path):
-                        folder_error_xml_format = xml_check(face_xml_path, face_neck_needed=True)
+                        folder_error_xml_format = xml_check(face_xml_path, team_id, face_neck_needed=True)
                     elif os.path.isfile(face_diff_xml_path):
                         folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
 
@@ -121,7 +121,7 @@ def faces_check(exportfolder_path, team_name):
                     for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
                         mtl_path = os.path.join(subfolder_path, mtl_name)
 
-                        if mtl_check(mtl_path):
+                        if mtl_check(mtl_path, team_id):
                             folder_error_mtl_format = True
 
                 # Set the main flag if any of the checks failed
@@ -528,7 +528,7 @@ def common_check(exportfolder_path, team_name):
             shutil.rmtree(itemfolder_path)
 
 # If a Boots folder exists and is not empty, check that the boots folder names are correct
-def boots_check(exportfolder_path, team_name):
+def boots_check(exportfolder_path, team_name, team_id):
     itemfolder_path = os.path.join(exportfolder_path, "Boots")
 
     # Check if the folder exists
@@ -569,7 +569,7 @@ def boots_check(exportfolder_path, team_name):
                     for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
                         mtl_path = os.path.join(subfolder_path, mtl_name)
 
-                        if mtl_check(mtl_path):
+                        if mtl_check(mtl_path, team_id):
                             folder_error_mtl_format = True
 
                 # Set the main flag if any of the checks failed
@@ -615,7 +615,7 @@ def boots_check(exportfolder_path, team_name):
             shutil.rmtree(itemfolder_path)
 
 # If a Gloves folder exists and is not empty, check that the boots folder names are correct
-def gloves_check(exportfolder_path, team_name):
+def gloves_check(exportfolder_path, team_name, team_id):
     itemfolder_path = os.path.join(exportfolder_path, "Gloves")
 
     # Check if the folder exists
@@ -647,7 +647,7 @@ def gloves_check(exportfolder_path, team_name):
                     # Check if the folder has a glove.xml
                     glove_xml_path = os.path.join(subfolder_path, "glove.xml")
                     if os.path.isfile(glove_xml_path):
-                        folder_error_xml_format = xml_check(glove_xml_path)
+                        folder_error_xml_format = xml_check(glove_xml_path, team_id)
 
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
@@ -663,7 +663,7 @@ def gloves_check(exportfolder_path, team_name):
                     for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
                         mtl_path = os.path.join(subfolder_path, mtl_name)
 
-                        if mtl_check(mtl_path):
+                        if mtl_check(mtl_path, team_id):
                             folder_error_mtl_format = True
 
                 # Set the main flag if any of the checks failed
@@ -727,7 +727,7 @@ def other_check(exportfolder_path, team_name):
 
 
 # Function with all the checks
-def export_check(exportfolder_path, team_name):
+def export_check(exportfolder_path, team_name, team_id):
 
     # Read the necessary parameters
     global fox_mode, fox_19, fox_21, pause_on_error
@@ -737,12 +737,12 @@ def export_check(exportfolder_path, team_name):
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
 
     nested_folders_fix(exportfolder_path, team_name)
-    faces_check(exportfolder_path, team_name)
+    faces_check(exportfolder_path, team_name, team_id)
     kitconfigs_check(exportfolder_path, team_name)
     kittextures_check(exportfolder_path, team_name)
     logo_check(exportfolder_path, team_name)
     portraits_check(exportfolder_path, team_name)
     common_check(exportfolder_path, team_name)
-    boots_check(exportfolder_path, team_name)
-    gloves_check(exportfolder_path, team_name)
+    boots_check(exportfolder_path, team_name, team_id)
+    gloves_check(exportfolder_path, team_name, team_id)
     other_check(exportfolder_path, team_name)

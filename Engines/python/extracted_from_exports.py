@@ -153,7 +153,7 @@ def extracted_from_exports():
 
         # Check the export for all kinds of errors
         if not pass_through:
-            export_check(export_destination_path, team_name)
+            export_check(export_destination_path, team_name, team_id)
 
         # If the export has a Note.txt file, append it to the teamnotes.txt file
         note_txt_append(team_name, export_destination_path)

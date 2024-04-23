@@ -4,8 +4,10 @@ import logging
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
 
+from .cpk_tools import files_fetch_from_cpks
 from .utils.zlib_plus import unzlib_file
 from .utils.elements import dummy_element
+from .utils.id_change import path_id_change
 
 
 # Read the necessary parameters
@@ -51,7 +53,7 @@ def file_exists(file_path):
         return (os.path.exists(file_path))
 
 
-def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, listed_file_type, material_name=None, sampler_name=None):
+def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, listed_file_type, team_id, material_name=None, sampler_name=None):
 
     FILE_NAME_EXCEPTION_LIST = [
         'dummy_kit.dds',
@@ -90,7 +92,10 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             file_subpath = listed_file_path[2:]
             file_path = os.path.join(os.path.dirname(xml_path), file_subpath)
 
-            file_path_check = True
+            # Replace * in the path with "win32"
+            file_path = file_path.replace('*', 'win32')
+
+            error_file_missing = not file_exists(file_path)
 
         # Check if the file path points to the uniform common folder and the file exists in the Common folder of the export
         elif listed_file_path.startswith('model/character/uniform/common/'):
@@ -110,7 +115,19 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))), "Common")
             file_path = os.path.join(common_folder_path, file_subpath)
 
-            file_path_check = True
+            # Replace * in the path with "win32"
+            file_path = file_path.replace('*', 'win32')
+
+            if not file_exists(file_path):
+
+                # Search for the file in every midcup cpk and the faces cpk in the download folder
+                listed_file_path_real = "common/character1/" + path_id_change(listed_file_path, team_id).replace('p0', 'p1')
+                file_info_list = [
+                    {'source_path': listed_file_path_real},
+                ]
+                cpk_names_list = ['midcup', 'uniform', 'faces']
+
+                error_file_missing = not files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=False)
 
         # Check if the file path points to the face common folder
         elif listed_file_path.startswith('model/character/face/common/'):
@@ -121,12 +138,6 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             file_path_short = "Unknown"
 
             error_file_missing = True
-
-        if file_path_check:
-            # Replace * in the path with "win32"
-            file_path = file_path.replace('*', 'win32')
-
-            error_file_missing = not file_exists(file_path)
 
         if error_file_missing:
 
@@ -221,7 +232,7 @@ def face_diff_xml_check(xml_path):
     return error
 
 
-def xml_check(xml_path, face_neck_needed=False):
+def xml_check(xml_path, team_id, face_neck_needed=False):
     """
     Checks the given .xml file.
 
@@ -302,11 +313,11 @@ def xml_check(xml_path, face_neck_needed=False):
             model_type_list.append(model_type)
 
         # Check that the model path corresponds to a file in the folder indicated
-        model_path_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model")
+        model_path_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model", team_id)
 
         # Check that the mtl path corresponds to a file in the folder indicated, if not checked previously
         if (not model_material_path) or (model_material_path not in model_material_path_list):
-            model_material_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_material_path, "Mtl")
+            model_material_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_material_path, "Mtl", team_id)
 
             if model_material_path:
                 model_material_path_list.append(model_material_path)
@@ -350,7 +361,7 @@ def xml_check(xml_path, face_neck_needed=False):
     return error
 
 
-def mtl_check(mtl_path):
+def mtl_check(mtl_path, team_id):
     """
     Checks the given .mtl file.
 
@@ -521,7 +532,7 @@ def mtl_check(mtl_path):
                 error = True
             else:
 
-                texture_path_error = listed_file_check(mtl_path, mtl_name, mtl_folder_name, sampler_texture_path, "Texture", material_name, sampler_name)
+                texture_path_error = listed_file_check(mtl_path, mtl_name, mtl_folder_name, sampler_texture_path, "Texture", team_id, material_name, sampler_name)
 
                 if texture_path_error:
                     error = True

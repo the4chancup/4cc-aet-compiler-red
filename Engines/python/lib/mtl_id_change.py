@@ -1,7 +1,7 @@
-import re
 import xml.etree.ElementTree as ET
 
 from .utils.zlib_plus import unzlib_file
+from .utils.id_change import path_id_change
 
 
 def mtl_id_change(mtl_path, team_id = "000"):
@@ -34,17 +34,8 @@ def mtl_id_change(mtl_path, team_id = "000"):
     for sampler in root.findall('.//sampler'):
         path = sampler.get('path')
         if path is not None:
-            new_path = re.sub(r'model/character/uniform/common/([a-zA-Z0-9]){3}/', 'model/character/uniform/common/'+team_id+'/', path)
-            if new_path != path:
-                modified = True
-                path = new_path
+            new_path = path_id_change(path, team_id)
 
-            new_path = re.sub(r'u0([a-zA-Z0-9]){3}p', 'u0'+team_id+'p', path)
-            if new_path != path:
-                modified = True
-                path = new_path
-
-            new_path = re.sub(r'u0([a-zA-Z0-9]){3}g', 'u0'+team_id+'g', path)
             if new_path != path:
                 modified = True
                 path = new_path

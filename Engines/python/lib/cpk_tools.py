@@ -32,7 +32,7 @@ def cpk_file_extract(cpk_path, file_source_path):
     return file_contents
 
 
-def files_fetch_from_cpks(file_info_list, cpk_names_list):
+def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
 
     # Read the necessary parameters
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
@@ -40,6 +40,8 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list):
 
     pes_download_path = os.path.join(pes_folder_path, "download")
     dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
+
+    file_found_all = True
 
     if os.path.exists(dpfl_path):
 
@@ -60,18 +62,25 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list):
                     file_data = cpk_file_extract(cpk_path, file_info['source_path'])
 
                     if file_data:
-                        # Save the file to the corresponding destination path after unzlibbing it if needed
-                        with open(file_info['destination_path'], "wb") as file:
-                            file.write(tryDecompress(file_data))
+                        if fetch:
+                            # Save the file to the corresponding destination path after unzlibbing it if needed
+                            with open(file_info['destination_path'], "wb") as file:
+                                file.write(tryDecompress(file_data))
 
                         break
+            else:
+                file_found_all = False
 
-    # Copy any missing files from the fallback folder
-    for file_info in file_info_list:
-        if not os.path.exists(file_info['destination_path']):
+    if fetch and not file_found_all:
 
-            file_fallback_path = os.path.join(os.path.dirname(os.path.dirname(file_info['destination_path'])), os.path.basename(file_info['destination_path']))
+        # Copy any missing files from the fallback folder
+        for file_info in file_info_list:
+            if not os.path.exists(file_info['destination_path']):
 
-            shutil.copy(file_fallback_path, file_info['destination_path'])
+                file_fallback_path = os.path.join(os.path.dirname(os.path.dirname(file_info['destination_path'])), os.path.basename(file_info['destination_path']))
 
-            print(f"- {os.path.basename(file_info['source_path'])} not found in any cpks, copied from the fallback folder")
+                shutil.copy(file_fallback_path, file_info['destination_path'])
+
+                print(f"- {os.path.basename(file_info['source_path'])} not found in any cpks, copied from the fallback folder")
+
+    return file_found_all

@@ -17,8 +17,8 @@ from python.patches_from_contents import patches_from_contents
 APP_OWNER = "the4chancup"
 APP_NAME = "4cc-aet-compiler-red"
 APP_VERSION_MAJOR = 3
-APP_VERSION_MINOR = 0
-APP_VERSION_PATCH = 2
+APP_VERSION_MINOR = 1
+APP_VERSION_PATCH = 0
 
 
 class ColorFilter(logging.Filter):

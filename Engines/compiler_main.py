@@ -13,11 +13,11 @@ from python.extracted_from_exports import extracted_from_exports
 from python.contents_from_extracted import contents_from_extracted
 from python.patches_from_contents import patches_from_contents
 
-
-COMPILER_NAME = "4cc-aet-compiler-red"
-COMPILER_VERSION_MAJOR = 3
-COMPILER_VERSION_MINOR = 0
-COMPILER_VERSION_PATCH = 2
+APP_OWNER = "the4chancup"
+APP_NAME = "4cc-aet-compiler-red"
+APP_VERSION_MAJOR = 3
+APP_VERSION_MINOR = 0
+APP_VERSION_PATCH = 2
 
 
 class ColorFilter(logging.Filter):
@@ -81,7 +81,7 @@ def admin_request(run_type):
 def intro_print():
     if sys.platform == "win32":
         os.system("color")
-    version_string = f'{COMPILER_VERSION_MAJOR}.{COMPILER_VERSION_MINOR}.{COMPILER_VERSION_PATCH}'
+    version_string = f'{APP_VERSION_MAJOR}.{APP_VERSION_MINOR}.{APP_VERSION_PATCH}'
     print('-')
     print('-')
     print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + f' {version_string}')
@@ -193,7 +193,7 @@ def main(run_type):
 
     # Check for updates
     if updates_check and sys.platform == "win32":
-        update_check(COMPILER_NAME, COMPILER_VERSION_MAJOR, COMPILER_VERSION_MINOR, COMPILER_VERSION_PATCH)
+        update_check(APP_OWNER, APP_NAME, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH)
 
     # If patches_from_contents_run is active and move_cpks mode is enabled
     if patches_from_contents_run and move_cpks:

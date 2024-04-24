@@ -24,5 +24,6 @@ if ERRORLEVEL 1 (
    echo -
    echo - A log file error.log has been saved to the compiler's folder
    echo - Please post it on the /aesco/ server or the cup thread
+   echo -
    pause
 )

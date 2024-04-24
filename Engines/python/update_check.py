@@ -172,7 +172,6 @@ def update_get(app_owner, app_name, version_last, update_major=False):
         os.startfile(app_new_folder)
 
 
-
 def updates_disable():
     """Disables update checking"""
 

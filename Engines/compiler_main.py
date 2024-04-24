@@ -13,6 +13,7 @@ from python.extracted_from_exports import extracted_from_exports
 from python.contents_from_extracted import contents_from_extracted
 from python.patches_from_contents import patches_from_contents
 
+
 APP_OWNER = "the4chancup"
 APP_NAME = "4cc-aet-compiler-red"
 APP_VERSION_MAJOR = 3

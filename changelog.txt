@@ -1,3 +1,15 @@
+24/04/24 - Version 3.1.0
+- Update checking is now much faster
+- New auto updating system, which downloads the new version and copies your
+  stuff automatically
+- Now allows skipping the latest version, or disabling update checking
+  directly from the compiler
+- Now looks inside the midcup cpks and the faces and uniform cpk for any files
+  whose path (listed on mtl and xml files) points to the common folder of the
+  team, which prevents the compiler from giving errors when processing barebone
+  midcup exports
+
+
 23/04/24 - Version 3.0.2
 - Added support for face folders with no mtl files, which would previously
   crash the compiler

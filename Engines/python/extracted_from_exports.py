@@ -74,6 +74,7 @@ def extracted_from_exports():
     with open("teamnotes.txt", "w") as f:
         f.write("--- 4cc txt notes compilation ---\n")
 
+    EXPORT_FILE_TYPES_LIST = ["zip", "7z"]
 
     for export_name in os.listdir(main_source_path):
 
@@ -83,14 +84,10 @@ def extracted_from_exports():
         if os.path.isdir(export_source_path):
             export_type = "folder"
             export_name_clean = export_name
-        elif export_source_path[-4:] == ".zip":
-            export_type = "zip"
-            export_name_clean = export_name[:-4]
-        elif export_source_path[-3:] == ".7z":
-            export_type = "7z"
-            export_name_clean = export_name[:-3]
+        elif any([export_name.endswith("." + type) for type in EXPORT_FILE_TYPES_LIST]):
+            export_name_clean, export_type = os.path.splitext(export_name)
         else:
-            # If the export is neither a zip, 7z nor a folder, skip it
+            # If the export is neither a folder nor an accepted type, skip it
             print(f"- \"{export_name}\" is unusable - Skipping")
             continue
 

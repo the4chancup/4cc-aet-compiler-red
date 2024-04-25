@@ -360,9 +360,6 @@ def xml_check(xml_path, team_id):
         tree_new.write(xml_path, encoding='UTF-8', xml_declaration=True)
 
 
-    if error and pause_on_error:
-        input("Press Enter to continue...")
-
     return error
 
 
@@ -542,8 +539,5 @@ def mtl_check(mtl_path, team_id):
                 if texture_path_error:
                     error = True
 
-
-    if error and pause_on_error:
-        input("Press Enter to continue...")
 
     return error

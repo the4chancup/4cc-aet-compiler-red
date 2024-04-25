@@ -11,7 +11,6 @@ from .utils.id_change import path_id_change
 
 
 # Read the necessary parameters
-global pes_version
 pes_version = int(os.environ.get('PES_VERSION', '16'))
 
 
@@ -81,7 +80,6 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         if os.path.basename(listed_file_path) in FILE_NAME_EXCEPTION_LIST:
             return False
 
-        file_path_check = False
         file_path_short = None
         error_file_missing = False
 

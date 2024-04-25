@@ -237,6 +237,9 @@ def main(run_type):
     if patches_from_contents_run:
         patches_from_contents()
 
+    # Stop the loggers
+    logging.shutdown()
+
     # Exit the script
     if not (patches_from_contents_run and run_pes) or os.path.exists("issues.log"):
         input("Press Enter to exit...")

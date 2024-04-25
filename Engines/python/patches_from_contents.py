@@ -194,6 +194,3 @@ def patches_from_contents():
         print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + ' by Shakes')
         print('-')
         print('-')
-
-        # Reset the all_in_one mode flag
-        os.environ['ALL_IN_ONE'] = '0'

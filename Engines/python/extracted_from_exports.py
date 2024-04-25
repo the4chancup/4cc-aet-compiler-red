@@ -105,7 +105,7 @@ def extracted_from_exports():
         team_name = f"/{team_name_raw.lower()}/"
 
         # Print team without a new line
-        print(f"- {team_name} ", end='')
+        print(f"- {team_name} ", end='', flush=True)
 
 
         # Delete the export destination folder if present

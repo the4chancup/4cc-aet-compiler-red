@@ -74,7 +74,7 @@ def extracted_from_exports():
     with open("teamnotes.txt", "w") as f:
         f.write("--- 4cc txt notes compilation ---\n")
 
-    EXPORT_FILE_TYPES_LIST = ["zip", "7z"]
+    EXPORT_FILE_TYPES_LIST = [".zip", ".7z"]
 
     for export_name in os.listdir(main_source_path):
 
@@ -84,12 +84,13 @@ def extracted_from_exports():
         if os.path.isdir(export_source_path):
             export_type = "folder"
             export_name_clean = export_name
-        elif any([export_name.endswith("." + file_type) for file_type in EXPORT_FILE_TYPES_LIST]):
-            export_name_clean, export_type = os.path.splitext(export_name)
         else:
-            # If the export is neither a folder nor an accepted type, skip it
-            print(f"- \"{export_name}\" is unusable - Skipping")
-            continue
+            export_name_clean, export_type = os.path.splitext(export_name)
+
+            if export_type not in EXPORT_FILE_TYPES_LIST:
+                # If the export is neither a folder nor an accepted type, skip it
+                print(f"- \"{export_name}\" is unusable - Skipping")
+                continue
 
         export_destination_path = os.path.join(main_destination_path, export_name_clean)
 
@@ -116,9 +117,9 @@ def extracted_from_exports():
             export_destination_path_temp = export_destination_path + "_temp"
             os.makedirs(export_destination_path_temp, exist_ok=True)
 
-            if export_type == "zip":
+            if export_type == ".zip":
                 shutil.unpack_archive(export_source_path, export_destination_path_temp, "zip")
-            elif export_type == "7z":
+            elif export_type == ".7z":
                 import py7zr
                 with py7zr.SevenZipFile(export_source_path, mode='r') as z:
                     z.extractall(export_destination_path_temp)

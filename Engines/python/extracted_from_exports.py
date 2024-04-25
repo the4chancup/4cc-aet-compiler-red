@@ -84,7 +84,7 @@ def extracted_from_exports():
         if os.path.isdir(export_source_path):
             export_type = "folder"
             export_name_clean = export_name
-        elif any([export_name.endswith("." + type) for type in EXPORT_FILE_TYPES_LIST]):
+        elif any([export_name.endswith("." + file_type) for file_type in EXPORT_FILE_TYPES_LIST]):
             export_name_clean, export_type = os.path.splitext(export_name)
         else:
             # If the export is neither a folder nor an accepted type, skip it

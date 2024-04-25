@@ -105,7 +105,7 @@ def faces_check(exportfolder_path, team_name, team_id):
                     if os.path.isfile(face_edithair_xml_path):
                         folder_error_edithairxml = True
                     elif os.path.isfile(face_xml_path):
-                        folder_error_xml_format = xml_check(face_xml_path, team_id, face_neck_needed=True)
+                        folder_error_xml_format = xml_check(face_xml_path, team_id)
                     elif os.path.isfile(face_diff_xml_path):
                         folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
 

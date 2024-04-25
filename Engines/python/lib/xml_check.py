@@ -230,7 +230,7 @@ def face_diff_xml_check(xml_path):
     return error
 
 
-def xml_check(xml_path, team_id, face_neck_needed=False):
+def xml_check(xml_path, team_id):
     """
     Checks the given .xml file.
 
@@ -248,6 +248,9 @@ def xml_check(xml_path, team_id, face_neck_needed=False):
     xml_name = os.path.basename(xml_path)
     xml_folder_path = os.path.dirname(xml_path)
     xml_folder_name = os.path.basename(xml_folder_path)
+
+    # Get the folder type from the name of the xml file
+    folder_type = xml_name.split('.')[0]
 
     # Try to unzlib the file
     unzlib_file(xml_path)
@@ -331,7 +334,7 @@ def xml_check(xml_path, team_id, face_neck_needed=False):
     dummy_model = None
 
     # Check if any of the models has the "face_neck" type
-    if face_neck_needed and ("face_neck" not in model_type_list):
+    if folder_type == "face" and ("face_neck" not in model_type_list):
 
         # Create a dummy model element and add it to the root
         dummy_model = dummy_element(xml_folder_path, model_material_path_list)

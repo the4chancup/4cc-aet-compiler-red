@@ -249,10 +249,6 @@ if __name__ == "__main__":
 
     intro_print()
 
-    # Make the terminal not close on error on linux systems
-    if not sys.platform == "win32":
-        sys.excepthook = lambda *args: (traceback.print_exception(*args), input())
-
     # Enable the advanced traceback handler
     from traceback_with_variables import activate_by_import as activate_by_import
     from traceback_with_variables import printing_exc, LoggerAsFile

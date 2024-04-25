@@ -41,7 +41,7 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
     pes_download_path = os.path.join(pes_folder_path, "download")
     dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
 
-    file_found_all = True
+    file_found_all = False
 
     if os.path.exists(dpfl_path):
 
@@ -49,6 +49,8 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
 
         # List with every cpk file in the dpfl, in reverse alphabetical order
         cpk_file_list = sorted(dpfl_list, reverse=True)
+
+        file_found_all = True
 
         for file_info in file_info_list:
             for cpk_file in cpk_file_list:

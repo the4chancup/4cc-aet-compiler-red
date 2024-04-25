@@ -30,6 +30,10 @@ def file_exists(file_path):
     file_name = os.path.basename(file_path)
     file_folder = os.path.dirname(file_path)
 
+    # Make sure the folder where the file should be exists
+    if not os.path.exists(file_folder):
+        return False
+
     # Check if the filename contains the u0XXXp pattern
     if re.search(r'u0[a-zA-Z0-9]{3}p', file_name):
 

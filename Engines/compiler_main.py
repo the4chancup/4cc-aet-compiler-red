@@ -187,6 +187,7 @@ def main(run_type):
     # Read the necessary parameters
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
+    run_pes = int(os.environ.get('RUN_PES', '0'))
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
     updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
 
@@ -237,7 +238,8 @@ def main(run_type):
         patches_from_contents()
 
     # Exit the script
-    input("Press Enter to exit...")
+    if not (patches_from_contents_run and run_pes) or os.path.exists("issues.log"):
+        input("Press Enter to exit...")
 
 
 if __name__ == "__main__":

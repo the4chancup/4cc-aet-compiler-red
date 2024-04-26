@@ -3,7 +3,6 @@ import os
 import sys
 import ctypes
 import logging
-import traceback
 
 from python.dependency_check import dependency_check_on_import as dependency_check_on_import
 from python.admin_check import admin_check

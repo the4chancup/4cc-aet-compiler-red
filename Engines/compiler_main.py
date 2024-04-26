@@ -22,13 +22,19 @@ APP_VERSION_PATCH = 0
 
 class ColorFilter(logging.Filter):
     """
-    This is a filter which colorizes the words "ERROR" and "Warning".
+    This is a filter which colorizes some alert words.
 
+    "FATAL" gets turned into "\033[31mFATAL\033[0m"
     "ERROR" gets turned into "\033[31mERROR\033[0m"
     "Warning" gets turned into "\033[33mWarning\033[0m"
     """
 
     def filter(self, record):
+
+        FATAL_STRING = "FATAL"
+        FATAL_STRING_COLORED = "\033[31mFATAL\033[0m"
+        record.msg = record.msg.replace(FATAL_STRING, FATAL_STRING_COLORED)
+
         ERROR_STRING = "ERROR"
         ERROR_STRING_COLORED = "\033[31mERROR\033[0m"
         record.msg = record.msg.replace(ERROR_STRING, ERROR_STRING_COLORED)

@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import logging
 import configparser
@@ -67,14 +68,16 @@ def settings_default_init(file_path, default_file_path):
         # Rename the main settings file
         os.rename(file_path, old_file_name)
 
-        # Open it in an external text editor
-        os.startfile(old_file_name)
+        if sys.platform == "win32":
+            # Open it in an external text editor
+            os.startfile(old_file_name)
 
     # Copy the default settings file to the main folder, with the original name
     shutil.copy(default_file_path, file_path)
 
-    # Open the settings file in an external text editor
-    os.startfile(file_path)
+    if sys.platform == "win32":
+        # Open the settings file in an external text editor
+        os.startfile(file_path)
 
     # Exit the script
     exit()

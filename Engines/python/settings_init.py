@@ -91,11 +91,11 @@ def settings_init(file_name):
     # Check if the file exists
     if not os.path.isfile(file_name):
 
-        logging.warning( "-")
-        logging.warning(f"- Warning - Missing {file_name} file")
-        logging.warning( "-")
-        logging.warning( "- A clean settings file will be generated and opened")
-        logging.warning( "- Please edit the settings as needed and restart the program")
+        logging.critical( "-")
+        logging.critical(f"- FATAL ERROR - Missing \"{file_name}\" file")
+        logging.critical( "-")
+        logging.critical( "- A clean settings file will be generated and opened")
+        logging.critical( "- Please edit the settings as needed and restart the program")
         print("-")
         input("Press Enter to continue...")
 
@@ -115,20 +115,26 @@ def settings_init(file_name):
         settings_missing = settings_missing_check(default_file_path)
         if settings_missing:
 
-            logging.warning( "-")
-            logging.warning( "- Warning - Missing settings")
-            logging.warning(f"- The following required settings are missing from the {file_name} file:")
+            logging.critical( "-")
+            logging.critical( "- FATAL ERROR - Missing settings")
+            logging.critical(f"- The following required settings are missing from the \"{file_name}\" file:")
             # Log the list of missing required settings
             for setting in settings_missing:
-                logging.warning(f"- {setting}")
-            logging.warning( "-")
-            logging.warning( "- A clean settings file will be generated and opened")
-            logging.warning( "- The old file will be renamed with _old at the end and opened too")
-            logging.warning( "- Please edit the settings as needed and restart the program")
+                logging.critical(f"- \"{setting.lower()}\"")
+            logging.critical( "-")
+            logging.critical( "- Please edit the settings file as needed and restart the program")
+            print( "-")
+            print( "-")
+            print( "- If you type \"new\" and press Enter:")
+            print( "- A clean settings file will be generated and opened, and")
+            print( "- the old file will be renamed with \"_old\" at the end and opened too")
             print("-")
-            input("Press Enter to continue...")
+            choice = input("Type \"new\" and press Enter, or just press Enter to exit...")
 
-            settings_default_init(file_name, default_file_path)
+            if "new" in choice:
+                settings_default_init(file_name, default_file_path)
+            else:
+                exit()
 
         # Check if the PES download folder location contains the magic number ** and replace it with the pes version
         pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')

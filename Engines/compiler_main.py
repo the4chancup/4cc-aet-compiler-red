@@ -247,8 +247,14 @@ def main(run_type):
     logging.shutdown()
 
     # Pause the script before exiting, unless PES is about to run
-    # Pause it anyway if there's a log file, but only if Pause on Error is enabled
-    if not (patches_from_contents_run and run_pes) or (os.path.exists("issues.log") and pause_on_error):
+    # Pause it anyway if there's a log file and Pause on Error is enabled
+    exit_pause_skip = (
+        run_pes and
+        patches_from_contents_run and
+        not (os.path.exists("issues.log") and pause_on_error)
+    )
+
+    if not exit_pause_skip:
         input("Press Enter to exit...")
 
 

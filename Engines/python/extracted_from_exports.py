@@ -1,6 +1,7 @@
 import os
 import re
 import stat
+import py7zr
 import shutil
 
 from .lib.teamid_get import teamid_get
@@ -120,7 +121,6 @@ def extracted_from_exports():
             if export_type == ".zip":
                 shutil.unpack_archive(export_source_path, export_destination_path_temp, "zip")
             elif export_type == ".7z":
-                import py7zr
                 with py7zr.SevenZipFile(export_source_path, mode='r') as z:
                     z.extractall(export_destination_path_temp)
 

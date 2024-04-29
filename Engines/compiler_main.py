@@ -24,9 +24,9 @@ class ColorFilter(logging.Filter):
     """
     This is a filter which colorizes some alert words.
 
-    "FATAL" gets turned into "\033[31mFATAL\033[0m"
-    "ERROR" gets turned into "\033[31mERROR\033[0m"
-    "Warning" gets turned into "\033[33mWarning\033[0m"
+    - "FATAL" gets turned into "\033[31mFATAL\033[0m" (red text)
+    - "ERROR" gets turned into "\033[31mERROR\033[0m" (red text)
+    - "Warning" gets turned into "\033[33mWarning\033[0m" (yellow text)
     """
 
     def filter(self, record):

@@ -44,8 +44,8 @@ def settings_default_path_get(file_path):
     # Prepare the name of the default settings file, with "_default" appended
     default_file_name = os.path.basename(file_path).replace(file_extension, "_default" + file_extension)
 
-    # Prepare the path to the default settings file inside the Engines folder
-    default_file_path = os.path.join(os.path.dirname(file_path), "Engines", default_file_name)
+    # Prepare the path to the default settings file inside the Engines\templates folder
+    default_file_path = os.path.join(os.path.dirname(file_path), "Engines", "templates", default_file_name)
 
     return default_file_path
 

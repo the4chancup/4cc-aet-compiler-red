@@ -135,7 +135,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             shutil.move(fpk_destination, final_folder_path)
 
             # Copy the generic fpkd to the same folder and rename it
-            generic_fpkd_path = os.path.join("Engines", "template", "generic.fpkd")
+            generic_fpkd_path = os.path.join("Engines", "templates", "generic.fpkd")
             shutil.copy(generic_fpkd_path, final_folder_path)
             os.rename(os.path.join(final_folder_path, "generic.fpkd"), os.path.join(final_folder_path, f"{object_type}.fpkd"))
 

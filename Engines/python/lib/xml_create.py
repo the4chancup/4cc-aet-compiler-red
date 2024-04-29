@@ -15,7 +15,7 @@ def xml_create(folder_path, folder_type):
     MTL_NAME_DEFAULT = "materials.mtl"
 
     DIFF_NAME = "face_diff"
-    DIFF_PATH_DEFAULT = os.path.join("Engines", "template", DIFF_NAME)
+    DIFF_PATH_DEFAULT = os.path.join("Engines", "templates", DIFF_NAME)
 
     TYPES_LIST = [
         "face_neck",

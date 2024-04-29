@@ -8,8 +8,8 @@ def dummy_element(folder_path, mtl_path_list):
     DUMMY_MODEL_NAME = "oral_dummy_win32.model"
     DUMMY_MTL_NAME_DEFAULT = "dummy.mtl"
 
-    # Copy the oral_dummy_win32.model file from the template folder to the xml folder
-    dummy_model_source = os.path.join('Engines', 'template', DUMMY_MODEL_NAME)
+    # Copy the oral_dummy_win32.model file from the templates folder to the xml folder
+    dummy_model_source = os.path.join('Engines', 'templates', DUMMY_MODEL_NAME)
     dummy_model_destination = os.path.join(folder_path, DUMMY_MODEL_NAME)
     shutil.copyfile(dummy_model_source, dummy_model_destination)
 
@@ -18,8 +18,8 @@ def dummy_element(folder_path, mtl_path_list):
     if mtl_path_list:
         dummy_mtl_path = mtl_path_list[0]
     else:
-        # Copy the dummy.mtl file from the template folder to the xml folder
-        dummy_mtl_source = os.path.join('Engines', 'template', DUMMY_MTL_NAME_DEFAULT)
+        # Copy the dummy.mtl file from the templates folder to the xml folder
+        dummy_mtl_source = os.path.join('Engines', 'templates', DUMMY_MTL_NAME_DEFAULT)
         dummy_mtl_destination = os.path.join(folder_path, DUMMY_MTL_NAME_DEFAULT)
         shutil.copyfile(dummy_mtl_source, dummy_mtl_destination)
 

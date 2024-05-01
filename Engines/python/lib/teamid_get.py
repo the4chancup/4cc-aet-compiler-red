@@ -2,6 +2,8 @@ import os
 import shutil
 import logging
 
+from .file_critical_check import file_critical_check
+
 
 # Function for finding the team ID after receiving the foldername as parameter
 def teamid_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
@@ -9,17 +11,7 @@ def teamid_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
     TEAMS_LIST_FILE = "teams_list.txt"
 
     # Check if the teams list file exists
-    if not os.path.isfile(TEAMS_LIST_FILE):
-        logging.critical( "-")
-        logging.critical(f"- FATAL ERROR - Missing \"{TEAMS_LIST_FILE}\" file")
-        logging.critical( "-")
-        logging.critical( "- Please grab it from the compiler's original 7z package")
-        logging.critical( "-")
-        logging.critical( "- The program will now close")
-        print("-")
-        input("Press Enter to continue...")
-
-        exit()
+    file_critical_check(TEAMS_LIST_FILE)
 
     # Read the necessary parameters
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))

@@ -2,6 +2,8 @@
 import os
 import logging
 
+from .file_critical_check import file_critical_check
+
 
 def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
 
@@ -182,20 +184,10 @@ def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
 def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
     EXTRACTED_EXPORTS_FOLDER = "./extracted_exports/"
-    TEAMS_LIST_FILE = "./teams_list.txt"
+    TEAMS_LIST_FILE = "teams_list.txt"
 
     # Check if the teams list file exists
-    if not os.path.isfile(TEAMS_LIST_FILE):
-        logging.critical( "-")
-        logging.critical(f"- FATAL ERROR - Missing \"{TEAMS_LIST_FILE}\" file")
-        logging.critical( "-")
-        logging.critical( "- Please grab it from the compiler's original 7z package")
-        logging.critical( "-")
-        logging.critical( "- The program will now close")
-        print("-")
-        input("Press Enter to continue...")
-
-        exit()
+    file_critical_check(TEAMS_LIST_FILE)
 
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))

@@ -181,9 +181,6 @@ def kitconfigs_check(exportfolder_path, team_name):
     # Check if the folder exists
     if os.path.isdir(itemfolder_path):
 
-        # Initialize the main error flag
-        folder_error = False
-
         # Check if the folder is empty
         if os.listdir(itemfolder_path):
 
@@ -258,24 +255,8 @@ def kitconfigs_check(exportfolder_path, team_name):
         # If the folder exists but is empty
         else:
 
-            # Warn about it later
-            folder_error = True
-
             # Delete the folder
             shutil.rmtree(itemfolder_path)
-
-    # If the folder doesn't exist
-    else:
-
-        # Warn about it later
-        folder_error = True
-
-    # Warn about the folder if needed
-    if folder_error:
-
-        logging.warning( "-")
-        logging.warning( "- Warning - No kit configs")
-        logging.warning(f"- Team name:      {team_name}")
 
 
 # If a Kit Textures folder exists and is not empty, check that the kit textures' filenames and type are correct
@@ -284,9 +265,6 @@ def kittextures_check(exportfolder_path, team_name):
 
     # Check if the folder exists
     if os.path.isdir(itemfolder_path):
-
-        # Initialize the main error flag
-        folder_error = False
 
         # Check if the folder is empty
         if os.listdir(itemfolder_path):
@@ -352,24 +330,8 @@ def kittextures_check(exportfolder_path, team_name):
         # If the folder exists but is empty
         else:
 
-            # Warn about it later
-            folder_error = True
-
             # Delete the folder
             shutil.rmtree(itemfolder_path)
-
-    # If the folder doesn't exist
-    else:
-
-        # Warn about it later
-        folder_error = True
-
-    # Warn about the folder if needed
-    if folder_error:
-
-        logging.warning( "-")
-        logging.warning( "- Warning - No kit textures")
-        logging.warning(f"- Team name:      {team_name}")
 
 
 # If a Logo folder exists and is not empty, check that the three logo images' filenames are correct

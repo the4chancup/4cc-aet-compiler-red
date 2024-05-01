@@ -181,15 +181,28 @@ def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
 
 def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
+    EXTRACTED_EXPORTS_FOLDER = "./extracted_exports/"
+    TEAMS_LIST_FILE = "./teams_list.txt"
+
+    # Check if the teams list file exists
+    if not os.path.isfile(TEAMS_LIST_FILE):
+        logging.critical( "-")
+        logging.critical(f"- FATAL ERROR - Missing \"{TEAMS_LIST_FILE}\" file")
+        logging.critical( "-")
+        logging.critical( "- Please grab it from the compiler's original 7z package")
+        logging.critical( "-")
+        logging.critical( "- The program will now close")
+        print("-")
+        input("Press Enter to continue...")
+
+        exit()
+
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
 
     print("-")
     print("- Adding the color entries to the bin files")
     print("- Working on team:")
-
-    extracted_exports_dir = "./extracted_exports/"
-    teams_list_file = "./teams_list.txt"
 
     # Open the TeamColor.bin file in binary mode for writing
     teamcolor_bin = open(teamcolor_bin_path, 'rb+')
@@ -198,9 +211,9 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     kitcolor_bin = open(kitcolor_bin_path, 'rb+')
 
     # For every Note txt file
-    for file_name in [f for f in os.listdir(extracted_exports_dir) if f.endswith(".txt")]:
+    for file_name in [f for f in os.listdir(EXTRACTED_EXPORTS_FOLDER) if f.endswith(".txt")]:
 
-        file_path = os.path.join(extracted_exports_dir, file_name)
+        file_path = os.path.join(EXTRACTED_EXPORTS_FOLDER, file_name)
         with open(file_path, 'r', encoding="utf8") as file:
 
             # Initialize variables
@@ -234,7 +247,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     team_name = data[-1]
 
                     # Search for the team name in the list of team IDs
-                    with open(teams_list_file, 'r') as teams_list:
+                    with open(TEAMS_LIST_FILE, 'r') as teams_list:
 
                         for teams_list_line in teams_list:
                             if teams_list_line.split()[1] == team_name.lower():

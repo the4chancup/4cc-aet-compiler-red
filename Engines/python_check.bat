@@ -6,6 +6,10 @@ for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
 
   set python_version_line=%%A
 
+  if "!python_version_line:~0,6!"=="Python" (
+    set python_installed=1
+  )
+
   if "!python_version_line:~7,1!"=="3" (
     if "!python_version_line:~9,1!"=="1" (
       if "!python_version_line:~10,1!" GEQ "2" (
@@ -20,13 +24,13 @@ for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
   )
 )
 
-if not defined python_version_ok (
+if not defined python_installed (
 
   echo -
-  echo - Python 3.12+ is missing from your pc, please install it
+  echo - Python is missing from your pc, please install the latest version
   echo -
-  echo - If it is already installed, run the installer again, choose Modify, click Next and make
-  echo - sure to check the "Add Python to environment variables" checkbox, then click Install
+  echo - When running the installer, choose Modify, click Next and make sure to check
+  echo - the "Add Python to environment variables" checkbox, then click Install
   echo -
   echo Press any key to open the Python download webpage...
 
@@ -34,7 +38,43 @@ if not defined python_version_ok (
 
   start "" https://www.python.org/downloads/
 
-  timeout /t 5 >nul
+  timeout /t 3 >nul
+
+  echo -
+  echo Press any key to resume the compiler after installing or fixing Python...
+
+  pause >nul
+
+  .\Engines\python_check
+)
+
+if not defined python_version_ok (
+
+  echo -
+  echo - Python is installed, but you need version 3.12+, please install it
+  echo -
+  echo - When running the installer, choose Modify, click Next and make sure to check
+  echo - the "Add Python to environment variables" checkbox, then click Install
+  echo -
+  echo - If it is already installed, open the Programs manager in the Control Panel
+  echo - and uninstall any old versions listed there
+  echo -
+  echo Press any key to open the Programs manager...
+
+  pause >nul
+
+  start "" appwiz.cpl
+
+  timeout /t 3 >nul
+
+  echo -
+  echo Press any key to open the Python download webpage...
+
+  pause >nul
+
+  start "" https://www.python.org/downloads/
+
+  timeout /t 3 >nul
 
   echo -
   echo Press any key to resume the compiler after installing or fixing Python...

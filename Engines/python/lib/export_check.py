@@ -537,6 +537,11 @@ def boots_check(exportfolder_path, team_name, team_id):
         # Check if the folder is empty
         if os.listdir(itemfolder_path):
 
+            MODEL_ALLOWED_LIST = [
+                "boots.model",
+                "boots_edit.model",
+            ]
+
             folder_error_any = None
 
             # Prepare a list of subfolders
@@ -549,11 +554,19 @@ def boots_check(exportfolder_path, team_name, team_id):
 
                 # Initialize error subflags
                 folder_error_name = False
+                folder_error_model_disallowed_list = []
                 folder_error_tex_format = False
                 folder_error_mtl_format = False
 
                 # Check that its name starts with a k and that the 4 characters after it are digits
                 folder_error_name = not (subfolder_name.startswith('k') and subfolder_name[1:5].isdigit())
+
+                if not fox_mode:
+                    # If there's no xml, check that all of the .model files are allowed
+                    model_files = [file for file in os.listdir(subfolder_path) if file.endswith('.model')]
+                    for model_file in model_files:
+                        if model_file not in MODEL_ALLOWED_LIST:
+                            folder_error_model_disallowed_list.append(model_file)
 
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
@@ -575,6 +588,7 @@ def boots_check(exportfolder_path, team_name, team_id):
                 # Set the main flag if any of the checks failed
                 folder_error = (
                     folder_error_name or
+                    folder_error_model_disallowed_list or
                     folder_error_tex_format or
                     folder_error_mtl_format
                 )
@@ -594,6 +608,9 @@ def boots_check(exportfolder_path, team_name, team_id):
                     # Give an error depending on the particular problem
                     if folder_error_name:
                         logging.error( "- (wrong folder name)")
+                    if folder_error_model_disallowed_list:
+                        for model_name in folder_error_model_disallowed_list:
+                            logging.error(f"- ({model_name} is not allowed)")
                     if folder_error_tex_format:
                         logging.error(f"- ({file_name} is a bad texture)")
                     if folder_error_mtl_format:
@@ -624,6 +641,12 @@ def gloves_check(exportfolder_path, team_name, team_id):
         # Check if the folder is empty
         if os.listdir(itemfolder_path):
 
+            MODEL_ALLOWED_LIST = [
+                "glove_l.model",
+                "glove_r.model",
+                "glove_edit.model",
+            ]
+
             folder_error_any = None
 
             # Prepare a list of subfolders
@@ -637,6 +660,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 # Initialize error subflags
                 folder_error_name = False
                 folder_error_xml_format = False
+                folder_error_model_disallowed_list = []
                 folder_error_tex_format = False
                 folder_error_mtl_format = False
 
@@ -644,10 +668,16 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 folder_error_name = not (subfolder_name.startswith('g') and subfolder_name[1:5].isdigit())
 
                 if not fox_mode:
-                    # Check if the folder has a glove.xml
+                    # Check if the folder has an xml
                     glove_xml_path = os.path.join(subfolder_path, "glove.xml")
                     if os.path.isfile(glove_xml_path):
                         folder_error_xml_format = xml_check(glove_xml_path, team_id)
+                    else:
+                        # If there's no xml, check that all of the .model files are allowed
+                        model_files = [file for file in os.listdir(subfolder_path) if file.endswith('.model')]
+                        for model_file in model_files:
+                            if model_file not in MODEL_ALLOWED_LIST:
+                                folder_error_model_disallowed_list.append(model_file)
 
                 # Check every texture
                 for file_name in os.listdir(subfolder_path):
@@ -670,6 +700,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 folder_error = (
                     folder_error_name or
                     folder_error_xml_format or
+                    folder_error_model_disallowed_list or
                     folder_error_tex_format or
                     folder_error_mtl_format
                 )
@@ -691,6 +722,9 @@ def gloves_check(exportfolder_path, team_name, team_id):
                         logging.error( "- (wrong folder name)")
                     if folder_error_xml_format:
                         logging.error( "- (broken xml file)")
+                    if folder_error_model_disallowed_list:
+                        for model_name in folder_error_model_disallowed_list:
+                            logging.error(f"- ({model_name} is not allowed)")
                     if folder_error_tex_format:
                         logging.error(f"- ({file_name} is a bad texture)")
                     if folder_error_mtl_format:

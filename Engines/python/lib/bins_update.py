@@ -205,7 +205,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
             # Initialize variables
             stop = None
-            team_id_found = False
+            team_id = None
 
             teamcols_search = False
             teamcols = []
@@ -228,7 +228,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                 data = line.split()
 
                 # If we just started output the team name to screen
-                if not team_id_found:
+                if team_id is None:
 
                     # Set the team name to the last word on the line
                     team_name = data[-1]
@@ -239,11 +239,10 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                         for teams_list_line in teams_list:
                             if teams_list_line.split()[1] == team_name.lower():
                                 team_id = teams_list_line.split()[0]
-                                team_id_found = True
                                 break
 
                     # Print team name and ID if found
-                    if team_id_found:
+                    if team_id is not None:
                         print(f"- {team_name} (ID: {team_id})")
 
                 # If the team ID was found
@@ -298,6 +297,13 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
                             # Add the entry to the kit color list
                             kitcols.append(kitcol)
+
+        if team_id is None:
+
+            # If no team ID was found, continue to the next file
+            logging.error(f"- {team_name} skipped (no team ID found)")
+
+            continue
 
         # When the file is done, update the bin files
 

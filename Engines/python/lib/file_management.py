@@ -35,12 +35,15 @@ def file_heal(file_path):
     if not os.path.exists(temp_folder_path):
         os.makedirs(temp_folder_path)
 
+    print("-")
+    print("- Downloading and unpacking...")
+
     # Download the latest version
     pack_name = version_download(APP_DATA.OWNER, APP_DATA.NAME, version_last, "7z", temp_folder_path)
 
     if pack_name is None:
         print("-")
-        print("- Failed to download the latest version")
+        print("- Failed to download")
 
         return False
 
@@ -65,18 +68,23 @@ def file_heal(file_path):
         logging.critical(f"- \"{file_path_new}\"")
         logging.critical( "- Please report this error to the developer by posting the \"issues.log\" file")
 
-        # Delete the "temp" folder
-        shutil.rmtree(temp_folder_path)
+        success = False
 
-        return False
+    else:
 
-    # Copy the file from its new location to its regular location
-    shutil.copy(file_path_new, file_path)
+        # Copy the file from its new location to its regular location
+        shutil.copy(file_path_new, file_path)
+
+        print( "-")
+        print( "- File healed successfully")
+        print( "-")
+
+        success = True
 
     # Delete the "temp" folder
     shutil.rmtree(temp_folder_path)
 
-    return True
+    return success
 
 
 def file_critical_check(file_path, healing_allowed = True):

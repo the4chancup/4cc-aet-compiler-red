@@ -29,7 +29,7 @@ def website_exist(url):
     return exist
 
 
-def version_last_find(owner, repo):
+def version_latest_find(owner, repo):
     """
     Find the latest version of a GitHub repository based on the owner and repo name.
     Returns the latest version as a string.
@@ -60,7 +60,7 @@ def version_last_find(owner, repo):
     return version
 
 
-def version_last_download(owner, repo, ver, ext, folder):
+def version_latest_download(owner, repo, ver, ext, folder):
     """
     Get the latest version of a GitHub repository based on the owner and repo name.
 
@@ -95,14 +95,14 @@ def version_last_download(owner, repo, ver, ext, folder):
     return None
 
 
-def update_get(app_owner, app_name, version_last, update_major=False):
+def update_get(app_owner, app_name, version_latest, update_major=False):
     """
     Download the latest version of the application to the parent folder of the program folder.
 
     Parameters:
     - app_owner: The owner of the application.
     - app_name: The name of the application.
-    - version_last: The last version of the application.
+    - version_latest: The latest version of the application.
     - update_major: A boolean flag indicating whether it's a major update (default is False).
 
     Returns:
@@ -116,7 +116,7 @@ def update_get(app_owner, app_name, version_last, update_major=False):
     print("-")
     print("- Updating...")
 
-    file_name = version_last_download(app_owner, app_name, version_last, "7z", app_folder_parent)
+    file_name = version_latest_download(app_owner, app_name, version_latest, "7z", app_folder_parent)
 
     if file_name is None:
         print("-")
@@ -133,7 +133,7 @@ def update_get(app_owner, app_name, version_last, update_major=False):
     # Delete the 7z file
     os.remove(file_path)
 
-    app_name_new = app_name + " " + version_last
+    app_name_new = app_name + " " + version_latest
     app_new_folder = os.path.join(app_folder_parent, app_name_new)
 
     if not update_major:
@@ -239,25 +239,25 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     print("-")
     print("- Checking for updates...")
 
-    version_last = version_last_find(app_owner, app_name)
+    version_latest = version_latest_find(app_owner, app_name)
 
     # If the version could not be checked, return None
-    if version_last is None:
+    if version_latest is None:
         return None
 
     # Save the current time
     with open(CHECK_LAST_FILE, "w") as f:
         f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
 
-    version_last_list = version_last.split(".")
+    version_latest_list = version_latest.split(".")
 
     update_major = False
-    if int(version_last_list[0]) > major:
+    if int(version_latest_list[0]) > major:
         update_available = "Major"
         update_major = True
-    elif int(version_last_list[1]) > minor:
+    elif int(version_latest_list[1]) > minor:
         update_available = "Minor"
-    elif int(version_last_list[2]) > patch:
+    elif int(version_latest_list[2]) > patch:
         update_available = "Bugfix"
     else:
         update_available = None
@@ -268,7 +268,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
         return False
 
-    print(f"- The latest version is {version_last}")
+    print(f"- The latest version is {version_latest}")
 
     # Read the last skipped version
     if os.path.exists(SKIP_LAST_FILE) and not check_force:
@@ -279,7 +279,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
     # Check if the latest version is the same as the last skipped version
     if skip_last is not None:
-        if version_last == skip_last:
+        if version_latest == skip_last:
             print("- (This version has been skipped)")
             return True
 
@@ -309,14 +309,14 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     match response:
         case "up":
             # Update the program
-            update_get(app_owner, app_name, version_last, update_major)
+            update_get(app_owner, app_name, version_latest, update_major)
 
             exit()
 
         case "skip":
             # Save the latest version
             with open(SKIP_LAST_FILE, "w") as f:
-                f.write(version_last)
+                f.write(version_latest)
 
         case "fuckoff":
             # Set updates_check on the settings ini to 0

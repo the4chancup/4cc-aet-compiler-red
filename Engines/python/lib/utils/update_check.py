@@ -298,15 +298,15 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         print("  skip                      Skips this version and doesn't warn again until a newer one comes out")
         print("  fuckoff                   Disables update checking (not recommended)")
         print("-")
-        question = input("Or just press Enter to continue normally...")
+        response = input("Or just press Enter to continue normally...")
 
-        if question == "info":
+        if response == "info":
             # Open the website in the default browser
             webbrowser.open(releases_url)
         else:
             break
 
-    match question:
+    match response:
         case "up":
             # Update the program
             update_get(app_owner, app_name, version_last, update_major)

@@ -1,16 +1,111 @@
 import os
+import sys
+import py7zr
+import shutil
 import logging
 
+from .utils import APP_DATA
+from .utils.update_check import update_check
+from .utils.update_check import version_latest_download
 
-def file_critical_check(file_path):
+
+def file_heal(file_path):
+    """
+    Check the current version, download the latest version, unpack and copy a file, and delete temporary files.
+
+    Args:
+        file_path (str): The path to the file to copy and delete.
+
+    Returns:
+        bool: True if the file was copied successfully, False otherwise.
+    """
+
+    # Check if the current version is the latest
+    update_available = update_check(APP_DATA.OWNER, APP_DATA.NAME, APP_DATA.VERSION_MAJOR, APP_DATA.VERSION_MINOR, APP_DATA.VERSION_PATCH, check_force=True)
+
+    if update_available is not False:
+        return False
+
+    # Prepare the version string
+    version_last = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
+
+    # Create a "temp" folder inside "Engines"
+    temp_folder_path = os.path.join("Engines", "temp")
+
+    if not os.path.exists(temp_folder_path):
+        os.makedirs(temp_folder_path)
+
+    # Download the latest version
+    pack_name = version_latest_download(APP_DATA.OWNER, APP_DATA.NAME, version_last, "7z", temp_folder_path)
+
+    if pack_name is None:
+        print("-")
+        print("- Failed to download the latest version")
+
+        return False
+
+    pack_path = os.path.join(temp_folder_path, pack_name)
+
+    # Unpack the 7z file to the parent folder using py7zr
+    with py7zr.SevenZipFile(pack_path, mode="r") as archive:
+        archive.extractall(temp_folder_path)
+
+    # Delete the 7z file
+    os.remove(pack_path)
+
+    app_name_full = APP_DATA.NAME + " " + version_last
+    app_full_folder = os.path.join(temp_folder_path, app_name_full)
+
+    file_path_new = os.path.join(app_full_folder, file_path)
+
+    if not os.path.exists(file_path_new):
+
+        logging.critical( "-")
+        logging.critical( "- FATAL ERROR - File not found in the clean package:")
+        logging.critical(f"- \"{file_path_new}\"")
+        logging.critical( "- Please report this error to the developer by posting the \"issues.log\" file")
+
+        # Delete the "temp" folder
+        shutil.rmtree(temp_folder_path)
+
+        return False
+
+    # Copy the file from its new location to its regular location
+    shutil.copy(file_path_new, file_path)
+
+    # Delete the "temp" folder
+    shutil.rmtree(temp_folder_path)
+
+    return True
+
+
+def file_critical_check(file_path, healing_allowed = True):
     if not os.path.isfile(file_path):
+
+        file_healed = False
+
         logging.critical( "-")
         logging.critical(f"- FATAL ERROR - Missing \"{file_path}\" file")
-        logging.critical( "-")
-        logging.critical( "- Please grab it from the compiler's original 7z package")
-        logging.critical( "-")
-        logging.critical( "- The program will now close")
-        print("-")
-        input("Press Enter to continue...")
+        print( "-")
+        print( "- Please grab it from the compiler's original 7z package")
 
-        exit()
+        if healing_allowed and sys.platform == "win32":
+            print( "- or, if you're on the latest version, you can type \"heal\" to have")
+            print( "- the compiler download a clean package and recover the file automatically")
+            print( "-")
+            response = input("Type \"heal\" and press Enter, or just press Enter to exit...")
+
+            if "heal" in response:
+                # Run the self-healing script
+                file_healed = file_heal(file_path)
+
+            else:
+                exit()
+
+        if not file_healed:
+            print( "-")
+            print( "- The program will now close")
+            print( "-")
+            input("Press Enter to continue...")
+
+            exit()

@@ -60,9 +60,9 @@ def version_latest_find(owner, repo):
     return version
 
 
-def version_latest_download(owner, repo, ver, ext, folder):
+def version_download(owner, repo, ver, ext, folder):
     """
-    Get the latest version of a GitHub repository based on the owner and repo name.
+    Get the version of a GitHub repository based on the owner and repo name.
 
     Parameters:
     - owner (str): The owner of the repository.
@@ -83,7 +83,7 @@ def version_latest_download(owner, repo, ver, ext, folder):
         response = requests.get(url)
 
     except requests.exceptions.ConnectionError:
-        print("- Failed to connect to GitHub API, cannot download latest version")
+        print("- Failed to connect to GitHub API, cannot download package")
         return None
 
     if response.status_code == 200:
@@ -116,7 +116,7 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     print("-")
     print("- Updating...")
 
-    file_name = version_latest_download(app_owner, app_name, version_latest, "7z", app_folder_parent)
+    file_name = version_download(app_owner, app_name, version_latest, "7z", app_folder_parent)
 
     if file_name is None:
         print("-")

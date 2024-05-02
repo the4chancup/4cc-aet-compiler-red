@@ -6,7 +6,7 @@ import logging
 
 from .utils import APP_DATA
 from .utils.update_check import update_check
-from .utils.update_check import version_latest_download
+from .utils.update_check import version_download
 
 
 def file_heal(file_path):
@@ -36,7 +36,7 @@ def file_heal(file_path):
         os.makedirs(temp_folder_path)
 
     # Download the latest version
-    pack_name = version_latest_download(APP_DATA.OWNER, APP_DATA.NAME, version_last, "7z", temp_folder_path)
+    pack_name = version_download(APP_DATA.OWNER, APP_DATA.NAME, version_last, "7z", temp_folder_path)
 
     if pack_name is None:
         print("-")

@@ -217,8 +217,8 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
     releases_url = f"https://github.com/{app_owner}/{app_name}/releases/"
 
-    CHECK_LAST_FILE = "./Engines/update_last_check.txt"
-    SKIP_LAST_FILE = "./Engines/update_last_skip.txt"
+    CHECK_LAST_FILE = "./Engines/update_check_last.txt"
+    SKIP_LAST_FILE = "./Engines/update_skip_last.txt"
 
     # Check the current time
     now = datetime.now()

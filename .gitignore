@@ -10,8 +10,8 @@ sideload
 exports_to_add
 !exports_to_add/delete_me.txt
 Engines/admin_warned.txt
-Engines/update_last_check.txt
-Engines/update_last_skip.txt
+Engines/update_check_last.txt
+Engines/update_skip_last.txt
 Engines/bins/temp
 Engines/python/__pycache__
 Engines/python/lib/__pycache__

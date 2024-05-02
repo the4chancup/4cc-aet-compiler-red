@@ -245,6 +245,10 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     if version_last is None:
         return None
 
+    # Save the current time
+    with open(CHECK_LAST_FILE, "w") as f:
+        f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
+
     version_last_list = version_last.split(".")
 
     update_major = False
@@ -265,10 +269,6 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         return False
 
     print(f"- The latest version is {version_last}")
-
-    # Save the current time
-    with open(CHECK_LAST_FILE, "w") as f:
-        f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
 
     # Read the last skipped version
     if os.path.exists(SKIP_LAST_FILE) and not check_force:

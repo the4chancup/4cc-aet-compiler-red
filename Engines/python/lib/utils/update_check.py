@@ -189,10 +189,30 @@ def updates_disable():
     print("- Updates Checking has been disabled")
 
 
-def update_check(app_owner, app_name, major, minor, patch, minutes_between_checks=120):
+def update_check(app_owner, app_name, major, minor, patch, minutes_between_checks=120, check_force=False):
     """
-    Check for updates on github based on the input major, minor, and patch numbers.
-    Returns the type of update available: Major, Minor, Bugfix, or None.
+    Check for updates on GitHub for the specified application and provide user with options.
+
+    Parameters:
+    - app_owner (str): The owner of the GitHub repository.
+    - app_name (str): The name of the GitHub repository.
+    - major (int): The major version number.
+    - minor (int): The minor version number.
+    - patch (int): The patch version number.
+    - minutes_between_checks (int): The minimum interval in minutes to wait between checks. Default is 120 minutes.
+    - check_force (bool): If True, forces an update check regardless of the last check time.
+
+    Returns:
+    - bool: A boolean indicating whether the function completed without initiating an update; True means no update was initiated, False means the current version is up-to-date.
+    - None: The function returns None if it's not time to check for updates (based on the interval), or if the latest version could not be checked.
+    - Exits: The program will exit if the user chooses to update ('up').
+
+    The function first determines if it's time to perform an update check. It then fetches the latest version from GitHub. If an update is available, it prompts the user with options:
+    - 'up' to update the compiler automatically.
+    - 'info' to open the GitHub releases page for manual review or update.
+    - 'skip' to skip the current version and not be warned until a new version is available.
+    - 'fuckoff' to disable future update checking.
+    If the user inputs anything else, it continues without updating.
     """
 
     releases_url = f"https://github.com/{app_owner}/{app_name}/releases/"
@@ -204,7 +224,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     now = datetime.now()
 
     # Read the last check time
-    if os.path.exists(CHECK_LAST_FILE):
+    if os.path.exists(CHECK_LAST_FILE) and not check_force:
         with open(CHECK_LAST_FILE, "r") as f:
             check_last = f.read()
     else:
@@ -242,7 +262,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         print("-")
         print("- You are running the latest version")
 
-        return None
+        return False
 
     print(f"- The latest version is {version_last}")
 
@@ -251,7 +271,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
 
     # Read the last skipped version
-    if os.path.exists(SKIP_LAST_FILE):
+    if os.path.exists(SKIP_LAST_FILE) and not check_force:
         with open(SKIP_LAST_FILE, "r") as f:
             skip_last = f.read()
     else:
@@ -261,7 +281,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     if skip_last is not None:
         if version_last == skip_last:
             print("- (This version has been skipped)")
-            return None
+            return True
 
     print("-")
     print(f"- <{update_available} update available>")
@@ -302,9 +322,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
             # Set updates_check on the settings ini to 0
             updates_disable()
 
-            return None
-
         case _:
             pass
 
-    return update_available
+    return True

@@ -1,4 +1,3 @@
-## Moves the contents of the export to the root of extracted_exports
 import os
 import re
 import time
@@ -11,8 +10,9 @@ from .fmdl_id_change import transfer
 from .xml_create import xml_create
 
 
-# Handles dds to ftex conversion of an entire folder
 def ftex_from_dds_multi(folder_path):
+    '''Convert all .dds files in the folder to .ftex files'''
+
     for dds_file in [f for f in os.listdir(folder_path) if f.endswith('.dds')]:
 
         dds_path = os.path.join(folder_path, dds_file)
@@ -22,8 +22,9 @@ def ftex_from_dds_multi(folder_path):
         os.remove(dds_path)
 
 
-# Replaces the dummy team ID with the actual one in any kit-dependent textures found in the folder
 def textures_id_change(subfolder_path, team_id):
+    '''Replace the dummy team ID with the actual one in any kit-dependent textures found in the folder'''
+
     for texture_file in [f for f in os.listdir(subfolder_path) if f.endswith(('.dds', '.ftex'))]:
 
         texture_path = os.path.join(subfolder_path, texture_file)
@@ -40,6 +41,7 @@ def textures_id_change(subfolder_path, team_id):
 
 
 def export_move(exportfolder_path, team_id, team_name):
+    '''Move the contents of the export to the root of the extracted_exports folder'''
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
@@ -88,9 +90,11 @@ def export_move(exportfolder_path, team_id, team_name):
         # Faces folder
         if team_itemfolder_name.lower() == "faces":
 
+            # Prepare a list of subfolders
+            subfolder_list = [subfolder for subfolder in os.listdir(team_itemfolder_path) if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]
+
             # For each subfolder
-            for subfolder_name in [subfolder for subfolder in os.listdir(team_itemfolder_path)
-                                   if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]:
+            for subfolder_name in subfolder_list:
                 subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Replace the dummy team ID with the actual one
@@ -257,9 +261,11 @@ def export_move(exportfolder_path, team_id, team_name):
         # Boots folder
         if team_itemfolder_name.lower() == "boots":
 
+            # Prepare a list of subfolders
+            subfolder_list = [subfolder for subfolder in os.listdir(team_itemfolder_path) if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]
+
             # For each subfolder
-            for subfolder_name in [subfolder for subfolder in os.listdir(team_itemfolder_path)
-                                   if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]:
+            for subfolder_name in subfolder_list:
                 subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Get the ID
@@ -292,9 +298,11 @@ def export_move(exportfolder_path, team_id, team_name):
         # Gloves folder
         if team_itemfolder_name.lower() == "gloves":
 
+            # Prepare a list of subfolders
+            subfolder_list = [subfolder for subfolder in os.listdir(team_itemfolder_path) if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]
+
             # For each subfolder
-            for subfolder_name in [subfolder for subfolder in os.listdir(team_itemfolder_path)
-                                   if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]:
+            for subfolder_name in subfolder_list:
                 subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Get the ID

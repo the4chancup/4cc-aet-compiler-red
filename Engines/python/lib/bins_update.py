@@ -2,7 +2,7 @@
 import os
 import logging
 
-from .file_critical_check import file_critical_check
+from .file_management import file_critical_check
 
 
 def bytes_from_color(color_entry_parts, index, colors_type_hex=False):

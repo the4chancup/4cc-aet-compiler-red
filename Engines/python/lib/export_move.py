@@ -40,6 +40,32 @@ def textures_id_change(subfolder_path, team_id):
         os.rename(texture_path, texture_path_new)
 
 
+def kit_masks_check(team_itemfolder_path, file_ext):
+
+    kit_texture_main_list = []
+
+    # Prepare a list of textures
+    file_name_list = [f for f in os.listdir(team_itemfolder_path) if f.endswith(f".{file_ext}")]
+
+    for file_name in file_name_list:
+
+        # If the name is eleven chars long (u0XXXxX.dds), add the texture to the list of main textures
+        if len(file_name) == 11:
+            kit_texture_main_list.append(file_name)
+
+    for kit_texture_main in kit_texture_main_list:
+
+        # Check if there is a corresponding "_mask" texture
+        kit_texture_mask = f"{kit_texture_main[:-4]}_mask.{file_ext}"
+
+        if kit_texture_mask not in file_name_list:
+            # Copy the default kit mask texture from the templates folder
+            kit_texture_mask_source = os.path.join("Engines", "templates", "kit_mask.dds")
+            kit_texture_mask_destination = os.path.join(team_itemfolder_path, kit_texture_mask)
+
+            shutil.copy(kit_texture_mask_source, kit_texture_mask_destination)
+
+
 def export_move(exportfolder_path, team_id, team_name):
     '''Move the contents of the export to the root of the extracted_exports folder'''
 
@@ -181,15 +207,22 @@ def export_move(exportfolder_path, team_id, team_name):
         # Kit Textures folder
         if team_itemfolder_name.lower() == "kit textures":
 
-            # Convert any dds textures to ftex if needed
-            if fox_mode:
-                ftex_from_dds_multi(team_itemfolder_path)
-
             # Set the texture file extension to ftex or dds
             file_ext = 'ftex' if fox_mode else 'dds'
 
+            if fox_mode:
+                # Convert any dds textures to ftex
+                ftex_from_dds_multi(team_itemfolder_path)
+
+            else:
+                # Add any missing kit masks
+                kit_masks_check(team_itemfolder_path, file_ext)
+
+            # Prepare a list of textures
+            file_name_list = [f for f in os.listdir(team_itemfolder_path) if f.endswith(f".{file_ext}")]
+
             # For every file
-            for file_name in [f for f in os.listdir(team_itemfolder_path) if f.endswith(f".{file_ext}")]:
+            for file_name in file_name_list:
                 file_path = os.path.join(team_itemfolder_path, file_name)
 
                 # Replace the dummy team ID with the actual one

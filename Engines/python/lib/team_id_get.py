@@ -2,7 +2,7 @@ import os
 import shutil
 import logging
 
-from .file_management import file_critical_check
+from .utils.file_management import file_critical_check
 
 
 # Function for finding the team ID after receiving the foldername as parameter

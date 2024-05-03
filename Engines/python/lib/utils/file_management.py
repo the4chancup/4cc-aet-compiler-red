@@ -4,9 +4,9 @@ import py7zr
 import shutil
 import logging
 
-from .utils import APP_DATA
-from .utils.update_check import update_check
-from .utils.update_check import version_download
+from . import APP_DATA
+from .update_check import update_check
+from .update_check import version_download
 
 
 def file_heal(file_path):

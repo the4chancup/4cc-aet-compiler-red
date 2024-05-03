@@ -6,7 +6,7 @@ from .file_management import file_critical_check
 
 
 # Function for finding the team ID after receiving the foldername as parameter
-def teamid_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
+def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
 
     TEAMS_LIST_FILE = "teams_list.txt"
 

@@ -4,7 +4,7 @@ import stat
 import py7zr
 import shutil
 
-from .lib.teamid_get import teamid_get
+from .lib.team_id_get import team_id_get
 from .lib.portraits_move import portraits_move
 from .lib.export_move import export_move
 from .lib.dummy_kit_replace import dummy_kits_replace
@@ -133,7 +133,7 @@ def extracted_from_exports():
         readonlybit_remove_tree(export_destination_path)
 
         # Get the team ID
-        team_id = teamid_get(export_destination_path, team_name, team_id_min, team_id_max)
+        team_id = team_id_get(export_destination_path, team_name, team_id_min, team_id_max)
 
         # If the teamID was not found, proceed to the next export
         if not team_id:

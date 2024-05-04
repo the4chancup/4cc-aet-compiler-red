@@ -18,12 +18,14 @@ REM - Invoke the main compiler
 call py -3 .\Engines\compiler_main.py %running_type_num%
 
 
-REM - Pause if the compiler returned an error
+REM - Pause if the compiler returned an error and run the log cleaner
 if ERRORLEVEL 1 (
-   echo -
-   echo -
-   echo - A log file error.log has been saved to the compiler's folder
-   echo - Please post it on the /aesco/ server or the cup thread
-   echo -
-   pause
+    call py -3 .\Engines\log_username_clean.py
+
+    echo -
+    echo -
+    echo - A log file error.log has been saved to the compiler's folder
+    echo - Please post it on the /aesco/ server or the cup thread
+    echo -
+    pause
 )

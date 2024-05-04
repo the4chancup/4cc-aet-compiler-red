@@ -2,6 +2,8 @@ import os
 import shutil
 import xml.etree.ElementTree as ET
 
+from .file_management import file_critical_check
+
 
 def dummy_element(folder_path, mtl_path_list):
 
@@ -11,6 +13,7 @@ def dummy_element(folder_path, mtl_path_list):
     # Copy the oral_dummy_win32.model file from the templates folder to the xml folder
     dummy_model_source = os.path.join('Engines', 'templates', DUMMY_MODEL_NAME)
     dummy_model_destination = os.path.join(folder_path, DUMMY_MODEL_NAME)
+    file_critical_check(dummy_model_source)
     shutil.copyfile(dummy_model_source, dummy_model_destination)
 
     dummy_model_path = f"./{DUMMY_MODEL_NAME.replace('win32', '*')}"
@@ -21,6 +24,7 @@ def dummy_element(folder_path, mtl_path_list):
         # Copy the dummy.mtl file from the templates folder to the xml folder
         dummy_mtl_source = os.path.join('Engines', 'templates', DUMMY_MTL_NAME_DEFAULT)
         dummy_mtl_destination = os.path.join(folder_path, DUMMY_MTL_NAME_DEFAULT)
+        file_critical_check(dummy_mtl_source)
         shutil.copyfile(dummy_mtl_source, dummy_mtl_destination)
 
         dummy_mtl_path = f"./{DUMMY_MTL_NAME_DEFAULT}"

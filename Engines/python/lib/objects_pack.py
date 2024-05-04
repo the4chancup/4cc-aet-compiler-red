@@ -3,6 +3,7 @@ import shutil
 
 from . import pes_cpk_pack as cpktool
 from . import pes_fpk_pack as fpktool
+from .utils.file_management import file_critical_check
 
 
 def objects_packer(object_type, object_source_folder, object_destination_folder, faces_foldername, uniform_foldername):
@@ -136,6 +137,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
 
             # Copy the generic fpkd to the same folder and rename it
             generic_fpkd_path = os.path.join("Engines", "templates", "generic.fpkd")
+            file_critical_check(generic_fpkd_path)
             shutil.copy(generic_fpkd_path, final_folder_path)
             os.rename(os.path.join(final_folder_path, "generic.fpkd"), os.path.join(final_folder_path, f"{object_type}.fpkd"))
 

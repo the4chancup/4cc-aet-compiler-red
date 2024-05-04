@@ -4,6 +4,8 @@ import shutil
 import logging
 import configparser
 
+from .lib.utils.file_management import file_critical_check
+
 
 def settings_missing_check(default_file_path):
 
@@ -46,6 +48,9 @@ def settings_default_path_get(file_path):
 
     # Prepare the path to the default settings file inside the Engines\templates folder
     default_file_path = os.path.join(os.path.dirname(file_path), "Engines", "templates", default_file_name)
+
+    # Check if the default settings file exists
+    file_critical_check(default_file_path)
 
     return default_file_path
 

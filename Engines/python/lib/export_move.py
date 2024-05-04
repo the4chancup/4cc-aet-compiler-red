@@ -4,6 +4,7 @@ import time
 import shutil
 
 from .utils.ftex import ddsToFtex
+from .utils.file_management import file_critical_check
 from .utils.zlib_plus import unzlib_file
 from .mtl_id_change import mtl_id_change
 from .fmdl_id_change import transfer
@@ -62,6 +63,8 @@ def kit_masks_check(team_itemfolder_path, file_ext):
             # Copy the default kit mask texture from the templates folder
             kit_texture_mask_source = os.path.join("Engines", "templates", "kit_mask.dds")
             kit_texture_mask_destination = os.path.join(team_itemfolder_path, kit_texture_mask)
+
+            file_critical_check(kit_texture_mask_source)
 
             shutil.copy(kit_texture_mask_source, kit_texture_mask_destination)
 

@@ -3,6 +3,7 @@ import sys
 import struct
 import logging
 
+from .utils.file_management import file_critical_check
 from .utils.zlib_plus import get_bytes_hex
 from .utils.zlib_plus import get_bytes_ascii
 from .utils.zlib_plus import unzlib_file
@@ -14,7 +15,9 @@ def dds_dxt5_conv(tex_path):
     tex_folder_path = os.path.dirname(tex_path)
     if sys.platform == "win32":
         # Convert the texture and store into its parent folder
-        os.system(f"Engines\\directxtex\\texconv.exe -f DXT5 -nologo -y -o \"{tex_folder_path}\" \"{tex_path}\" >nul")
+        texconv_path = os.path.join("Engines", "directxtex", "texconv.exe")
+        file_critical_check(texconv_path)
+        os.system(f"{texconv_path} -f DXT5 -nologo -y -o \"{tex_folder_path}\" \"{tex_path}\" >nul")
     else:
         # Prepare a dummy path to save the converted texture
         dummy_tex_path = os.path.join(tex_folder_path, '_dummy_.dds')

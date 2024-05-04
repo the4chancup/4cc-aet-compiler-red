@@ -2,6 +2,7 @@ import os
 import base64
 import xml.etree.ElementTree as ET
 
+from .utils.file_management import file_critical_check
 from .utils.elements import dummy_element
 from .utils.elements import glove_element
 
@@ -15,7 +16,8 @@ def xml_create(folder_path, folder_type):
     MTL_NAME_DEFAULT = "materials.mtl"
 
     DIFF_NAME = "face_diff"
-    DIFF_PATH_DEFAULT = os.path.join("Engines", "templates", DIFF_NAME)
+    DIFF_BIN_PATH_DEFAULT = os.path.join("Engines", "templates", f"{DIFF_NAME}.bin")
+    file_critical_check(DIFF_BIN_PATH_DEFAULT)
 
     TYPES_LIST = [
         "face_neck",
@@ -113,7 +115,7 @@ def xml_create(folder_path, folder_type):
         elif os.path.isfile(diff_xml_path):
             diff_type = "xml"
         else:
-            diff_bin_path = f"{DIFF_PATH_DEFAULT}.bin"
+            diff_bin_path = DIFF_BIN_PATH_DEFAULT
             diff_type = "bin"
 
         if diff_type == "xml":

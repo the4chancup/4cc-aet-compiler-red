@@ -6,7 +6,7 @@ import logging
 
 from python.dependency_check import dependency_check_on_import as dependency_check_on_import
 from python.lib.utils import APP_DATA
-from python.admin_check import admin_check
+from python.lib.utils.admin_tools import admin_check
 from python.lib.utils.update_check import update_check
 from python.settings_init import settings_init
 from python.extracted_from_exports import extracted_from_exports

@@ -1,3 +1,8 @@
+import os
+import sys
+import ctypes
+
+
 def admin_check(folder_location):
     """
     Collection of system folders on which PES is usually installed
@@ -14,3 +19,37 @@ def admin_check(folder_location):
         if folder_location[3:].lower().startswith(folder.lower()):
             return 1
     return 0
+
+
+def admin_request(compiler_run_path, run_type):
+
+    WARNING_PATH = os.path.join("Engines","admin_warned.txt")
+
+    def is_admin():
+        try:
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        except PermissionError:
+            return False
+
+    if not is_admin():
+
+        print('-')
+        print('-')
+        print('Your PES is installed in a system folder and Move Cpks mode is enabled.')
+        print('Administrative privileges are needed to move the cpk directly to the download folder.')
+        print('-')
+
+        if not os.path.exists(WARNING_PATH):
+            print('Either accept the incoming request or disable Move Cpks mode in the settings file.')
+            print('-')
+
+            input('Press Enter to continue...')
+
+            with open(WARNING_PATH, 'w') as f:
+                f.write('This file tells the compiler that you know why the request for admin privileges is needed.')
+
+        # Re-run the program with admin rights
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", compiler_run_path, run_type, None, 1)
+
+        # Exit the program
+        sys.exit()

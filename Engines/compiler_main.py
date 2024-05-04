@@ -1,12 +1,12 @@
 ## Main script for the compiler
 import os
 import sys
-import ctypes
 import logging
 
 from python.dependency_check import dependency_check_on_import as dependency_check_on_import
 from python.lib.utils import APP_DATA
 from python.lib.utils.admin_tools import admin_check
+from python.lib.utils.admin_tools import admin_request
 from python.lib.utils.update_check import update_check
 from python.settings_init import settings_init
 from python.extracted_from_exports import extracted_from_exports
@@ -46,44 +46,6 @@ class ColorFilter(logging.Filter):
         record.msg = record.msg.replace(WARNING_STRING, WARNING_STRING_COLORED)
 
         return True
-
-
-def admin_request(run_type):
-
-    def is_admin():
-        try:
-            return ctypes.windll.shell32.IsUserAnAdmin()
-        except PermissionError:
-            return False
-
-    if not is_admin():
-
-        print('-')
-        print('-')
-        print('Your PES is installed in a system folder and Move Cpks mode is enabled.')
-        print('Administrative privileges are needed to move the cpk directly to the download folder.')
-        print('-')
-
-        warning_path = os.path.join("Engines","admin_warned.txt")
-
-        if not os.path.exists(warning_path):
-            print('Either accept the incoming request or disable Move Cpks mode in the settings file.')
-            print('-')
-
-            input('Press Enter to continue...')
-
-            with open(warning_path, 'w') as f:
-                f.write('This file tells the compiler that you know why the request for admin privileges is needed.')
-
-        # Prepare the path to the compiler_run.bat file in the same folder
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        compiler_run_path = os.path.join(current_dir, "compiler_run.bat")
-
-        # Re-run the program with admin rights
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", compiler_run_path, run_type, None, 1)
-
-        # Exit the program
-        sys.exit()
 
 
 def intro_print():
@@ -227,8 +189,13 @@ def main(run_type):
 
         # If admin mode has been forced or is needed
         if sys.platform == "win32" and (admin_mode or admin_check(pes_download_path)):
+
+            # Prepare the path to the compiler_run.bat file in the same folder
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            compiler_run_path = os.path.join(current_dir, "compiler_run.bat")
+
             # Ask for admin permissions if not obtained yet
-            admin_request(run_type)
+            admin_request(compiler_run_path, run_type)
 
     # Save the all-in-one mode
     os.environ['ALL_IN_ONE'] = str(int(all_in_one))

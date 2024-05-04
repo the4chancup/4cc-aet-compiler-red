@@ -14,6 +14,13 @@ from python.contents_from_extracted import contents_from_extracted
 from python.patches_from_contents import patches_from_contents
 
 
+APP_OWNER = APP_DATA.OWNER
+APP_NAME = APP_DATA.NAME
+APP_VERSION_MAJOR = APP_DATA.VERSION_MAJOR
+APP_VERSION_MINOR = APP_DATA.VERSION_MINOR
+APP_VERSION_PATCH = APP_DATA.VERSION_PATCH
+
+
 class ColorFilter(logging.Filter):
     """
     This is a filter which colorizes some alert words.

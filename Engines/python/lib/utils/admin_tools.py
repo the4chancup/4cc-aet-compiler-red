@@ -21,7 +21,7 @@ def admin_check(folder_location):
     return 0
 
 
-def admin_request(compiler_run_path, run_type):
+def admin_request(run_path, run_type):
 
     WARNING_PATH = os.path.join("Engines","admin_warned.txt")
 
@@ -46,10 +46,10 @@ def admin_request(compiler_run_path, run_type):
             input('Press Enter to continue...')
 
             with open(WARNING_PATH, 'w') as f:
-                f.write('This file tells the compiler that you know why the request for admin privileges is needed.')
+                f.write('This file tells the program that you know why the request for admin privileges is needed.')
 
         # Re-run the program with admin rights
-        ctypes.windll.shell32.ShellExecuteW(None, "runas", compiler_run_path, run_type, None, 1)
+        ctypes.windll.shell32.ShellExecuteW(None, "runas", run_path, run_type, None, 1)
 
         # Exit the program
         sys.exit()

@@ -26,7 +26,7 @@ APP_VERSION_BETA = APP_DATA.VERSION_BETA
 def intro_print():
     if sys.platform == "win32":
         os.system("color")
-    version_string = f'{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}'
+    version_string = f'{APP_VERSION_MAJOR}.{APP_VERSION_MINOR}.{APP_VERSION_PATCH}'
     print('-')
     print('-')
     print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + f' {version_string}')
@@ -83,7 +83,7 @@ def main(run_type):
 
     # Check for updates
     if updates_check and sys.platform == "win32":
-        update_check(APP_DATA.OWNER, APP_DATA.NAME, APP_DATA.VERSION_MAJOR, APP_DATA.VERSION_MINOR, APP_DATA.VERSION_PATCH)
+        update_check(APP_OWNER, APP_NAME, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH)
 
     # If patches_from_contents_run is active and move_cpks mode is enabled
     if patches_from_contents_run and move_cpks:

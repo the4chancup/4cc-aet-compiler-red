@@ -2,6 +2,10 @@ import os
 import logging
 
 
+ISSUES_LOG_NAME = "issues.log"
+ERROR_LOG_NAME = "error.log"
+
+
 class ColorFilter(logging.Filter):
     """
     This is a filter which colorizes some alert words.
@@ -46,7 +50,6 @@ def log_store(log_name):
 def logger_init(__name__):
 
     # If an issues log file already exists, add .old to it
-    ISSUES_LOG_NAME = "issues.log"
     log_store(ISSUES_LOG_NAME)
 
     # Create a file handler which will only create a file when a WARNING or higher occurs
@@ -66,7 +69,6 @@ def logger_init(__name__):
 
 
     # If an error log file already exists, add .old to it
-    ERROR_LOG_NAME = "error.log"
     log_store(ERROR_LOG_NAME)
 
     # Create a logger

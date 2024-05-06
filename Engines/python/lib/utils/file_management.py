@@ -98,17 +98,25 @@ def file_critical_check(file_path, healing_allowed = True):
         print( "- Please grab it from the compiler's original 7z package")
 
         if healing_allowed and sys.platform == "win32":
-            print( "- or, if you're on the latest version, you can type \"heal\" to have")
-            print( "- the compiler download a clean package and recover the file automatically")
+
             print( "-")
-            response = input("Type \"heal\" and press Enter, or just press Enter to exit...")
+            print( "- If you're on the latest version, you can type \"heal\" to have")
+            print( "- the compiler download a clean package and recover the file automatically")
 
-            if "heal" in response:
-                # Run the self-healing script
-                file_healed = file_heal(file_path)
+            while True:
+                print( "-")
+                response = input("Type \"heal\" and press Enter, or just press Enter to exit...")
 
-            else:
-                exit()
+                if not response:
+                    exit()
+
+                if "heal" in response:
+                    # Run the self-healing script
+                    file_healed = file_heal(file_path)
+                    break
+                else:
+                    print( "-")
+                    print( "- Try again")
 
         if not file_healed:
             print( "-")

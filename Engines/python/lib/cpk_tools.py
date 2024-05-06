@@ -79,13 +79,15 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
 
         # Copy any missing files from the fallback folder
         for file_info in file_info_list:
-            if not os.path.exists(file_info['destination_path']):
 
-                file_fallback_path = os.path.join(os.path.dirname(os.path.dirname(file_info['destination_path'])), os.path.basename(file_info['destination_path']))
-                file_critical_check(file_fallback_path)
+            if os.path.exists(file_info['destination_path']):
+                continue
 
-                shutil.copy(file_fallback_path, file_info['destination_path'])
+            file_fallback_path = os.path.join(os.path.dirname(os.path.dirname(file_info['destination_path'])), os.path.basename(file_info['destination_path']))
+            file_critical_check(file_fallback_path)
 
-                print(f"- {os.path.basename(file_info['source_path'])} not found in any cpks, copied from the fallback folder")
+            shutil.copy(file_fallback_path, file_info['destination_path'])
+
+            print(f"- {os.path.basename(file_info['source_path'])} not found in any cpks, copied from the fallback folder")
 
     return file_found_all

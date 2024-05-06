@@ -3,16 +3,42 @@ import os
 import sys
 import logging
 
-from python.dependency_check import dependency_check_on_import as dependency_check_on_import
-from python.lib.utils import APP_DATA
-from python.lib.utils.logging_tools import logger_init
-from python.lib.utils.admin_tools import admin_check
-from python.lib.utils.admin_tools import admin_request
-from python.lib.utils.update_check import update_check
-from python.settings_init import settings_init
-from python.extracted_from_exports import extracted_from_exports
-from python.contents_from_extracted import contents_from_extracted
-from python.patches_from_contents import patches_from_contents
+try:
+    from python.dependency_check import dependency_check_on_import as dependency_check_on_import
+    from python.lib.utils import APP_DATA
+    from python.lib.utils.update_check import update_check
+    from python.lib.utils.file_management import module_heal_offer
+except ImportError as e:
+    print("- Library file not found:")
+    print(e)
+    print("- Please grab a clean compiler folder.")
+    # Log to file
+    logging.basicConfig(filename="error.log", level=logging.ERROR, filemode='w')
+    logging.exception("Library file not found, please grab a clean compiler folder.")
+    exit(1)
+
+while True:
+    try:
+        from python.lib.utils.logging_tools import logger_init
+        from python.lib.utils.admin_tools import admin_check
+        from python.lib.utils.admin_tools import admin_request
+        from python.settings_init import settings_init
+        from python.extracted_from_exports import extracted_from_exports
+        from python.contents_from_extracted import contents_from_extracted
+        from python.patches_from_contents import patches_from_contents
+    except ImportError as e:
+        print("- Library file not found:")
+        print(e)
+        file_healed = False
+        if sys.platform == "win32":
+            file_healed = module_heal_offer(e)
+        if not file_healed:
+            # Log to file
+            logging.basicConfig(filename="error.log", level=logging.ERROR, filemode='w')
+            logging.exception("Library file not found, self healing failed or not attempted.")
+            exit(1)
+    else:
+        break
 
 
 APP_OWNER = APP_DATA.OWNER

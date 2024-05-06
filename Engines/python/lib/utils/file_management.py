@@ -111,6 +111,20 @@ def file_heal_offer(file_path):
     return file_healed
 
 
+def module_heal_offer(module_exception):
+
+    # Get the path to the module from the exception string
+    # "No module named 'folder.module'"
+    module_path_raw = module_exception.args[0][17:].strip("'")
+    module_path = module_path_raw.replace(".", "\\") + ".py"
+
+    file_path = os.path.join("Engines", module_path)
+
+    file_healed = file_heal_offer(file_path)
+
+    return file_healed
+
+
 def file_critical_check(file_path, healing_allowed = True):
 
     if os.path.exists(file_path):

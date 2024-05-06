@@ -28,18 +28,20 @@ def readonlybit_remove_tree(path):
 # Append the contents of a txt file to teamnotes.txt for quick reading
 def note_txt_append(team_name, export_destination_path):
 
+    TEAMNOTES_NAME = "teamnotes.txt"
+
     team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
     note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
-    teamnotes_name = "teamnotes.txt"
 
-    if os.path.exists(note_path):
+    if not os.path.exists(note_path):
+        return
 
-        with open(teamnotes_name, "a") as f2:
-            f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
-        with open(note_path, "r", encoding="utf8") as f:
-            teamnotes = f.read()
-            with open(teamnotes_name, "a", encoding="utf8") as f2:
-                f2.write(f"{teamnotes}\n")
+    with open(TEAMNOTES_NAME, "a") as f2:
+        f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
+    with open(note_path, "r", encoding="utf8") as f:
+        teamnotes = f.read()
+        with open(TEAMNOTES_NAME, "a", encoding="utf8") as f2:
+            f2.write(f"{teamnotes}\n")
 
 
 def extracted_from_exports():

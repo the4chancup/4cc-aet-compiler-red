@@ -33,18 +33,23 @@ class ColorFilter(logging.Filter):
 
 
 def log_store(log_name):
-    if os.path.exists(log_name):
-        log_name_old = log_name + ".old"
-        if os.path.exists(log_name_old):
-            os.remove(log_name_old)
-        try:
-            os.rename(log_name, log_name_old)
-        except OSError:
-            print(f"- An error occurred while trying to rename the {log_name} file")
-            print("- Please check if it's open in another program")
-            print("-")
-            input("Press Enter to continue after checking...")
-            os.rename(log_name, log_name_old)
+
+    if not os.path.exists(log_name):
+        return
+
+    log_name_old = log_name + ".old"
+
+    if os.path.exists(log_name_old):
+        os.remove(log_name_old)
+
+    try:
+        os.rename(log_name, log_name_old)
+    except OSError:
+        print(f"- An error occurred while trying to rename the {log_name} file")
+        print( "- Please check if it's open in another program")
+        print( "-")
+        input("Press Enter to continue after checking...")
+        os.rename(log_name, log_name_old)
 
 
 def logger_init(__name__):

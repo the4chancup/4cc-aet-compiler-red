@@ -112,23 +112,25 @@ def file_heal_offer(file_path):
 
 
 def file_critical_check(file_path, healing_allowed = True):
-    if not os.path.isfile(file_path):
 
-        file_healed = False
+    if os.path.exists(file_path):
+        return
 
-        logging.critical( "-")
-        logging.critical(f"- FATAL ERROR - Missing \"{file_path}\" file")
+    file_healed = False
+
+    logging.critical( "-")
+    logging.critical(f"- FATAL ERROR - Missing \"{file_path}\" file")
+    print( "-")
+    print( "- Please grab it from the compiler's original 7z package")
+
+    if healing_allowed and sys.platform == "win32":
+
+        file_healed = file_heal_offer(file_path)
+
+    if not file_healed:
         print( "-")
-        print( "- Please grab it from the compiler's original 7z package")
+        print( "- The program will now close")
+        print( "-")
+        input("Press Enter to continue...")
 
-        if healing_allowed and sys.platform == "win32":
-
-            file_healed = file_heal_offer(file_path)
-
-        if not file_healed:
-            print( "-")
-            print( "- The program will now close")
-            print( "-")
-            input("Press Enter to continue...")
-
-            exit()
+        exit()

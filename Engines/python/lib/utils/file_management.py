@@ -101,7 +101,7 @@ def file_heal_offer(file_path):
             exit()
 
         if "heal" in response:
-                    # Run the self-healing script
+            # Run the self-healing script
             file_healed = file_heal(file_path)
             break
         else:

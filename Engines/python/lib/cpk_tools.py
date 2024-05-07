@@ -52,11 +52,19 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
         file_found_all = True
 
         for file_info in file_info_list:
+
+            cpk_name_found = False
+
             for cpk_file in cpk_file_list:
 
-                # If the cpk name contains any of the names in the list, and is not
-                # the cpk we are about to pack, search for the corresponding file
-                if any(x in cpk_file for x in cpk_names_list) and (cpk_file != cpk_name):
+                # Skip the cpks until we have found and skipped the cpk we are about to pack
+                if not cpk_name_found:
+                    if cpk_file == cpk_name + ".cpk":
+                        cpk_name_found = True
+                    continue
+
+                # If the cpk name contains any of the names in the list, search for the corresponding file
+                if any(x in cpk_file for x in cpk_names_list):
 
                     cpk_path = os.path.join(pes_download_path, cpk_file)
 

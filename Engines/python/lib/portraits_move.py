@@ -16,6 +16,7 @@ def portraits_move(exportfolder_path, team_id):
     """
 
     # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
 
     TEX_NAME = "portrait.dds"
@@ -54,10 +55,11 @@ def portraits_move(exportfolder_path, team_id):
                     portrait_destination_path = os.path.join(portraits_path, portrait_name)
                     os.rename(portrait_path, portrait_destination_path)
 
-        # Check if the folder is now empty
-        if not os.listdir(os.path.join(faces_path, face_name)):
-            # If empty remove it
-            os.rmdir(os.path.join(faces_path, face_name))
+        if not fox_mode:
+            # Check if the folder is now empty
+            if not os.listdir(os.path.join(faces_path, face_name)):
+                # If empty remove it
+                os.rmdir(os.path.join(faces_path, face_name))
 
     # If there are any portrait conflicts
     if portrait_conflicts:

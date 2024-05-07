@@ -119,6 +119,11 @@ def export_move(exportfolder_path, team_id, team_name):
         # Faces folder
         if team_itemfolder_name.lower() == "faces":
 
+            if fox_mode:
+                DIFF_NAME = "face_diff"
+                DIFF_BIN_PATH_DEFAULT = os.path.join("Engines", "templates", f"{DIFF_NAME}.bin")
+                file_critical_check(DIFF_BIN_PATH_DEFAULT)
+
             # Prepare a list of subfolders
             subfolder_list = [subfolder for subfolder in os.listdir(team_itemfolder_path) if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]
 
@@ -137,6 +142,11 @@ def export_move(exportfolder_path, team_id, team_name):
 
                     # Convert any dds textures to ftex if needed
                     ftex_from_dds_multi(subfolder_path)
+
+                    # If the face_diff.bin doesn't exist, copy the default one
+                    face_diff_path = os.path.join(subfolder_path, "face_diff.bin")
+                    if not os.path.exists(face_diff_path):
+                        shutil.copyfile(DIFF_BIN_PATH_DEFAULT, face_diff_path)
 
                 else:
                     # Change the texture IDs inside each mtl file

@@ -57,6 +57,9 @@ def dimensions_check(dds_path):
     height_bad = not ((height & (height-1) == 0) and height != 0)
     width_bad = not ((width & (width-1) == 0) and width != 0)
 
+    # Check if the texture is a main kit texture
+    texture_type_kit = dds_folder == "Kit Textures" and dds_name.startswith('u0') and len(dds_name) == 11
+
     if (height_bad or width_bad) and not mips_missing:
 
         logging.warning( "-")
@@ -82,6 +85,17 @@ def dimensions_check(dds_path):
         logging.error(f"- Texture name:   {dds_name}")
         logging.error( "- This texture will not work")
         logging.error( "- Resize it so that both sizes are 4 or higher")
+
+        error = True
+
+    if not fox_mode and texture_type_kit and (height != 2048 or width != 2048):
+
+        logging.error( "-")
+        logging.error(f"- ERROR - Main Kit Texture file with invalid dimensions ({str(width)}x{str(height)})")
+        logging.error(f"- Folder:         {dds_folder}")
+        logging.error(f"- Texture name:   {dds_name}")
+        logging.error( "- This texture will not work")
+        logging.error( "- Resize it so that both sizes are 2048x2048")
 
         error = True
 

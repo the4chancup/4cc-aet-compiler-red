@@ -105,7 +105,6 @@ def xml_create(folder_path, folder_type):
         ET.indent(root_new, '   ')
 
         # Decode the diff file and add it to the root
-
         diff_bin_path_test = os.path.join(folder_path, f"{DIFF_NAME}.bin")
         diff_xml_path = os.path.join(folder_path, f"{DIFF_NAME}.xml")
 

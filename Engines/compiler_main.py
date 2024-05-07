@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 
+# Modules needed for self healing
 try:
     from python.dependency_check import dependency_check_on_import as dependency_check_on_import
     from python.lib.utils import APP_DATA
@@ -11,12 +12,14 @@ try:
 except ImportError as e:
     print("- Library file not found:")
     print(e)
-    print("- Please grab a clean compiler folder.")
+    print("-")
+    print("- Please grab a clean compiler folder")
     # Log to file
     logging.basicConfig(filename="error.log", level=logging.ERROR, filemode='w')
     logging.exception("Library file not found, please grab a clean compiler folder.")
     exit(1)
 
+# Modules which can be self healed
 while True:
     try:
         from python.lib.utils.logging_tools import logger_init

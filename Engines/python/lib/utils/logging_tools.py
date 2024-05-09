@@ -5,7 +5,7 @@ from .pausing import pause
 
 
 ISSUES_LOG_NAME = "issues.log"
-ERROR_LOG_NAME = "error.log"
+CRASH_LOG_NAME = "crash.log"
 
 
 class ColorFilter(logging.Filter):
@@ -75,14 +75,14 @@ def logger_init(__name__):
     logging.getLogger().addHandler(stream_handler)
 
 
-    # If an error log file already exists, add .old to it
-    log_store(ERROR_LOG_NAME)
+    # If a crash log file already exists, add .old to it
+    log_store(CRASH_LOG_NAME)
 
     # Create a logger
     logger = logging.getLogger(__name__)
 
     # Create a file handler which will only create a file when an exception occurs
-    handler = logging.FileHandler(ERROR_LOG_NAME, delay=True)
+    handler = logging.FileHandler(CRASH_LOG_NAME, delay=True)
 
     # Create a formatter and add it to the handler
     formatter = logging.Formatter('%(asctime)-15s - %(name)s - %(levelname)s - %(message)s')

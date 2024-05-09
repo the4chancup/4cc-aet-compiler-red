@@ -22,4 +22,4 @@ def log_username_clean(log_name):
 if __name__ == "__main__":
 
     log_username_clean(logging_tools.ISSUES_LOG_NAME)
-    log_username_clean(logging_tools.ERROR_LOG_NAME)
+    log_username_clean(logging_tools.CRASH_LOG_NAME)

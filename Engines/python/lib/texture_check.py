@@ -58,24 +58,40 @@ def dimensions_check(dds_path):
     width_bad = not ((width & (width-1) == 0) and width != 0)
 
     # Check if the texture is a main kit texture
-    texture_type_kit = dds_folder == "Kit Textures" and dds_name.startswith('u0') and len(dds_name) == 11
+    texture_type_kit = dds_folder.lower() == "kit textures" and dds_name.startswith('u0') and len(dds_name) == 11
 
-    if (height_bad or width_bad) and not mips_missing:
+    # Check if the texture is a portrait
+    texture_type_portrait = dds_folder.lower() == "portraits"
 
-        logging.warning( "-")
-        logging.warning(f"- Warning: Texture file with invalid dimensions ({str(width)}x{str(height)})")
-        logging.warning(f"- Folder:         {dds_folder}")
-        logging.warning(f"- Texture name:   {dds_name}")
-        logging.warning( "- This texture will probably not work")
-        logging.warning( "- Resize it so that both sizes are powers of 2, or resave it without mipmaps")
+    if texture_type_portrait:
+        if (height_bad or width_bad):
 
-    if fox_mode and mips_missing and not (dds_name == "portrait.dds"):
+            logging.error( "-")
+            logging.error(f"- ERROR: Portrait Texture file with invalid dimensions ({str(width)}x{str(height)})")
+            logging.error(f"- Folder:         {dds_folder}")
+            logging.error(f"- Texture name:   {dds_name}")
+            logging.error( "- This texture will crash the game")
+            logging.error( "- Resize it so that both sizes are powers of 2")
 
-        logging.warning( "-")
-        logging.warning( "- Warning: Texture file without mipmaps")
-        logging.warning(f"- Folder:         {dds_folder}")
-        logging.warning(f"- Texture name:   {dds_name}")
-        logging.warning( "- This texture will probably not work, please resave it with mipmaps")
+            error = True
+
+    else:
+        if (height_bad or width_bad) and not mips_missing:
+
+            logging.warning( "-")
+            logging.warning(f"- Warning: Texture file with invalid dimensions ({str(width)}x{str(height)})")
+            logging.warning(f"- Folder:         {dds_folder}")
+            logging.warning(f"- Texture name:   {dds_name}")
+            logging.warning( "- This texture will probably not work")
+            logging.warning( "- Resize it so that both sizes are powers of 2, or resave it without mipmaps")
+
+        if fox_mode and mips_missing:
+
+            logging.warning( "-")
+            logging.warning( "- Warning: Texture file without mipmaps")
+            logging.warning(f"- Folder:         {dds_folder}")
+            logging.warning(f"- Texture name:   {dds_name}")
+            logging.warning( "- This texture will probably not work, please resave it with mipmaps")
 
     if height < 4 or width < 4:
 
@@ -94,7 +110,7 @@ def dimensions_check(dds_path):
         logging.error(f"- ERROR - Main Kit Texture file with invalid dimensions ({str(width)}x{str(height)})")
         logging.error(f"- Folder:         {dds_folder}")
         logging.error(f"- Texture name:   {dds_name}")
-        logging.error( "- This texture will not work")
+        logging.error( "- This texture will crash the game")
         logging.error( "- Resize it so that both sizes are 2048x2048")
 
         error = True

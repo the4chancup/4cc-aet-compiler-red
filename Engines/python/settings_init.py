@@ -5,6 +5,7 @@ import logging
 import configparser
 
 from .lib.utils.file_management import file_critical_check
+from .lib.utils.pausing import pause
 
 
 def settings_missing_check(default_file_path):
@@ -102,7 +103,7 @@ def settings_init(file_name):
         logging.critical( "- A clean settings file will be generated and opened")
         logging.critical( "- Please edit the settings as needed and restart the program")
         print("-")
-        input("Press Enter to continue...")
+        pause("Press any key to continue... ")
 
         settings_default_init(file_name, default_file_path)
 

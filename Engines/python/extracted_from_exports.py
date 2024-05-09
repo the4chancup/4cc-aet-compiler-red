@@ -10,6 +10,7 @@ from .lib.export_move import export_move
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
 from .lib.utils.zlib_plus import zlib_files_in_folder
+from .lib.utils.pausing import pause
 
 
 def readonlybit_remove_tree(path):
@@ -195,4 +196,4 @@ def extracted_from_exports():
         print("- Please open it and check its contents")
         print('-')
         if pause_on_error:
-            input('Press Enter to continue...')
+            pause()

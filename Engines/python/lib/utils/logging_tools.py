@@ -1,6 +1,8 @@
 import os
 import logging
 
+from .pausing import pause
+
 
 ISSUES_LOG_NAME = "issues.log"
 ERROR_LOG_NAME = "error.log"
@@ -48,7 +50,7 @@ def log_store(log_name):
         print(f"- An error occurred while trying to rename the {log_name} file")
         print( "- Please check if it's open in another program")
         print( "-")
-        input("Press Enter to continue after checking...")
+        pause("Press any key to continue after checking... ")
         os.rename(log_name, log_name_old)
 
 

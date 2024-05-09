@@ -5,6 +5,7 @@ import shutil
 import logging
 
 from . import APP_DATA
+from .pausing import pause
 from .update_check import update_check
 from .update_check import version_download
 
@@ -145,6 +146,6 @@ def file_critical_check(file_path, healing_allowed = True):
         print( "-")
         print( "- The program will now close")
         print( "-")
-        input("Press Enter to continue...")
+        pause()
 
         exit()

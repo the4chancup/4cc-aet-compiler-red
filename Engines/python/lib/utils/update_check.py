@@ -6,6 +6,8 @@ import webbrowser
 from datetime import datetime
 from datetime import timedelta
 
+from .pausing import pause
+
 
 def website_exist(url):
     """
@@ -157,12 +159,12 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     print("- The old folder has been preserved, so you can delete it later")
     print("-")
     if not update_major:
-        input("Press Enter to open the new folder...")
+        pause("Press any key to open the new folder... ")
 
         # Open the unpacked folder in the default file explorer
         os.startfile(app_new_folder)
     else:
-        input("Press Enter to open the new folder, and the old and new settings files...")
+        pause("Press any key to open the new folder, and the old and new settings files... ")
 
         # Open the old settings file and the new settings file
         os.startfile(os.path.join(app_folder, "settings.ini"))

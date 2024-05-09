@@ -2,6 +2,8 @@ import os
 import sys
 import ctypes
 
+from .pausing import pause
+
 
 def admin_check(folder_location):
     """
@@ -43,7 +45,7 @@ def admin_request(run_path, run_type):
             print('Either accept the incoming request or disable Move Cpks mode in the settings file.')
             print('-')
 
-            input('Press Enter to continue...')
+            pause()
 
             with open(WARNING_PATH, 'w') as f:
                 f.write('This file tells the program that you know why the request for admin privileges is needed.')

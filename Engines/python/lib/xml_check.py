@@ -8,6 +8,7 @@ from .cpk_tools import files_fetch_from_cpks
 from .utils.zlib_plus import unzlib_file
 from .utils.elements import dummy_element
 from .utils.id_change import path_id_change
+from .utils.pausing import pause
 
 
 # Read the necessary parameters
@@ -209,7 +210,7 @@ def face_diff_xml_check(xml_path):
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
-            input("Press Enter to continue...")
+            pause()
 
         return True
 
@@ -229,7 +230,7 @@ def face_diff_xml_check(xml_path):
         error = True
 
     if error and pause_on_error:
-        input("Press Enter to continue...")
+        pause()
 
     return error
 
@@ -274,7 +275,7 @@ def xml_check(xml_path, team_id):
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
-            input("Press Enter to continue...")
+            pause()
 
         return True
 
@@ -399,7 +400,7 @@ def mtl_check(mtl_path, team_id):
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
-            input("Press Enter to continue...")
+            pause()
 
         return True
 

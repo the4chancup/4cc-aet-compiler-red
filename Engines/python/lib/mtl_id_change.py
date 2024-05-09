@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 
+from .utils.pausing import pause
 from .utils.zlib_plus import unzlib_file
 from .utils.id_change import path_id_change
 
@@ -24,7 +25,7 @@ def mtl_id_change(mtl_path, team_id = "000"):
         tree = ET.parse(mtl_path)
     except ET.ParseError:
         print(f"- ERROR: {mtl_path} is not a valid .mtl file")
-        input('Press Enter to continue...')
+        pause()
         return True
 
     root = tree.getroot()

@@ -2,6 +2,8 @@ import os
 import shutil
 import logging
 
+from .utils.pausing import pause
+
 
 def portraits_move(exportfolder_path, team_id):
     """
@@ -77,7 +79,7 @@ def portraits_move(exportfolder_path, team_id):
         logging.error( "- The entire export will be skipped")
 
         if pause_on_error:
-            input("Press Enter to continue...")
+            pause()
 
         # Delete the entire export folder
         shutil.rmtree(exportfolder_path)

@@ -3,6 +3,7 @@ import shutil
 import logging
 
 from .utils.file_management import file_critical_check
+from .utils.pausing import pause
 
 
 # Function for finding the team ID after receiving the foldername as parameter
@@ -74,7 +75,7 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
         shutil.rmtree(exportfolder_path)
 
         if pause_on_error:
-            input("Press Enter to continue...")
+            pause()
 
         return None
 
@@ -143,7 +144,7 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
         logging.error(f"- Add the team name to the \"{TEAMS_LIST_FILE}\" file and restart")
 
         if pause_on_error:
-            input("Press Enter to continue...")
+            pause()
 
         # Skip the whole export
         shutil.rmtree(exportfolder_path)

@@ -25,6 +25,7 @@ while True:
         from python.lib.utils.logging_tools import logger_init
         from python.lib.utils.admin_tools import admin_check
         from python.lib.utils.admin_tools import admin_request
+        from python.lib.utils.pausing import pause
         from python.settings_init import settings_init
         from python.extracted_from_exports import extracted_from_exports
         from python.contents_from_extracted import contents_from_extracted
@@ -122,11 +123,11 @@ def main(run_type):
         if not os.path.exists(pes_download_path):
             print("-")
             print("-")
-            print("- PES download folder not found.")
-            print("- Please set its correct path in the settings file and start again.")
+            print("- PES download folder not found")
+            print("- Please set its correct path in the settings file and start again")
             print("-")
             print("-")
-            input("Press Enter to continue...")
+            pause()
 
             if sys.platform == "win32":
                 # Open the settings file in an external text editor
@@ -172,7 +173,7 @@ def main(run_type):
     )
 
     if not exit_pause_skip:
-        input("Press Enter to exit...")
+        pause("Press any key to exit... ")
 
 
 if __name__ == "__main__":

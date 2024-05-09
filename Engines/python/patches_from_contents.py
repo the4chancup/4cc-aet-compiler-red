@@ -1,5 +1,6 @@
 import os
 import shutil
+import logging
 import subprocess
 
 from .lib import pes_cpk_pack as cpktool
@@ -40,12 +41,18 @@ def patches_from_contents():
     # Create output folder just in case
     os.makedirs("./patches_output", exist_ok=True)
 
-    # Verify that the input folders exist, stop the script otherwise
+    # Verify that the input folders exist, stop the program otherwise
     if (not os.path.exists(f"./patches_contents/{faces_foldername}") or
-        not os.path.exists(f"./patches_contents/{uniform_foldername}") or
-        (not os.path.exists(f"./patches_contents/{bins_foldername}") and bins_updating)):
-        input("Input folder not found. Exiting...")
-        exit()
+            not os.path.exists(f"./patches_contents/{uniform_foldername}") or
+            (not os.path.exists(f"./patches_contents/{bins_foldername}") and bins_updating)):
+
+        logging.critical("- FATAL ERROR - Input folder \"patches_contents\" not found")
+        logging.critical("- Either this folder or one of its subfolders does not exist")
+        logging.critical("-")
+        logging.critical("- Please do not run this script before running the previous ones")
+        logging.critical("-")
+
+        return
 
 
     # Make the patches

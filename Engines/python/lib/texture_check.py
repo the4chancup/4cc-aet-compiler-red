@@ -79,19 +79,19 @@ def dimensions_check(dds_path):
         if (height_bad or width_bad) and not mips_missing:
 
             logging.warning( "-")
-            logging.warning(f"- Warning: Texture file with invalid dimensions ({str(width)}x{str(height)})")
+            logging.warning(f"- Warning: Texture file with irregular dimensions ({str(width)}x{str(height)})")
             logging.warning(f"- Folder:         {dds_folder}")
             logging.warning(f"- Texture name:   {dds_name}")
-            logging.warning( "- This texture will probably not work")
+            logging.warning( "- This texture might not work, in which case:")
             logging.warning( "- Resize it so that both sizes are powers of 2, or resave it without mipmaps")
 
-        if fox_mode and mips_missing:
+        if mips_missing:
 
-            logging.warning( "-")
-            logging.warning( "- Warning: Texture file without mipmaps")
-            logging.warning(f"- Folder:         {dds_folder}")
-            logging.warning(f"- Texture name:   {dds_name}")
-            logging.warning( "- This texture will probably not work, please resave it with mipmaps")
+            logging.info( "-")
+            logging.info( "- Info: Texture file without mipmaps")
+            logging.info(f"- Folder:         {dds_folder}")
+            logging.info(f"- Texture name:   {dds_name}")
+            logging.info( "- This texture will work, but it will look better if you resave it with mipmaps")
 
     if height < 4 or width < 4:
 

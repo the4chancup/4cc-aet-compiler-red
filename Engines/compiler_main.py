@@ -10,14 +10,19 @@ try:
     from python.lib.utils.update_check import update_check
     from python.lib.utils.file_management import module_heal_offer
 except ImportError as e:
-    print("- Library file not found:")
+    print("- FATAL ERROR - Library file not found:")
     print(e)
     print("-")
     print("- Please grab a clean compiler folder")
     # Log to file
-    logging.basicConfig(filename="error.log", level=logging.ERROR, filemode='w')
-    logging.exception("Library file not found, please grab a clean compiler folder.")
-    exit(1)
+    logging.basicConfig(filename="issues.log", level=logging.CRITICAL, filemode='w', format="%(message)s")
+    logging.critical("Library file not found, please grab a clean compiler folder.")
+    logging.critical(e)
+
+    print("-")
+    input("Press Enter to exit... ")
+
+    exit()
 
 # Modules which can be self healed
 while True:
@@ -31,16 +36,21 @@ while True:
         from python.contents_from_extracted import contents_from_extracted
         from python.patches_from_contents import patches_from_contents
     except ImportError as e:
-        print("- Library file not found:")
+        print("- FATAL ERROR - Library file not found:")
         print(e)
         file_healed = False
         if sys.platform == "win32":
             file_healed = module_heal_offer(e)
         if not file_healed:
             # Log to file
-            logging.basicConfig(filename="error.log", level=logging.ERROR, filemode='w')
-            logging.exception("Library file not found, self healing failed or not attempted.")
-            exit(1)
+            logging.basicConfig(filename="issues.log", level=logging.CRITICAL, filemode='w', format="%(message)s")
+            logging.critical("Library file not found, self healing failed or not attempted.")
+            logging.critical(e)
+
+            print("-")
+            input("Press Enter to exit... ")
+
+            exit()
     else:
         break
 

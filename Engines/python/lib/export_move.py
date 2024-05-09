@@ -412,7 +412,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 os.makedirs(main_itemfolder_team_path)
 
                 # Replace the dummy team ID with the actual one in any kit-dependent textures found
-                textures_id_change(subfolder_path, team_id)
+                textures_id_change(team_itemfolder_path, team_id)
 
                 # Convert any dds textures to ftex if needed
                 if fox_mode:

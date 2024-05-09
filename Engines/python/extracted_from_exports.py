@@ -184,8 +184,8 @@ def extracted_from_exports():
         if os.path.exists("issues.log"):
             # Warn about there being some issues and about having to open the log
             print('-')
-            print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some issues in the exports")
-            print("- Please check the issues.log file for a log")
+            print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some potential issues in the exports")
+            print("- Please check the issues.log file for more details")
         else:
             print('-')
             print('- No issues were found')
@@ -193,7 +193,7 @@ def extracted_from_exports():
         if os.path.exists("suggestions.log"):
             # Warn about there being some suggestions
             print('-')
-            print('- \033[32m' + 'Info' + '\033[0m' + ": There are some suggestions available")
+            print('- \033[36m' + 'Info' + '\033[0m' + ": There are some suggestions available")
             print("- Check the suggestions.log file to improve your aesthetics")
 
         print('-')

@@ -4,6 +4,7 @@ import logging
 from .pausing import pause
 
 
+SUGGESTIONS_LOG_NAME = "suggestions.log"
 ISSUES_LOG_NAME = "issues.log"
 CRASH_LOG_NAME = "crash.log"
 
@@ -56,15 +57,34 @@ def log_store(log_name):
 
 def logger_init(__name__):
 
+    # Set the root logger level
+    logging.getLogger().setLevel(logging.INFO)
+
+
+    # If a suggestions log file already exists, add .old to it
+    log_store(SUGGESTIONS_LOG_NAME)
+
+    # Create a file handler which will only store INFO messages
+    # It will only create a file when a message occurs
+    suggestions_log_handler = logging.FileHandler(SUGGESTIONS_LOG_NAME, delay=True)
+    suggestions_log_handler.setLevel(logging.INFO)
+    suggestions_log_handler.addFilter(lambda record: record.levelno == logging.INFO)
+
+    # Add it to the root logger
+    logging.getLogger().addHandler(suggestions_log_handler)
+
+
     # If an issues log file already exists, add .old to it
     log_store(ISSUES_LOG_NAME)
 
-    # Create a file handler which will only create a file when a WARNING or higher occurs
-    file_handler = logging.FileHandler(ISSUES_LOG_NAME, delay=True)
-    file_handler.setLevel(logging.WARNING)
+    # Create a file handler which which will only store WARNING messages or higher
+    # It will only create a file when a message occurs
+    issues_log_handler = logging.FileHandler(ISSUES_LOG_NAME, delay=True)
+    issues_log_handler.setLevel(logging.WARNING)
 
     # Add it to the root logger
-    logging.getLogger().addHandler(file_handler)
+    logging.getLogger().addHandler(issues_log_handler)
+
 
     # Create a stream handler for outputting colored errors to stderr
     stream_handler = logging.StreamHandler()
@@ -82,13 +102,13 @@ def logger_init(__name__):
     logger = logging.getLogger(__name__)
 
     # Create a file handler which will only create a file when an exception occurs
-    handler = logging.FileHandler(CRASH_LOG_NAME, delay=True)
+    crash_log_handler = logging.FileHandler(CRASH_LOG_NAME, delay=True)
 
     # Create a formatter and add it to the handler
     formatter = logging.Formatter('%(asctime)-15s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
+    crash_log_handler.setFormatter(formatter)
 
     # Add the handler to the logger
-    logger.addHandler(handler)
+    logger.addHandler(crash_log_handler)
 
     return logger

@@ -192,12 +192,17 @@ def patches_from_contents():
             print('-')
             print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some issues in the exports")
             print("- Please check the issues.log file for a log")
-            print('-')
         else:
             print('-')
             print('- No issues were found in the exports')
-            print('-')
 
+        if os.path.exists("suggestions.log"):
+            # Warn about there being some suggestions
+            print('-')
+            print('- \033[32m' + 'Info' + '\033[0m' + ": There are some suggestions available")
+            print("- Check the suggestions.log file to improve your aesthetics")
+
+        print('-')
         print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + ' by Shakes')
         print('-')
         print('-')

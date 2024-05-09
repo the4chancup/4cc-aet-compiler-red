@@ -183,12 +183,20 @@ def extracted_from_exports():
     if not all_in_one:
         if os.path.exists("issues.log"):
             # Warn about there being some issues and about having to open the log
+            print('-')
             print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some issues in the exports")
             print("- Please check the issues.log file for a log")
-            print('-')
         else:
-            print('- No issues were found')
             print('-')
+            print('- No issues were found')
+
+        if os.path.exists("suggestions.log"):
+            # Warn about there being some suggestions
+            print('-')
+            print('- \033[32m' + 'Info' + '\033[0m' + ": There are some suggestions available")
+            print("- Check the suggestions.log file to improve your aesthetics")
+
+        print('-')
 
     # Check if the Other folder exists and there are files in it, if there are print a warning
     if os.path.exists("./extracted_exports/Other") and len(os.listdir("./extracted_exports/Other")) > 0:

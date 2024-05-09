@@ -79,6 +79,7 @@ def portraits_move(exportfolder_path, team_id):
         logging.error( "- The entire export will be skipped")
 
         if pause_on_error:
+            print("-")
             pause()
 
         # Delete the entire export folder

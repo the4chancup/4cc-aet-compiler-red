@@ -75,6 +75,7 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
         shutil.rmtree(exportfolder_path)
 
         if pause_on_error:
+            print("-")
             pause()
 
         return None
@@ -144,6 +145,7 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
         logging.error(f"- Add the team name to the \"{TEAMS_LIST_FILE}\" file and restart")
 
         if pause_on_error:
+            print("-")
             pause()
 
         # Skip the whole export

@@ -192,8 +192,9 @@ def extracted_from_exports():
 
     # Check if the Other folder exists and there are files in it, if there are print a warning
     if os.path.exists("./extracted_exports/Other") and len(os.listdir("./extracted_exports/Other")) > 0:
+        print('-')
         print('- \033[33m' + 'Warning' + '\033[0m' + ": There are files in the Other folder")
         print("- Please open it and check its contents")
-        print('-')
         if pause_on_error:
+            print('-')
             pause()

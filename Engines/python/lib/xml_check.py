@@ -210,6 +210,7 @@ def face_diff_xml_check(xml_path):
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
+            print("-")
             pause()
 
         return True
@@ -230,6 +231,7 @@ def face_diff_xml_check(xml_path):
         error = True
 
     if error and pause_on_error:
+        print("-")
         pause()
 
     return error
@@ -275,6 +277,7 @@ def xml_check(xml_path, team_id):
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
+            print("-")
             pause()
 
         return True
@@ -400,6 +403,7 @@ def mtl_check(mtl_path, team_id):
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
         if pause_on_error:
+            print("-")
             pause()
 
         return True

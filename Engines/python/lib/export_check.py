@@ -168,6 +168,7 @@ def faces_check(exportfolder_path, team_name, team_id):
                 logging.error( "- These face folders will be discarded to avoid problems")
 
                 if pause_on_error:
+                    print("-")
                     pause()
 
         # If the folder exists but is empty, delete it
@@ -231,6 +232,7 @@ def kitconfigs_check(exportfolder_path, team_name):
 
                 # Pause if needed
                 if pause_on_error:
+                    print("-")
                     pause()
 
             else:
@@ -295,6 +297,7 @@ def kittextures_check(exportfolder_path, team_name):
                 logging.error( "- The Kit Textures folder will be discarded since it's unusable")
 
                 if pause_on_error:
+                    print("-")
                     pause()
 
             else:
@@ -326,6 +329,7 @@ def kittextures_check(exportfolder_path, team_name):
                     logging.error( "- The kit textures mentioned above will be discarded since they're unusable")
 
                     if pause_on_error:
+                        print("-")
                         pause()
 
         # If the folder exists but is empty
@@ -382,6 +386,7 @@ def logo_check(exportfolder_path, team_name):
                 logging.error( "- The Logo folder will be discarded since it's unusable")
 
                 if pause_on_error:
+                    print("-")
                     pause()
 
         else:
@@ -438,6 +443,7 @@ def portraits_check(exportfolder_path, team_name):
                 logging.error( "- These portraits will be discarded since they're unusable")
 
                 if pause_on_error:
+                    print("-")
                     pause()
 
         else:
@@ -484,6 +490,7 @@ def common_check(exportfolder_path, team_name):
                 logging.error( "- The textures mentioned above will be discarded since they're unusable")
 
                 if pause_on_error:
+                    print("-")
                     pause()
 
         else:
@@ -588,6 +595,7 @@ def boots_check(exportfolder_path, team_name, team_id):
                 logging.error( "- The boots folders mentioned above will be discarded since they're unusable")
 
                 if pause_on_error:
+                    print("-")
                     pause()
 
         # If the folder exists but is empty, delete it
@@ -702,6 +710,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 logging.error( "- The gloves folders mentioned above will be discarded since they're unusable")
 
                 if pause_on_error:
+                    print("-")
                     pause()
 
         # If the folder exists but is empty, delete it

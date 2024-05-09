@@ -38,9 +38,6 @@ def patches_from_contents():
         uniform_foldername = "Uniformcpk"
         bins_foldername = "Binscpk"
 
-    # Create output folder just in case
-    os.makedirs("./patches_output", exist_ok=True)
-
     # Verify that the input folders exist, stop the program otherwise
     if (not os.path.exists(f"./patches_contents/{faces_foldername}") or
             not os.path.exists(f"./patches_contents/{uniform_foldername}") or
@@ -53,6 +50,9 @@ def patches_from_contents():
         logging.critical("-")
 
         return
+
+    # Create output folder just in case
+    os.makedirs("./patches_output", exist_ok=True)
 
 
     # Make the patches

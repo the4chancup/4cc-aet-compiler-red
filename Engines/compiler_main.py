@@ -38,17 +38,12 @@ while True:
     except ImportError as e:
         print("- FATAL ERROR - Library file not found:")
         print(e)
-        file_healed = False
-        if sys.platform == "win32":
-            file_healed = module_heal_offer(e)
+        file_healed = module_heal_offer(e)
         if not file_healed:
             # Log to file
             logging.basicConfig(filename="issues.log", level=logging.CRITICAL, filemode='w', format="%(message)s")
             logging.critical("Library file not found, self healing failed or not attempted.")
             logging.critical(e)
-
-            print("-")
-            input("Press Enter to exit... ")
 
             exit()
     else:
@@ -123,7 +118,7 @@ def main(run_type):
     pes_download_path = os.path.join(pes_folder_path, "download")
 
     # Check for updates
-    if updates_check and sys.platform == "win32":
+    if updates_check:
         update_check(APP_OWNER, APP_NAME, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH)
 
     # If patches_from_contents_run is active and move_cpks mode is enabled

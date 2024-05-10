@@ -137,7 +137,7 @@ def file_critical_check(file_path, healing_allowed = True):
     print( "-")
     print( "- Please grab it from the compiler's original 7z package")
 
-    if healing_allowed and sys.platform == "win32":
+    if healing_allowed:
 
         file_healed = file_heal_offer(file_path)
 

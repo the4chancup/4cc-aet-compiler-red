@@ -9,10 +9,9 @@ def dependency_check_on_import():
     # Prepare a list of dependencies
     dependencies = [
         "py7zr",
+        "requests",
         "traceback_with_variables",
     ]
-    if sys.platform == "win32":
-        dependencies.append("requests")
 
     dependencies_missing = []
 

@@ -9,7 +9,8 @@
   Please follow the PEP8 guidelines whenever possible.
 
 ## Commit Message Rules
-- Use imperative mood on the subject line (first line).
+- Use the imperative mood on the subject line (first line).  
+  E.g.: "Fix bug", instead of "Fixed bug" or "Fixes bug".
 - Always keep the second line empty.
 - The body lines (if needed) must start from the third line.
 - Follow the 52/72 rule:  

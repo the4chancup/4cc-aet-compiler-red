@@ -99,7 +99,8 @@ def file_heal_offer(file_path):
         response = input("Type \"heal\" and press Enter, or just press Enter to exit...")
 
         if not response:
-            exit()
+            file_healed = False
+            break
 
         if "heal" in response:
             # Run the self-healing script
@@ -131,8 +132,6 @@ def file_critical_check(file_path, healing_allowed = True):
     if os.path.exists(file_path):
         return
 
-    file_healed = False
-
     logging.critical( "-")
     logging.critical(f"- FATAL ERROR - Missing \"{file_path}\" file")
     print( "-")
@@ -142,10 +141,13 @@ def file_critical_check(file_path, healing_allowed = True):
 
         file_healed = file_heal_offer(file_path)
 
-    if not file_healed:
+    else:
+        file_healed = False
+
         print( "-")
         print( "- The program will now close")
         print( "-")
         pause()
 
+    if not file_healed:
         exit()

@@ -1,6 +1,5 @@
 import os
 import re
-import stat
 import py7zr
 import shutil
 
@@ -18,10 +17,10 @@ def readonlybit_remove_tree(path):
     for root, dirs, files in os.walk(path, topdown=False):
         for name in files:
             filename = os.path.join(root, name)
-            os.chmod(filename, stat.S_IWRITE)
+            os.chmod(filename, 0o600)
         for name in dirs:
             filename = os.path.join(root, name)
-            os.chmod(filename, stat.S_IWRITE)
+            os.chmod(filename, 0o700)
         for dir in dirs:
             readonlybit_remove_tree(os.path.join(root, dir))
 

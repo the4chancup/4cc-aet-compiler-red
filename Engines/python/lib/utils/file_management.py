@@ -1,5 +1,4 @@
 import os
-import sys
 import py7zr
 import shutil
 import logging

@@ -79,58 +79,58 @@ ID Name
 778 Backup 7
 779 Backup 8
 780 Backup 9
-781 VGL 1
-782 VGL 2
-783 VGL 3
-784 VGL 4
-785 VGL 5
-786 VGL 6
-787 VGL 7
-788 VGL 8
-789 VGL 9
-790 VGL 10
-791 VGL 11
-792 VGL 12
-793 VGL 13
-794 VGL 14
-795 VGL 15
-796 VGL 16
-797 VGL 17
-798 VGL 18
-799 VGL 19
-800 VGL 20
-801 VGL 21
-802 VGL 22
-803 VGL 23
-804 VGL 24
-805 VGL 25
-806 VGL 26
-807 VGL 27
-808 VGL 28
-809 VGL 29
-810 VGL 30
-811 VGL 31
-812 VGL 32
-813 VGL 33
-814 VGL 34
-815 VGL 35
-816 VGL 36
-817 VGL 37
-818 VGL 38
-819 VGL 39
-820 VGL 40
-821 VGL 41
-822 VGL 42
-823 VGL 43
-824 VGL 44
-825 VGL 45
-826 VGL 46
-827 VGL 47
-828 VGL 48
-829 VGL 49
-830 VGL 50
-831 VGL 51
-832 VGL 52
+781 /@/
+782 /2hug/
+783 /aceg/
+784 /akg/
+785 /alg/
+786 /bag/
+787 /dbg/
+788 /ddg/
+789 /ddlc/
+790 /dng/
+791 /domg/
+792 /egg/
+793 /fgoalter/
+794 /fgog/
+795 /gbfg/
+796 /gbpen/
+797 /gfg/
+798 /ggg/
+799 /gig/
+800 /hanny/
+801 /hgg2d/
+802 /hsrg/
+803 /indie/
+804 /ink/
+805 /kfg/
+806 /lcg/
+807 /llsifg/
+808 /mjg/
+809 /mmg/
+810 /nepgen/
+811 /nikg/
+812 /omg/
+813 /pcrg/
+814 /pg/
+815 /pmmm/
+816 /psg/
+817 /revue/
+818 /skg/
+819 /smbg/
+820 /smtg/
+821 /snowg/
+822 /ss13g/
+823 /tf2g/
+824 /twg/
+825 /uma/
+826 /utg/
+827 /vgt/
+828 /vitagen/
+829 /vn/
+830 /vrg/
+831 /wtg/
+832 /xgg/
 833 VGL 53
 834 VGL 54
 835 VGL 55

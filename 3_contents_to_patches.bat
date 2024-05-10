@@ -9,4 +9,14 @@ REM - Set the running type from the bat file's name
 set running_type=%~n0
 
 REM - Call the runner
-.\Engines\compiler_run %running_type%
+if exist "Engines\compiler_run" (
+    .\Engines\compiler_run %running_type%
+) else (
+    echo -
+    echo - FATAL ERROR - Missing vital file
+    echo - The file compiler_run.bat was not found in the Engines folder
+    echo -
+    echo - Please grab a clean compiler folder
+    echo -
+    pause
+)

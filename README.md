@@ -4,6 +4,7 @@ New python-based version, three times faster.
 
 - Setting up
 - Simple stuff
+- Message types
 - Advanced stuff
 - Troubleshooting
 
@@ -16,8 +17,10 @@ https://www.python.org/downloads/
 Make sure to enable the "Add to PATH" setting during the installation.
 
 Now open the settings txt file and set the following:
-- PES Version: Set the PES version you're compiling exports for.
-- Download Folder Path: Check if it's good.
+- PES Version:
+  Set the PES version you're compiling exports for.
+- Download Folder Path:
+  Check if it's good.
 
 You don't normally have to edit any of the other settings, but feel free to
 take a look. The Run PES setting, in particular, opens PES after packing a cpk.
@@ -47,6 +50,54 @@ be opened so you can set the correct folder path.
 After you've run the compiler you only need to open PES and check your stuff.
 
 Check the Troubleshooting section at the bottom if you run into trouble.
+
+
+## Message types
+
+Here are the types of message the compiler can output, from least to more
+important:
+
+- Info
+
+  These are just suggestions, they let you know about stuff which will always
+  work but is not ideal, and which you can look into to make your aesthetics
+  look better.
+
+  [Not shown on screen] [Written to suggestions.log]
+
+- Warning
+
+  These warn about stuff which usually works fine as it is, but in some cases
+  might break things. You can ignore them, but if something is broken on PES you
+  should come back and look into them.
+
+  [Not shown on screen] [Written to issues.log]
+
+- Error
+
+  Something in an export is broken in such a way that it cannot be used, so it
+  will be discarded. Fix them and compile the export again.
+  In some cases you might get errors for stuff which sometimes does work as it
+  is, but it is still risky. Fix it anyway.
+
+  [-Shown on screen-] [Written to issues.log]
+
+- Fatal Error
+
+  A file from the compiler's folder is missing (for example the teams list), so
+  the compiler cannot run. This does not count as a crash, it is still something
+  the user can fix, either by grabbing a new compiler folder or by letting it
+  fix itself (the compiler will offer to "self-heal" when possible).
+
+  [-Shown on screen-] [Written to issues.log]
+
+- Crash
+
+  The compiler ran into an unexpected error and simply crashed (also known as
+  unhandled exception). This is something that can only be fixed by the
+  developer, so please report it by posting the crash.log file from the folder.
+
+  [-Shown on screen-] [Written to crash.log]
 
 
 ## Advanced stuff

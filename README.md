@@ -10,15 +10,15 @@ New python-based version, three times faster.
 
 ## Setting up
 
-IMPORTANT: Make sure you have python 3.12 or higher installed on your pc.
-You can download it from this link.
-https://www.python.org/downloads/
+IMPORTANT: Make sure you have python 3.12 or higher installed on your pc.  
+You can download it from this link.  
+https://www.python.org/downloads/  
 Make sure to enable the "Add to PATH" setting during the installation.
 
 Now open the settings txt file and set the following:
-- PES Version:
+- PES Version:  
   Set the PES version you're compiling exports for.
-- Download Folder Path:
+- Download Folder Path:  
   Check if it's good.
 
 You don't normally have to edit any of the other settings, but feel free to
@@ -33,18 +33,18 @@ compiling is listed on the teams_list.txt file of the compiler, next to the
 team ID assigned to it. If it's not in there, then write it in.
 
 Also make sure your export follows the proper AET format as described on the
-following wikipage:
-https://implyingrigged.info/wiki/AET
+following wikipage:  
+https://implyingrigged.info/wiki/AET  
 Keep in mind that you don't need to edit the team ID listed in your export's
 files, the compiler will take care of that!
 
 Now put the export in the exports_to_add folder (folders, zip or 7z are all
 fine) and run the 0_all_in_one script.
 
-A cpk will be created and copied automatically to your PES download folder.
+A cpk will be created and copied automatically to your PES download folder.  
 Now you only need to run PES and check your stuff.
 
-Check the Troubleshooting section at the bottom if you run into trouble.
+Check the Troubleshooting section at the bottom if you run into trouble.  
 It the compiler throws a message at you and you don't know why, read below.
 
 
@@ -119,5 +119,5 @@ Q: I've got some other problem/question.
 
 Tool by Shakes
 
-Special thanks for ideas and fixes, and for some of the libraries used:
+Special thanks for ideas and fixes, and for some of the libraries used:  
 Tomato4cc, Giovani1906, fg4cc, blu_ray_

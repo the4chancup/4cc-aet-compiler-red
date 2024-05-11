@@ -204,6 +204,7 @@ def patches_from_contents():
             print( "- Check the suggestions.log file to improve your aesthetics")
 
         print( "-")
+        print( "-")
         print(f"- 4cc aet compiler {COLORS.BRIGHT_RED}Red{COLORS.RESET} by Shakes")
         print( "-")
         print( "-")

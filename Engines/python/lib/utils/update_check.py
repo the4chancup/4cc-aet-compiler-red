@@ -1,6 +1,8 @@
 import os
 import py7zr
 import shutil
+import filecmp
+import difflib
 import requests
 import webbrowser
 from datetime import datetime
@@ -142,11 +144,37 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         # Copy the settings ini to the new folder after deleting the one in the old folder
         if os.path.exists(os.path.join(app_new_folder, "settings.ini")):
             os.remove(os.path.join(app_new_folder, "settings.ini"))
-        shutil.copy(os.path.join(app_folder, "settings.ini"), app_new_folder)
+        shutil.copy("settings.ini", app_new_folder)
+
+    # Check if the teams_list.txt file is different from the new one
+    if not update_major:
+
+        teams_list_curr_path = "teams_list.txt"
+        teams_list_new_path = os.path.join(app_new_folder, "teams_list.txt")
+
+        if not filecmp.cmp(teams_list_curr_path, teams_list_new_path):
+
+            print("-")
+            print("- A new different \"teams_list.txt\" file is available in the new version")
+            print("-")
+            pause("Press any key to see the differences... ")
+            # Print the differences between the two files
+            with open(teams_list_new_path, "r") as f1:
+                with open(teams_list_curr_path, "r") as f2:
+                    diff = difflib.unified_diff(f1.readlines(), f2.readlines(), fromfile="teams_list.txt", tofile="teams_list.txt")
+                    for line in diff:
+                        print(line, end="")
+            print("-")
+            response = input("Type \"new\" to use the new file, or just press Enter to keep the current one... ")
+
+            if "new" not in response:
+                if os.path.exists(teams_list_new_path):
+                    os.remove(teams_list_new_path)
+                shutil.copy(teams_list_curr_path, app_new_folder)
 
     # Move the contents of the exports_to_add folder to the new folder after deleting the one in the old folder
-    for file in os.listdir(os.path.join(app_folder, "exports_to_add")):
-        shutil.move(os.path.join(app_folder, "exports_to_add", file), os.path.join(app_new_folder, "exports_to_add"))
+    for file in os.listdir("exports_to_add"):
+        shutil.move(os.path.join("exports_to_add", file), os.path.join(app_new_folder, "exports_to_add"))
 
     print("-")
     print("- Successfully downloaded and unpacked the latest version")
@@ -167,7 +195,7 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         pause("Press any key to open the new folder, and the old and new settings files... ")
 
         # Open the old settings file and the new settings file
-        os.startfile(os.path.join(app_folder, "settings.ini"))
+        os.startfile( "settings.ini")
         os.startfile(os.path.join(app_new_folder, "settings.ini"))
 
         # Open the unpacked folder in the default file explorer
@@ -300,7 +328,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         print("  skip                      Skips this version and doesn't warn again until a newer one comes out")
         print("  fuckoff                   Disables update checking (not recommended)")
         print("-")
-        response = input("Or just press Enter to continue normally...")
+        response = input("Or just press Enter to continue normally... ")
 
         if response == "info":
             # Open the website in the default browser

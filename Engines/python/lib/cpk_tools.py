@@ -131,3 +131,38 @@ def pes_download_path_check(settings_name, pes_download_path):
 
     # Exit the script
     exit()
+
+
+def cpk_name_check(settings_name, cpk_listed, pes_download_path):
+    '''Check if the cpk name is listed on the dpfl file'''
+
+    dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
+    dpfl_list = dpfl_scan(dpfl_path)
+
+    if (cpk_listed + ".cpk") in dpfl_list:
+        return
+
+    logging.critical("-")
+    logging.critical("- FATAL ERROR - CPK name not listed on the DpFileList file")
+    logging.critical("-")
+    logging.critical("- Please set a listed CPK name in the settings file and start again")
+
+    # Stop the loggers
+    logger_stop()
+
+    print("-")
+    pause("Press any key to show the list of CPKs on the DpFileList... ")
+    print("-")
+    for cpk_listed in dpfl_list:
+        print("- " + cpk_listed[0:-4])
+
+    print("-")
+    if sys.platform == "win32":
+        pause("Press any key to open the settings file and exit... ")
+        # Open the settings file in an external text editor
+        os.startfile(settings_name)
+    else:
+        pause("Press any key to exit... ")
+
+    # Exit the script
+    exit()

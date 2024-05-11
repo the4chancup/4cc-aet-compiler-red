@@ -107,23 +107,30 @@ def main(run_type):
 
         # Check the PES download folder
         if not os.path.exists(pes_download_path):
+            logging.critical("-")
+            logging.critical("- FATAL ERROR - PES download folder not found")
+            logging.critical("-")
+            logging.critical("- Please set the correct path to the main PES folder")
+            logging.critical("- in the settings file and start again")
             print("-")
-            print("-")
-            print("- PES download folder not found")
-            print("- Please set its correct path in the settings file and start again")
-            print("-")
-            print("-")
-            pause()
+
+            # Stop the loggers
+            logger_stop()
 
             if sys.platform == "win32":
+                pause("- Press any key to open the settings file... ")
                 # Open the settings file in an external text editor
                 os.startfile(settings_name)
+            else:
+                pause("- Press any key to exit... ")
 
             # Exit the script
             sys.exit()
 
         # If admin mode has been forced or is needed
-        if sys.platform == "win32" and (admin_mode or admin_check(pes_download_path)):
+        admin_needed = admin_mode or admin_check(pes_download_path)
+
+        if sys.platform == "win32" and admin_needed:
 
             # Prepare the path to the compiler_run.bat file in the same folder
             current_dir = os.path.dirname(os.path.abspath(__file__))

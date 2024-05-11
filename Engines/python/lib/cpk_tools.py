@@ -1,9 +1,14 @@
 import os
+import sys
 import shutil
+import logging
+
 
 from .utils import cpk
+from .utils.pausing import pause
 from .utils.dpfl_scan import dpfl_scan
 from .utils.zlib_plus import tryDecompress
+from .utils.logging_tools import logger_stop
 from .utils.file_management import file_critical_check
 
 
@@ -99,3 +104,30 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
             print(f"- {os.path.basename(file_info['source_path'])} not found in any cpks, copied from the fallback folder")
 
     return file_found_all
+
+
+def pes_download_path_check(settings_name, pes_download_path):
+    '''Check the PES download folder'''
+
+    if os.path.exists(pes_download_path):
+        return
+
+    logging.critical("-")
+    logging.critical("- FATAL ERROR - PES download folder not found")
+    logging.critical("-")
+    logging.critical("- Please set the correct path to the main PES folder")
+    logging.critical("- in the settings file and start again")
+
+    # Stop the loggers
+    logger_stop()
+
+    print("-")
+    if sys.platform == "win32":
+        pause("Press any key to open the settings file and exit... ")
+        # Open the settings file in an external text editor
+        os.startfile(settings_name)
+    else:
+        pause("Press any key to exit... ")
+
+    # Exit the script
+    exit()

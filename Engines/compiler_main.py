@@ -34,6 +34,7 @@ while True:
         from python.lib.utils.admin_tools import admin_request
         from python.lib.utils.pausing import pause
         from python.lib.utils.dpfl_scan import dpfl_scan
+        from python.lib.cpk_tools import pes_download_path_check
         from python.settings_init import settings_init
         from python.extracted_from_exports import extracted_from_exports
         from python.contents_from_extracted import contents_from_extracted
@@ -108,27 +109,7 @@ def main(run_type):
     if patches_from_contents_run and move_cpks:
 
         # Check the PES download folder
-        if not os.path.exists(pes_download_path):
-
-            logging.critical("-")
-            logging.critical("- FATAL ERROR - PES download folder not found")
-            logging.critical("-")
-            logging.critical("- Please set the correct path to the main PES folder")
-            logging.critical("- in the settings file and start again")
-
-            # Stop the loggers
-            logger_stop()
-
-            print("-")
-            if sys.platform == "win32":
-                pause("Press any key to open the settings file and exit... ")
-                # Open the settings file in an external text editor
-                os.startfile(settings_name)
-            else:
-                pause("Press any key to exit... ")
-
-            # Exit the script
-            sys.exit()
+        pes_download_path_check(settings_name, pes_download_path)
 
         # Check if the cpk name is listed on the dpfl file
         dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")

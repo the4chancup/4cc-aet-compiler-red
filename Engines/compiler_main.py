@@ -27,7 +27,7 @@ except ImportError as e:
 # Modules which can be self healed
 while True:
     try:
-        from python.lib.utils.app_tools import intro_print
+        from python.lib.utils.app_tools import app_title
         from python.lib.utils.logging_tools import logger_init
         from python.lib.utils.admin_tools import admin_check
         from python.lib.utils.admin_tools import admin_request
@@ -172,7 +172,14 @@ def main(run_type):
 
 if __name__ == "__main__":
 
-    intro_print()
+    if sys.platform == "win32":
+        os.system("color")
+
+    print("-")
+    print("-")
+    print(app_title())
+    print("-")
+    print("-")
 
     # Enable the advanced traceback handler
     from traceback_with_variables import activate_by_import as activate_by_import

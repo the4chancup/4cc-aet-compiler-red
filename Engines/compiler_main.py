@@ -164,7 +164,7 @@ def main(run_type):
 
 if __name__ == "__main__":
 
-    if sys.platform == "win32":
+    if sys.platform == "win32" and "NO_COLOR" not in os.environ:
         os.system("color")
 
     print("-")

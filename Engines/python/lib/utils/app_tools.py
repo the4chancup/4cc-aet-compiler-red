@@ -1,4 +1,4 @@
-from python.lib.utils import APP_DATA
+from . import APP_DATA
 
 
 def app_title():

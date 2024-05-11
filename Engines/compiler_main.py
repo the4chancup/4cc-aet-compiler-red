@@ -29,6 +29,7 @@ while True:
     try:
         from python.lib.utils.app_tools import app_title
         from python.lib.utils.logging_tools import logger_init
+        from python.lib.utils.logging_tools import logger_stop
         from python.lib.utils.admin_tools import admin_check
         from python.lib.utils.admin_tools import admin_request
         from python.lib.utils.pausing import pause
@@ -156,7 +157,7 @@ def main(run_type):
         patches_from_contents()
 
     # Stop the loggers
-    logging.shutdown()
+    logger_stop()
 
     # Pause the script before exiting, unless PES is about to run
     # Pause it anyway if there's a log file and Pause on Error is enabled

@@ -3,6 +3,7 @@ import logging
 
 from . import COLORS
 from .pausing import pause
+from .app_tools import app_title
 
 
 SUGGESTIONS_LOG_NAME = "suggestions.log"
@@ -109,3 +110,17 @@ def logger_init(__name__):
     logger.addHandler(crash_log_handler)
 
     return logger
+
+
+def logger_stop():
+
+    logging.shutdown()
+
+    # Check if any of the non-crash log files exist and add the program version to them
+    for log_name in [SUGGESTIONS_LOG_NAME, ISSUES_LOG_NAME]:
+        if os.path.isfile(log_name):
+            with open(log_name, "r") as log_file:
+                previous_contents = log_file.read()
+
+            with open(log_name, "w") as log_file:
+                log_file.write(app_title(colorize=False) + "\n" + previous_contents)

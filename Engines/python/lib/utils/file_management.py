@@ -135,7 +135,8 @@ def file_critical_check(file_path, healing_allowed = True):
         return
 
     logging.critical( "-")
-    logging.critical(f"- FATAL ERROR - Missing \"{file_path}\" file")
+    logging.critical( "- FATAL ERROR - Missing vital file")
+    logging.critical(f"- The file \"{file_path}\" is missing")
     print( "-")
     print( "- Please grab it from the compiler's original 7z package")
 

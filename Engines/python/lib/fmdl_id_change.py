@@ -1,8 +1,8 @@
-import struct
 import os
-import sys
-import fnmatch
 import re
+import sys
+import struct
+import fnmatch
 import logging
 
 
@@ -101,7 +101,7 @@ def fmdl_id_change(fn, id, teamid = "000"):
                     strs[path-1] = npath #Overwrite old path in string list
                     tpc = tpc + 1
                 else:
-                    logging.debug("[MTLTools] Incorrect player ID " + id + ", please make sure the ID is exactly 5 digits long", file=sys.stderr)
+                    logging.debug("[MTLTools] Incorrect player ID " + id + ", please make sure the ID is exactly 5 digits long")
 
             #Refs path
             if(len(spath) == 10 and re.fullmatch("referee[0-9]{3}", spath[7])):
@@ -112,7 +112,7 @@ def fmdl_id_change(fn, id, teamid = "000"):
                     strs[path-1] = npath #Overwrite old path in string list
                     tpc = tpc + 1
                 else:
-                    logging.debug("[MTLTools] Incorrect referee name " + id, file=sys.stderr)
+                    logging.debug("[MTLTools] Incorrect referee name " + id)
 
             #Boots path
             elif(len(spath) == 8 and re.fullmatch("k[0-9]{4}", spath[6])):
@@ -123,7 +123,7 @@ def fmdl_id_change(fn, id, teamid = "000"):
                     strs[path-1] = npath #Overwrite old path in string list
                     tpc = tpc + 1
                 else:
-                    logging.debug("[MTLTools] Incorrect boots ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'kXXXX' format", file=sys.stderr)
+                    logging.debug("[MTLTools] Incorrect boots ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'kXXXX' format")
 
             #Gloves path
             elif(len(spath) == 8 and re.fullmatch("g[0-9]{4}", spath[6])):
@@ -134,7 +134,7 @@ def fmdl_id_change(fn, id, teamid = "000"):
                     strs[path-1] = npath #Overwrite old path in string list
                     tpc = tpc + 1
                 else:
-                    logging.debug("[MTLTools] Incorrect gloves ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'gXXXX' format", file=sys.stderr)
+                    logging.debug("[MTLTools] Incorrect gloves ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'gXXXX' format")
 
             #Balls path
             elif(len(spath) == 7 and re.fullmatch("ball[0-9]{3}", spath[5])):
@@ -145,7 +145,7 @@ def fmdl_id_change(fn, id, teamid = "000"):
                     strs[path-1] = npath #Overwrite old path in string list
                     tpc = tpc + 1
                 else:
-                    logging.debug("[MTLTools] Incorrect ball ID " + id + ", please make sure the ID is exactly 7 characters long and follows the 'ballXXX' format", file=sys.stderr)
+                    logging.debug("[MTLTools] Incorrect ball ID " + id + ", please make sure the ID is exactly 7 characters long and follows the 'ballXXX' format")
 
             #Common path
             elif(len(spath) == 9 and re.fullmatch("[0-9]{3}", spath[6])):
@@ -156,7 +156,7 @@ def fmdl_id_change(fn, id, teamid = "000"):
                     strs[path-1] = npath #Overwrite old path in string list
                     tpc = tpc + 1
                 else:
-                    logging.debug("[MTLTools] Incorrect Team ID " + teamid + ", please make sure the ID is exactly 3 characters long and follows the 'XXX' format", file=sys.stderr)
+                    logging.debug("[MTLTools] Incorrect Team ID " + teamid + ", please make sure the ID is exactly 3 characters long and follows the 'XXX' format")
 
             else:
                 logging.debug("[MTLTools] No ID found in path " + strs[path-1])
@@ -164,7 +164,7 @@ def fmdl_id_change(fn, id, teamid = "000"):
         #Yell if there were no paths with IDs at all
         if(tpc == 0):
             logging.debug("[MTLTools] No paths with IDs found in file " + fn)
-            print("[MTLTools] No paths with IDs found in file " + fn, file=sys.stderr)
+            print("[MTLTools] No paths with IDs found in file " + fn)
 
         #Re-open file for writing
         b = open(fn, "r+b")
@@ -186,14 +186,14 @@ def fmdl_id_change(fn, id, teamid = "000"):
 
 def main():
     if not((len(sys.argv) >= 3) and (len(sys.argv) <= 4)):
-        logging.debug("[MTLTools] Error: Invalid arguments.\nUsage: id.exe <.fmdl file> <new ID> [team ID]", file=sys.stderr)
+        logging.debug("[MTLTools] Error: Invalid arguments.\nUsage: id.exe <.fmdl file> <new ID> [team ID]")
     elif not(os.path.isfile(sys.argv[1])):
-        logging.debug("[MTLTools] Error: Provided file " + sys.argv[1] + " doesn't exist or is not a valid file", file=sys.stderr)
+        logging.debug("[MTLTools] Error: Provided file " + sys.argv[1] + " doesn't exist or is not a valid file")
     elif not(fnmatch.fnmatch(sys.argv[1], '*.fmdl')):
-        logging.debug("[MTLTools] Error: Provided file " + sys.argv[1] + " doesn't appear to be a .fmdl file", file=sys.stderr)
-        logging.debug("[MTLTools] Please make sure the file ends in \".fmdl\"", file=sys.stderr)
+        logging.debug("[MTLTools] Error: Provided file " + sys.argv[1] + " doesn't appear to be a .fmdl file")
+        logging.debug("[MTLTools] Please make sure the file ends in \".fmdl\"")
     else:
-        transfer(sys.argv[1], sys.argv[2], sys.argv[3])
+        fmdl_id_change(sys.argv[1], sys.argv[2], sys.argv[3])
 
 if __name__ == '__main__':
     main()

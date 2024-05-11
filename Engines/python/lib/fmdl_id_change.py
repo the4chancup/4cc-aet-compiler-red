@@ -5,7 +5,8 @@ import fnmatch
 import re
 import logging
 
-def transfer(fn, id, teamid = "000"):
+
+def fmdl_id_change(fn, id, teamid = "000"):
 
     b = open(fn, 'rb')
 

@@ -7,7 +7,7 @@ from .utils.ftex import ddsToFtex
 from .utils.file_management import file_critical_check
 from .utils.zlib_plus import unzlib_file
 from .mtl_id_change import mtl_id_change
-from .fmdl_id_change import transfer
+from .fmdl_id_change import fmdl_id_change
 from .xml_create import xml_create
 
 
@@ -138,7 +138,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 if fox_mode:
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
-                        transfer(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
+                        fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
 
                     # Convert any dds textures to ftex if needed
                     ftex_from_dds_multi(subfolder_path)
@@ -320,7 +320,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 if fox_mode:
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
-                        transfer(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
+                        fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
 
                     # Convert any dds textures to ftex if needed
                     ftex_from_dds_multi(subfolder_path)
@@ -357,7 +357,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 if fox_mode:
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
-                        transfer(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
+                        fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
 
                     # Convert any dds textures to ftex if needed
                     ftex_from_dds_multi(subfolder_path)

@@ -6,6 +6,7 @@ import logging
 from . import APP_DATA
 from .pausing import pause
 from .update_check import version_download
+from .logging_tools import logger_stop
 
 
 def file_heal(file_path):
@@ -146,4 +147,5 @@ def file_critical_check(file_path, healing_allowed = True):
         pause()
 
     if not file_healed:
+        logger_stop()
         exit()

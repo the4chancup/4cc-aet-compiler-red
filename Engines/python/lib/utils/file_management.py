@@ -21,7 +21,7 @@ def file_heal(file_path):
     """
 
     # Prepare the version string
-    version_last = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
+    app_version = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
 
     # Create a "temp" folder inside "Engines"
     temp_folder_path = os.path.join("Engines", "temp")
@@ -30,10 +30,10 @@ def file_heal(file_path):
         os.makedirs(temp_folder_path)
 
     print("-")
-    print(f"- Downloading and unpacking version {version_last}...")
+    print(f"- Downloading and unpacking version {app_version}...")
 
     # Download the current version
-    pack_name = version_download(APP_DATA.OWNER, APP_DATA.NAME, version_last, "7z", temp_folder_path)
+    pack_name = version_download(APP_DATA.OWNER, APP_DATA.NAME, app_version, "7z", temp_folder_path)
 
     if pack_name is None:
         print("-")
@@ -50,7 +50,7 @@ def file_heal(file_path):
     # Delete the 7z file
     os.remove(pack_path)
 
-    app_name_full = APP_DATA.NAME + " " + version_last
+    app_name_full = APP_DATA.NAME + " " + app_version
     app_full_folder = os.path.join(temp_folder_path, app_name_full)
 
     file_path_new = os.path.join(app_full_folder, file_path)

@@ -2,11 +2,11 @@ from . import APP_DATA
 from . import COLORS
 
 
-def app_title():
+def app_title(colorize=True):
 
-    color_bright_cyan = COLORS.BRIGHT_CYAN
-    color_bright_red = COLORS.BRIGHT_RED
-    color_reset = COLORS.RESET
+    color_bright_cyan = COLORS.BRIGHT_CYAN if colorize else ""
+    color_bright_red = COLORS.BRIGHT_RED if colorize else ""
+    color_reset = COLORS.RESET if colorize else ""
 
     version_string = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
     dev_string = f"-{color_bright_cyan}dev{color_reset}" if APP_DATA.VERSION_DEV else ""

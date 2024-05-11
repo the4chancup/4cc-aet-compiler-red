@@ -6,8 +6,8 @@ cd /D "%~dp0\.."
 
 
 REM - Check if python is installed and was added to the PATH
-if exist "Engines\python_check" (
-    call .\Engines\python_check
+if exist ".\Engines\python_check.bat" (
+    call .\Engines\python_check.bat
 ) else (
     echo -
     echo - FATAL ERROR - Missing vital file
@@ -25,7 +25,7 @@ REM - Grab the number from the first character from the running type
 set running_type_num=%running_type:~0,1%
 
 REM - Invoke the main compiler script
-if exist "Engines\compiler_main.py" (
+if exist ".\Engines\compiler_main.py" (
     call py -3 .\Engines\compiler_main.py %running_type_num%
 ) else (
     echo -

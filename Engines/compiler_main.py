@@ -107,22 +107,23 @@ def main(run_type):
 
         # Check the PES download folder
         if not os.path.exists(pes_download_path):
+
             logging.critical("-")
             logging.critical("- FATAL ERROR - PES download folder not found")
             logging.critical("-")
             logging.critical("- Please set the correct path to the main PES folder")
             logging.critical("- in the settings file and start again")
-            print("-")
 
             # Stop the loggers
             logger_stop()
 
+            print("-")
             if sys.platform == "win32":
-                pause("- Press any key to open the settings file... ")
+                pause("Press any key to open the settings file and exit... ")
                 # Open the settings file in an external text editor
                 os.startfile(settings_name)
             else:
-                pause("- Press any key to exit... ")
+                pause("Press any key to exit... ")
 
             # Exit the script
             sys.exit()

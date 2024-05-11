@@ -111,8 +111,8 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     - None
     """
 
-    # Download the latest version to the parent folder of the program folder
-    app_folder = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    # Download the latest version to the parent folder of the working folder
+    app_folder = os.getcwd()
     app_folder_parent = os.path.dirname(app_folder)
 
     print("-")

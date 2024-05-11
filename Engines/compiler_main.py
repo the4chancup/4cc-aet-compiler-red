@@ -33,6 +33,7 @@ while True:
         from python.lib.utils.admin_tools import admin_check
         from python.lib.utils.admin_tools import admin_request
         from python.lib.utils.pausing import pause
+        from python.lib.utils.dpfl_scan import dpfl_scan
         from python.settings_init import settings_init
         from python.extracted_from_exports import extracted_from_exports
         from python.contents_from_extracted import contents_from_extracted
@@ -89,6 +90,7 @@ def main(run_type):
     settings_init(settings_name)
 
     # Read the necessary parameters
+    cpk_name = os.environ.get('CPK_NAME', 'unknown')
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     run_pes = int(os.environ.get('RUN_PES', '0'))
@@ -116,6 +118,37 @@ def main(run_type):
 
             # Stop the loggers
             logger_stop()
+
+            print("-")
+            if sys.platform == "win32":
+                pause("Press any key to open the settings file and exit... ")
+                # Open the settings file in an external text editor
+                os.startfile(settings_name)
+            else:
+                pause("Press any key to exit... ")
+
+            # Exit the script
+            sys.exit()
+
+        # Check if the cpk name is listed on the dpfl file
+        dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
+        dpfl_list = dpfl_scan(dpfl_path)
+
+        if (cpk_name + ".cpk") not in dpfl_list:
+
+            logging.critical("-")
+            logging.critical("- FATAL ERROR - CPK name not listed on the DpFileList file")
+            logging.critical("-")
+            logging.critical("- Please set a listed CPK name in the settings file and start again")
+
+            # Stop the loggers
+            logger_stop()
+
+            print("-")
+            pause("Press any key to show the list of CPKs on the DpFileList... ")
+            print("-")
+            for cpk in dpfl_list:
+                print("- " + cpk[0:-4])
 
             print("-")
             if sys.platform == "win32":

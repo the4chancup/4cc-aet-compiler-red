@@ -27,6 +27,7 @@ except ImportError as e:
 # Modules which can be self healed
 while True:
     try:
+        from python.lib.utils.app_tools import intro_print
         from python.lib.utils.logging_tools import logger_init
         from python.lib.utils.admin_tools import admin_check
         from python.lib.utils.admin_tools import admin_request
@@ -56,18 +57,6 @@ APP_VERSION_MAJOR = APP_DATA.VERSION_MAJOR
 APP_VERSION_MINOR = APP_DATA.VERSION_MINOR
 APP_VERSION_PATCH = APP_DATA.VERSION_PATCH
 APP_VERSION_DEV = APP_DATA.VERSION_DEV
-
-
-def intro_print():
-    if sys.platform == "win32":
-        os.system("color")
-    version_string = f'{APP_VERSION_MAJOR}.{APP_VERSION_MINOR}.{APP_VERSION_PATCH}'
-    dev_string = "-\033[96mdev\033[0m" if APP_VERSION_DEV else ""
-    print('-')
-    print('-')
-    print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + f' {version_string}' + f'{dev_string}')
-    print('-')
-    print('-')
 
 
 def run_type_request():

@@ -68,8 +68,8 @@ def patches_from_contents():
 
 
         # Make the Faces patch (faces, portraits)
-        print('-')
-        print('- Packing the Faces patch')
+        print("-")
+        print("- Packing the Faces patch")
 
         source_path = os.path.join("patches_contents", f"{faces_foldername}")
         source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
@@ -78,8 +78,8 @@ def patches_from_contents():
         cpktool.main(destination_path, source_contents_path_list, True)
 
         # Make the Uniform patch (kits, logos, boots, gloves, etc.)
-        print('-')
-        print('- Packing the Uniform patch')
+        print("-")
+        print("- Packing the Uniform patch")
 
         source_path = os.path.join("patches_contents", f"{uniform_foldername}")
         source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
@@ -91,8 +91,8 @@ def patches_from_contents():
         if bins_updating:
 
             # Make the Bins patch (unicolor, teamcolor)
-            print('-')
-            print('- Packing the Bins patch')
+            print("-")
+            print("- Packing the Bins patch")
 
             source_path = os.path.join("patches_contents", f"{bins_foldername}")
             source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
@@ -108,8 +108,8 @@ def patches_from_contents():
 
 
         # Make the single cpk patch
-        print('-')
-        print('- Packing the patch')
+        print("-")
+        print("- Packing the patch")
 
         source_path = os.path.join("patches_contents", "Singlecpk")
         source_contents_path_list = [os.path.join(source_path, x) for x in os.listdir(source_path)]
@@ -122,18 +122,18 @@ def patches_from_contents():
     if cache_clear:
         shutil.rmtree("./patches_contents")
 
-    print('-')
-    print('- The patches have been created')
-    print('-')
+    print("-")
+    print("- The patches have been created")
+    print("-")
 
 
     # If Move Cpks mode is enabled
     if move_cpks:
 
-        print('- Move Cpks mode is enabled')
-        print('-')
-        print('- Moving the cpks to the download folder')
-        print('-')
+        print("- Move Cpks mode is enabled")
+        print("-")
+        print("- Moving the cpks to the download folder")
+        print("-")
 
         if multicpk_mode:
 
@@ -167,8 +167,8 @@ def patches_from_contents():
             # Move the cpk to the destination folder
             shutil.move(f"patches_output/{cpk_name}.cpk", pes_download_path)
 
-        print('- Done')
-        print('-')
+        print("- Done")
+        print("-")
 
         # If Run PES mode is enabled, start the pes exe from PES_EXE_PATH
         if run_pes:
@@ -177,32 +177,32 @@ def patches_from_contents():
 
             if os.path.exists(pes_exe_path):
                 print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
-                print('-')
+                print("-")
                 subprocess.Popen([pes_exe_path], cwd=pes_folder_path)
             else:
                 print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
                 print(f"- in the {pes_folder_path} folder")
                 print("- PES won't be started")
-                print('-')
+                print("-")
 
 
     if all_in_one:
         if os.path.exists("issues.log"):
             # Warn about there being some issues and about having to open the log
-            print('-')
-            print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some potential issues in the exports")
+            print("-")
+            print("- \033[33m" + "Warning" + "\033[0m" + ": There were some potential issues in the exports")
             print("- Please check the issues.log file for more details")
         else:
-            print('-')
-            print('- No issues were found in the exports')
+            print("-")
+            print("- No issues were found in the exports")
 
         if os.path.exists("suggestions.log"):
             # Warn about there being some suggestions
-            print('-')
-            print('- \033[36m' + 'Info' + '\033[0m' + ": There are some suggestions available")
+            print("-")
+            print("- \033[36m" + "Info" + "\033[0m" + ": There are some suggestions available")
             print("- Check the suggestions.log file to improve your aesthetics")
 
-        print('-')
-        print('- 4cc aet compiler ' + '\033[91m' + 'Red' + '\033[0m' + ' by Shakes')
-        print('-')
-        print('-')
+        print("-")
+        print("- 4cc aet compiler " + "\033[91m" + "Red" + "\033[0m" + " by Shakes")
+        print("-")
+        print("-")

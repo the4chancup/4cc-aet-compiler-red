@@ -54,9 +54,9 @@ def extracted_from_exports():
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
 
 
-    print("- ")
+    print("-")
     print("- Extracting and checking the exports")
-    print("- ")
+    print("-")
 
     # Define the names of the main folders
     main_source_path = "exports_to_add"
@@ -168,40 +168,40 @@ def extracted_from_exports():
         # Delete the now empty export folder
         shutil.rmtree(export_destination_path)
 
-        print("- ")
+        print("-")
 
     if dds_compression and not fox_mode:
         # zlib compress all the dds files
         print("- Compressing dds files...")
-        print('-')
+        print("-")
         zlib_files_in_folder(main_destination_path, "dds")
 
     print("- Done")
-    print('-')
+    print("-")
 
     if not all_in_one:
         if os.path.exists("issues.log"):
             # Warn about there being some issues and about having to open the log
-            print('-')
-            print('- \033[33m' + 'Warning' + '\033[0m' + ": There were some potential issues in the exports")
+            print("-")
+            print("- \033[33m" + "Warning" + "\033[0m" + ": There were some potential issues in the exports")
             print("- Please check the issues.log file for more details")
         else:
-            print('-')
-            print('- No issues were found')
+            print("-")
+            print("- No issues were found")
 
         if os.path.exists("suggestions.log"):
             # Warn about there being some suggestions
-            print('-')
-            print('- \033[36m' + 'Info' + '\033[0m' + ": There are some suggestions available")
+            print("-")
+            print("- \033[36m" + "Info" + "\033[0m" + ": There are some suggestions available")
             print("- Check the suggestions.log file to improve your aesthetics")
 
-        print('-')
+        print("-")
 
     # Check if the Other folder exists and there are files in it, if there are print a warning
     if os.path.exists("./extracted_exports/Other") and len(os.listdir("./extracted_exports/Other")) > 0:
-        print('-')
-        print('- \033[33m' + 'Warning' + '\033[0m' + ": There are files in the Other folder")
+        print("-")
+        print("- \033[33m" + "Warning" + "\033[0m" + ": There are files in the Other folder")
         print("- Please open it and check its contents")
         if pause_on_error:
-            print('-')
+            print("-")
             pause()

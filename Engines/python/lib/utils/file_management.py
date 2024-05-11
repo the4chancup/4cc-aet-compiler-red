@@ -66,7 +66,10 @@ def file_heal(file_path):
         logging.critical( "-")
         logging.critical( "- FATAL ERROR - File not found in the clean package:")
         logging.critical(f"- \"{file_path_new}\"")
+        logging.critical( "-")
         logging.critical( "- Please report this error to the developer by posting the \"issues.log\" file")
+        print( "-")
+        pause("- Press Enter to exit... ")
 
         success = False
 

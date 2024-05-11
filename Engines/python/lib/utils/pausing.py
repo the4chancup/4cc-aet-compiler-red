@@ -17,6 +17,7 @@ def pause(message="Press any key to continue... "):
 
     if sys.platform == 'win32':
         os.system('pause >nul')
+        print("")
 
     else:
         os.system("read -n1 -r")

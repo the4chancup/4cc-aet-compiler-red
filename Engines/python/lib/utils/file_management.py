@@ -5,13 +5,12 @@ import logging
 
 from . import APP_DATA
 from .pausing import pause
-from .update_check import update_check
 from .update_check import version_download
 
 
 def file_heal(file_path):
     """
-    Check the current version, download the latest version, unpack and copy a file, and delete temporary files.
+    Download the current version, unpack and copy a file, and delete temporary files.
 
     Args:
         file_path (str): The path to the file to copy and delete.
@@ -19,12 +18,6 @@ def file_heal(file_path):
     Returns:
         bool: True if the file was copied successfully, False otherwise.
     """
-
-    # Check if the current version is the latest
-    update_available = update_check(APP_DATA.OWNER, APP_DATA.NAME, APP_DATA.VERSION_MAJOR, APP_DATA.VERSION_MINOR, APP_DATA.VERSION_PATCH, check_force=True)
-
-    if update_available is not False:
-        return False
 
     # Prepare the version string
     version_last = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
@@ -36,9 +29,9 @@ def file_heal(file_path):
         os.makedirs(temp_folder_path)
 
     print("-")
-    print("- Downloading and unpacking...")
+    print(f"- Downloading and unpacking version {version_last}...")
 
-    # Download the latest version
+    # Download the current version
     pack_name = version_download(APP_DATA.OWNER, APP_DATA.NAME, version_last, "7z", temp_folder_path)
 
     if pack_name is None:
@@ -93,8 +86,8 @@ def file_heal(file_path):
 def file_heal_offer(file_path):
 
     print( "-")
-    print( "- If you're on the latest version, you can type \"heal\" to have")
-    print( "- the compiler download a clean package and recover the file automatically")
+    print( "- You can also type \"heal\" to have the compiler download")
+    print( "- a clean package and recover the file automatically")
 
     while True:
         print( "-")

@@ -1,6 +1,7 @@
 import os
 import logging
 
+from . import COLORS
 from .pausing import pause
 
 
@@ -11,25 +12,21 @@ CRASH_LOG_NAME = "crash.log"
 
 class ColorFilter(logging.Filter):
     """
-    This is a filter which colorizes some alert words.
-
-    - "FATAL" gets turned into "\033[31mFATAL\033[0m" (red text)
-    - "ERROR" gets turned into "\033[31mERROR\033[0m" (red text)
-    - "Warning" gets turned into "\033[33mWarning\033[0m" (yellow text)
+    This is a filter which colorizes the alert words "FATAL", "ERROR" and "Warning".
     """
 
     def filter(self, record):
 
         FATAL_STRING = "FATAL"
-        FATAL_STRING_COLORED = "\033[31mFATAL\033[0m"
+        FATAL_STRING_COLORED = COLORS.DARK_RED + "FATAL" + COLORS.RESET
         record.msg = record.msg.replace(FATAL_STRING, FATAL_STRING_COLORED)
 
         ERROR_STRING = "ERROR"
-        ERROR_STRING_COLORED = "\033[31mERROR\033[0m"
+        ERROR_STRING_COLORED = COLORS.DARK_RED + "ERROR" + COLORS.RESET
         record.msg = record.msg.replace(ERROR_STRING, ERROR_STRING_COLORED)
 
         WARNING_STRING = "Warning"
-        WARNING_STRING_COLORED = "\033[33mWarning\033[0m"
+        WARNING_STRING_COLORED = COLORS.DARK_YELLOW + "Warning" + COLORS.RESET
         record.msg = record.msg.replace(WARNING_STRING, WARNING_STRING_COLORED)
 
         return True

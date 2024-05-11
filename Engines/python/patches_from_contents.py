@@ -4,6 +4,7 @@ import logging
 import subprocess
 
 from .lib import pes_cpk_pack as cpktool
+from .lib.utils import COLORS
 
 
 def patches_from_contents():
@@ -177,32 +178,32 @@ def patches_from_contents():
 
             if os.path.exists(pes_exe_path):
                 print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
-                print("-")
+                print( "-")
                 subprocess.Popen([pes_exe_path], cwd=pes_folder_path)
             else:
                 print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
                 print(f"- in the {pes_folder_path} folder")
-                print("- PES won't be started")
-                print("-")
+                print( "- PES won't be started")
+                print( "-")
 
 
     if all_in_one:
         if os.path.exists("issues.log"):
             # Warn about there being some issues and about having to open the log
-            print("-")
-            print("- \033[33m" + "Warning" + "\033[0m" + ": There were some potential issues in the exports")
-            print("- Please check the issues.log file for more details")
+            print( "-")
+            print(f"- {COLORS.DARK_YELLOW}Warning{COLORS.RESET}: There were some potential issues in the exports")
+            print( "- Please check the issues.log file for more details")
         else:
-            print("-")
-            print("- No issues were found in the exports")
+            print( "-")
+            print(f"- {COLORS.DARK_GREEN}No issues were found{COLORS.RESET}")
 
         if os.path.exists("suggestions.log"):
             # Warn about there being some suggestions
-            print("-")
-            print("- \033[36m" + "Info" + "\033[0m" + ": There are some suggestions available")
-            print("- Check the suggestions.log file to improve your aesthetics")
+            print( "-")
+            print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are some suggestions available")
+            print( "- Check the suggestions.log file to improve your aesthetics")
 
-        print("-")
-        print("- 4cc aet compiler " + "\033[91m" + "Red" + "\033[0m" + " by Shakes")
-        print("-")
-        print("-")
+        print( "-")
+        print(f"- 4cc aet compiler {COLORS.BRIGHT_RED}Red{COLORS.RESET} by Shakes")
+        print( "-")
+        print( "-")

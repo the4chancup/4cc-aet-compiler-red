@@ -8,7 +8,7 @@ try:
     from python.dependency_check import dependency_check_on_import as dependency_check_on_import
     from python.lib.utils import APP_DATA
     from python.lib.utils.update_check import update_check
-    from python.lib.utils.file_management import module_heal_offer
+    from python.lib.utils.file_management import module_recover
 except ImportError as e:
     print("- FATAL ERROR - Library file not found:")
     print(e)
@@ -38,16 +38,7 @@ while True:
         from python.contents_from_extracted import contents_from_extracted
         from python.patches_from_contents import patches_from_contents
     except ImportError as e:
-        print("- FATAL ERROR - Library file not found:")
-        print(e)
-        file_healed = module_heal_offer(e)
-        if not file_healed:
-            # Log to file
-            logging.basicConfig(filename="issues.log", level=logging.CRITICAL, filemode='w', format="%(message)s")
-            logging.critical("Library file not found, self healing failed or not attempted.")
-            logging.critical(e)
-
-            exit()
+        module_recover(e)
     else:
         break
 

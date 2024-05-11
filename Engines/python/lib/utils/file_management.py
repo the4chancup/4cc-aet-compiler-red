@@ -109,7 +109,7 @@ def file_heal_offer(file_path):
     return file_healed
 
 
-def module_heal_offer(module_exception):
+def module_recover(module_exception):
 
     # Get the path to the module from the exception string
     # "No module named 'folder.module'"
@@ -118,7 +118,26 @@ def module_heal_offer(module_exception):
 
     file_path = os.path.join("Engines", module_path)
 
+    print( "-")
+    print( "- FATAL ERROR - Missing library file")
+    print(f"- The file \"{file_path}\" is missing")
+    print( "-")
+    print( "- Please grab it from the compiler's original 7z package")
+
     file_healed = file_heal_offer(file_path)
+
+    if not file_healed:
+        # Log to file
+        app_version = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
+        title_string = f"- 4cc aet compiler Red {app_version}"
+
+        logging.basicConfig(filename="issues.log", level=logging.CRITICAL, filemode='w', format="%(message)s")
+        logging.critical(title_string)
+        logging.critical("-")
+        logging.critical("- Library file not found, self healing failed or not attempted.")
+        logging.critical(module_exception)
+
+        exit()
 
     return file_healed
 

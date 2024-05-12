@@ -6,7 +6,14 @@ import fnmatch
 import logging
 
 
-def fmdl_id_change(file_path: str, id: str, teamid: str = "000"):
+def fmdl_id_change(file_path: str, id: str, team_id: str = "000"):
+
+    # Make sure the file exists
+    if not os.path.exists(file_path):
+        return
+
+    file_name = os.path.basename(file_path)
+    file_folder = os.path.dirname(file_path)
 
     b = open(file_path, 'rb')
 
@@ -45,14 +52,13 @@ def fmdl_id_change(file_path: str, id: str, teamid: str = "000"):
 
     # Go through blockmap 1
     strend = 0
-    strlen = 0
     for i in range(sec1):
         dat = b.read(4)
         off = b.read(4)
         blen = b.read(4)
         if(struct.unpack("<I", dat)[0] == 3):
             strend = struct.unpack("<I", off)[0]
-            strlen = struct.unpack("<I", blen)[0]
+            struct.unpack("<I", blen)[0] # Length of string block
 
     # Check if all required blocks were found.
     ##NOTE: Change this when a new block is added
@@ -149,13 +155,13 @@ def fmdl_id_change(file_path: str, id: str, teamid: str = "000"):
 
         # Common path
         elif(len(spath) == 9 and re.fullmatch("[0-9]{3}", spath[6])):
-            if(re.fullmatch("[0-9]{3}", teamid)):
-                spath[6] = teamid # Change the ID
+            if(re.fullmatch("[0-9]{3}", team_id)):
+                spath[6] = team_id # Change the ID
                 npath = "/".join(spath) # Combine the path
                 strs[path-1] = npath # Overwrite old path in string list
                 tpc = tpc + 1
             else:
-                logging.debug("Incorrect Team ID " + teamid + ", please make sure the ID is exactly 3 characters long and follows the 'XXX' format")
+                logging.debug("Incorrect Team ID " + team_id + ", please make sure the ID is exactly 3 characters long and follows the 'XXX' format")
 
         else:
             logging.debug("No ID found in path " + strs[path-1])
@@ -163,7 +169,6 @@ def fmdl_id_change(file_path: str, id: str, teamid: str = "000"):
     # Yell if there were no paths with IDs at all
     if(tpc == 0):
         logging.debug("No paths with IDs found in file " + file_path)
-        print("No paths with IDs found in file " + file_path)
 
     # Re-open file for writing
     b = open(file_path, "r+b")

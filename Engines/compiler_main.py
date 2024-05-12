@@ -158,8 +158,14 @@ def main(run_type):
 
 if __name__ == "__main__":
 
-    if sys.platform == "win32" and "NO_COLOR" not in os.environ:
-        os.system("color")
+    if sys.platform == "win32":
+
+        # Set the console title
+        os.system("title " + app_title(colorize=False))
+
+        # Enable color on Windows
+        if "NO_COLOR" not in os.environ:
+            os.system("color")
 
     print("-")
     print("-")

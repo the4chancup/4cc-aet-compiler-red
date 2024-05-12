@@ -50,6 +50,13 @@ def fmdl_id_change(file_path: str, id: str, team_id: str = "000"):
             strc = struct.unpack("<H", items)[0]
             bcv = bcv + 1
 
+    # Check if all required blocks were found.
+    ##NOTE: Change this when a new block is added
+    if not (bcv == 2):
+        logging.debug("1") # Error code 1 - Didn't find required blocks in file (texture definition, string block)
+        b.close()
+        return
+
     # Go through blockmap 1
     strend = 0
     for i in range(sec1):
@@ -59,13 +66,6 @@ def fmdl_id_change(file_path: str, id: str, team_id: str = "000"):
         if(struct.unpack("<I", dat)[0] == 3):
             strend = struct.unpack("<I", off)[0]
             struct.unpack("<I", blen)[0] # Length of string block
-
-    # Check if all required blocks were found.
-    ##NOTE: Change this when a new block is added
-    if not (bcv == 2):
-        logging.debug("1") # Error code 1 - Didn't find required blocks in file (texture definition, string block)
-        b.close()
-        return
 
     # We have all the required offsets now, start building output
     b.seek(head+stroff)

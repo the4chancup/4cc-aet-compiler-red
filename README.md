@@ -50,7 +50,7 @@ It the compiler throws a message at you and you don't know why, read below.
 
 ## Message types
 
-Here are the types of message the compiler can output, from least to more
+Here are the types of message the compiler can output, from least to most
 important:
 
 - Info

@@ -123,4 +123,4 @@ def logger_stop():
                 previous_contents = log_file.read()
 
             with open(log_name, "w") as log_file:
-                log_file.write(app_title(colorize=False) + "\n" + previous_contents)
+                log_file.write("- " + app_title(colorize=False) + "\n" + previous_contents)

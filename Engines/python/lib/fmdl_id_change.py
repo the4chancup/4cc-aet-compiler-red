@@ -15,174 +15,180 @@ def fmdl_id_change(file_path: str, id: str, team_id: str = "000"):
     file_name = os.path.basename(file_path)
     file_folder = os.path.dirname(file_path)
 
-    b = open(file_path, 'rb')
+    file_binary = open(file_path, 'rb')
 
     logging.debug("Working on file " + file_path)
 
     # Grab actually important values from header
-    b.seek(32)
-    sec0 = struct.unpack("<I", b.read(4))[0] # Number of items in section 0
-    sec1 = struct.unpack("<I", b.read(4))[0] # Number of items in section 1
-    head = struct.unpack("<I", b.read(4))[0] # Header length
-    b.seek(4, 1)
-    sec1off = struct.unpack("<I", b.read(4))[0] # Sector 1 offset
+    file_binary.seek(32)
+    section0_item_count = struct.unpack("<I", file_binary.read(4))[0]
+    section1_item_count = struct.unpack("<I", file_binary.read(4))[0]
+    header_length = struct.unpack("<I", file_binary.read(4))[0]
+
+    file_binary.seek(4, 1)
+    section1_offset = struct.unpack("<I", file_binary.read(4))[0]
 
     # Then start working on the rest of the file
-    b.seek(64, 0)
+    file_binary.seek(64, 0)
 
     # Go through blockmap 0
-    texoff = 0 # Texture offset
-    texc = 0 # Texture count
-    stroff = 0 # Str offset
-    strc = 0 # Str count
-    bcv = 0 # Block Check Value, make sure all blocks were found
+    texture_offset = 0
+    texture_count = 0
+    string_offset = 0
+    string_count = 0
+    block_count = 0
 
-    for i in range(sec0):
-        dat = b.read(2)
-        items = b.read(2)
-        off = b.read(4)
-        if(struct.unpack("<H", dat)[0] == 6): # Texture block
-            texoff = struct.unpack("<I", off)[0]
-            texc = struct.unpack("<H", items)[0]
-            bcv = bcv + 1
-        elif(struct.unpack("<H", dat)[0] == 12): # String block
-            stroff = struct.unpack("<I", off)[0]
-            strc = struct.unpack("<H", items)[0]
-            bcv = bcv + 1
+    for i in range(section0_item_count):
+        # Read block data in order to determine what type of block it is
+        block_type = file_binary.read(2)
+        block_items_count = file_binary.read(2)
+        block_items_offset = file_binary.read(4)
+
+        if(struct.unpack("<H", block_type)[0] == 6): # Texture block
+            texture_offset = struct.unpack("<I", block_items_offset)[0]
+            texture_count = struct.unpack("<H", block_items_count)[0]
+            block_count = block_count + 1
+        elif(struct.unpack("<H", block_type)[0] == 12): # String block
+            string_offset = struct.unpack("<I", block_items_offset)[0]
+            string_count = struct.unpack("<H", block_items_count)[0]
+            block_count = block_count + 1
 
     # Check if all required blocks were found.
     ##NOTE: Change this when a new block is added
-    if not (bcv == 2):
+    if not (block_count == 2):
         logging.debug("1") # Error code 1 - Didn't find required blocks in file (texture definition, string block)
-        b.close()
+        file_binary.close()
         return
 
     # Go through blockmap 1
-    strend = 0
-    for i in range(sec1):
-        dat = b.read(4)
-        off = b.read(4)
-        blen = b.read(4)
-        if(struct.unpack("<I", dat)[0] == 3):
-            strend = struct.unpack("<I", off)[0]
-            struct.unpack("<I", blen)[0] # Length of string block
+    string_end = 0
+    _string_length = 0
+    for i in range(section1_item_count):
+        block_type = file_binary.read(4)
+        block_items_offset = file_binary.read(4)
+        block_end = file_binary.read(4)
+
+        if(struct.unpack("<I", block_type)[0] == 3):
+            string_end = struct.unpack("<I", block_items_offset)[0]
+            _string_length = struct.unpack("<I", block_end)[0] # Not used
 
     # We have all the required offsets now, start building output
-    b.seek(head+stroff)
+    file_binary.seek(header_length + string_offset)
 
     # Store string lengths
-    lens = []
-    for i in range(strc):
-        b.seek(2, 1)
-        lens.append(struct.unpack('<H', b.read(2))[0])
-        b.seek(4, 1)
+    string_length_list = []
+    for i in range(string_count):
+        file_binary.seek(2, 1)
+        string_length_list.append(struct.unpack('<H', file_binary.read(2))[0])
+        file_binary.seek(4, 1)
 
     # Then process MTL
-    strs = [] # Store strings in a list
-    b.seek(sec1off + strend)
-    for i in range(strc):
-        ln = b.read(lens[i]+1).rstrip(b'\0').decode('utf-8')
-        if(ln):
-            strs.append(ln)
+    string_list = []
+    file_binary.seek(section1_offset + string_end)
+    for i in range(string_count):
+        string = file_binary.read(string_length_list[i]+1).rstrip(b'\0').decode('utf-8')
+        if(string):
+            string_list.append(string)
 
     # Scan textures
-    b.seek(head + texoff)
-    paths = [] # Store texture paths
-    for i in range(texc):
-        texp = struct.unpack("<H", b.read(2))[0] # Texture path
-        if texp not in paths:
-            paths.append(texp)
+    file_binary.seek(header_length + texture_offset)
+    texture_path_list = []
+    for i in range(texture_count):
+        texture_path = struct.unpack("<H", file_binary.read(2))[0]
+        if texture_path not in texture_path_list:
+            texture_path_list.append(texture_path)
 
     # Close file for now, we're done reading
-    b.close()
+    file_binary.close()
 
     # Texture Path Count, for error reporting
-    tpc = 0
+    texture_path_count = 0
+
     # Process the paths
-    for path in paths:
-        spath = strs[path-1].split("/") # Split path to individual pieces
+    for texture_path in texture_path_list:
+        texture_path_split = string_list[texture_path-1].split("/") # Split path to individual pieces
 
         # Make sure our magic piece is the player ID and the path is the correct path
         # Faces path
-        if(len(spath) == 10 and re.fullmatch("[0-9]{5}", spath[7])):
+        if(len(texture_path_split) == 10 and re.fullmatch("[0-9]{5}", texture_path_split[7])):
             if(id.isdigit() and len(id) == 5):
-                spath[7] = str(id) # Change the ID
-                npath = "/".join(spath) # Combine the path
-                strs[path-1] = npath # Overwrite old path in string list
-                tpc = tpc + 1
+                texture_path_split[7] = str(id) # Change the ID
+                texture_path_new = "/".join(texture_path_split) # Combine the path
+                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
+                texture_path_count = texture_path_count + 1
             else:
                 logging.debug("Incorrect player ID " + id + ", please make sure the ID is exactly 5 digits long")
 
         # Refs path
-        if(len(spath) == 10 and re.fullmatch("referee[0-9]{3}", spath[7])):
+        if(len(texture_path_split) == 10 and re.fullmatch("referee[0-9]{3}", texture_path_split[7])):
             if(re.fullmatch("referee[0-9]{3}", id)):
-                spath[7] = str(id) # Change the ID
-                npath = "/".join(spath) # Combine the path
-                strs[path-1] = npath # Overwrite old path in string list
-                tpc = tpc + 1
+                texture_path_split[7] = str(id) # Change the ID
+                texture_path_new = "/".join(texture_path_split) # Combine the path
+                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
+                texture_path_count = texture_path_count + 1
             else:
                 logging.debug("Incorrect referee name " + id)
 
         # Boots path
-        elif(len(spath) == 8 and re.fullmatch("k[0-9]{4}", spath[6])):
+        elif(len(texture_path_split) == 8 and re.fullmatch("k[0-9]{4}", texture_path_split[6])):
             if(re.fullmatch("k[0-9]{4}", id)):
-                spath[6] = id # Change the ID
-                npath = "/".join(spath) # Combine the path
-                strs[path-1] = npath # Overwrite old path in string list
-                tpc = tpc + 1
+                texture_path_split[6] = id # Change the ID
+                texture_path_new = "/".join(texture_path_split) # Combine the path
+                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
+                texture_path_count = texture_path_count + 1
             else:
                 logging.debug("Incorrect boots ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'kXXXX' format")
 
         # Gloves path
-        elif(len(spath) == 8 and re.fullmatch("g[0-9]{4}", spath[6])):
+        elif(len(texture_path_split) == 8 and re.fullmatch("g[0-9]{4}", texture_path_split[6])):
             if(re.fullmatch("g[0-9]{4}", id)):
-                spath[6] = id # Change the ID
-                npath = "/".join(spath) # Combine the path
-                strs[path-1] = npath # Overwrite old path in string list
-                tpc = tpc + 1
+                texture_path_split[6] = id # Change the ID
+                texture_path_new = "/".join(texture_path_split) # Combine the path
+                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
+                texture_path_count = texture_path_count + 1
             else:
                 logging.debug("Incorrect gloves ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'gXXXX' format")
 
         # Balls path
-        elif(len(spath) == 7 and re.fullmatch("ball[0-9]{3}", spath[5])):
+        elif(len(texture_path_split) == 7 and re.fullmatch("ball[0-9]{3}", texture_path_split[5])):
             if(re.fullmatch("ball[0-9]{3}", id)):
-                spath[5] = id # Change the ID
-                npath = "/".join(spath) # Combine the path
-                strs[path-1] = npath # Overwrite old path in string list
-                tpc = tpc + 1
+                texture_path_split[5] = id # Change the ID
+                texture_path_new = "/".join(texture_path_split) # Combine the path
+                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
+                texture_path_count = texture_path_count + 1
             else:
                 logging.debug("Incorrect ball ID " + id + ", please make sure the ID is exactly 7 characters long and follows the 'ballXXX' format")
 
         # Common path
-        elif(len(spath) == 9 and re.fullmatch("[0-9]{3}", spath[6])):
+        elif(len(texture_path_split) == 9 and re.fullmatch("[0-9]{3}", texture_path_split[6])):
             if(re.fullmatch("[0-9]{3}", team_id)):
-                spath[6] = team_id # Change the ID
-                npath = "/".join(spath) # Combine the path
-                strs[path-1] = npath # Overwrite old path in string list
-                tpc = tpc + 1
+                texture_path_split[6] = team_id # Change the ID
+                texture_path_new = "/".join(texture_path_split) # Combine the path
+                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
+                texture_path_count = texture_path_count + 1
             else:
                 logging.debug("Incorrect Team ID " + team_id + ", please make sure the ID is exactly 3 characters long and follows the 'XXX' format")
 
         else:
-            logging.debug("No ID found in path " + strs[path-1])
+            logging.debug("No ID found in path " + string_list[texture_path-1])
 
     # Yell if there were no paths with IDs at all
-    if(tpc == 0):
+    if(texture_path_count == 0):
         logging.debug("No paths with IDs found in file " + file_path)
 
     # Re-open file for writing
-    b = open(file_path, "r+b")
+    file_binary = open(file_path, "r+b")
 
     # Seek to string block
-    b.seek(sec1off + strend)
+    file_binary.seek(section1_offset + string_end)
 
     # Re-write FMDL strings
-    for s in strs:
-        b.write(struct.pack("B", 0))
-        b.write(bytes(s, 'utf-8'))
+    for string in string_list:
+        file_binary.write(struct.pack("B", 0))
+        file_binary.write(bytes(string, 'utf-8'))
 
     # Done, close file for good and exit
-    b.close()
+    file_binary.close()
 
     return
 

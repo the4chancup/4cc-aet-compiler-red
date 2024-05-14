@@ -3,7 +3,6 @@ import sys
 import shutil
 import logging
 
-
 from .utils import cpk
 from .utils.pausing import pause
 from .utils.dpfl_scan import dpfl_scan

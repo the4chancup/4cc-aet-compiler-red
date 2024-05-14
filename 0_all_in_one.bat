@@ -9,7 +9,7 @@ REM - Set the running type from the bat file's name
 set running_type=%~n0
 
 REM - Call the runner
-if exist .\Engines\compiler_run.bat (
+if exist ".\Engines\compiler_run.bat" (
     .\Engines\compiler_run.bat %running_type%
 ) else (
     echo -

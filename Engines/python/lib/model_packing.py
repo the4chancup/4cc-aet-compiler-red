@@ -75,6 +75,9 @@ def models_pack(models_type, models_source_folder, models_destination_folder, cp
         if not os.path.exists(object_destination_path):
             os.makedirs(object_destination_path)
 
+        # Make a list of allowed files
+        FILE_TYPE_ALLOWED_LIST = [".bin", ".fmdl", ".skl"]
+
         # For every folder in the source directory
         for object_name in os.listdir(object_source_path):
 
@@ -107,10 +110,10 @@ def models_pack(models_type, models_source_folder, models_destination_folder, cp
                         shutil.move(os.path.join(texture_path, texture_file),
                                     os.path.join(temp_path, "#windx11"))
 
-            # Delete the .fpk.xml file if it exists
-            fpkxml_path = os.path.join(temp_path, f"{models_type}.fpk.xml")
-            if os.path.exists(fpkxml_path):
-                os.remove(fpkxml_path)
+            # Delete any files which aren't on the allowed list
+            for file_name in os.listdir(temp_path):
+                if os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST:
+                    os.remove(os.path.join(temp_path, file_name))
 
             # Rename the folder for packing
             os.rename(os.path.join(temp_path, object_id), os.path.join(temp_path, f"{models_type}_fpk"))

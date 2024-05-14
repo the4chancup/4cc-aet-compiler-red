@@ -3,7 +3,7 @@ import shutil
 
 from .lib.bins_update import bins_update
 from .lib import pes_uniparam_edit as uniparamtool
-from .lib.objects_pack import objects_packer
+from .lib.model_packing import models_pack
 from .lib.cpk_tools import files_fetch_from_cpks
 
 
@@ -132,7 +132,7 @@ def contents_from_extracted():
 
         print("- \n- Packing the face folders")
 
-        objects_packer('face', 'Faces', 'face/real', faces_foldername, uniform_foldername)
+        models_pack('face', 'Faces', 'face/real', faces_foldername, uniform_foldername)
 
 
     # Moving the kit configs if 'Kit Configs' directory exists
@@ -202,7 +202,7 @@ def contents_from_extracted():
             print('-')
             print('- Packing the boots folders')
 
-        objects_packer('boots', 'Boots', 'boots', faces_foldername, uniform_foldername)
+        models_pack('boots', 'Boots', 'boots', faces_foldername, uniform_foldername)
 
     # If there's a Gloves folder, move its stuff
     if os.path.exists(os.path.join('extracted_exports', 'Gloves')):
@@ -214,7 +214,7 @@ def contents_from_extracted():
             print('-')
             print('- Packing the gloves folders')
 
-        objects_packer('glove', 'Gloves', 'glove', faces_foldername, uniform_foldername)
+        models_pack('glove', 'Gloves', 'glove', faces_foldername, uniform_foldername)
 
 
     other_message = False

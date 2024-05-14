@@ -6,12 +6,12 @@ from . import pes_fpk_pack as fpktool
 from .utils.file_management import file_critical_check
 
 
-def objects_packer(object_type, object_source_folder, object_destination_folder, faces_foldername, uniform_foldername):
+def models_pack(models_type, models_source_folder, models_destination_folder, faces_foldername, uniform_foldername):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
 
-    object_source_path = os.path.join("extracted_exports", object_source_folder)
+    object_source_path = os.path.join("extracted_exports", models_source_folder)
     temp_folder_path = os.path.join("temp")
 
     # Check if the temp folder exists and delete it
@@ -22,10 +22,10 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
     if not fox_mode:
 
         # Set the destination path
-        if object_type == "face":
+        if models_type == "face":
             object_destination_path = os.path.join("patches_contents",faces_foldername,"common","character0","model","character","face","real")
         else:
-            object_destination_path = os.path.join("patches_contents",uniform_foldername,"common","character0","model","character",object_destination_folder)
+            object_destination_path = os.path.join("patches_contents",uniform_foldername,"common","character0","model","character",models_destination_folder)
 
         # Create a destination folder if needed
         if not os.path.exists(object_destination_path):
@@ -43,7 +43,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             # Rename it with the proper id
             os.rename(object_path, object_path_new)
 
-            if object_type == "face":
+            if models_type == "face":
 
                 # Make a properly structured temp folder
                 temp_path = os.path.join(temp_folder_path, object_id, "common", "character0", "model", "character", "face", "real")
@@ -69,7 +69,7 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
     else:
 
         # Set the destination path
-        object_destination_path = os.path.join("patches_contents", faces_foldername, "Asset", "model", "character", object_destination_folder)
+        object_destination_path = os.path.join("patches_contents", faces_foldername, "Asset", "model", "character", models_destination_folder)
 
         # Create a destination folder if needed
         if not os.path.exists(object_destination_path):
@@ -108,16 +108,16 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
                                     os.path.join(temp_path, "#windx11"))
 
             # Delete the .fpk.xml file if it exists
-            fpkxml_path = os.path.join(temp_path, f"{object_type}.fpk.xml")
+            fpkxml_path = os.path.join(temp_path, f"{models_type}.fpk.xml")
             if os.path.exists(fpkxml_path):
                 os.remove(fpkxml_path)
 
             # Rename the folder for packing
-            os.rename(os.path.join(temp_path, object_id), os.path.join(temp_path, f"{object_type}_fpk"))
+            os.rename(os.path.join(temp_path, object_id), os.path.join(temp_path, f"{models_type}_fpk"))
 
             # Pack the fpk
-            fpk_destination = os.path.join(temp_path, f"{object_type}.fpk")
-            fpk_source_path = os.path.join(temp_path, f"{object_type}_fpk")
+            fpk_destination = os.path.join(temp_path, f"{models_type}.fpk")
+            fpk_source_path = os.path.join(temp_path, f"{models_type}_fpk")
 
             # Prepare an array with the files to pack
             file_path_list = []
@@ -139,10 +139,10 @@ def objects_packer(object_type, object_source_folder, object_destination_folder,
             generic_fpkd_path = os.path.join("Engines", "templates", "generic.fpkd")
             file_critical_check(generic_fpkd_path)
             shutil.copy(generic_fpkd_path, final_folder_path)
-            os.rename(os.path.join(final_folder_path, "generic.fpkd"), os.path.join(final_folder_path, f"{object_type}.fpkd"))
+            os.rename(os.path.join(final_folder_path, "generic.fpkd"), os.path.join(final_folder_path, f"{models_type}.fpkd"))
 
             # Move the textures
-            if object_type == "face":
+            if models_type == "face":
                 source_images_path = os.path.join(object_destination_path, object_id, "sourceimages")
                 os.makedirs(source_images_path, exist_ok=True)
                 shutil.move(os.path.join(temp_path, "#windx11"), source_images_path)

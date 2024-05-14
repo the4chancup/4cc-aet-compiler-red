@@ -112,11 +112,12 @@ def pes_download_path_check(settings_name, pes_download_path):
     if os.path.exists(pes_download_path):
         return
 
-    logging.critical("-")
-    logging.critical("- FATAL ERROR - PES download folder not found")
-    logging.critical("-")
-    logging.critical("- Please set the correct path to the main PES folder")
-    logging.critical("- in the settings file and start again")
+    logging.critical( "-")
+    logging.critical( "- FATAL ERROR - PES download folder not found")
+    logging.critical(f"- Path set: {pes_download_path}")
+    logging.critical( "-")
+    logging.critical( "- Please set the correct path to the main PES folder")
+    logging.critical( "- in the settings file and start again")
 
     # Stop the loggers
     logger_stop()
@@ -133,19 +134,21 @@ def pes_download_path_check(settings_name, pes_download_path):
     exit()
 
 
-def cpk_name_check(settings_name, cpk_listed, pes_download_path):
+def cpk_name_check(settings_name, cpk_name, pes_download_path):
     '''Check if the cpk name is listed on the dpfl file'''
 
     dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
     dpfl_list = dpfl_scan(dpfl_path)
 
-    if (cpk_listed + ".cpk") in dpfl_list:
+    if (cpk_name + ".cpk") in dpfl_list:
         return
 
-    logging.critical("-")
-    logging.critical("- FATAL ERROR - CPK name not listed on the DpFileList file")
-    logging.critical("-")
-    logging.critical("- Please set a listed CPK name in the settings file and start again")
+    logging.critical( "-")
+    logging.critical( "- FATAL ERROR - CPK name not listed on the DpFileList file")
+    logging.critical(f"- CPK name: {cpk_name}")
+    logging.critical( "-")
+    logging.critical( "- Please set a listed CPK name in the settings file and start again")
+    logging.critical( "- Or, if you really want to use this CPK name, disable Move Cpks instead")
 
     # Stop the loggers
     logger_stop()

@@ -1,5 +1,5 @@
 # 4cc AET Compiler Red
-A "4chan Cup Aesthetic Export" compiler for the Pro Evolution Soccer series.
+A "4chan Cup Aesthetic Export" compiler for the Pro Evolution Soccer series.  
 New python-based version, three times faster.
 
 - Setting up
@@ -79,10 +79,9 @@ important:
 
 - Fatal Error
 
-  A file from the compiler's folder is missing (for example the teams list), so
-  the compiler can't run. This does not count as a crash, it is still something
-  the user can fix, either by grabbing a new compiler folder or by letting it
-  fix itself (the compiler will offer to "self-heal" when possible).
+  Something is missing (for example the teams list) or badly configured, so the
+  compiler can't run. This does not count as a crash, it is still something
+  the user (You) can fix. Just carefully follow the instructions on screen.
 
   [-Shown on screen-] [Written to issues.log]
 

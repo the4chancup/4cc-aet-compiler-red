@@ -77,13 +77,14 @@ def faces_check(exportfolder_path, team_name, team_id):
 
     ##TODO: After combining with the other model checks, make it specific to fox or pre-fox
     FILE_TYPE_ALLOWED_LIST = [
-        "bin",
-        "xml",
-        "fmdl",
-        "model",
-        "mtl",
-        "dds",
-        "ftex",
+        ".bin",
+        ".xml",
+        ".fmdl",
+        ".model",
+        ".mtl",
+        ".dds",
+        ".ftex",
+        ".skl",
     ]
 
     folder_error_any = None
@@ -137,7 +138,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         # Check if any file is unrecognized
         for file_name in os.listdir(subfolder_path):
             if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
-                not any(file_name.endswith(file_type) for file_type in FILE_TYPE_ALLOWED_LIST)):
+                os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST):
 
                 folder_error_file_unrecognized_list.append(file_name)
 
@@ -149,7 +150,7 @@ def faces_check(exportfolder_path, team_name, team_id):
             logging.warning(f"- Face folder:    {subfolder_name}")
             for file_name in folder_error_file_unrecognized_list:
                 logging.warning(f"- File name:      {file_name}")
-            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex files are allowed")
+            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex, skl files are allowed")
             logging.warning( "-")
             logging.warning( "- <After the next major update this will be an error which discards the folder>")
 
@@ -532,13 +533,14 @@ def boots_check(exportfolder_path, team_name, team_id):
     ]
 
     FILE_TYPE_ALLOWED_LIST = [
-        "bin",
-        "xml",
-        "fmdl",
-        "model",
-        "mtl",
-        "dds",
-        "ftex",
+        ".bin",
+        ".xml",
+        ".fmdl",
+        ".model",
+        ".mtl",
+        ".dds",
+        ".ftex",
+        ".skl",
     ]
 
     folder_error_any = None
@@ -588,7 +590,7 @@ def boots_check(exportfolder_path, team_name, team_id):
         # Check if any file is unrecognized
         for file_name in os.listdir(subfolder_path):
             if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
-                not any(file_name.endswith(file_type) for file_type in FILE_TYPE_ALLOWED_LIST)):
+                os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST):
 
                 folder_error_file_unrecognized_list.append(file_name)
 
@@ -600,7 +602,7 @@ def boots_check(exportfolder_path, team_name, team_id):
             logging.warning(f"- Face folder:    {subfolder_name}")
             for file_name in folder_error_file_unrecognized_list:
                 logging.warning(f"- File name:      {file_name}")
-            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex files are allowed")
+            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex, skl files are allowed")
             logging.warning( "-")
             logging.warning( "- <After the next major update this will be an error which discards the folder>")
 
@@ -668,13 +670,14 @@ def gloves_check(exportfolder_path, team_name, team_id):
     ]
 
     FILE_TYPE_ALLOWED_LIST = [
-        "bin",
-        "xml",
-        "fmdl",
-        "model",
-        "mtl",
-        "dds",
-        "ftex",
+        ".bin",
+        ".xml",
+        ".fmdl",
+        ".model",
+        ".mtl",
+        ".dds",
+        ".ftex",
+        ".skl",
     ]
 
     folder_error_any = None
@@ -730,7 +733,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
         # Check if any file is unrecognized
         for file_name in os.listdir(subfolder_path):
             if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
-                not any(file_name.endswith(file_type) for file_type in FILE_TYPE_ALLOWED_LIST)):
+                os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST):
 
                 folder_error_file_unrecognized_list.append(file_name)
 
@@ -742,7 +745,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
             logging.warning(f"- Face folder:    {subfolder_name}")
             for file_name in folder_error_file_unrecognized_list:
                 logging.warning(f"- File name:      {file_name}")
-            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex files are allowed")
+            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex, skl files are allowed")
             logging.warning( "-")
             logging.warning( "- <After the next major update this will be an error which discards the folder>")
 

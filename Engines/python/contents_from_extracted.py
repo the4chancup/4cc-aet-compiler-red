@@ -132,7 +132,7 @@ def contents_from_extracted():
 
         print("- \n- Packing the face folders")
 
-        models_pack('face', 'Faces', 'face/real', faces_foldername, uniform_foldername)
+        models_pack('face', 'Faces', 'face/real', faces_foldername)
 
 
     # Moving the kit configs if 'Kit Configs' directory exists
@@ -202,7 +202,7 @@ def contents_from_extracted():
             print('-')
             print('- Packing the boots folders')
 
-        models_pack('boots', 'Boots', 'boots', faces_foldername, uniform_foldername)
+        models_pack('boots', 'Boots', 'boots', faces_foldername)
 
     # If there's a Gloves folder, move its stuff
     if os.path.exists(os.path.join('extracted_exports', 'Gloves')):
@@ -214,7 +214,7 @@ def contents_from_extracted():
             print('-')
             print('- Packing the gloves folders')
 
-        models_pack('glove', 'Gloves', 'glove', faces_foldername, uniform_foldername)
+        models_pack('glove', 'Gloves', 'glove', faces_foldername)
 
 
     other_message = False

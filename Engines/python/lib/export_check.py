@@ -75,6 +75,17 @@ def faces_check(exportfolder_path, team_name, team_id):
         shutil.rmtree(itemfolder_path)
         return
 
+    ##TODO: After combining with the other model checks, make it specific to fox or pre-fox
+    FILE_TYPE_ALLOWED_LIST = [
+        "bin",
+        "xml",
+        "fmdl",
+        "model",
+        "mtl",
+        "dds",
+        "ftex",
+    ]
+
     folder_error_any = None
 
     # Prepare a list of subfolders
@@ -91,6 +102,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error_xml_format = False
         folder_error_tex_format = False
         folder_error_mtl_format = False
+        folder_error_file_unrecognized_list = []
 
         # Check that the player number is within the 01-23 range
         folder_error_num = not (subfolder_name[3:5].isdigit() and '01' <= subfolder_name[3:5] <= '23')
@@ -121,6 +133,25 @@ def faces_check(exportfolder_path, team_name, team_id):
 
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
+
+        # Check if any file is unrecognized
+        for file_name in os.listdir(subfolder_path):
+            if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
+                not any(file_name.endswith(file_type) for file_type in FILE_TYPE_ALLOWED_LIST)):
+
+                folder_error_file_unrecognized_list.append(file_name)
+
+        ##TODO Make this an error, plus setting to turn it into a suggestion
+        if folder_error_file_unrecognized_list:
+            logging.warning( "-")
+            logging.warning( "- Warning - Unrecognized files")
+            logging.warning(f"- Team name:      {team_name}")
+            logging.warning(f"- Face folder:    {subfolder_name}")
+            for file_name in folder_error_file_unrecognized_list:
+                logging.warning(f"- File name:      {file_name}")
+            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex files are allowed")
+            logging.warning( "-")
+            logging.warning( "- <After the next major update this will be an error which discards the folder>")
 
         # Set the main flag if any of the checks failed
         folder_error = (
@@ -500,6 +531,16 @@ def boots_check(exportfolder_path, team_name, team_id):
         "boots_edit.model",
     ]
 
+    FILE_TYPE_ALLOWED_LIST = [
+        "bin",
+        "xml",
+        "fmdl",
+        "model",
+        "mtl",
+        "dds",
+        "ftex",
+    ]
+
     folder_error_any = None
 
     # Prepare a list of subfolders
@@ -515,6 +556,7 @@ def boots_check(exportfolder_path, team_name, team_id):
         folder_error_model_disallowed_list = []
         folder_error_tex_format = False
         folder_error_mtl_format = False
+        folder_error_file_unrecognized_list = []
 
         # Check that its name starts with a k and that the 4 characters after it are digits
         folder_error_name = not (subfolder_name.startswith('k') and subfolder_name[1:5].isdigit())
@@ -542,6 +584,25 @@ def boots_check(exportfolder_path, team_name, team_id):
 
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
+
+        # Check if any file is unrecognized
+        for file_name in os.listdir(subfolder_path):
+            if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
+                not any(file_name.endswith(file_type) for file_type in FILE_TYPE_ALLOWED_LIST)):
+
+                folder_error_file_unrecognized_list.append(file_name)
+
+        ##TODO Make this an error, plus setting to turn it into a suggestion
+        if folder_error_file_unrecognized_list:
+            logging.warning( "-")
+            logging.warning( "- Warning - Unrecognized files")
+            logging.warning(f"- Team name:      {team_name}")
+            logging.warning(f"- Face folder:    {subfolder_name}")
+            for file_name in folder_error_file_unrecognized_list:
+                logging.warning(f"- File name:      {file_name}")
+            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex files are allowed")
+            logging.warning( "-")
+            logging.warning( "- <After the next major update this will be an error which discards the folder>")
 
         # Set the main flag if any of the checks failed
         folder_error = (
@@ -606,6 +667,16 @@ def gloves_check(exportfolder_path, team_name, team_id):
         "glove_edit.model",
     ]
 
+    FILE_TYPE_ALLOWED_LIST = [
+        "bin",
+        "xml",
+        "fmdl",
+        "model",
+        "mtl",
+        "dds",
+        "ftex",
+    ]
+
     folder_error_any = None
 
     # Prepare a list of subfolders
@@ -622,6 +693,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
         folder_error_model_disallowed_list = []
         folder_error_tex_format = False
         folder_error_mtl_format = False
+        folder_error_file_unrecognized_list = []
 
         # Check that its name starts with a g and that the 4 characters after it are digits
         folder_error_name = not (subfolder_name.startswith('g') and subfolder_name[1:5].isdigit())
@@ -654,6 +726,25 @@ def gloves_check(exportfolder_path, team_name, team_id):
 
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
+
+        # Check if any file is unrecognized
+        for file_name in os.listdir(subfolder_path):
+            if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
+                not any(file_name.endswith(file_type) for file_type in FILE_TYPE_ALLOWED_LIST)):
+
+                folder_error_file_unrecognized_list.append(file_name)
+
+        ##TODO Make this an error, plus setting to turn it into a suggestion
+        if folder_error_file_unrecognized_list:
+            logging.warning( "-")
+            logging.warning( "- Warning - Unrecognized files")
+            logging.warning(f"- Team name:      {team_name}")
+            logging.warning(f"- Face folder:    {subfolder_name}")
+            for file_name in folder_error_file_unrecognized_list:
+                logging.warning(f"- File name:      {file_name}")
+            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex files are allowed")
+            logging.warning( "-")
+            logging.warning( "- <After the next major update this will be an error which discards the folder>")
 
         # Set the main flag if any of the checks failed
         folder_error = (

@@ -263,25 +263,26 @@ def kitconfigs_check(exportfolder_path, team_name):
             print("-")
             pause()
 
-    else:
-        # Prepare a clean version of the team name without slashes
-        team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
+        return
 
-        # Path to the txt file with the team"s name
-        note_path = os.path.join(exportfolder_path, f"{team_name_clean} Note.txt")
+    # Prepare a clean version of the team name without slashes
+    team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
 
-        # Check if the txt file exists
-        if os.path.exists(note_path):
+    # Path to the txt file with the team"s name
+    note_path = os.path.join(exportfolder_path, f"{team_name_clean} Note.txt")
 
-            # Check that the number of kit configs and kit color entries in the Note txt are the same
-            config_count_note = txt_kits_count(note_path)
-            if config_count_note != config_count:
+    # Check if the txt file exists
+    if os.path.exists(note_path):
 
-                logging.warning( "-")
-                logging.warning( "- Warning - Missing kit configs or txt kit color entries")
-                logging.warning(f"- Team name:      {team_name}")
-                logging.warning(f"- The number of kit config files ({config_count}) is not equal to")
-                logging.warning(f"- the number of kit color entries ({config_count_note}) in the Note txt file")
+        # Check that the number of kit configs and kit color entries in the Note txt are the same
+        config_count_note = txt_kits_count(note_path)
+        if config_count_note != config_count:
+
+            logging.warning( "-")
+            logging.warning( "- Warning - Missing kit configs or txt kit color entries")
+            logging.warning(f"- Team name:      {team_name}")
+            logging.warning(f"- The number of kit config files ({config_count}) is not equal to")
+            logging.warning(f"- the number of kit color entries ({config_count_note}) in the Note txt file")
 
 
 # If a Kit Textures folder exists and is not empty, check that the kit textures' filenames and type are correct
@@ -325,37 +326,37 @@ def kittextures_check(exportfolder_path, team_name):
             print("-")
             pause()
 
-    else:
+        return
 
-        file_error_any = False
+    file_error_any = False
 
-        # For every texture
-        for file_name in os.listdir(itemfolder_path):
+    # For every texture
+    for file_name in os.listdir(itemfolder_path):
 
-            # Check that its name starts with u and that its name has p or g in the correct position
-            if not (file_name[0] == 'u' and (file_name[5] == 'p' or file_name[5] == 'g')):
+        # Check that its name starts with u and that its name has p or g in the correct position
+        if not (file_name[0] == 'u' and (file_name[5] == 'p' or file_name[5] == 'g')):
 
-                # Warn about the team having bad texture names
-                if not file_error_any:
-                    logging.error( "-")
-                    logging.error( "- ERROR - Bad kit texture names")
-                    logging.error(f"- Team name:      {team_name}")
-                    file_error_any = True
+            # Warn about the team having bad texture names
+            if not file_error_any:
+                logging.error( "-")
+                logging.error( "- ERROR - Bad kit texture names")
+                logging.error(f"- Team name:      {team_name}")
+                file_error_any = True
 
-                logging.error(f"- Texture name:   {file_name}")
+            logging.error(f"- Texture name:   {file_name}")
 
-                # And skip it
-                file_path = os.path.join(itemfolder_path, file_name)
-                os.remove(file_path)
+            # And skip it
+            file_path = os.path.join(itemfolder_path, file_name)
+            os.remove(file_path)
 
-        # If the team has bad files close the previously opened message
-        if file_error_any:
+    # If the team has bad files close the previously opened message
+    if file_error_any:
 
-            logging.error( "- The kit textures mentioned above will be discarded since they're unusable")
+        logging.error( "- The kit textures mentioned above will be discarded since they're unusable")
 
-            if pause_on_error:
-                print("-")
-                pause()
+        if pause_on_error:
+            print("-")
+            pause()
 
 
 # If a Logo folder exists and is not empty, check that the three logo images' filenames are correct

@@ -1,13 +1,13 @@
 import re
 
 
-def path_id_change(path, team_id = "000"):
+def path_id_change(path, team_id):
     """
     Change the team ID in the given path string.
 
     Parameters:
         path (str): The path string.
-        team_id (str, optional): The team ID to replace in the file. Defaults to "000".
+        team_id (str): The team ID to replace in the file.
 
     This function looks for model/character/uniform/common/XXX/, u0XXXp and u0XXXg inside the path string,
     where XXX is any sequence of three characters, and replaces XXX with the team ID provided as parameter.

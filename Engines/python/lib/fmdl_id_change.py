@@ -5,11 +5,18 @@ import struct
 import fnmatch
 import logging
 
+from .utils.id_change import path_id_change
 
-def fmdl_id_change(file_path: str, id: str, team_id: str = "000"):
+
+def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
 
     # Make sure the file exists
     if not os.path.exists(file_path):
+        return
+
+    # Check the team ID if provided
+    if team_id and not re.match(r'[0-9]{3}', team_id):
+        logging.debug(f"Incorrect Team ID {team_id}, please make sure the ID is exactly 3 digits long")
         return
 
     file_name = os.path.basename(file_path)
@@ -92,89 +99,74 @@ def fmdl_id_change(file_path: str, id: str, team_id: str = "000"):
 
     # Scan textures
     file_binary.seek(header_length + texture_offset)
+    texture_index_list = []
     texture_path_list = []
     for i in range(texture_count):
-        texture_path = struct.unpack("<H", file_binary.read(2))[0]
-        if texture_path not in texture_path_list:
-            texture_path_list.append(texture_path)
+        texture_index = struct.unpack("<H", file_binary.read(2))[0]
+        if texture_index not in texture_index_list:
+            texture_index_list.append(texture_index)
+            texture_path_list.append(string_list[texture_index])
 
     # Close file for now, we're done reading
     file_binary.close()
 
-    # Texture Path Count, for error reporting
-    texture_path_count = 0
+    # Prepare a list of dictionaries of path info
+    path_info_list = [
+        {"type": "face",    "id_pattern": "[0-9]{5}",        "section_count": 10, "id_section": 7},
+        {"type": "referee", "id_pattern": "referee[0-9]{3}", "section_count": 10, "id_section": 7},
+        {"type": "boots",   "id_pattern": "k[0-9]{4}",       "section_count": 8,  "id_section": 6},
+        {"type": "glove",   "id_pattern": "g[0-9]{4}",       "section_count": 8,  "id_section": 6},
+        {"type": "ball",    "id_pattern": "ball[0-9]{3}",    "section_count": 7,  "id_section": 5},
+    ]
+
+    # Check the type of ID that was provided
+    for path_info in path_info_list:
+        if(re.fullmatch(path_info["id_pattern"], model_id)):
+            model_path_info = path_info
+            break
+    else:
+        print(f"- Unrecognized ID \"{model_id}\"")
+        return
+
+    texture_path_found = False
 
     # Process the paths
-    for texture_path in texture_path_list:
-        texture_path_split = string_list[texture_path-1].split("/") # Split path to individual pieces
+    for texture_index in texture_index_list:
+        # Split path to individual pieces
+        texture_path_split = string_list[texture_index].split("/")
+        texture_path_section_count = len(texture_path_split)
 
-        # Make sure our magic piece is the player ID and the path is the correct path
-        # Faces path
-        if(len(texture_path_split) == 10 and re.fullmatch("[0-9]{5}", texture_path_split[7])):
-            if(id.isdigit() and len(id) == 5):
-                texture_path_split[7] = str(id) # Change the ID
-                texture_path_new = "/".join(texture_path_split) # Combine the path
-                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
-                texture_path_count = texture_path_count + 1
-            else:
-                logging.debug("Incorrect player ID " + id + ", please make sure the ID is exactly 5 digits long")
+        # Model ID
+        if(texture_path_section_count == model_path_info["section_count"] and
+            re.fullmatch(model_path_info["id_pattern"], texture_path_split[model_path_info["id_section"]])):
 
-        # Refs path
-        if(len(texture_path_split) == 10 and re.fullmatch("referee[0-9]{3}", texture_path_split[7])):
-            if(re.fullmatch("referee[0-9]{3}", id)):
-                texture_path_split[7] = str(id) # Change the ID
-                texture_path_new = "/".join(texture_path_split) # Combine the path
-                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
-                texture_path_count = texture_path_count + 1
-            else:
-                logging.debug("Incorrect referee name " + id)
+            # Change the ID
+            texture_path_split[model_path_info["id_section"]] = model_id
+            # Overwrite old path in the string list
+            string_list[texture_index] = "/".join(texture_path_split)
 
-        # Boots path
-        elif(len(texture_path_split) == 8 and re.fullmatch("k[0-9]{4}", texture_path_split[6])):
-            if(re.fullmatch("k[0-9]{4}", id)):
-                texture_path_split[6] = id # Change the ID
-                texture_path_new = "/".join(texture_path_split) # Combine the path
-                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
-                texture_path_count = texture_path_count + 1
-            else:
-                logging.debug("Incorrect boots ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'kXXXX' format")
+            texture_path_found = True
 
-        # Gloves path
-        elif(len(texture_path_split) == 8 and re.fullmatch("g[0-9]{4}", texture_path_split[6])):
-            if(re.fullmatch("g[0-9]{4}", id)):
-                texture_path_split[6] = id # Change the ID
-                texture_path_new = "/".join(texture_path_split) # Combine the path
-                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
-                texture_path_count = texture_path_count + 1
-            else:
-                logging.debug("Incorrect gloves ID " + id + ", please make sure the ID is exactly 5 characters long and follows the 'gXXXX' format")
+    if team_id:
 
-        # Balls path
-        elif(len(texture_path_split) == 7 and re.fullmatch("ball[0-9]{3}", texture_path_split[5])):
-            if(re.fullmatch("ball[0-9]{3}", id)):
-                texture_path_split[5] = id # Change the ID
-                texture_path_new = "/".join(texture_path_split) # Combine the path
-                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
-                texture_path_count = texture_path_count + 1
-            else:
-                logging.debug("Incorrect ball ID " + id + ", please make sure the ID is exactly 7 characters long and follows the 'ballXXX' format")
+        # Replace the team ID on common paths and kit-dependent texture names
+        for i, string in enumerate(string_list):
+            string_new = path_id_change(string, team_id)
+            if string_new != string:
+                string_list[i] = string_new
 
-        # Common path
-        elif(len(texture_path_split) == 9 and re.fullmatch("[0-9]{3}", texture_path_split[6])):
-            if(re.fullmatch("[0-9]{3}", team_id)):
-                texture_path_split[6] = team_id # Change the ID
-                texture_path_new = "/".join(texture_path_split) # Combine the path
-                string_list[texture_path-1] = texture_path_new # Overwrite old path in string list
-                texture_path_count = texture_path_count + 1
-            else:
-                logging.debug("Incorrect Team ID " + team_id + ", please make sure the ID is exactly 3 characters long and follows the 'XXX' format")
+                texture_path_found = True
 
-        else:
-            logging.debug("No ID found in path " + string_list[texture_path-1])
-
-    # Yell if there were no paths with IDs at all
-    if(texture_path_count == 0):
-        logging.debug("No paths with IDs found in file " + file_path)
+    if not texture_path_found:
+        logging.warning("- Warning: No texture paths with IDs found")
+        logging.warning(f"- Folder:         {file_folder}")
+        logging.warning(f"- File:           {file_name}")
+        logging.warning(f"- Model ID:       {model_id}")
+        if team_id:
+            logging.warning(f"- Team ID:        {team_id}")
+        for texture_path in texture_path_list:
+            logging.warning(f"- Texture path:   {texture_path}")
+        logging.warning("- This model might work fine, double-check its texture paths if it doesn't")
 
     # Re-open file for writing
     file_binary = open(file_path, "r+b")
@@ -191,6 +183,7 @@ def fmdl_id_change(file_path: str, id: str, team_id: str = "000"):
     file_binary.close()
 
     return
+
 
 def main():
     if not((len(sys.argv) >= 3) and (len(sys.argv) <= 4)):

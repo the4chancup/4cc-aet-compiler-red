@@ -25,7 +25,7 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 	except Exception as e:
 		print("Error reading UniformParameter file: %s" % e)
 		return
-	
+
 	changes = {}
 	for filename in addedFiles:
 		effectiveFilename = filename
@@ -33,36 +33,36 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 			effectiveFilename = effectiveFilename[effectiveFilename.rfind('/') + 1:]
 		if '\\' in effectiveFilename:
 			effectiveFilename = effectiveFilename[effectiveFilename.rfind('\\') + 1:]
-		
+
 		if effectiveFilename in changes:
 			print("Cannot make conflicting edits for file '%s'" % filename)
 			return
-		
+
 		inputFile = open(filename, 'rb')
 		content = inputFile.read()
 		inputFile.close()
 		changes[effectiveFilename] = content
-	
+
 	for filename in deletedFiles:
 		effectiveFilename = filename
 		if '/' in effectiveFilename:
 			effectiveFilename = effectiveFilename[effectiveFilename.rfind('/') + 1:]
 		if '\\' in effectiveFilename:
 			effectiveFilename = effectiveFilename[effectiveFilename.rfind('\\') + 1:]
-		
+
 		if effectiveFilename in changes:
 			print("Cannot make conflicting edits for file '%s'" % filename)
 			return
-		
+
 		changes[effectiveFilename] = None
-	
+
 	for filename in changes:
 		if changes[filename] is None:
 			if filename in activeUniparamFile.entries:
 				del activeUniparamFile.entries[filename]
 		else:
 			activeUniparamFile.entries[filename] = changes[filename]
-	
+
 	if outputFile is None:
 		effectiveOutputFile = uniparamFile
 	else:
@@ -70,7 +70,7 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 		if not allowOverwrite and os.path.exists(effectiveOutputFile):
 			print("Output file '%s' already exists, not overwriting" % effectiveOutputFile)
 			return
-	
+
 	activeUniparamFile.writeFile(effectiveOutputFile)
 
 def usage():

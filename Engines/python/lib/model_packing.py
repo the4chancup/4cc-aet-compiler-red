@@ -111,13 +111,13 @@ def models_pack(models_type, models_source_folder, models_destination_folder, cp
                     shutil.move(os.path.join(model_temp_path, texture_file), textures_temp_path)
 
             # Delete any folders and any files which aren't on the allowed list
-            for name in os.listdir(model_temp_path):
-                path = os.path.join(temp_path, name)
-                if os.path.isfile(path):
-                    if os.path.splitext(name)[1] not in FILE_TYPE_ALLOWED_LIST:
-                        os.remove(path)
-                elif os.path.isdir(path):
-                    shutil.rmtree(path)
+            for item_name in os.listdir(model_temp_path):
+                item_path = os.path.join(temp_path, item_name)
+                if os.path.isfile(item_path):
+                    if os.path.splitext(item_name)[1] not in FILE_TYPE_ALLOWED_LIST:
+                        os.remove(item_path)
+                elif os.path.isdir(item_path):
+                    shutil.rmtree(item_path)
 
             # Rename the folder for packing
             fpk_source_path = os.path.join(temp_path, f"{models_type}_fpk")

@@ -1,10 +1,13 @@
 import os
 import shutil
+import logging
 
 from .lib.bins_update import bins_update
 from .lib import pes_uniparam_edit as uniparamtool
 from .lib.model_packing import models_pack
 from .lib.cpk_tools import files_fetch_from_cpks
+from .lib.utils.pausing import pause
+from .lib.utils.logging_tools import logger_stop
 
 
 def contents_from_extracted():
@@ -115,7 +118,21 @@ def contents_from_extracted():
                     kit_config_path_list.append(kit_config_path)
 
             # Compile the UniformParameter file
-            uniparamtool.main(uniparam_bin_path, kit_config_path_list, [], uniparam_bin_path, True)
+            uniparam_error = uniparamtool.main(uniparam_bin_path, kit_config_path_list, [], uniparam_bin_path, True)
+
+            if uniparam_error:
+                logging.critical("-")
+                logging.critical("- FATAL ERROR - Error compiling the UniformParameter file")
+                logging.critical("- The compiler will stop here because the cpk generated would crash PES")
+                logging.critical("- Disable Bins Updating on the settings file and try again")
+                logging.critical("-")
+                logging.critical("- Please report this issue to the developer")
+                logger_stop()
+
+                print("-")
+                pause("Press any key to exit... ")
+
+                exit()
 
             # Copy the uniparam to the the Bins cpk folder with the proper filename
             shutil.copy(uniparam_bin_path, f"{uniform_team_path}/UniformParameter.bin")

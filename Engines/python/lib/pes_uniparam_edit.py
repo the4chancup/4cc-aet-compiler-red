@@ -24,7 +24,7 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 		activeUniparamFile.readFile(uniparamFile)
 	except Exception as e:
 		print("Error reading UniformParameter file: %s" % e)
-		return
+		return True
 
 	changes = {}
 	for filename in addedFiles:
@@ -36,7 +36,7 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 
 		if effectiveFilename in changes:
 			print("Cannot make conflicting edits for file '%s'" % filename)
-			return
+			return True
 
 		inputFile = open(filename, 'rb')
 		content = inputFile.read()
@@ -52,7 +52,7 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 
 		if effectiveFilename in changes:
 			print("Cannot make conflicting edits for file '%s'" % filename)
-			return
+			return True
 
 		changes[effectiveFilename] = None
 
@@ -69,9 +69,11 @@ def main(uniparamFile, addedFiles, deletedFiles, outputFile, allowOverwrite):
 		effectiveOutputFile = outputFile
 		if not allowOverwrite and os.path.exists(effectiveOutputFile):
 			print("Output file '%s' already exists, not overwriting" % effectiveOutputFile)
-			return
+			return True
 
 	activeUniparamFile.writeFile(effectiveOutputFile)
+
+	return False
 
 def usage():
 	print("pes-uniparam-edit -- Edit the contents of a PES UniformParameters file")

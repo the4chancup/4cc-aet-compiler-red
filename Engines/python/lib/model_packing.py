@@ -110,10 +110,14 @@ def models_pack(models_type, models_source_folder, models_destination_folder, cp
                 if texture_file.endswith('.ftex'):
                     shutil.move(os.path.join(model_temp_path, texture_file), textures_temp_path)
 
-            # Delete any files which aren't on the allowed list
-            for file_name in os.listdir(temp_path):
-                if os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST:
-                    os.remove(os.path.join(temp_path, file_name))
+            # Delete any folders and any files which aren't on the allowed list
+            for name in os.listdir(model_temp_path):
+                path = os.path.join(temp_path, name)
+                if os.path.isfile(path):
+                    if os.path.splitext(name)[1] not in FILE_TYPE_ALLOWED_LIST:
+                        os.remove(path)
+                elif os.path.isdir(path):
+                    shutil.rmtree(path)
 
             # Rename the folder for packing
             fpk_source_path = os.path.join(temp_path, f"{models_type}_fpk")

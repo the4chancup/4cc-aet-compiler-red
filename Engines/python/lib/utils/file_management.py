@@ -5,7 +5,7 @@ import logging
 
 from . import APP_DATA
 from .pausing import pause
-from .updating import version_download
+from .version_downloading import version_download
 from .logging_tools import logger_stop
 
 

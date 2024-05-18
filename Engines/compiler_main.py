@@ -30,12 +30,12 @@ while True:
         from python.lib.utils.app_tools import app_title
         from python.lib.utils.logging_tools import logger_init
         from python.lib.utils.logging_tools import logger_stop
+        from python.lib.utils.settings_init import settings_init
         from python.lib.utils.admin_tools import admin_check
         from python.lib.utils.admin_tools import admin_request
         from python.lib.utils.pausing import pause
         from python.lib.cpk_tools import pes_download_path_check
         from python.lib.cpk_tools import cpk_name_check
-        from python.settings_init import settings_init
         from python.extracted_from_exports import extracted_from_exports
         from python.contents_from_extracted import contents_from_extracted
         from python.patches_from_contents import patches_from_contents

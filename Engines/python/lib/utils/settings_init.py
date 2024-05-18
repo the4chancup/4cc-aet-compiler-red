@@ -4,8 +4,8 @@ import shutil
 import logging
 import configparser
 
-from .lib.utils.file_management import file_critical_check
-from .lib.utils.pausing import pause
+from .file_management import file_critical_check
+from .pausing import pause
 
 
 def settings_missing_check(default_file_path):

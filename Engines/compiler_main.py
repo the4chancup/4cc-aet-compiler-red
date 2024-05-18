@@ -30,7 +30,7 @@ while True:
         from python.lib.utils.app_tools import app_title
         from python.lib.utils.logging_tools import logger_init
         from python.lib.utils.logging_tools import logger_stop
-        from python.lib.utils.settings_init import settings_init
+        from python.lib.utils.settings_management import settings_init
         from python.lib.utils.admin_tools import admin_check
         from python.lib.utils.admin_tools import admin_request
         from python.lib.utils.pausing import pause

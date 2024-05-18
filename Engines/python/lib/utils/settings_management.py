@@ -3,9 +3,60 @@ import sys
 import shutil
 import logging
 import configparser
+import commentedconfigparser
 
 from .file_management import file_critical_check
 from .pausing import pause
+
+
+def settings_transfer(file_old_path, file_new_path):
+
+    config_old = commentedconfigparser.CommentedConfigParser()
+    config_old.read(file_old_path)
+    config_new = commentedconfigparser.CommentedConfigParser()
+    config_new.read(file_new_path)
+
+    # Prepare lists to store any new or missing settings
+    settings_added = []
+    settings_removed = []
+
+    # Iterate over all the settings in the new config
+    for section_new in config_new.sections():
+        for key_new, value_new in config_new.items(section_new):
+
+            # Check if the setting exists in the old config
+            for section_old in config_old.sections():
+                if key_new in config_old[section_old]:
+                    break
+            else:
+                settings_added.append(key_new)
+
+    # Iterate over all the settings in the old config
+    for section_old in config_old.sections():
+        for key_old, value_old in config_old.items(section_old):
+
+            # Check if the setting exists in the new config
+            for section_new in config_new.sections():
+                if key_old in config_new[section_new]:
+                    config_new[section_new][key_old] = value_old
+                    break
+            else:
+                settings_removed.append(key_old)
+
+    # Write the new config to the file
+    with open(file_new_path, 'w') as configfile:
+        config_new.write(configfile)
+
+    # Add a blank line after lines 1 and 4 to the new config file
+    with open(file_new_path, 'r') as f:
+        lines = f.readlines()
+        lines.insert(1, '\n')
+        lines.insert(4, '\n')
+    with open(file_new_path, 'w') as f:
+        f.writelines(lines)
+
+    # Return the lists of added and removed settings
+    return settings_added, settings_removed
 
 
 def settings_missing_check(default_file_path):

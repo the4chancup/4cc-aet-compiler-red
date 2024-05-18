@@ -10,6 +10,7 @@ from datetime import timedelta
 
 from .pausing import pause
 from .version_downloading import version_download
+from .settings_management import settings_transfer
 
 
 def website_exist(url):
@@ -106,11 +107,17 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     app_name_new = app_name + " " + version_latest
     app_new_folder = os.path.join(app_folder_parent, app_name_new)
 
+    settings_new_path = os.path.join(app_new_folder, "settings.ini")
+
     if not update_major:
         # Copy the settings ini to the new folder after deleting the one in the old folder
-        if os.path.exists(os.path.join(app_new_folder, "settings.ini")):
-            os.remove(os.path.join(app_new_folder, "settings.ini"))
+        if os.path.exists(settings_new_path):
+            os.remove(settings_new_path)
         shutil.copy("settings.ini", app_new_folder)
+
+    else:
+        # Transfer the settings from the old ini to the new one
+        settings_added, settings_removed = settings_transfer("settings.ini", settings_new_path)
 
     # Check if the teams_list.txt file is different from the new one
     if not update_major:
@@ -145,27 +152,30 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     print("-")
     print("- Successfully downloaded and unpacked the latest version")
     print("- The exports in the \"exports_to_add\" folder have been moved over")
+    print("-")
     if not update_major:
         print("- The settings file has also been copied to the new folder")
     else:
-        print("- The settings file has been overhauled, so you will need to edit it manually")
+        print("- The settings file has been overhauled, but the settings")
+        print("- from the current settings file have been copied to it")
+        if settings_removed:
+            print("-")
+            print("- The following settings have been removed:")
+            for setting in settings_removed:
+                print(f"- \"{setting}\"")
+        if settings_added:
+            print("-")
+            print("- The following settings have been added:")
+            for setting in settings_added:
+                print(f"- \"{setting}\"")
     print("-")
     print("- The old folder has been preserved, so you can delete it later")
+
     print("-")
-    if not update_major:
-        pause("Press any key to open the new folder... ")
+    pause("Press any key to open the new folder... ")
 
-        # Open the unpacked folder in the default file explorer
-        os.startfile(app_new_folder)
-    else:
-        pause("Press any key to open the new folder, and the old and new settings files... ")
-
-        # Open the old settings file and the new settings file
-        os.startfile( "settings.ini")
-        os.startfile(os.path.join(app_new_folder, "settings.ini"))
-
-        # Open the unpacked folder in the default file explorer
-        os.startfile(app_new_folder)
+    # Open the unpacked folder in the default file explorer
+    os.startfile(app_new_folder)
 
 
 def updates_disable():

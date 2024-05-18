@@ -7,7 +7,7 @@ import logging
 try:
     from python.dependency_check import dependency_check_on_import as dependency_check_on_import
     from python.lib.utils import APP_DATA
-    from python.lib.utils.update_check import update_check
+    from python.lib.utils.updating import update_check
     from python.lib.utils.file_management import module_recover
 except ImportError as e:
     print("- FATAL ERROR - Library file not found:")

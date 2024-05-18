@@ -1,13 +1,14 @@
 *.pyc
-*.txt
 *.log
 *.old
+teamnotes.txt
 extracted_exports
 patches_contents
 patches_output
 sideload
 exports_to_add
-!changelog.txt
-!teams_list.txt
 !exports_to_add/delete_me.txt
+Engines/admin_warned.txt
+Engines/update_check_last.txt
+Engines/update_skip_last.txt
 Engines/bins/temp

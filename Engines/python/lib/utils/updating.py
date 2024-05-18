@@ -116,8 +116,15 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         shutil.copy("settings.ini", app_new_folder)
 
     else:
+        # Check if the new version has a transfer table
+        transfer_table_path = os.path.join(app_new_folder, "Engines", "templates", "settings_transfer_table.txt")
+        if not os.path.exists(transfer_table_path):
+            transfer_table_path = None
+
         # Transfer the settings from the old ini to the new one
-        settings_added, settings_removed = settings_transfer("settings.ini", settings_new_path)
+        settings_added, settings_removed, settings_renamed = (
+            settings_transfer("settings.ini", settings_new_path, transfer_table_path)
+        )
 
     # Check if the teams_list.txt file is different from the new one
     if not update_major:
@@ -157,7 +164,12 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         print("- The settings file has also been copied to the new folder")
     else:
         print("- The settings file has been overhauled, but the settings")
-        print("- from the current settings file have been copied to it")
+        print("- from the current settings file have been transferred to it")
+        if settings_renamed:
+            print("-")
+            print("- The following settings have been renamed, and their values transferred:")
+            for setting in settings_renamed:
+                print(f"- \"{setting[0]}\" -> \"{setting[1]}\"")
         if settings_removed:
             print("-")
             print("- The following settings have been removed:")

@@ -9,7 +9,7 @@ from .file_management import file_critical_check
 from .pausing import pause
 
 
-def settings_transfer(file_old_path, file_new_path):
+def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
 
     config_old = commentedconfigparser.CommentedConfigParser()
     config_old.read(file_old_path)
@@ -19,6 +19,38 @@ def settings_transfer(file_old_path, file_new_path):
     # Prepare lists to store any new or missing settings
     settings_added = []
     settings_removed = []
+    settings_renamed = []
+
+    if transfer_table_path is not None:
+
+        # Prepare a dictionary of settings that need to be renamed
+        settings_transfer_dict = {}
+
+        with open(transfer_table_path, 'r') as f:
+            transfer_table = f.readlines()
+        transfer_table = [line.strip() for line in transfer_table]
+
+        # Parse the transfer table
+        # The format is "setting_old -> setting_new"
+        for line in transfer_table:
+            setting_old, setting_new = line.split(" -> ")
+            settings_transfer_dict[setting_old] = setting_new
+
+        # Rename all the settings in the old config
+        for section in config_old.sections():
+            for key, value in config_old.items(section):
+                if key in settings_transfer_dict:
+                    key_new = settings_transfer_dict[key]
+
+                    # Check if the new name exists in the new config
+                    for section_new in config_new.sections():
+                        if key_new in config_new[section_new]:
+                            settings_renamed.append((key, key_new))
+                            # Delete the old setting
+                            config_old.remove_option(section, key)
+                            # Recreate the setting with the new name
+                            config_old.set(section, key_new, value)
+                            break
 
     # Iterate over all the settings in the new config
     for section_new in config_new.sections():
@@ -48,6 +80,7 @@ def settings_transfer(file_old_path, file_new_path):
         config_new.write(configfile)
 
     # Add a blank line after lines 1 and 4 to the new config file
+    # to preserve the original formatting
     with open(file_new_path, 'r') as f:
         lines = f.readlines()
         lines.insert(1, '\n')
@@ -55,8 +88,7 @@ def settings_transfer(file_old_path, file_new_path):
     with open(file_new_path, 'w') as f:
         f.writelines(lines)
 
-    # Return the lists of added and removed settings
-    return settings_added, settings_removed
+    return settings_added, settings_removed, settings_renamed
 
 
 def settings_missing_check(default_file_path):

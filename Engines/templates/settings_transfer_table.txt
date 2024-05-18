@@ -1,0 +1,1 @@
+pause_when_wrong -> pause_on_error

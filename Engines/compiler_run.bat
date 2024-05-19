@@ -45,7 +45,7 @@ if ERRORLEVEL 1 (
 
     echo -
     echo -
-    echo - CRASH - The compiler has run into an unexpected error
+    echo - CRASH - The compiler has run into an unexpected error and stopped
     echo - A log file crash.log has been saved to the compiler's folder
     echo - Please post it on the /aesco/ server or the cup thread
     echo -

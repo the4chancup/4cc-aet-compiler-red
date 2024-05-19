@@ -137,6 +137,20 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path):
     '''Check if the cpk name is listed on the dpfl file'''
 
     dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
+
+    if not os.path.exists(dpfl_path):
+        logging.critical( "-")
+        logging.critical( "- FATAL ERROR - DpFileList file not found in the PES download folder")
+        logging.critical(f"- Path: {dpfl_path}")
+        logging.critical( "-")
+        logging.critical( "- Please make sure there is a DpFileList file in the PES download folder")
+        logging.critical( "- and start again")
+
+        print("-")
+        pause("Press any key to exit... ")
+
+        exit()
+
     dpfl_list = dpfl_scan(dpfl_path)
 
     if (cpk_name + ".cpk") in dpfl_list:

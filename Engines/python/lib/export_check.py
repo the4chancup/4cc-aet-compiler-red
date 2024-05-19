@@ -444,10 +444,12 @@ def portraits_check(exportfolder_path, team_name):
     for file_name in os.listdir(itemfolder_path):
 
         file_error = False
+        file_error_prefix = True
         file_error_id = True
 
         # Check that the player number starts with "player_" and is within the 01-23 range
-        file_error_id = not (file_name[:7] == "player_" and file_name[-6:-4].isdigit() and '01' <= file_name[-6:-4] <= '23')
+        file_error_prefix = not (file_name[:7] == "player_")
+        file_error_id = not (file_name[-6:-4].isdigit() and '01' <= file_name[-6:-4] <= '23')
 
         # Check that the texture is proper
         file_path = os.path.join(itemfolder_path, file_name)
@@ -455,6 +457,7 @@ def portraits_check(exportfolder_path, team_name):
 
         # Set the main flag if any of the checks failed
         file_error = (
+            file_error_prefix or
             file_error_id or
             file_error_tex_format
         )
@@ -470,6 +473,8 @@ def portraits_check(exportfolder_path, team_name):
             # Give an error depending on the particular problem
             logging.error(f"- Portrait name:  {file_name} ")
 
+            if file_error_prefix:
+                logging.error( "- (incorrect prefix, should be \"player_\")")
             if file_error_id:
                 logging.error(f"- (player number {file_name[-6:-4]} out of the 01-23 range)")
             if file_error_tex_format:

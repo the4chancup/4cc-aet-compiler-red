@@ -98,8 +98,20 @@ def export_move(exportfolder_path, team_id, team_name):
     # For each item folder
     for team_itemfolder_name in os.listdir(exportfolder_path):
 
+        itemfolder_name_known_list = [
+            "faces",
+            "kit configs",
+            "kit textures",
+            "logo",
+            "portraits",
+            "boots",
+            "gloves",
+            "collars",
+            "common",
+            "other"
+        ]
         # If the folder is a known type
-        if team_itemfolder_name.lower() in ["faces", "kit configs", "kit textures", "logo", "portraits", "boots", "gloves", "common", "other"]:
+        if team_itemfolder_name.lower() in itemfolder_name_known_list:
 
             team_itemfolder_path = os.path.join(exportfolder_path, team_itemfolder_name)
             main_itemfolder_path = os.path.join(mainfolder_path, team_itemfolder_name)
@@ -388,7 +400,8 @@ def export_move(exportfolder_path, team_id, team_name):
         if team_itemfolder_name.lower() == "collars":
 
             # For each file
-            for file_name in os.listdir(os.path.join(team_itemfolder_path, file_name)):
+            for file_name in os.listdir(team_itemfolder_path):
+                file_path = os.path.join(team_itemfolder_path, file_name)
 
                 # Delete the destination file if already present
                 file_destination_path = os.path.join(main_itemfolder_path, file_name)
@@ -396,7 +409,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     os.remove(file_destination_path)
 
                 # Move the file to the main folder
-                os.replace(os.path.join(team_itemfolder_path, file_name), main_itemfolder_path)
+                os.replace(file_path, main_itemfolder_path)
 
         # Common folder
         if team_itemfolder_name.lower() == "common":

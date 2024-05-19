@@ -226,6 +226,11 @@ def export_move(exportfolder_path, team_id, team_name):
                 file_path_new = os.path.join(team_itemfolder_path, file_name_new)
                 os.rename(file_path, file_path_new)
 
+                # Delete the destination file if already present
+                file_destination_path = os.path.join(main_itemfolder_team_path, file_name_new)
+                if os.path.exists(file_destination_path):
+                    os.remove(file_destination_path)
+
                 # Move the file to the team folder inside the main folder
                 shutil.move(file_path_new, main_itemfolder_team_path)
 

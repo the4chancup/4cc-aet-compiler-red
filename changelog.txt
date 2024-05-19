@@ -1,3 +1,79 @@
+19/05/24 - Version 3.2.0
+- Important
+  - Updated the teams list file with the teams from VGL22
+  - The readme file has been split into a simple one in the main folder and an
+    advanced one in the Engines folder, please read the simple one at least once
+  - Team IDs are now also replaced on the texture filenames which have u0XXXp0
+    (or u0XXXg0) on them, both in model folders and in the common folder
+  - The same is done on the texture paths inside fmdl files
+  - Kit textures without a mask file (srm) will get a dummy one added when
+    compiling for pre-fox PES versions
+    (This prevents the kits from turning black on some computers)
+  - Face folders without a face_diff.bin file will get a dummy one added, which
+    has the EEEE hidden, when compiling for Fox PES versions
+    (This allows you to use empty face folders on players with an FBM)
+    (Reminder: fpk.xml files are not needed anymore on face/boots/glove folders)
+- Fixes
+  - Fixed crash when updating bins without a proper "PES Folder Path" set
+  - Fixed unzipping of zip and 7z exports again
+  - Fixed cleaning of read-only permissions on exports for linux
+  - Fixed crash when using bin files from a compressed bins cpk
+  - Fixed crash when moving models from the Collars folder of the export
+  - Fixed crashes caused by irregular team note txt files, to a certain extent
+  - Fixed non-DX10 textures getting converted to DXT5 instead of DX10 textures
+    when compiling for PES18
+  - Fixed crash when handling ftex textures saved with the CGPE tool
+  - Fixed crash when moving kit configs on exports which have duplicate kit
+    configs with different team IDs (for some reason)
+- New checks
+  - Checks for any unusable .model files in the boots and glove folders,
+    preventing misnamed models
+  - Checks if model folders (face/boots/glove folders) contain any unrecognized
+    files and warns about them
+    (In the future there will be a new setting, enabled by default, which will
+    turn this into an error and discard the entire model folder)
+  - Checks if any compiler files are missing, and offers to "self-heal" them
+    if possible
+  - Checks for portrait files without powers of two as sides
+  - Checks for non-2048 main kit textures on pre-fox PES versions
+  - Checks if any exports have duplicate kit configs with different team IDs
+  - Checks if the "Cpk Name" written on the settings file is present on the
+    DpFileList file in the PES download folder
+- Other new stuff
+  - A new message type has been added: Info
+    These are just suggestions, they let you know about stuff which will always
+    work but isn't ideal, and which you can look into to improve your aesthetics
+    They will be written to the new suggestions.log file
+  - The missing mipmaps message is now an Info instead of a Warning
+  - A new message type has been added: Fatal Error
+    These happen when something is missing in the compiler's folder (for example
+    the teams list) or is badly configured, so the compiler can't run
+  - The error.log file is now called crash.log, and your user name will be
+    removed from it every time it is generated, so that you can post it without
+    doxing yourself
+  - Stops asking for a button press to exit if "Run PES" is enabled
+    (Unless there were any issues in the exports)
+  - Stops the loggers before asking for a button press to exit
+    (This prevents crashes if you run the compiler again without closing it)
+  - Allows the terminal to close on error on linux systems
+  - The message for indicating an old version of python is installed has been
+    improved, with more details on what to do to fix the problem
+  - Searches for bin files only on the cpks listed on the dpfl before the
+    one you are about to compile, allowing to rebuild past midcup cpks properly
+  - Converts any DX10 textures (e.g. BC7 textures) to DXT5 when compiling for
+    pre-fox PES versions, like done already for PES18
+  - Removes unrecognized files and folders from model folders when packing fpks
+    for Fox PES versions
+  - Allows pressing any key to skip error messages or exit, instead of just
+    the Enter key
+  - Boots and gloves are packed to the faces cpk instead of the uniform cpk
+    when compiling for pre-fox PES versions, like done already for Fox versions
+  - The auto-updater has been improved with a new settings transfer function,
+    used when updating to a new major version, which compares the old and new
+    settings files and transfers as many settings as possible, warning about
+    any new settings you need to pay attention to
+
+
 24/04/24 - Version 3.1.0
 - Update checking is now much faster
 - New auto updating system, which downloads the new version and copies your

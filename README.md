@@ -18,7 +18,7 @@ Make sure to enable the "Add to PATH" setting during the installation.
 Now open the settings txt file and set the following:
 - PES Version:  
   Set the PES version you're compiling exports for.
-- Download Folder Path:  
+- PES Folder Path:  
   Check if it's good.
 
 You don't normally have to edit any of the other settings, but feel free to

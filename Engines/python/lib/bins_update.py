@@ -267,8 +267,8 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                         kitcols_search = True
                         teamcols_search = False
 
-                    # If we've reached the Player section or the Other section
-                    if data[0].lower() == "player" or data[0].lower() == "other":
+                    # If we've reached the Player, Other, or Notes section
+                    if any(line.lower().startswith(word) for word in ["player", "other", "notes"]):
 
                         # Stop looking for data in this file
                         stop = True

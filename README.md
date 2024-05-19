@@ -71,7 +71,7 @@ important:
 - Error
 
   Something in an export is broken in such a way that it can't be used, so it
-  will be discarded. Fix it and compile the export again.
+  will be discarded. Fix it and compile the export again.  
   In some cases you might get errors for stuff which sometimes does work as it
   is, but they're still a risk to keep. Fix them anyway.
 
@@ -79,9 +79,10 @@ important:
 
 - Fatal Error
 
-  Something is missing (for example the teams list) or badly configured, so the
-  compiler can't run. This does not count as a crash, it is still something
-  the user (You) can fix. Just carefully follow the instructions on screen.
+  Something is missing in the compiler's folder (for example the teams list) or
+  is badly configured, so the compiler can't run.  
+  This does not count as a crash, it is still something the user (You) can fix.  
+  Just carefully follow the instructions on screen.
 
   [-Shown on screen-] [Written to issues.log]
 

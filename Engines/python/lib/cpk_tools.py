@@ -77,7 +77,7 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
                     if file_data:
                         if fetch:
 
-                            print(f"- {os.path.basename(file_info['source_path'])} found in the cpk {os.path.basename(cpk_path)}")
+                            print(f"- {os.path.basename(file_info['source_path'])} found in {os.path.basename(cpk_path)}")
 
                             # Save the file to the corresponding destination path after unzlibbing it if needed
                             with open(file_info['destination_path'], "wb") as file:

@@ -230,6 +230,7 @@ def kitconfigs_check(exportfolder_path, team_name):
             shutil.rmtree(subitem_path)
 
     config_count = len(os.listdir(itemfolder_path))
+    config_list = []
 
     # For every file
     for file_name in os.listdir(itemfolder_path):
@@ -238,9 +239,21 @@ def kitconfigs_check(exportfolder_path, team_name):
         # Check the DEF part of the name
         if not file_name[3:8].lower() == "_def_":#DEF?
             file_error = True
+            break
         # Check the realUni part
         if not file_name[-12:].lower() == "_realuni.bin":#realUni?
             file_error = True
+            break
+
+        # Prepare the name without the team ID
+        config_name_base = file_name[3:].lower()
+
+        # Check if the name is in the list
+        if config_name_base in config_list:
+            file_error = True
+            break
+
+        config_list.append(file_name[3:].lower())
 
         # Unzlib it if needed
         file_path = os.path.join(itemfolder_path, file_name)

@@ -440,6 +440,12 @@ def portraits_check(exportfolder_path, team_name):
         file_path = os.path.join(itemfolder_path, file_name)
         file_error_tex_format = texture_check(file_path)
 
+        # Set the main flag if any of the checks failed
+        file_error = (
+            file_error_id or
+            file_error_tex_format
+        )
+
         # If the file is bad
         if file_error:
             if not file_error_any:

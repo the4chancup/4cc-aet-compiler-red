@@ -170,8 +170,8 @@ def texture_check(tex_path):
 
             if fox_mode and not fox_19:
 
-                # Check if it is a BC7 file (DX10 label starting from index 84)
-                if not (get_bytes_ascii(tex_check_path, 84, 4) == 'DX10'):
+                # Check if it is a DX10 file (DX10 label starting from index 84)
+                if get_bytes_ascii(tex_check_path, 84, 4) == 'DX10':
                     # Convert it to DXT5
                     dds_dxt5_conv(tex_check_path)
 

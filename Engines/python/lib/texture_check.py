@@ -198,10 +198,10 @@ def texture_check(tex_path):
 
             # If fox mode is disabled, reject the texture
             logging.error( "-")
-            logging.error(f"- ERROR - Texture is a {tex_type} file")
+            logging.error( "- ERROR - Texture is an ftex file")
             logging.error(f"- Folder:         {tex_folder}")
             logging.error(f"- Texture name:   {tex_name}")
-            logging.error(f"- {tex_type} textures are not supported on the chosen PES version")
+            logging.error( "- ftex textures are not supported on the chosen PES version")
             error = True
 
         if not error:

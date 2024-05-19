@@ -45,7 +45,7 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
                     # Check if the new name exists in the new config
                     for section_new in config_new.sections():
                         if key_new in config_new[section_new]:
-                            settings_renamed.append((key, key_new))
+                            settings_renamed.append((section, section_new))
                             # Delete the old setting
                             config_old.remove_option(section, key)
                             # Recreate the setting with the new name
@@ -61,7 +61,7 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
                 if key_new in config_old[section_old]:
                     break
             else:
-                settings_added.append(key_new)
+                settings_added.append(section_new)
 
     # Iterate over all the settings in the old config
     for section_old in config_old.sections():
@@ -73,7 +73,7 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
                     config_new[section_new][key_old] = value_old
                     break
             else:
-                settings_removed.append(key_old)
+                settings_removed.append(section_old)
 
     # Write the new config to the file
     with open(file_new_path, 'w') as configfile:

@@ -169,17 +169,17 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
             print("-")
             print("- The following settings have been renamed, and their values transferred:")
             for setting in settings_renamed:
-                print(f"- \"{setting[0]}\" -> \"{setting[1]}\"")
+                print(f"- [{setting[0]}] -> [{setting[1]}]")
         if settings_removed:
             print("-")
             print("- The following settings have been removed:")
             for setting in settings_removed:
-                print(f"- \"{setting}\"")
+                print(f"- [{setting}]")
         if settings_added:
             print("-")
             print("- The following settings have been added:")
             for setting in settings_added:
-                print(f"- \"{setting}\"")
+                print(f"- [{setting}]")
     print("-")
     print("- The old folder has been preserved, so you can delete it later")
 

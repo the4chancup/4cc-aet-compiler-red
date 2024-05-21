@@ -105,11 +105,11 @@ def extracted_from_exports():
             raise ValueError
 
         # Get the team name from the first word of the export name
-        team_name_raw = export_name_words[0]
-        team_name = f"/{team_name_raw.lower()}/"
+        team_name_folder_raw = export_name_words[0]
+        team_name_folder = f"/{team_name_folder_raw.lower()}/"
 
         # Print team without a new line
-        print(f"- {team_name} ", end='', flush=True)
+        print(f"- {team_name_folder} ", end='', flush=True)
 
 
         # Delete the export destination folder if present
@@ -135,8 +135,8 @@ def extracted_from_exports():
         # Remove the read-only flag from every item inside the export folder
         readonlybit_remove_tree(export_destination_path)
 
-        # Get the team ID
-        team_id = team_id_get(export_destination_path, team_name, team_id_min, team_id_max)
+        # Get the team ID and real name
+        team_id, team_name = team_id_get(export_destination_path, team_name_folder, team_id_min, team_id_max)
 
         # If the teamID was not found, proceed to the next export
         if not team_id:

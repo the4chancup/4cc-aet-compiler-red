@@ -7,7 +7,7 @@ from .utils.pausing import pause
 
 
 # Function for finding the team ID after receiving the foldername as parameter
-def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
+def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_max):
 
     TEAMS_LIST_FILE = "teams_list.txt"
 
@@ -16,9 +16,6 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
 
     # Read the necessary parameters
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
-
-    # Prepare a clean version of the team name without slashes
-    team_name_folder_clean = team_name_folder.replace("/", "").replace("\\", "").upper()
 
     root_found = None
     not_root = None
@@ -78,8 +75,7 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
             print("-")
             pause()
 
-        return None
-
+        return None, None
 
     # If the folders are not at the root
     if not_root:
@@ -95,16 +91,15 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
     note_name = None
     for file in os.listdir(exportfolder_path):
         if file.endswith(".txt") and "note" in file.lower():
-            note_name = f"{team_name_folder_clean} Note.txt"
-            os.rename(f"{exportfolder_path}/{file}", f"{exportfolder_path}/{note_name}")
+            note_name = file
             break
 
     team_id = None
+    team_name = None
 
     # If there's a Note file try to get the team name from it
     if note_name:
 
-        team_name = None
         with open(f"{exportfolder_path}/{note_name}", 'r', encoding="utf8") as file:
             for line in file:
                 if "Team:" in line:
@@ -113,7 +108,12 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
 
         if team_name:
 
-            # If the name on the note file is different than the one on the export foldername print it
+            # Rename the Note file with a clean version of the team name without slashes
+            team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
+            note_name_new = f"{team_name_clean} Note.txt"
+            os.rename(f"{exportfolder_path}/{note_name}", f"{exportfolder_path}/{note_name_new}")
+
+            # If the name on the Note file is different than the one on the export foldername print it
             if team_name.lower() != team_name_folder.lower():
                 print(f"- Actual name: {team_name} ", end='')
 
@@ -132,6 +132,7 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
             for line in team_file.readlines()[1:]:
                 if team_name_folder.lower() == line.split()[1].lower():
                     team_id = line.split()[0]
+                    team_name = team_name_folder
                     break
 
     # If no usable team name was found even then
@@ -151,7 +152,7 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
         # Skip the whole export
         shutil.rmtree(exportfolder_path)
 
-        return None
+        return None, None
 
     print(f"(ID: {team_id})")
 
@@ -168,6 +169,6 @@ def team_id_get(exportfolder_path, team_name_folder, team_id_min, team_id_max):
         # Skip the whole export
         shutil.rmtree(exportfolder_path)
 
-        return None
+        return None, None
 
-    return team_id
+    return team_id, team_name

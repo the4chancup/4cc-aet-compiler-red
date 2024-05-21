@@ -106,23 +106,23 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
                     team_name = line.split(":", 1)[1].strip()
                     break
 
-        if team_name:
+    if team_name:
 
-            # Rename the Note file with a clean version of the team name without slashes
-            team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
-            note_name_new = f"{team_name_clean} Note.txt"
-            os.rename(f"{exportfolder_path}/{note_name}", f"{exportfolder_path}/{note_name_new}")
+        # Rename the Note file with a clean version of the team name without slashes
+        team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
+        note_name_new = f"{team_name_clean} Note.txt"
+        os.rename(f"{exportfolder_path}/{note_name}", f"{exportfolder_path}/{note_name_new}")
 
-            # If the name on the Note file is different than the one on the export foldername print it
-            if team_name.lower() != team_name_folder.lower():
-                print(f"- Actual name: {team_name} ", end='')
+        # If the name on the Note file is different than the one on the export foldername print it
+        if team_name.lower() != team_name_folder.lower():
+            print(f"- Actual name: {team_name} ", end='')
 
-            # Search for the team ID on the list of team names
-            with open(TEAMS_LIST_FILE, 'r') as team_file:
-                for line in team_file.readlines()[1:]:
-                    if team_name.lower() == line.split()[1].lower():
-                        team_id = line.split()[0]
-                        break
+        # Search for the team ID on the list of team names
+        with open(TEAMS_LIST_FILE, 'r') as team_file:
+            for line in team_file.readlines()[1:]:
+                if team_name.lower() == line.split()[1].lower():
+                    team_id = line.split()[0]
+                    break
 
     # If there's no Note file or no usable team name was found on it
     if not team_id:

@@ -122,8 +122,9 @@ def dimensions_check(dds_path):
 def texture_check(tex_path):
 
     # Read the necessary parameters
-    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
+    pes_version = os.environ.get('PES_VERSION', '19')
+    fox_mode = (int(pes_version) >= 18)
+    fox_19 = (int(pes_version) >= 19)
 
     # Store the name of the parent folder
     tex_folder = os.path.basename(os.path.dirname(tex_path))
@@ -201,7 +202,7 @@ def texture_check(tex_path):
             logging.error( "- ERROR - Texture is an ftex file")
             logging.error(f"- Folder:         {tex_folder}")
             logging.error(f"- Texture name:   {tex_name}")
-            logging.error( "- ftex textures are not supported on the chosen PES version")
+            logging.error(f"- ftex textures are not supported on the chosen PES version ({pes_version})")
             error = True
 
         if not error:

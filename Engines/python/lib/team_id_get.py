@@ -140,7 +140,10 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
 
         logging.error( "-")
         logging.error( "- ERROR - Unusable team name")
-        logging.error(f"- Team name:      {team_name}")
+        if team_name:
+            logging.error(f"- Team name:      {team_name}")
+        else:
+            logging.error(f"- Team name:      {team_name_folder}")
         logging.error( "- The team name was not found on the teams list file.")
         logging.error( "- This export will be discarded to prevent conflicts.")
         logging.error(f"- Add the team name to the \"{TEAMS_LIST_FILE}\" file and restart")

@@ -39,10 +39,14 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
 
     # Read the necessary parameters
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
-    cpk_name = os.environ.get('CPK_NAME', 'unknown')
+
+    multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
+    cpk_name_singlecpk = os.environ.get('CPK_NAME', 'unknown')
+    cpk_name_multicpk = os.environ.get('BINS_CPK_NAME', 'unknown')
 
     pes_download_path = os.path.join(pes_folder_path, "download")
     dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
+    cpk_name = cpk_name_singlecpk if not multicpk_mode else cpk_name_multicpk
 
     file_found_all = False
 

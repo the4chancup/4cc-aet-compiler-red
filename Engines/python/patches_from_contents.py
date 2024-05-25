@@ -5,6 +5,8 @@ import subprocess
 
 from .lib import pes_cpk_pack as cpktool
 from .lib.utils import COLORS
+from .lib.utils.pausing import pause
+from .lib.utils.logging_tools import logger_stop
 
 
 def patches_from_contents():
@@ -58,8 +60,12 @@ def patches_from_contents():
             logging.critical(f"- Missing folder: {folder_path}")
             logging.critical( "-")
             logging.critical( "- Please do not run this script before running the previous ones")
+            logger_stop()
 
-            return
+            print( "-")
+            pause("Press any key to exit... ")
+
+            exit()
 
         # Make sure that the folder is not empty to avoid errors
         if not os.listdir(folder_path):
@@ -90,7 +96,31 @@ def patches_from_contents():
 
             # Remove the cpk from the destination folder if present
             if os.path.exists(cpk_destination_path):
-                os.remove(cpk_destination_path)
+                try:
+                    os.remove(cpk_destination_path)
+
+                except PermissionError:
+                    logging.critical( "-")
+                    logging.critical( "- FATAL ERROR - Error while trying to remove the old cpk")
+                    logging.critical(f"- Path:           {cpk_destination_path}")
+                    logging.critical( "- Please check if PES is open, and close it if so")
+
+                    print( "-")
+                    input("Press Enter to continue after checking... ")
+
+                    try:
+                        os.remove(cpk_destination_path)
+
+                    except PermissionError:
+                        logging.critical( "-")
+                        logging.critical( "- FATAL ERROR - Cannot remove the old cpk")
+                        logging.critical( "- Restart your PC and try again")
+                        logger_stop()
+
+                        print( "-")
+                        pause("Press any key to exit... ")
+
+                        exit()
 
             # Move the cpk to the destination folder
             cpk_path = os.path.join("patches_output", f"{cpk_name}.cpk")

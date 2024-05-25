@@ -3,7 +3,7 @@ A "4chan Cup Aesthetic Export" compiler for the Pro Evolution Soccer series.
 New python-based version, three times faster.
 
 This is a short readme, with just the information you need to compile your
-team's aesthetics so that you can check them on PES.
+team's aesthetics so that you can check them on PES.  
 You can also find an advanced readme in the Engines folder, with full details on
 how the compiler works. Read it if you're going to compile a full DLC for a cup.
 

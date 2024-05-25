@@ -36,7 +36,7 @@ def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
 
     return color
 
-def bytes_from_color_entry(color_entry,type_kits = False):
+def bytes_from_color_entry(color_entry, type_kits = False):
 
     # Split the color entry into its components
     color_entry_parts = color_entry.split()
@@ -96,7 +96,7 @@ def teamcolor_bin_update(team_id, teamcols, teamcolor_bin):
         # Increment the position by 3
         position = hex(int(position, 16) + 3).replace("0x", "").upper()
 
-    return
+    return len(teamcols)
 
 
 def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
@@ -178,7 +178,7 @@ def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
         # Increment the position by 8
         position = hex(int(position, 16) + 8).replace("0x", "").upper()
 
-    return
+    return player_kits, gk_kits
 
 
 def bins_update(teamcolor_bin_path, kitcolor_bin_path):
@@ -205,20 +205,21 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     # For every Note txt file
     for file_name in [f for f in os.listdir(EXTRACTED_EXPORTS_FOLDER) if f.endswith("Note.txt")]:
 
+        # Initialize variables
+        stop = None
+        team_id = None
+
+        teamcols_search = False
+        teamcols = []
+        teamcols_cnt = 0
+
+        kitcols_search = False
+        kitcols = []
+        kitcols_player_cnt = 0
+        kitcols_gk_cnt = 0
+
         file_path = os.path.join(EXTRACTED_EXPORTS_FOLDER, file_name)
         with open(file_path, 'r', encoding="utf8") as file:
-
-            # Initialize variables
-            stop = None
-            team_id = None
-
-            teamcols_search = False
-            teamcols = []
-            teamcols_cnt = 0
-
-            kitcols_search = False
-            kitcols = []
-            kitcols_cnt = 0
 
             for line in file:
 
@@ -315,18 +316,15 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
         # If there are team colors
         if teamcols:
             # Update the team bin
-            teamcolor_bin_update(team_id, teamcols, teamcolor_bin)
-
-            # Store the number of team colors
-            teamcols_cnt = len(teamcols)
+            teamcols_cnt = teamcolor_bin_update(team_id, teamcols, teamcolor_bin)
 
         # If there are kit colors
         if kitcols:
             # Update the kits bin
-            kitcolor_bin_update(team_id, kitcols, kitcolor_bin)
+            kitcols_player_cnt, kitcols_gk_cnt = kitcolor_bin_update(team_id, kitcols, kitcolor_bin)
 
             # Store the number of kit colors
-            kitcols_cnt = len(kitcols)
+            kitcols_cnt = kitcols_player_cnt + kitcols_gk_cnt
 
             # Set the kit configs folder path
             kit_configs_folder_path = os.path.join('extracted_exports', 'Kit Configs', team_id)
@@ -349,7 +347,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     logging.warning(f"- the number of kit color entries ({kitcols_cnt}) in the Note txt file")
 
         # Print the number of team and kit colors
-        print(f"- Team colors: {teamcols_cnt} - Kits: {kitcols_cnt}")
+        print(f"- Team colors: {teamcols_cnt} - Kits: {kitcols_player_cnt}P + {kitcols_gk_cnt}GK")
 
 
     # Close the TeamColor.bin file

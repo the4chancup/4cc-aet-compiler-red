@@ -203,7 +203,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     kitcolor_bin = open(kitcolor_bin_path, 'rb+')
 
     # For every Note txt file
-    for file_name in [f for f in os.listdir(EXTRACTED_EXPORTS_FOLDER) if f.endswith(".txt")]:
+    for file_name in [f for f in os.listdir(EXTRACTED_EXPORTS_FOLDER) if f.endswith("Note.txt")]:
 
         file_path = os.path.join(EXTRACTED_EXPORTS_FOLDER, file_name)
         with open(file_path, 'r', encoding="utf8") as file:

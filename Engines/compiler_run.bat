@@ -37,11 +37,11 @@ if exist ".\Engines\compiler_main.py" (
     pause
 )
 
+call py -3 .\Engines\log_username_clean.py
 
 
 REM - Pause if the compiler returned an error and run the log cleaner
 if ERRORLEVEL 1 (
-    call py -3 .\Engines\log_username_clean.py
 
     echo -
     echo -

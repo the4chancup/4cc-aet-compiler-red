@@ -111,7 +111,24 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
         # Rename the Note file with a clean version of the team name without slashes
         team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
         note_name_new = f"{team_name_clean} Note.txt"
-        os.rename(f"{exportfolder_path}/{note_name}", f"{exportfolder_path}/{note_name_new}")
+
+        if note_name_new != note_name:
+            try:
+                os.rename(f"{exportfolder_path}/{note_name}", f"{exportfolder_path}/{note_name_new}")
+            except FileExistsError:
+                logging.error( "-")
+                logging.error( "- ERROR - Duplicate Note file found")
+                logging.error(f"- Team name:      {team_name_folder}")
+                logging.error( "- This export will be discarded")
+
+                if pause_on_error:
+                    print("-")
+                    pause()
+
+                # Skip the whole export
+                shutil.rmtree(exportfolder_path)
+
+                return None, None
 
         # If the name on the Note file is different than the one on the export foldername print it
         if team_name.lower() != team_name_folder.lower():
@@ -144,8 +161,8 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
             logging.error(f"- Team name:      {team_name}")
         else:
             logging.error(f"- Team name:      {team_name_folder}")
-        logging.error( "- The team name was not found on the teams list file.")
-        logging.error( "- This export will be discarded to prevent conflicts.")
+        logging.error( "- The team name was not found on the teams list file")
+        logging.error( "- This export will be discarded to prevent conflicts")
         logging.error(f"- Add the team name to the \"{TEAMS_LIST_FILE}\" file and restart")
 
         if pause_on_error:

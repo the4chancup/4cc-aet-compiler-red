@@ -37,11 +37,14 @@ if exist ".\Engines\compiler_main.py" (
     pause
 )
 
+set crashed=%ERRORLEVEL%
+
+REM - Run the log cleaner
 call py -3 .\Engines\log_username_clean.py
 
 
-REM - Pause if the compiler returned an error and run the log cleaner
-if ERRORLEVEL 1 (
+REM - Pause if the compiler returned an error
+if %crashed% GEQ 1 (
 
     echo -
     echo -

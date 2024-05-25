@@ -45,12 +45,28 @@ def log_store(log_name):
 
     try:
         os.rename(log_name, log_name_old)
-    except OSError:
-        print(f"- An error occurred while trying to rename the {log_name} file")
-        print( "- Please check if it's open in another program")
+
+    except PermissionError:
         print( "-")
-        pause("Press any key to continue after checking... ")
-        os.rename(log_name, log_name_old)
+        print(f"- {COLORS.DARK_RED}FATAL ERROR{COLORS.RESET} - Error while trying to rename the {log_name} file")
+        print( "- Please check if it's open in another program, or")
+        print( "- if you have left another session of the compiler open")
+
+        print( "-")
+        input("Press Enter to continue after checking... ")
+
+        try:
+            os.rename(log_name, log_name_old)
+
+        except PermissionError:
+            print( "-")
+            print(f"- {COLORS.DARK_RED}FATAL ERROR{COLORS.RESET} - Cannot rename the {log_name} file")
+            print( "- Restart your PC and try again")
+
+            print( "-")
+            pause("Press any key to exit... ")
+
+            exit()
 
 
 def logger_init(__name__):

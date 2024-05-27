@@ -3,19 +3,19 @@ import os
 from python.lib.utils import logging_tools
 
 
-def log_username_clean(log_name):
+def log_username_clean(log_path):
 
-    if not os.path.exists(log_name):
+    if not os.path.exists(log_path):
         return
 
     username = os.getenv("USERNAME", "unknown")
 
-    with open(log_name, "r") as f:
+    with open(log_path, "r") as f:
         text = f.readlines()
 
     text = [line.replace(f"\\{username}\\", "\\<username>\\") for line in text]
 
-    with open(log_name, "w") as f:
+    with open(log_path, "w") as f:
         f.writelines(text)
 
 

@@ -172,29 +172,29 @@ def settings_default_init(file_path, default_file_path):
     exit()
 
 
-def settings_init(file_name):
+def settings_init(file_path):
 
     # Prepare the name of the default settings file
-    default_file_path = settings_default_path_get(file_name)
+    default_file_path = settings_default_path_get(file_path)
 
     # Check if the file exists
-    if not os.path.isfile(file_name):
+    if not os.path.isfile(file_path):
 
         logging.critical( "-")
-        logging.critical(f"- FATAL ERROR - Missing \"{file_name}\" file")
+        logging.critical(f"- FATAL ERROR - Missing \"{file_path}\" file")
         logging.critical( "-")
         logging.critical( "- A clean settings file will be generated and opened")
         logging.critical( "- Please edit the settings as needed and restart the program")
         print("-")
         pause("Press any key to continue... ")
 
-        settings_default_init(file_name, default_file_path)
+        settings_default_init(file_path, default_file_path)
 
     else:
 
         # Read the settings
         config = configparser.ConfigParser()
-        config.read(file_name)
+        config.read(file_path)
 
         for section in config.sections():
             for key, value in config.items(section):
@@ -206,7 +206,7 @@ def settings_init(file_name):
 
             logging.critical( "-")
             logging.critical( "- FATAL ERROR - Missing settings")
-            logging.critical(f"- The following required settings are missing from the \"{file_name}\" file:")
+            logging.critical(f"- The following required settings are missing from the \"{file_path}\" file:")
             # Log the list of missing required settings
             for setting in settings_missing:
                 logging.critical(f"- \"{setting.lower()}\"")
@@ -221,7 +221,7 @@ def settings_init(file_name):
             choice = input("Type \"new\" and press Enter, or just press Enter to exit...")
 
             if "new" in choice:
-                settings_default_init(file_name, default_file_path)
+                settings_default_init(file_path, default_file_path)
             else:
                 exit()
 

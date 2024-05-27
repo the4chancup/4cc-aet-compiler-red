@@ -3,8 +3,8 @@ import runpy
 import importlib.util
 
 
-# Check if the dependencies are installed
 def dependency_check_on_import():
+    """Checks if the dependencies are installed, and if not, installs them."""
 
     # Prepare a list of dependencies as dictionaries with name and name_pip
     dependencies = [
@@ -41,7 +41,20 @@ def dependency_check_on_import():
 
         # Install the dependencies (closes the program automatically after the installation)
         sys.argv = ["pip", "install"] + dependencies_missing
-        runpy.run_module("pip", run_name="__main__")
+
+        try:
+            runpy.run_module("pip", run_name="__main__")
+
+        except Exception as e:
+            print("-")
+            print("- FATAL ERROR - Error while trying to install the dependencies:")
+            print(e)
+            print("-")
+            print("- Try reinstalling python, do not choose \"Install for all users\".")
+            print("-")
+
+            input("Press Enter to exit... ")
+            exit()
 
 
 # Run the check when imported

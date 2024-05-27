@@ -44,7 +44,8 @@ Keep in mind that you don't need to edit the team ID listed in your export's
 files, the compiler will take care of that!
 
 Now put the export in the exports_to_add folder (folders, zip or 7z are all
-fine) and run the 0_all_in_one script.
+fine) and run the 0_all_in_one script. If you're using a Linux distro, run
+compiler_main from the Engines folder.
 
 A cpk will be created and copied automatically to your PES download folder.  
 Now you only need to run PES and check your stuff.

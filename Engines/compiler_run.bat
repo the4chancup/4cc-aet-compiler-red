@@ -49,8 +49,13 @@ if %crashed% GEQ 1 (
     echo -
     echo -
     echo - CRASH - The compiler has run into an unexpected error and stopped
+    if exist ".\crash.log" (
     echo - A log file crash.log has been saved to the compiler's folder
     echo - Please post it on the /aesco/ server or the cup thread
+    ) else (
+        echo - Please take a screenshot and post it on the /aesco/ server
+        echo - or the cup thread
+    )
     echo -
     pause
 )

@@ -6,7 +6,14 @@ import logging
 # Modules needed for self healing
 try:
     from python.dependency_check import dependency_check_on_import as dependency_check_on_import
-    from python.lib.utils import APP_DATA
+    from python.lib.utils.APP_DATA import (
+        APP_OWNER,
+        APP_NAME,
+        APP_VERSION_MAJOR,
+        APP_VERSION_MINOR,
+        APP_VERSION_PATCH,
+        APP_VERSION_DEV as APP_VERSION_DEV,
+    )
     from python.lib.utils.updating import update_check
     from python.lib.utils.file_management import module_recover
 except ImportError as e:
@@ -43,14 +50,6 @@ while True:
         module_recover(e)
     else:
         break
-
-
-APP_OWNER = APP_DATA.OWNER
-APP_NAME = APP_DATA.NAME
-APP_VERSION_MAJOR = APP_DATA.VERSION_MAJOR
-APP_VERSION_MINOR = APP_DATA.VERSION_MINOR
-APP_VERSION_PATCH = APP_DATA.VERSION_PATCH
-APP_VERSION_DEV = APP_DATA.VERSION_DEV
 
 
 def run_type_request():

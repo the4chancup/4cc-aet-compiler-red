@@ -1,6 +1,6 @@
-OWNER = "the4chancup"
-NAME = "4cc-aet-compiler-red"
-VERSION_MAJOR = 3
-VERSION_MINOR = 2
-VERSION_PATCH = 0
-VERSION_DEV = True
+APP_OWNER = "the4chancup"
+APP_NAME = "4cc-aet-compiler-red"
+APP_VERSION_MAJOR = 3
+APP_VERSION_MINOR = 2
+APP_VERSION_PATCH = 0
+APP_VERSION_DEV = True

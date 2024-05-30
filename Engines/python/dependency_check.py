@@ -1,10 +1,22 @@
 import sys
 import runpy
+import subprocess
 import importlib.util
 
 
 def dependency_check_on_import():
     """Checks if the dependencies are installed, and if not, installs them."""
+
+    if sys.platform != "win32":
+        # Check if imagemagick is installed
+        if not subprocess.check_output(["whereis", "convert"]) != b'convert:\n':
+            print("-")
+            print("- ImageMagick was not found.")
+            print("- It is required to convert DDS DX10 textures.")
+            print("-")
+            print("- Please install ImageMagick and rerun the program.")
+            print("-")
+            exit()
 
     # Prepare a list of dependencies as dictionaries with name and name_pip
     dependencies = [

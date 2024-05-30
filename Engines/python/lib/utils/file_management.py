@@ -3,7 +3,13 @@ import py7zr
 import shutil
 import logging
 
-from . import APP_DATA
+from .APP_DATA import (
+    APP_OWNER,
+    APP_NAME,
+    APP_VERSION_MAJOR,
+    APP_VERSION_MINOR,
+    APP_VERSION_PATCH,
+)
 from .pausing import pause
 from .version_downloading import version_download
 from .logging_tools import logger_stop
@@ -21,7 +27,7 @@ def file_heal(file_path):
     """
 
     # Prepare the version string
-    app_version = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
+    app_version = f"{APP_VERSION_MAJOR}.{APP_VERSION_MINOR}.{APP_VERSION_PATCH}"
 
     # Create a "temp" folder inside "Engines"
     temp_folder_path = os.path.join("Engines", "temp")
@@ -33,7 +39,7 @@ def file_heal(file_path):
     print(f"- Downloading and unpacking version {app_version}...")
 
     # Download the current version
-    pack_name = version_download(APP_DATA.OWNER, APP_DATA.NAME, app_version, "7z", temp_folder_path)
+    pack_name = version_download(APP_OWNER, APP_NAME, app_version, "7z", temp_folder_path)
 
     if pack_name is None:
         print("-")
@@ -50,7 +56,7 @@ def file_heal(file_path):
     # Delete the 7z file
     os.remove(pack_path)
 
-    app_name_full = APP_DATA.NAME + " " + app_version
+    app_name_full = APP_NAME + " " + app_version
     app_full_folder = os.path.join(temp_folder_path, app_name_full)
 
     file_path_new = os.path.join(app_full_folder, file_path)
@@ -128,7 +134,7 @@ def module_recover(module_exception):
 
     if not file_healed:
         # Log to file
-        app_version = f"{APP_DATA.VERSION_MAJOR}.{APP_DATA.VERSION_MINOR}.{APP_DATA.VERSION_PATCH}"
+        app_version = f"{APP_VERSION_MAJOR}.{APP_VERSION_MINOR}.{APP_VERSION_PATCH}"
         title_string = f"- 4cc aet compiler Red {app_version}"
 
         logging.basicConfig(filename="issues.log", level=logging.CRITICAL, filemode='w', format="%(message)s")

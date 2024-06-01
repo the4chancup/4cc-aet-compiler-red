@@ -7,6 +7,7 @@ from .lib import pes_cpk_pack as cpktool
 from .lib.utils import COLORS
 from .lib.utils.pausing import pause
 from .lib.utils.logging_tools import logger_stop
+from .lib.utils.app_tools import log_presence_warn
 
 
 def patches_from_contents():
@@ -146,20 +147,7 @@ def patches_from_contents():
                 print( "- PES won't be started")
 
     if all_in_one:
-        if os.path.exists("issues.log"):
-            # Warn about there being some issues and about having to open the log
-            print( "-")
-            print(f"- {COLORS.DARK_YELLOW}Warning{COLORS.RESET}: There were some potential issues in the exports")
-            print( "- Please check the issues.log file for more details")
-        else:
-            print( "-")
-            print(f"- {COLORS.DARK_GREEN}No issues were found{COLORS.RESET}")
-
-        if os.path.exists("suggestions.log"):
-            # Warn about there being some suggestions
-            print( "-")
-            print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are some suggestions available")
-            print( "- Check the suggestions.log file to improve your aesthetics")
+        log_presence_warn()
 
         print( "-")
         print( "-")

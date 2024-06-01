@@ -99,10 +99,8 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
             if os.path.exists(file_info['destination_path']):
                 continue
 
-            file_fallback_path = os.path.join(os.path.dirname(os.path.dirname(file_info['destination_path'])), os.path.basename(file_info['destination_path']))
-            file_critical_check(file_fallback_path)
-
-            shutil.copy(file_fallback_path, file_info['destination_path'])
+            file_critical_check(file_info['fallback_path'])
+            shutil.copy(file_info['fallback_path'], file_info['destination_path'])
 
             print(f"- {os.path.basename(file_info['source_path'])} not found in any cpks, copied from the fallback folder")
 

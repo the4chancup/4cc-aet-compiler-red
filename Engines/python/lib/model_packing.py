@@ -6,7 +6,7 @@ from . import pes_fpk_pack as fpktool
 from .utils.file_management import file_critical_check
 
 
-def models_pack(models_type, models_source_path, models_destination_folder, cpk_folder_name):
+def models_pack(models_type, models_source_path, models_destination_folder, cpk_folder_path):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
@@ -22,9 +22,9 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
 
         # Set the destination path
         if models_type == "face":
-            models_destination_path = os.path.join("patches_contents",cpk_folder_name,"common","character0","model","character","face","real")
+            models_destination_path = os.path.join(cpk_folder_path,"common","character0","model","character","face","real")
         else:
-            models_destination_path = os.path.join("patches_contents",cpk_folder_name,"common","character0","model","character",models_destination_folder)
+            models_destination_path = os.path.join(cpk_folder_path,"common","character0","model","character",models_destination_folder)
 
         # Create a destination folder if needed
         if not os.path.exists(models_destination_path):
@@ -69,7 +69,7 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
     else:
 
         # Set the destination path
-        models_destination_path = os.path.join("patches_contents", cpk_folder_name, "Asset", "model", "character", models_destination_folder)
+        models_destination_path = os.path.join(cpk_folder_path, "Asset", "model", "character", models_destination_folder)
 
         # Create a destination folder if needed
         if not os.path.exists(models_destination_path):

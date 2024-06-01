@@ -142,6 +142,7 @@ def contents_from_extracted():
         # Delete the bins folder
         shutil.rmtree(bins_folder_path)
 
+    faces_folder_path = os.path.join("./patches_contents", faces_foldername)
 
     # Packing the face folders if 'Faces' directory exists
     main_dir = "./extracted_exports/Faces"
@@ -149,7 +150,7 @@ def contents_from_extracted():
 
         print("- \n- Packing the face folders")
 
-        models_pack('face', main_dir, 'face/real', faces_foldername)
+        models_pack('face', main_dir, 'face/real', faces_folder_path)
 
 
     # Moving the kit configs if 'Kit Configs' directory exists
@@ -220,7 +221,7 @@ def contents_from_extracted():
             print('-')
             print('- Packing the boots folders')
 
-        models_pack('boots', main_dir, 'boots', faces_foldername)
+        models_pack('boots', main_dir, 'boots', faces_folder_path)
 
     # If there's a Gloves folder, move its stuff
     main_dir = "./extracted_exports/Gloves"
@@ -233,7 +234,7 @@ def contents_from_extracted():
             print('-')
             print('- Packing the gloves folders')
 
-        models_pack('glove', main_dir, 'glove', faces_foldername)
+        models_pack('glove', main_dir, 'glove', faces_folder_path)
 
 
     other_message = False

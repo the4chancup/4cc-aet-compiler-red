@@ -6,12 +6,11 @@ from . import pes_fpk_pack as fpktool
 from .utils.file_management import file_critical_check
 
 
-def models_pack(models_type, models_source_folder, models_destination_folder, cpk_folder_name):
+def models_pack(models_type, models_source_path, models_destination_folder, cpk_folder_name):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
 
-    models_source_path = os.path.join("extracted_exports", models_source_folder)
     temp_folder_path = os.path.join("temp")
 
     # Check if the temp folder exists and delete it

@@ -8,6 +8,16 @@ from .lib.model_packing import models_pack
 from .lib.cpk_tools import files_fetch_from_cpks
 from .lib.utils.pausing import pause
 from .lib.utils.logging_tools import logger_stop
+from .lib.utils.FILE_INFO import (
+    EXTRACTED_PATH,
+    PATCHES_CONTENTS_PATH,
+    BIN_FOLDER_PATH,
+    TEAMCOLOR_BIN_NAME,
+    UNICOLOR_BIN_NAME,
+    UNIPARAM_NAME,
+    UNIPARAM_18_NAME,
+    UNIPARAM_19_NAME,
+)
 
 
 def contents_from_extracted():
@@ -35,8 +45,8 @@ def contents_from_extracted():
 
 
     # Create folders just in case
-    os.makedirs(f"./patches_contents/{faces_foldername}", exist_ok=True)
-    os.makedirs(f"./patches_contents/{uniform_foldername}", exist_ok=True)
+    os.makedirs(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", exist_ok=True)
+    os.makedirs(f"{PATCHES_CONTENTS_PATH}/{uniform_foldername}", exist_ok=True)
 
 
     print("-")
@@ -45,71 +55,68 @@ def contents_from_extracted():
 
 
     # If Bins Updating is enabled and there's an extracted_exports folder
-    if bins_updating and os.path.exists("extracted_exports"):
+    if bins_updating and os.path.exists(EXTRACTED_PATH):
 
         print("-")
         print("- Bins Updating is enabled")
         print("-")
 
         # Set the paths
-        common_root_path = os.path.join("patches_contents", bins_foldername, "common")
-        common_etc_path = os.path.join(common_root_path, "etc")
-        uniform_team_path = os.path.join(common_root_path, "character0", "model", "character", "uniform", "team")
+        COMMON_ETC_PATH = "common/etc"
+        UNIFORM_TEAM_PATH = "common/character0/model/character/uniform/team"
+
+        PATCH_BINS_PATH = os.path.join(PATCHES_CONTENTS_PATH, bins_foldername)
+        PATCH_BINS_COMMON_ETC_PATH = os.path.join(PATCH_BINS_PATH, COMMON_ETC_PATH)
+        PATCH_BINS_UNIFORM_TEAM_PATH = os.path.join(PATCH_BINS_PATH, UNIFORM_TEAM_PATH)
 
         # Prepare a list of sources and destination paths for the bin files
-        bins_temp_folder_path = "Engines/bins/temp"
-        teamcolor_bin_temp_path = os.path.join(bins_temp_folder_path, "TeamColor.bin")
-        kitcolor_bin_temp_path = os.path.join(bins_temp_folder_path, "UniColor.bin")
-
-        bins_folder_path = "Engines/bins"
-        teamcolor_bin_path = os.path.join(bins_folder_path, "TeamColor.bin")
-        kitcolor_bin_path = os.path.join(bins_folder_path, "UniColor.bin")
+        BINS_TEMP_FOLDER_PATH = os.path.join(BIN_FOLDER_PATH, "temp")
+        TEAMCOLOR_BIN_TEMP_PATH = os.path.join(BINS_TEMP_FOLDER_PATH, TEAMCOLOR_BIN_NAME)
+        UNICOLOR_BIN_TEMP_PATH = os.path.join(BINS_TEMP_FOLDER_PATH, UNICOLOR_BIN_NAME)
 
         bin_info_list = [
             {
-                'source_path': "common/etc/TeamColor.bin",
-                'destination_path': teamcolor_bin_temp_path,
-                'fallback_path': teamcolor_bin_path,
+                'source_path': f"{COMMON_ETC_PATH}/{TEAMCOLOR_BIN_NAME}",
+                'destination_path': TEAMCOLOR_BIN_TEMP_PATH,
+                'fallback_path': f"{BIN_FOLDER_PATH}/{TEAMCOLOR_BIN_NAME}",
             },
             {
-                'source_path': "common/character0/model/character/uniform/team/UniColor.bin",
-                'destination_path': kitcolor_bin_temp_path,
-                'fallback_path': kitcolor_bin_path,
+                'source_path': f"{UNIFORM_TEAM_PATH}/{UNICOLOR_BIN_NAME}",
+                'destination_path': UNICOLOR_BIN_TEMP_PATH,
+                'fallback_path': f"{BIN_FOLDER_PATH}/{UNICOLOR_BIN_NAME}",
             },
         ]
 
         if fox_mode:
             # Set the filename depending on pes version
-            uniparam_name = "UniformParameter19.bin" if fox_19 else "UniformParameter18.bin"
-
-            uniparam_bin_temp_path = os.path.join(bins_temp_folder_path, uniparam_name)
-            uniparam_bin_path = os.path.join(bins_folder_path, uniparam_name)
+            UNIPARAM_TEMP_NAME = UNIPARAM_19_NAME if fox_19 else UNIPARAM_18_NAME
+            UNIPARAM_BIN_TEMP_PATH = os.path.join(BINS_TEMP_FOLDER_PATH, UNIPARAM_TEMP_NAME)
 
             bin_info_list.append(
                 {
-                    'source_path': "common/character0/model/character/uniform/team/UniformParameter.bin",
-                    'destination_path': uniparam_bin_temp_path,
-                    'fallback_path': uniparam_bin_path,
+                    'source_path': f"{UNIFORM_TEAM_PATH}/{UNIPARAM_NAME}",
+                    'destination_path': UNIPARAM_BIN_TEMP_PATH,
+                    'fallback_path': f"{BIN_FOLDER_PATH}/{UNIPARAM_TEMP_NAME}",
                 }
             )
 
         # Create the folders
-        os.makedirs(common_etc_path, exist_ok=True)
-        os.makedirs(uniform_team_path, exist_ok=True)
-        os.makedirs(bins_temp_folder_path, exist_ok=True)
+        os.makedirs(PATCH_BINS_COMMON_ETC_PATH, exist_ok=True)
+        os.makedirs(PATCH_BINS_UNIFORM_TEAM_PATH, exist_ok=True)
+        os.makedirs(BINS_TEMP_FOLDER_PATH, exist_ok=True)
 
         # Fetch the bin files from the cpks in the download folder and update their values
-        bin_cpk_names_list = ['midcup', 'bins']
-        files_fetch_from_cpks(bin_info_list, bin_cpk_names_list)
+        BIN_CPK_NAMES_LIST = ['midcup', 'bins']
+        files_fetch_from_cpks(bin_info_list, BIN_CPK_NAMES_LIST)
 
-        bins_update(teamcolor_bin_temp_path, kitcolor_bin_temp_path)
+        bins_update(TEAMCOLOR_BIN_TEMP_PATH, UNICOLOR_BIN_TEMP_PATH)
 
         # And copy them to the Bins cpk folder
-        shutil.copy(teamcolor_bin_temp_path, common_etc_path)
-        shutil.copy(kitcolor_bin_temp_path, uniform_team_path)
+        shutil.copy(TEAMCOLOR_BIN_TEMP_PATH, PATCH_BINS_COMMON_ETC_PATH)
+        shutil.copy(UNICOLOR_BIN_TEMP_PATH, PATCH_BINS_UNIFORM_TEAM_PATH)
 
         # If fox mode is enabled and there's a Kit Configs folder
-        itemfolder_path = os.path.join("extracted_exports", "Kit Configs")
+        itemfolder_path = os.path.join(EXTRACTED_PATH, "Kit Configs")
         if fox_mode and os.path.exists(itemfolder_path):
 
             print("- \n- Compiling the kit config files into the UniformParameter bin")
@@ -125,7 +132,7 @@ def contents_from_extracted():
                     kit_config_path_list.append(kit_config_path)
 
             # Compile the UniformParameter file
-            uniparam_error = uniparamtool.main(uniparam_bin_temp_path, kit_config_path_list, [], uniparam_bin_temp_path, True)
+            uniparam_error = uniparamtool.main(UNIPARAM_BIN_TEMP_PATH, kit_config_path_list, [], UNIPARAM_BIN_TEMP_PATH, True)
 
             if uniparam_error:
                 logging.critical("-")
@@ -142,17 +149,17 @@ def contents_from_extracted():
                 exit()
 
             # Copy the uniparam to the the Bins cpk folder with the proper filename
-            shutil.copy(uniparam_bin_temp_path, f"{uniform_team_path}/UniformParameter.bin")
+            shutil.copy(UNIPARAM_BIN_TEMP_PATH, f"{PATCH_BINS_UNIFORM_TEAM_PATH}/{UNIPARAM_NAME}")
 
             print("-")
 
         # Delete the bins temp folder
-        shutil.rmtree(bins_temp_folder_path)
+        shutil.rmtree(BINS_TEMP_FOLDER_PATH)
 
     faces_folder_path = os.path.join("./patches_contents", faces_foldername)
 
     # Packing the face folders if 'Faces' directory exists
-    main_dir = "./extracted_exports/Faces"
+    main_dir = os.path.join(EXTRACTED_PATH, "Faces")
     if os.path.exists(main_dir):
 
         print("- \n- Packing the face folders")
@@ -161,11 +168,11 @@ def contents_from_extracted():
 
 
     # Moving the kit configs if 'Kit Configs' directory exists
-    main_dir = "./extracted_exports/Kit Configs"
+    main_dir = os.path.join(EXTRACTED_PATH, "Kit Configs")
     if os.path.exists(main_dir):
         print("- \n- Moving the kit configs")
 
-        items_dir = f"./patches_contents/{uniform_foldername}/common/character0/model/character/uniform/team"
+        items_dir = f"{PATCHES_CONTENTS_PATH}/{uniform_foldername}/common/character0/model/character/uniform/team"
 
         # Create a "team" folder if needed
         os.makedirs(items_dir, exist_ok=True)
@@ -188,13 +195,13 @@ def contents_from_extracted():
 
 
     # If there's a Kit Textures folder, move its stuff
-    main_dir = "./extracted_exports/Kit Textures"
+    main_dir = os.path.join(EXTRACTED_PATH, "Kit Textures")
     if os.path.exists(main_dir):
         print("- \n- Moving the kit textures")
 
         items_dir = (
-            f"./patches_contents/{uniform_foldername}/common/character0/model/character/uniform/texture" if not fox_mode
-            else f"./patches_contents/{uniform_foldername}/Asset/model/character/uniform/texture/#windx11"
+            f"{PATCHES_CONTENTS_PATH}/{uniform_foldername}/common/character0/model/character/uniform/texture" if not fox_mode
+            else f"{PATCHES_CONTENTS_PATH}/{uniform_foldername}/Asset/model/character/uniform/texture/#windx11"
         )
 
         # Create a texture folder if needed
@@ -218,7 +225,7 @@ def contents_from_extracted():
 
 
     # If there's a Boots folder, move or pack its stuff
-    main_dir = "./extracted_exports/Boots"
+    main_dir = os.path.join(EXTRACTED_PATH, "Boots")
     if os.path.exists(main_dir):
 
         if not fox_mode:
@@ -231,7 +238,7 @@ def contents_from_extracted():
         models_pack('boots', main_dir, 'boots', faces_folder_path)
 
     # If there's a Gloves folder, move its stuff
-    main_dir = "./extracted_exports/Gloves"
+    main_dir = os.path.join(EXTRACTED_PATH, "Gloves")
     if os.path.exists(main_dir):
 
         if not fox_mode:
@@ -247,7 +254,7 @@ def contents_from_extracted():
     other_message = False
 
     # If there's a Collars folder, move its stuff
-    main_dir = "./extracted_exports/Collars"
+    main_dir = os.path.join(EXTRACTED_PATH, "Collars")
     if os.path.exists(main_dir):
 
         if not other_message:
@@ -262,7 +269,7 @@ def contents_from_extracted():
         )
 
         # Create a "collars" folder if needed
-        items_folder_path_full = os.path.join('patches_contents', faces_foldername, items_folder_path)
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_foldername, items_folder_path)
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
@@ -275,7 +282,7 @@ def contents_from_extracted():
 
 
     # If there's a Portraits folder, move its stuff
-    main_dir = os.path.join('extracted_exports', 'Portraits')
+    main_dir = os.path.join(EXTRACTED_PATH, 'Portraits')
     if os.path.exists(main_dir):
 
         if not other_message:
@@ -285,7 +292,7 @@ def contents_from_extracted():
             print('- Moving the other stuff')
 
         # Create a "player" folder if needed
-        items_folder_path_full = os.path.join('patches_contents', faces_foldername, 'common/render/symbol/player')
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_foldername, 'common/render/symbol/player')
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
@@ -302,7 +309,7 @@ def contents_from_extracted():
 
 
     # If there's a Logo folder, move its stuff
-    main_dir = os.path.join('extracted_exports', 'Logo')
+    main_dir = os.path.join(EXTRACTED_PATH, 'Logo')
     if os.path.exists(main_dir):
 
         if not other_message:
@@ -312,7 +319,7 @@ def contents_from_extracted():
             print('- Moving the other stuff')
 
         # Create a "flag" folder if needed
-        items_folder_path_full = os.path.join('patches_contents', uniform_foldername, 'common/render/symbol/flag')
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, uniform_foldername, 'common/render/symbol/flag')
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
@@ -335,7 +342,7 @@ def contents_from_extracted():
         common_path = 'Asset/model/character/common'
 
     # If there's a Common folder, move its stuff
-    main_dir = 'extracted_exports/Common'
+    main_dir = os.path.join(EXTRACTED_PATH, 'Common')
     if os.path.exists(main_dir):
 
         if not other_message:
@@ -345,7 +352,7 @@ def contents_from_extracted():
             print('- Moving the other stuff')
 
         # Create a "common" folder if needed
-        items_folder_path_full = os.path.join('patches_contents', faces_foldername, common_path)
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_foldername, common_path)
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
@@ -381,8 +388,8 @@ def contents_from_extracted():
 
 
     # Finally delete the extracted exports folder
-    if os.path.exists('./extracted_exports'):
-        shutil.rmtree('./extracted_exports')
+    if os.path.exists(EXTRACTED_PATH):
+        shutil.rmtree(EXTRACTED_PATH)
 
 
     if 'all_in_one' in os.environ:

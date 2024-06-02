@@ -12,6 +12,11 @@ from .lib.utils.zlib_plus import zlib_files_in_folder
 from .lib.utils.pausing import pause
 from .lib.utils import COLORS
 from .lib.utils.app_tools import log_presence_warn
+from .lib.utils.FILE_INFO import (
+    EXPORTS_TO_ADD_PATH,
+    EXTRACTED_PATH,
+    TEAMNOTES_PATH,
+)
 
 
 def readonlybit_remove_tree(path):
@@ -30,19 +35,17 @@ def readonlybit_remove_tree(path):
 # Append the contents of a txt file to teamnotes.txt for quick reading
 def note_txt_append(team_name, export_destination_path):
 
-    TEAMNOTES_NAME = "teamnotes.txt"
-
     team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
     note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
 
     if not os.path.exists(note_path):
         return
 
-    with open(TEAMNOTES_NAME, "a") as f2:
+    with open(TEAMNOTES_PATH, "a") as f2:
         f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
     with open(note_path, "r", encoding="utf8") as f:
         teamnotes = f.read()
-        with open(TEAMNOTES_NAME, "a", encoding="utf8") as f2:
+        with open(TEAMNOTES_PATH, "a", encoding="utf8") as f2:
             f2.write(f"{teamnotes}\n")
 
 
@@ -61,8 +64,8 @@ def extracted_from_exports():
     print("-")
 
     # Define the names of the main folders
-    main_source_path = "exports_to_add"
-    main_destination_path = "extracted_exports"
+    main_source_path = EXPORTS_TO_ADD_PATH
+    main_destination_path = EXTRACTED_PATH
 
     # Create folders as needed
     os.makedirs(main_source_path, exist_ok=True)
@@ -76,7 +79,7 @@ def extracted_from_exports():
     team_id_max = 920
 
     # Reset the notes compilation
-    with open("teamnotes.txt", "w") as f:
+    with open(TEAMNOTES_PATH, "w") as f:
         f.write("--- 4cc txt notes compilation ---\n")
 
     EXPORT_FILE_TYPES_LIST = [".zip", ".7z"]
@@ -186,7 +189,8 @@ def extracted_from_exports():
         print("-")
 
     # Check if the Other folder exists and there are files in it, if there are print a warning
-    if os.path.exists("./extracted_exports/Other") and len(os.listdir("./extracted_exports/Other")) > 0:
+    other_path = os.path.join(EXTRACTED_PATH, "Other")
+    if os.path.exists(other_path) and len(os.listdir(other_path)) > 0:
         print( "-")
         print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are files in the Other folder")
         print( "- Please open it and check its contents")

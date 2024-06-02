@@ -9,15 +9,15 @@ from .utils.zlib_plus import get_bytes_ascii
 from .utils.zlib_plus import unzlib_file
 from .utils.ftex import ftexToDds
 from .utils.ftex import ddsToFtex
+from .utils.FILE_INFO import TEXCONV_PATH
 
 
 def dds_dxt5_conv(tex_path):
     tex_folder_path = os.path.dirname(tex_path)
     if sys.platform == "win32":
         # Convert the texture and store into its parent folder
-        texconv_path = os.path.join("Engines", "directxtex", "texconv.exe")
-        file_critical_check(texconv_path)
-        os.system(f"{texconv_path} -f DXT5 -nologo -y -o \"{tex_folder_path}\" \"{tex_path}\" >nul")
+        file_critical_check(TEXCONV_PATH)
+        os.system(f"{TEXCONV_PATH} -f DXT5 -nologo -y -o \"{tex_folder_path}\" \"{tex_path}\" >nul")
     else:
         # Prepare a dummy path to save the converted texture
         dummy_tex_path = os.path.join(tex_folder_path, '_dummy_.dds')

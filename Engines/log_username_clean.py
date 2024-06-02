@@ -1,6 +1,9 @@
 import os
 
-from python.lib.utils import logging_tools
+from python.lib.utils.FILE_INFO import (
+    ISSUES_LOG_PATH,
+    CRASH_LOG_PATH
+)
 
 
 def log_username_clean(log_path):
@@ -21,5 +24,5 @@ def log_username_clean(log_path):
 
 if __name__ == "__main__":
 
-    log_username_clean(logging_tools.ISSUES_LOG_NAME)
-    log_username_clean(logging_tools.CRASH_LOG_NAME)
+    log_username_clean(ISSUES_LOG_PATH)
+    log_username_clean(CRASH_LOG_PATH)

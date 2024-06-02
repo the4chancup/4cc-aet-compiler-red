@@ -9,6 +9,7 @@ from .utils.zlib_plus import unzlib_file
 from .utils.elements import dummy_element
 from .utils.id_change import path_id_change
 from .utils.pausing import pause
+from .utils.FILE_INFO import EXTRACTED_PATH
 
 
 # Read the necessary parameters
@@ -146,7 +147,8 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
 
             if not file_path_short:
                 # Remove "extracted_exports/" from the path
-                file_path_short = file_path[18:]
+                extracted_path_length = len(EXTRACTED_PATH)
+                file_path_short = file_path[(extracted_path_length-1):]
 
             ##TODO: Make error-only and merge once the templates have been updated
             type_string_raw = f"{listed_file_type} path:"

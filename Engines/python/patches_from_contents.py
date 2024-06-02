@@ -8,6 +8,10 @@ from .lib.utils import COLORS
 from .lib.utils.pausing import pause
 from .lib.utils.logging_tools import logger_stop
 from .lib.utils.app_tools import log_presence_warn
+from .lib.utils.FILE_INFO import (
+    PATCHES_CONTENTS_PATH,
+    PATCHES_OUTPUT_PATH,
+)
 
 
 def patches_from_contents():
@@ -30,7 +34,7 @@ def patches_from_contents():
     pes_download_path = os.path.join(pes_folder_path, "download")
 
     # Create output folder just in case
-    os.makedirs("./patches_output", exist_ok=True)
+    os.makedirs(PATCHES_OUTPUT_PATH, exist_ok=True)
 
     # Set the names for the folders to put stuff into and for the cpks
     if not multicpk_mode:
@@ -51,7 +55,7 @@ def patches_from_contents():
 
     for folder_name, cpk_name in zip(folder_name_list, cpk_name_list):
 
-        folder_path = os.path.join("patches_contents", folder_name)
+        folder_path = os.path.join(PATCHES_CONTENTS_PATH, folder_name)
 
         # Verify that the input folder exists, stop the program otherwise
         if not os.path.exists(folder_path):
@@ -73,13 +77,13 @@ def patches_from_contents():
             open(os.path.join(folder_path, 'placeholder'), 'w').close()
 
         source_contents_path_list = [os.path.join(folder_path, x) for x in os.listdir(folder_path)]
-        cpk_path = os.path.join("patches_output", f"{cpk_name}.cpk")
+        cpk_path = os.path.join(PATCHES_OUTPUT_PATH, f"{cpk_name}.cpk")
 
         cpktool.main(cpk_path, source_contents_path_list, True)
 
-    # Delete the contents folder
+    # Delete the patches contents folder
     if cache_clear:
-        shutil.rmtree("./patches_contents")
+        shutil.rmtree(PATCHES_CONTENTS_PATH)
 
     print("-")
     print("- The patches have been created")
@@ -124,7 +128,7 @@ def patches_from_contents():
                         exit()
 
             # Move the cpk to the destination folder
-            cpk_path = os.path.join("patches_output", f"{cpk_name}.cpk")
+            cpk_path = os.path.join(PATCHES_OUTPUT_PATH, f"{cpk_name}.cpk")
             shutil.move(cpk_path, pes_download_path)
 
         print("-")

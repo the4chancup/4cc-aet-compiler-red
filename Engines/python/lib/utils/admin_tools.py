@@ -3,6 +3,7 @@ import sys
 import ctypes
 
 from .pausing import pause
+from .FILE_INFO import ADMIN_WARNED_PATH
 
 
 def admin_check(folder_location):
@@ -25,8 +26,6 @@ def admin_check(folder_location):
 
 def admin_request(run_path, run_type):
 
-    WARNING_PATH = os.path.join("Engines","admin_warned.txt")
-
     def is_admin():
         try:
             return ctypes.windll.shell32.IsUserAnAdmin()
@@ -41,13 +40,13 @@ def admin_request(run_path, run_type):
         print('Administrative privileges are needed to move the cpk directly to the download folder.')
         print('-')
 
-        if not os.path.exists(WARNING_PATH):
+        if not os.path.exists(ADMIN_WARNED_PATH):
             print('Either accept the incoming request or disable Move Cpks mode in the settings file.')
             print('-')
 
             pause()
 
-            with open(WARNING_PATH, 'w') as f:
+            with open(ADMIN_WARNED_PATH, 'w') as f:
                 f.write('This file tells the program that you know why the request for admin privileges is needed.')
 
         # Re-run the program with admin rights

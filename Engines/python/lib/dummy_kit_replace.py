@@ -1,11 +1,15 @@
 import os
 import shutil
 
+
+from .utils.FILE_INFO import EXTRACTED_PATH
+
+
 def dummy_replace(dummytexture_filename, kittexture_filename, team_id, team_name):
 
-    kittexture_filepath = os.path.join(".\\extracted_exports\\Kit Textures", kittexture_filename.format(team_id))
+    kittexture_filepath = os.path.join(EXTRACTED_PATH, "Kit Textures", kittexture_filename.format(team_id))
 
-    team_commonfolder_path = f".\\extracted_exports\\Common\\{team_id}"
+    team_commonfolder_path = os.path.join(EXTRACTED_PATH, "Common", team_id)
     dummytexture_filepath = os.path.join(team_commonfolder_path, dummytexture_filename)
 
     if not os.path.exists(dummytexture_filepath):
@@ -18,6 +22,7 @@ def dummy_replace(dummytexture_filename, kittexture_filename, team_id, team_name
     else:
         print(f"- Team {team_name} has a {dummytexture_filename} texture in their common folder but their kit 1 does not")
         print(f"- have a corresponding {kittexture_filename} texture. This dummy texture will not be replaced.")
+
 
 def dummy_kits_replace(team_id, team_name):
 

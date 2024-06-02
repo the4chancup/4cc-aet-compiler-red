@@ -34,6 +34,11 @@ except ImportError as e:
 # Modules which can be self healed
 while True:
     try:
+        from python.lib.utils.FILE_INFO import (
+            SETTINGS_PATH,
+            ISSUES_LOG_PATH,
+            RUN_BATCH_PATH,
+        )
         from python.lib.utils.app_tools import app_title
         from python.lib.utils.logging_tools import logger_init
         from python.lib.utils.logging_tools import logger_stop
@@ -86,8 +91,7 @@ def main(run_type):
     patches_from_contents_run = (run_type == "0" or run_type == "3")
 
     # Load the settings into the environment
-    settings_name = "settings.ini"
-    settings_init(settings_name)
+    settings_init()
 
     # Read the necessary parameters
     cpk_name = os.environ.get('CPK_NAME', 'unknown')
@@ -108,22 +112,18 @@ def main(run_type):
     if patches_from_contents_run and move_cpks:
 
         # Check the PES download folder
-        pes_download_path_check(settings_name, pes_download_path)
+        pes_download_path_check(SETTINGS_PATH, pes_download_path)
 
         # Check if the cpk name is listed on the dpfl file
-        cpk_name_check(settings_name, cpk_name, pes_download_path)
+        cpk_name_check(SETTINGS_PATH, cpk_name, pes_download_path)
 
         # If admin mode has been forced or is needed
         admin_needed = admin_mode or admin_check(pes_download_path)
 
         if sys.platform == "win32" and admin_needed:
 
-            # Prepare the path to the compiler_run.bat file in the same folder
-            current_dir = os.path.dirname(os.path.abspath(__file__))
-            compiler_run_path = os.path.join(current_dir, "compiler_run.bat")
-
             # Ask for admin permissions if not obtained yet
-            admin_request(compiler_run_path, run_type)
+            admin_request(RUN_BATCH_PATH, run_type)
 
     # Save the all-in-one mode
     os.environ['ALL_IN_ONE'] = str(int(all_in_one))
@@ -148,7 +148,7 @@ def main(run_type):
     exit_pause_skip = (
         run_pes and
         patches_from_contents_run and
-        not (os.path.exists("issues.log") and pause_on_error)
+        not (os.path.exists(ISSUES_LOG_PATH) and pause_on_error)
     )
 
     if not exit_pause_skip:

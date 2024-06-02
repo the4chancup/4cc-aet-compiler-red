@@ -7,6 +7,10 @@ import commentedconfigparser
 
 from .file_management import file_critical_check
 from .pausing import pause
+from .FILE_INFO import (
+    SETTINGS_PATH,
+    SETTINGS_DEFAULT_PATH,
+)
 
 
 def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
@@ -122,23 +126,6 @@ def settings_missing_check(default_file_path):
     return False
 
 
-def settings_default_path_get(file_path):
-
-    # Grab the extension of the file
-    file_extension = os.path.splitext(file_path)[1]
-
-    # Prepare the name of the default settings file, with "_default" appended
-    default_file_name = os.path.basename(file_path).replace(file_extension, "_default" + file_extension)
-
-    # Prepare the path to the default settings file inside the Engines\templates folder
-    default_file_path = os.path.join(os.path.dirname(file_path), "Engines", "templates", default_file_name)
-
-    # Check if the default settings file exists
-    file_critical_check(default_file_path)
-
-    return default_file_path
-
-
 def settings_default_init(file_path, default_file_path):
 
     # If there already is a main settings file, rename it by appending "_old" to it
@@ -172,41 +159,43 @@ def settings_default_init(file_path, default_file_path):
     exit()
 
 
-def settings_init(file_path):
+def settings_init():
 
-    # Prepare the name of the default settings file
-    default_file_path = settings_default_path_get(file_path)
+    # Check if the default settings file exists
+    file_critical_check(SETTINGS_DEFAULT_PATH)
+
+    SETTINGS_NAME = os.path.basename(SETTINGS_PATH)
 
     # Check if the file exists
-    if not os.path.isfile(file_path):
+    if not os.path.isfile(SETTINGS_PATH):
 
         logging.critical( "-")
-        logging.critical(f"- FATAL ERROR - Missing \"{file_path}\" file")
+        logging.critical(f"- FATAL ERROR - Missing \"{SETTINGS_NAME}\" file")
         logging.critical( "-")
         logging.critical( "- A clean settings file will be generated and opened")
         logging.critical( "- Please edit the settings as needed and restart the program")
         print("-")
         pause("Press any key to continue... ")
 
-        settings_default_init(file_path, default_file_path)
+        settings_default_init(SETTINGS_PATH, SETTINGS_DEFAULT_PATH)
 
     else:
 
         # Read the settings
         config = configparser.ConfigParser()
-        config.read(file_path)
+        config.read(SETTINGS_PATH)
 
         for section in config.sections():
             for key, value in config.items(section):
                 os.environ[key.upper()] = value
 
         # Check if any required settings are missing
-        settings_missing = settings_missing_check(default_file_path)
+        settings_missing = settings_missing_check(SETTINGS_DEFAULT_PATH)
         if settings_missing:
 
             logging.critical( "-")
             logging.critical( "- FATAL ERROR - Missing settings")
-            logging.critical(f"- The following required settings are missing from the \"{file_path}\" file:")
+            logging.critical(f"- The following required settings are missing from the \"{SETTINGS_NAME}\" file:")
             # Log the list of missing required settings
             for setting in settings_missing:
                 logging.critical(f"- \"{setting.lower()}\"")
@@ -214,14 +203,14 @@ def settings_init(file_path):
             logging.critical( "- Please edit the settings file as needed and restart the program")
             print( "-")
             print( "-")
-            print( "- If you type \"new\" and press Enter:")
-            print( "- A clean settings file will be generated and opened, and")
+            print( "- If you type \"new\" and press Enter,")
+            print( "- a clean settings file will be generated and opened, and")
             print( "- the old file will be renamed with \"_old\" at the end and opened too")
             print("-")
             choice = input("Type \"new\" and press Enter, or just press Enter to exit...")
 
             if "new" in choice:
-                settings_default_init(file_path, default_file_path)
+                settings_default_init(SETTINGS_PATH, SETTINGS_DEFAULT_PATH)
             else:
                 exit()
 

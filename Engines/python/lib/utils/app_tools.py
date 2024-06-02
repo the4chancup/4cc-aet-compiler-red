@@ -1,13 +1,18 @@
 import os
 
 
+from . import COLORS
 from .APP_DATA import (
     APP_VERSION_MAJOR,
     APP_VERSION_MINOR,
     APP_VERSION_PATCH,
     APP_VERSION_DEV,
 )
-from . import COLORS
+from .FILE_INFO import (
+    SUGGESTIONS_LOG_PATH,
+    ISSUES_LOG_PATH,
+)
+
 
 
 def app_title(colorize=True):
@@ -25,7 +30,7 @@ def app_title(colorize=True):
 
 
 def log_presence_warn():
-    if os.path.exists("issues.log"):
+    if os.path.exists(ISSUES_LOG_PATH):
         # Warn about there being some issues and about having to open the log
         print( "-")
         print(f"- {COLORS.DARK_YELLOW}Warning{COLORS.RESET}: There were some potential issues in the exports")
@@ -34,7 +39,7 @@ def log_presence_warn():
         print( "-")
         print(f"- {COLORS.DARK_GREEN}No issues were found{COLORS.RESET}")
 
-    if os.path.exists("suggestions.log"):
+    if os.path.exists(SUGGESTIONS_LOG_PATH):
         # Warn about there being some suggestions
         print( "-")
         print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are some suggestions available")

@@ -4,6 +4,10 @@ import shutil
 from . import pes_cpk_pack as cpktool
 from . import pes_fpk_pack as fpktool
 from .utils.file_management import file_critical_check
+from .utils.FILE_INFO import (
+    TEMPLATE_FOLDER_PATH,
+    GENERIC_FPKD_NAME,
+)
 
 
 def models_pack(models_type, models_source_path, models_destination_folder, cpk_folder_path):
@@ -140,10 +144,10 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
             shutil.move(fpk_destination_path, final_folder_path)
 
             # Copy the generic fpkd to the same folder and rename it
-            generic_fpkd_path = os.path.join("Engines", "templates", "generic.fpkd")
-            file_critical_check(generic_fpkd_path)
-            shutil.copy(generic_fpkd_path, final_folder_path)
-            os.rename(os.path.join(final_folder_path, "generic.fpkd"), os.path.join(final_folder_path, f"{models_type}.fpkd"))
+            GENERIC_FPKD_PATH = os.path.join(TEMPLATE_FOLDER_PATH, GENERIC_FPKD_NAME)
+            fpkd_destination_path = os.path.join(final_folder_path, f"{models_type}.fpkd")
+            file_critical_check(GENERIC_FPKD_PATH)
+            shutil.copy(GENERIC_FPKD_PATH, fpkd_destination_path)
 
             # Move the textures
             if models_type == "face":

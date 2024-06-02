@@ -11,6 +11,14 @@ from datetime import timedelta
 from .pausing import pause
 from .version_downloading import version_download
 from .settings_management import settings_transfer
+from .FILE_INFO import (
+    TEAMS_LIST_PATH,
+    EXPORTS_TO_ADD_PATH,
+    SETTINGS_PATH,
+    SETTINGS_TRANSFER_TABLE_PATH,
+    CHECK_LAST_PATH,
+    SKIP_LAST_PATH,
+)
 
 
 def website_exist(url):
@@ -107,41 +115,41 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     app_name_new = app_name + " " + version_latest
     app_new_folder = os.path.join(app_folder_parent, app_name_new)
 
-    settings_new_path = os.path.join(app_new_folder, "settings.ini")
+    settings_new_path = os.path.join(app_new_folder, os.path.basename(SETTINGS_PATH))
 
     if not update_major:
         # Copy the settings ini to the new folder after deleting the one in the old folder
         if os.path.exists(settings_new_path):
             os.remove(settings_new_path)
-        shutil.copy("settings.ini", app_new_folder)
+        shutil.copy(SETTINGS_PATH, app_new_folder)
 
     else:
         # Check if the new version has a transfer table
-        transfer_table_path = os.path.join(app_new_folder, "Engines", "templates", "settings_transfer_table.txt")
-        if not os.path.exists(transfer_table_path):
-            transfer_table_path = None
+        transfer_table_path = None
+        if os.path.exists(SETTINGS_TRANSFER_TABLE_PATH):
+            transfer_table_path = SETTINGS_TRANSFER_TABLE_PATH
 
         # Transfer the settings from the old ini to the new one
         settings_added, settings_removed, settings_renamed = (
-            settings_transfer("settings.ini", settings_new_path, transfer_table_path)
+            settings_transfer(SETTINGS_PATH, settings_new_path, transfer_table_path)
         )
 
     # Check if the teams_list.txt file is different from the new one
     if not update_major:
 
-        teams_list_curr_path = "teams_list.txt"
-        teams_list_new_path = os.path.join(app_new_folder, "teams_list.txt")
+        TEAMS_LIST_NAME = os.path.basename(TEAMS_LIST_PATH)
+        teams_list_new_path = os.path.join(app_new_folder, TEAMS_LIST_NAME)
 
-        if not filecmp.cmp(teams_list_curr_path, teams_list_new_path):
+        if not filecmp.cmp(TEAMS_LIST_PATH, teams_list_new_path):
 
-            print("-")
-            print("- A new different \"teams_list.txt\" file is available in the new version")
-            print("-")
+            print( "-")
+            print(f"- A new different \"{TEAMS_LIST_NAME}\" file is available in the new version")
+            print( "-")
             pause("Press any key to see the differences... ")
             # Print the differences between the two files
             with open(teams_list_new_path, "r") as f1:
-                with open(teams_list_curr_path, "r") as f2:
-                    diff = difflib.unified_diff(f1.readlines(), f2.readlines(), fromfile="teams_list.txt", tofile="teams_list.txt")
+                with open(TEAMS_LIST_PATH, "r") as f2:
+                    diff = difflib.unified_diff(f1.readlines(), f2.readlines(), fromfile=TEAMS_LIST_NAME + " current", tofile=TEAMS_LIST_NAME + " new")
                     for line in diff:
                         print(line, end="")
             print("-")
@@ -150,16 +158,17 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
             if "new" not in response:
                 if os.path.exists(teams_list_new_path):
                     os.remove(teams_list_new_path)
-                shutil.copy(teams_list_curr_path, app_new_folder)
+                shutil.copy(TEAMS_LIST_PATH, app_new_folder)
 
     # Move the contents of the exports_to_add folder to the new folder after deleting the one in the old folder
-    for file in os.listdir("exports_to_add"):
-        shutil.move(os.path.join("exports_to_add", file), os.path.join(app_new_folder, "exports_to_add"))
+    EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)
+    for file in os.listdir(EXPORTS_TO_ADD_PATH):
+        shutil.move(os.path.join(EXPORTS_TO_ADD_PATH, file), os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH))
 
-    print("-")
-    print("- Successfully downloaded and unpacked the latest version")
-    print("- The exports in the \"exports_to_add\" folder have been moved over")
-    print("-")
+    print( "-")
+    print( "- Successfully downloaded and unpacked the latest version")
+    print(f"- The exports in the \"{EXPORTS_TO_ADD_NAME}\" folder have been moved over")
+    print( "-")
     if not update_major:
         print("- The settings file has also been copied to the new folder")
     else:
@@ -193,10 +202,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 def updates_disable():
     """Disables update checking"""
 
-    with open("./settings.ini", "r") as f:
+    with open(SETTINGS_PATH, "r") as f:
         lines = f.readlines()
 
-    with open("./settings.ini", "w") as f:
+    with open(SETTINGS_PATH, "w") as f:
         for line in lines:
             if line.startswith("updates_check"):
                 line = "updates_check = 0\n"
@@ -235,15 +244,12 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
     releases_url = f"https://github.com/{app_owner}/{app_name}/releases/"
 
-    CHECK_LAST_FILE = "./Engines/update_check_last.txt"
-    SKIP_LAST_FILE = "./Engines/update_skip_last.txt"
-
     # Check the current time
     now = datetime.now()
 
     # Read the last check time
-    if os.path.exists(CHECK_LAST_FILE) and not check_force:
-        with open(CHECK_LAST_FILE, "r") as f:
+    if os.path.exists(CHECK_LAST_PATH) and not check_force:
+        with open(CHECK_LAST_PATH, "r") as f:
             check_last = f.read()
     else:
         check_last = None
@@ -264,7 +270,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         return None
 
     # Save the current time
-    with open(CHECK_LAST_FILE, "w") as f:
+    with open(CHECK_LAST_PATH, "w") as f:
         f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
 
     version_latest_list = version_latest.split(".")
@@ -289,8 +295,8 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     print(f"- The latest version is {version_latest}")
 
     # Read the last skipped version
-    if os.path.exists(SKIP_LAST_FILE) and not check_force:
-        with open(SKIP_LAST_FILE, "r") as f:
+    if os.path.exists(SKIP_LAST_PATH) and not check_force:
+        with open(SKIP_LAST_PATH, "r") as f:
             skip_last = f.read()
     else:
         skip_last = None
@@ -333,7 +339,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
         case "skip":
             # Save the latest version
-            with open(SKIP_LAST_FILE, "w") as f:
+            with open(SKIP_LAST_PATH, "w") as f:
                 f.write(version_latest)
 
         case "fuckoff":

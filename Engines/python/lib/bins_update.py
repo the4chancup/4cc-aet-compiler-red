@@ -3,6 +3,10 @@ import os
 import logging
 
 from .utils.file_management import file_critical_check
+from .utils.FILE_INFO import (
+    EXTRACTED_PATH,
+    TEAMS_LIST_PATH,
+)
 
 
 def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
@@ -183,11 +187,8 @@ def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
 
 def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
-    EXTRACTED_EXPORTS_FOLDER = "./extracted_exports/"
-    TEAMS_LIST_FILE = "teams_list.txt"
-
     # Check if the teams list file exists
-    file_critical_check(TEAMS_LIST_FILE)
+    file_critical_check(TEAMS_LIST_PATH)
 
     # Read the necessary parameters
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
@@ -203,7 +204,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     kitcolor_bin = open(kitcolor_bin_path, 'rb+')
 
     # For every Note txt file
-    for file_name in [f for f in os.listdir(EXTRACTED_EXPORTS_FOLDER) if f.endswith("Note.txt")]:
+    for file_name in [f for f in os.listdir(EXTRACTED_PATH) if f.endswith("Note.txt")]:
 
         # Initialize variables
         stop = None
@@ -218,7 +219,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
         kitcols_player_cnt = 0
         kitcols_gk_cnt = 0
 
-        file_path = os.path.join(EXTRACTED_EXPORTS_FOLDER, file_name)
+        file_path = os.path.join(EXTRACTED_PATH, file_name)
         with open(file_path, 'r', encoding="utf8") as file:
 
             for line in file:
@@ -240,7 +241,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     team_name = data[-1]
 
                     # Search for the team name in the list of team IDs
-                    with open(TEAMS_LIST_FILE, 'r') as teams_list:
+                    with open(TEAMS_LIST_PATH, 'r') as teams_list:
 
                         for teams_list_line in teams_list:
                             if teams_list_line.split()[1] == team_name.lower():
@@ -327,7 +328,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
             kitcols_cnt = kitcols_player_cnt + kitcols_gk_cnt
 
             # Set the kit configs folder path
-            kit_configs_folder_path = os.path.join('extracted_exports', 'Kit Configs', team_id)
+            kit_configs_folder_path = os.path.join(EXTRACTED_PATH, 'Kit Configs', team_id)
 
             # If there's a kit configs folder and we haven't checked the amount of kits before
             if os.path.exists(kit_configs_folder_path) and not all_in_one:

@@ -3,45 +3,48 @@ import shutil
 import xml.etree.ElementTree as ET
 
 from .file_management import file_critical_check
+from .FILE_INFO import (
+    TEMPLATE_FOLDER_PATH,
+    DUMMY_MODEL_NAME,
+    DUMMY_MTL_NAME,
+)
 
 
 def dummy_element(folder_path, mtl_path_list):
 
-    DUMMY_MODEL_NAME = "oral_dummy_win32.model"
-    DUMMY_MTL_NAME_DEFAULT = "dummy.mtl"
+    DUMMY_MODEL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, DUMMY_MODEL_NAME)
+    DUMMY_MTL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, DUMMY_MTL_NAME)
 
     # Copy the oral_dummy_win32.model file from the templates folder to the xml folder
-    dummy_model_source = os.path.join('Engines', 'templates', DUMMY_MODEL_NAME)
     dummy_model_destination = os.path.join(folder_path, DUMMY_MODEL_NAME)
-    file_critical_check(dummy_model_source)
-    shutil.copyfile(dummy_model_source, dummy_model_destination)
+    file_critical_check(DUMMY_MODEL_PATH)
+    shutil.copyfile(DUMMY_MODEL_PATH, dummy_model_destination)
 
-    dummy_model_path = f"./{DUMMY_MODEL_NAME.replace('win32', '*')}"
+    dummy_model_path_xml = f"./{DUMMY_MODEL_NAME.replace('win32', '*')}"
 
     if mtl_path_list:
-        dummy_mtl_path = mtl_path_list[0]
+        dummy_mtl_path_xml = mtl_path_list[0]
     else:
         # Copy the dummy.mtl file from the templates folder to the xml folder
-        dummy_mtl_source = os.path.join('Engines', 'templates', DUMMY_MTL_NAME_DEFAULT)
-        dummy_mtl_destination = os.path.join(folder_path, DUMMY_MTL_NAME_DEFAULT)
-        file_critical_check(dummy_mtl_source)
-        shutil.copyfile(dummy_mtl_source, dummy_mtl_destination)
+        dummy_mtl_destination = os.path.join(folder_path, DUMMY_MTL_NAME)
+        file_critical_check(DUMMY_MTL_PATH)
+        shutil.copyfile(DUMMY_MTL_PATH, dummy_mtl_destination)
 
-        dummy_mtl_path = f"./{DUMMY_MTL_NAME_DEFAULT}"
+        dummy_mtl_path_xml = f"./{DUMMY_MTL_NAME}"
 
     # Then add a model entry to the .xml file, with the type "face_neck" and the first mtl path from the list
     dummy_model = ET.Element('model')
     dummy_model.set('level', '0')
     dummy_model.set('type', 'face_neck')
-    dummy_model.set('path', dummy_model_path)
-    dummy_model.set('material', dummy_mtl_path)
+    dummy_model.set('path', dummy_model_path_xml)
+    dummy_model.set('material', dummy_mtl_path_xml)
 
     return dummy_model
 
 
 def glove_element(folder_path, glove_side):
 
-    MTL_NAME_DEFAULT = "materials.mtl"
+    MTL_DEFAULT_NAME = "materials.mtl"
 
     glove_name = f"glove_{glove_side}.model"
     glove_path = os.path.join(folder_path, glove_name)
@@ -51,13 +54,13 @@ def glove_element(folder_path, glove_side):
         glove_type = f"glove{glove_side.upper()}"
         glove_path_xml = f"./{glove_name}"
 
-        mtl_name = glove_name.replace('.model', '.mtl')
-        mtl_path_xml_test = os.path.join(folder_path, mtl_name)
+        mtl_test_name = glove_name.replace('.model', '.mtl')
+        mtl_test_path = os.path.join(folder_path, mtl_test_name)
 
-        if os.path.isfile(mtl_path_xml_test):
-            mtl_path_xml = f"./{mtl_name}"
+        if os.path.isfile(mtl_test_path):
+            mtl_path_xml = f"./{mtl_test_name}"
         else:
-            mtl_path_xml = f"./{MTL_NAME_DEFAULT}"
+            mtl_path_xml = f"./{MTL_DEFAULT_NAME}"
 
         # Add a model entry to the root
         model = ET.Element('model')

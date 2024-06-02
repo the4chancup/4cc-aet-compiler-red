@@ -4,11 +4,11 @@ import logging
 from . import COLORS
 from .pausing import pause
 from .app_tools import app_title
-
-
-SUGGESTIONS_LOG_NAME = "suggestions.log"
-ISSUES_LOG_NAME = "issues.log"
-CRASH_LOG_NAME = "crash.log"
+from .FILE_INFO import (
+    SUGGESTIONS_LOG_PATH,
+    ISSUES_LOG_PATH,
+    CRASH_LOG_PATH
+)
 
 
 class ColorFilter(logging.Filter):
@@ -33,18 +33,20 @@ class ColorFilter(logging.Filter):
         return True
 
 
-def log_store(log_name):
+def log_store(log_path):
 
-    if not os.path.exists(log_name):
+    if not os.path.exists(log_path):
         return
 
-    log_name_old = log_name + ".old"
+    log_path_old = log_path + ".old"
 
-    if os.path.exists(log_name_old):
-        os.remove(log_name_old)
+    log_name = os.path.basename(log_path)
+
+    if os.path.exists(log_path_old):
+        os.remove(log_path_old)
 
     try:
-        os.rename(log_name, log_name_old)
+        os.rename(log_path, log_path_old)
 
     except PermissionError:
         print( "-")
@@ -56,7 +58,7 @@ def log_store(log_name):
         input("Press Enter to continue after checking... ")
 
         try:
-            os.rename(log_name, log_name_old)
+            os.rename(log_path, log_path_old)
 
         except PermissionError:
             print( "-")
@@ -76,11 +78,11 @@ def logger_init(__name__):
 
 
     # If a suggestions log file already exists, add .old to it
-    log_store(SUGGESTIONS_LOG_NAME)
+    log_store(SUGGESTIONS_LOG_PATH)
 
     # Create a file handler which will only store INFO messages
     # It will only create a file when a message occurs
-    suggestions_log_handler = logging.FileHandler(SUGGESTIONS_LOG_NAME, delay=True)
+    suggestions_log_handler = logging.FileHandler(SUGGESTIONS_LOG_PATH, delay=True)
     suggestions_log_handler.setLevel(logging.INFO)
     suggestions_log_handler.addFilter(lambda record: record.levelno == logging.INFO)
 
@@ -89,11 +91,11 @@ def logger_init(__name__):
 
 
     # If an issues log file already exists, add .old to it
-    log_store(ISSUES_LOG_NAME)
+    log_store(ISSUES_LOG_PATH)
 
     # Create a file handler which which will only store WARNING messages or higher
     # It will only create a file when a message occurs
-    issues_log_handler = logging.FileHandler(ISSUES_LOG_NAME, delay=True)
+    issues_log_handler = logging.FileHandler(ISSUES_LOG_PATH, delay=True)
     issues_log_handler.setLevel(logging.WARNING)
 
     # Add it to the root logger
@@ -110,13 +112,13 @@ def logger_init(__name__):
 
 
     # If a crash log file already exists, add .old to it
-    log_store(CRASH_LOG_NAME)
+    log_store(CRASH_LOG_PATH)
 
     # Create a logger
     logger = logging.getLogger(__name__)
 
     # Create a file handler which will only create a file when an exception occurs
-    crash_log_handler = logging.FileHandler(CRASH_LOG_NAME, delay=True)
+    crash_log_handler = logging.FileHandler(CRASH_LOG_PATH, delay=True)
 
     # Create a formatter and add it to the handler
     formatter = logging.Formatter('%(asctime)-15s - %(name)s - %(levelname)s - %(message)s')
@@ -133,10 +135,10 @@ def logger_stop():
     logging.shutdown()
 
     # Check if any of the non-crash log files exist and add the program version to them
-    for log_name in [SUGGESTIONS_LOG_NAME, ISSUES_LOG_NAME]:
-        if os.path.isfile(log_name):
-            with open(log_name, "r") as log_file:
+    for log_path in [SUGGESTIONS_LOG_PATH, ISSUES_LOG_PATH]:
+        if os.path.isfile(log_path):
+            with open(log_path, "r") as log_file:
                 previous_contents = log_file.read()
 
-            with open(log_name, "w") as log_file:
+            with open(log_path, "w") as log_file:
                 log_file.write("- " + app_title(colorize=False) + "\n" + previous_contents)

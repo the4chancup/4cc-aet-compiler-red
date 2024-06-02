@@ -4,15 +4,14 @@ import logging
 
 from .utils.file_management import file_critical_check
 from .utils.pausing import pause
+from .utils.FILE_INFO import TEAMS_LIST_PATH
 
 
 # Function for finding the team ID after receiving the foldername as parameter
 def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_max):
 
-    TEAMS_LIST_FILE = "teams_list.txt"
-
     # Check if the teams list file exists
-    file_critical_check(TEAMS_LIST_FILE)
+    file_critical_check(TEAMS_LIST_PATH)
 
     # Read the necessary parameters
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
@@ -135,7 +134,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
             print(f"- Actual name: {team_name} ", end='')
 
         # Search for the team ID on the list of team names
-        with open(TEAMS_LIST_FILE, 'r') as team_file:
+        with open(TEAMS_LIST_PATH, 'r') as team_file:
             for line in team_file.readlines()[1:]:
                 if team_name.lower() == line.split()[1].lower():
                     team_id = line.split()[0]
@@ -145,7 +144,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
     if not team_id:
 
         # Check if the team name taken from the export foldername with brackets added is on the list
-        with open(TEAMS_LIST_FILE, 'r') as team_file:
+        with open(TEAMS_LIST_PATH, 'r') as team_file:
             for line in team_file.readlines()[1:]:
                 if team_name_folder.lower() == line.split()[1].lower():
                     team_id = line.split()[0]
@@ -154,6 +153,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
 
     # If no usable team name was found even then
     if not team_id:
+        TEAMS_LIST_NAME = os.path.basename(TEAMS_LIST_PATH)
 
         logging.error( "-")
         logging.error( "- ERROR - Unusable team name")
@@ -163,7 +163,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
             logging.error(f"- Team name:      {team_name_folder}")
         logging.error( "- The team name was not found on the teams list file")
         logging.error( "- This export will be discarded to prevent conflicts")
-        logging.error(f"- Add the team name to the \"{TEAMS_LIST_FILE}\" file and restart")
+        logging.error(f"- Add the team name to the \"{TEAMS_LIST_NAME}\" file and restart")
 
         if pause_on_error:
             print("-")

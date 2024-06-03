@@ -54,7 +54,7 @@ def contents_from_extracted():
     print("-")
 
 
-    # If Bins Updating is enabled and there's an extracted_exports folder
+    # If Bins Updating is enabled and there's an "extracted" folder
     if bins_updating and os.path.exists(EXTRACTED_PATH):
 
         print("-")
@@ -387,7 +387,7 @@ def contents_from_extracted():
         shutil.rmtree(main_dir)
 
 
-    # Finally delete the extracted exports folder
+    # Finally delete the "extracted" folder
     if os.path.exists(EXTRACTED_PATH):
         shutil.rmtree(EXTRACTED_PATH)
 

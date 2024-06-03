@@ -163,7 +163,7 @@ def extracted_from_exports():
         # If the export has a Note.txt file, append it to the teamnotes.txt file
         note_txt_append(team_name, export_destination_path)
 
-        # Move the contents of the export to the root of extracted_exports
+        # Move the contents of the export to the root of "extracted"
         export_move(export_destination_path, team_id, team_name)
 
         # If fox mode is enabled and the team has a common folder replace the dummy textures with the kit 1 textures

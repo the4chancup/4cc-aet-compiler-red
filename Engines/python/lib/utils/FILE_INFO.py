@@ -1,6 +1,6 @@
 # Folder paths
 EXPORTS_TO_ADD_PATH          = "./exports_to_add"
-EXTRACTED_PATH               = "./extracted_exports"
+EXTRACTED_PATH               = "./extracted"
 PATCHES_CONTENTS_PATH        = "./patches_contents"
 PATCHES_OUTPUT_PATH          = "./patches_output"
 

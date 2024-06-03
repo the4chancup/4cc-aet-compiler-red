@@ -16,7 +16,7 @@ higher.
 ## 1_exports_to_extracted
 
 This script extracts the exports located in the exports_to_add folder into the
-extracted_exports folder, then checks them for typical issues, discarding the
+"extracted" folder, then checks them for typical issues, discarding the
 whole export or parts of it if it finds any.
 It also saves a log file named issues.log with the list of problems it found,
 and pauses at every error unless the pause_on_error setting has been disabled
@@ -73,13 +73,13 @@ called teamnotes.txt, allowing you to read them all quickly without having
 to open multiple files.
 
 Use this script on its own if you only want to check the exports for
-correctness and/or prepare the extracted_exports folder for the next step.
+correctness and/or prepare the "extracted" folder for the next step.
 
 
 ## 2_extracted_to_contents
 
 This script makes a cpk/fpk for each of the folders in the Faces folder inside
-the extracted_exports folder and stores it in the Singlecpk or Facescpk folder
+the "extracted" folder and stores it in the Singlecpk or Facescpk folder
 inside the patches_contents folder.
 
 It also moves the content from the other Kits, Boots, Gloves, Collars, Logo,

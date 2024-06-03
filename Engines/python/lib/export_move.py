@@ -73,7 +73,7 @@ def kit_masks_check(team_itemfolder_path, file_ext):
 
 
 def export_move(exportfolder_path, team_id, team_name):
-    '''Move the contents of the export to the root of the extracted_exports folder'''
+    '''Move the contents of the export to the root of the "extracted" folder'''
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)

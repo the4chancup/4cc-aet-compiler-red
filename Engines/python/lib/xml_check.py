@@ -146,7 +146,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         if error_file_missing:
 
             if not file_path_short:
-                # Remove "extracted_exports/" from the path
+                # Remove "extracted/" from the path ("./extracted" minus one character)
                 extracted_path_length = len(EXTRACTED_PATH)
                 file_path_short = file_path[(extracted_path_length-1):]
 

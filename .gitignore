@@ -2,7 +2,7 @@
 *.log
 *.old
 teamnotes.txt
-extracted_exports
+extracted
 patches_contents
 patches_output
 sideload

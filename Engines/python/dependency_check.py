@@ -21,9 +21,9 @@ def dependency_check_on_import():
 
     # Prepare a list of dependencies as dictionaries with name and name_pip
     dependencies = [
-        {"name": "py7zr",                    "name_pip": "py7zr"},
-        {"name": "requests",                 "name_pip": "requests"},
-        {"name": "commentedconfigparser",    "name_pip": "commented-configparser"},
+        {"name": "py7zr"                   , "name_pip": "py7zr"                   },
+        {"name": "requests"                , "name_pip": "requests"                },
+        {"name": "commentedconfigparser"   , "name_pip": "commented-configparser"  },
         {"name": "traceback_with_variables", "name_pip": "traceback_with_variables"},
     ]
 

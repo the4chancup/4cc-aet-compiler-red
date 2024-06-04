@@ -112,11 +112,11 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
 
     # Prepare a list of dictionaries of path info
     path_info_list = [
-        {"type": "face",    "id_pattern": "[0-9]{5}",        "section_count": 10, "id_section": 7},
+        {"type": "face"   , "id_pattern": "[0-9]{5}"       , "section_count": 10, "id_section": 7},
         {"type": "referee", "id_pattern": "referee[0-9]{3}", "section_count": 10, "id_section": 7},
-        {"type": "boots",   "id_pattern": "k[0-9]{4}",       "section_count": 8,  "id_section": 6},
-        {"type": "glove",   "id_pattern": "g[0-9]{4}",       "section_count": 8,  "id_section": 6},
-        {"type": "ball",    "id_pattern": "ball[0-9]{3}",    "section_count": 7,  "id_section": 5},
+        {"type": "boots"  , "id_pattern": "k[0-9]{4}"      , "section_count": 8 , "id_section": 6},
+        {"type": "glove"  , "id_pattern": "g[0-9]{4}"      , "section_count": 8 , "id_section": 6},
+        {"type": "ball"   , "id_pattern": "ball[0-9]{3}"   , "section_count": 7 , "id_section": 5},
     ]
 
     # Check the type of ID that was provided

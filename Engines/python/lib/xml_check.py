@@ -146,9 +146,9 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         if error_file_missing:
 
             if not file_path_short:
-                # Remove "extracted/" from the path ("./extracted" minus one character)
+                # Remove the extracted folder path and / from the path
                 extracted_path_length = len(EXTRACTED_PATH)
-                file_path_short = file_path[(extracted_path_length-1):]
+                file_path_short = file_path[(extracted_path_length+1):]
 
             ##TODO: Make error-only and merge once the templates have been updated
             type_string_raw = f"{listed_file_type} path:"

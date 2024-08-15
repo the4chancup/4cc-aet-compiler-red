@@ -94,14 +94,14 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
     file_binary.seek(section1_offset + string_end)
     for i in range(string_count):
         string = file_binary.read(string_length_list[i]+1).rstrip(b'\0').decode('utf-8')
-        if(string):
+        if string is not None:
             string_list.append(string)
 
     # Scan textures
     file_binary.seek(header_length + texture_offset)
     texture_index_list = []
     texture_path_list = []
-    for i in range(texture_count):
+    for i in range(texture_count*2): # 2 strings per texture: directory and filename
         texture_index = struct.unpack("<H", file_binary.read(2))[0]
         if texture_index not in texture_index_list:
             texture_index_list.append(texture_index)

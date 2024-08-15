@@ -1,6 +1,5 @@
 import os
 
-
 from . import COLORS
 from .APP_DATA import (
     APP_VERSION_MAJOR,
@@ -12,7 +11,6 @@ from .FILE_INFO import (
     SUGGESTIONS_LOG_PATH,
     ISSUES_LOG_PATH,
 )
-
 
 
 def app_title(colorize=True):

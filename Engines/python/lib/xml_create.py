@@ -1,4 +1,5 @@
 import os
+import copy
 import base64
 import xml.etree.ElementTree as ET
 
@@ -119,8 +120,8 @@ def xml_create(folder_path, folder_type):
 
         if diff_type == "xml":
             diff_file = ET.ElementTree(file=diff_xml_path)
-            diff = diff_file.getroot()
-            os.remove(diff_xml_path)
+            diff_temp = diff_file.getroot()
+            diff = copy.deepcopy(diff_temp)
         else:
             diff = ET.Element("dif")
             diff_file = open(diff_bin_path, 'rb').read()

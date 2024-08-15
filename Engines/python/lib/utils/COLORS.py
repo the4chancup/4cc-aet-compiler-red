@@ -1,7 +1,21 @@
 import os
+import sys
 
-# Check if the NO_COLOR environment variable is set
-colorize = "NO_COLOR" not in os.environ
+
+if sys.platform == "win32":
+
+    # Enable color on Windows 10+ only
+    win_version = sys.getwindowsversion().major
+
+    # Check if the NO_COLOR environment variable is set
+    colorize = "NO_COLOR" not in os.environ and win_version >= 10
+
+    if colorize:
+        os.system("color")
+
+else:
+    # Check if the NO_COLOR environment variable is set
+    colorize = "NO_COLOR" not in os.environ
 
 BLACK          = '\033[30m' if colorize else ''
 

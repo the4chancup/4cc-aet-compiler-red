@@ -162,11 +162,6 @@ if __name__ == "__main__":
         # Set the console title
         os.system("title " + app_title(colorize=False))
 
-        # Enable color on Windows 10+
-        win_version = sys.getwindowsversion().major
-        if "NO_COLOR" not in os.environ and win_version >= 10:
-            os.system("color")
-
     print("-")
     print("-")
     print("- " + app_title())

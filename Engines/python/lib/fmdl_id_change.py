@@ -137,9 +137,10 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
         texture_path_section_count = len(texture_path_split)
 
         # Model ID
-        if(texture_path_section_count == model_path_info["section_count"] and
-            re.fullmatch(model_path_info["id_pattern"], texture_path_split[model_path_info["id_section"]])):
-
+        if(
+            texture_path_section_count == model_path_info["section_count"] and
+            re.fullmatch(model_path_info["id_pattern"], texture_path_split[model_path_info["id_section"]])
+        ):
             # Change the ID
             texture_path_split[model_path_info["id_section"]] = model_id
             # Overwrite old path in the string list
@@ -176,8 +177,8 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
 
     # Re-write FMDL strings
     for string in string_list:
-        file_binary.write(struct.pack("B", 0))
         file_binary.write(bytes(string, 'utf-8'))
+        file_binary.write(struct.pack("B", 0))
 
     # Done, close file for good and exit
     file_binary.close()

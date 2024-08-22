@@ -123,6 +123,11 @@ def main(run_type):
             # Ask for admin permissions if not obtained yet
             admin_request(RUN_BATCH_PATH, run_type)
 
+    elif patches_from_contents_run:
+
+        # Check if the cpk name is listed on the dpfl file
+        cpk_name_check(SETTINGS_PATH, cpk_name, pes_download_path, compulsory=False)
+
     # Save the all-in-one mode
     os.environ['ALL_IN_ONE'] = str(int(all_in_one))
 

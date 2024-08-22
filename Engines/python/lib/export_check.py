@@ -99,6 +99,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         # Initialize error subflags
         folder_error_num = False
         folder_error_edithairxml = False
+        folder_error_hairxml = False
         folder_error_xml_format = False
         folder_error_tex_format = False
         folder_error_mtl_format = False
@@ -108,12 +109,15 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error_num = not (subfolder_name[3:5].isdigit() and '01' <= subfolder_name[3:5] <= '23')
 
         if not fox_mode:
-            # Check if the folder has a face.xml or the unsupported face_edithair.xml file
+            # Check if the folder has a face.xml or the unsupported face_edithair.xml and hair.xml
             face_xml_path = os.path.join(subfolder_path, "face.xml")
             face_diff_xml_path = os.path.join(subfolder_path, "face_diff.xml")
             face_edithair_xml_path = os.path.join(subfolder_path, "face_edithair.xml")
+            hair_xml_path = os.path.join(subfolder_path, "hair.xml")
             if os.path.isfile(face_edithair_xml_path):
                 folder_error_edithairxml = True
+            elif os.path.isfile(hair_xml_path):
+                folder_error_hairxml = True
             elif os.path.isfile(face_xml_path):
                 folder_error_xml_format = xml_check(face_xml_path, team_id)
             elif os.path.isfile(face_diff_xml_path):
@@ -156,6 +160,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error = (
             folder_error_num or
             folder_error_edithairxml or
+            folder_error_hairxml or
             folder_error_xml_format or
             folder_error_tex_format or
             folder_error_mtl_format
@@ -180,6 +185,8 @@ def faces_check(exportfolder_path, team_name, team_id):
                 logging.error( "- (broken xml file)")
             if folder_error_edithairxml:
                 logging.error( "- (unsupported edithair face folder, needs updating)")
+            if folder_error_hairxml:
+                logging.error( "- (unsupported hair xml inside, needs updating)")
             if folder_error_tex_format:
                 logging.error( "- (bad textures)")
             if folder_error_mtl_format:

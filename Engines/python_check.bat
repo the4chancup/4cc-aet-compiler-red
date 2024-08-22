@@ -2,6 +2,18 @@ REM - Script to check if python is in the PATH and that its version is 3.12 or h
 
 setlocal EnableDelayedExpansion
 
+REM - Check if the Windows version is 7
+ver | find "6.1." > nul
+echo %ERRORLEVEL%
+
+if %ERRORLEVEL% == 0 (
+  REM - Windows 7
+  set "python_link=https://github.com/adang1345/PythonWin7"
+) else (
+  REM - Windows 8 or newer
+  set "python_link=https://www.python.org/downloads/"
+)
+
 for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
 
   set python_version_line=%%A
@@ -36,7 +48,7 @@ if not defined python_installed (
 
   pause >nul
 
-  start "" https://www.python.org/downloads/
+  start "" %python_link%
 
   timeout /t 3 >nul
 
@@ -72,7 +84,7 @@ if not defined python_version_ok (
 
   pause >nul
 
-  start "" https://www.python.org/downloads/
+  start "" %python_link%
 
   timeout /t 3 >nul
 

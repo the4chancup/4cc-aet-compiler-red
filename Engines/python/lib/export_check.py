@@ -3,7 +3,6 @@ import os
 import shutil
 import logging
 
-from .utils.zlib_plus import unzlib_file
 from .utils.pausing import pause
 from .texture_check import texture_check
 from .xml_check import mtl_check
@@ -253,10 +252,6 @@ def kitconfigs_check(exportfolder_path, team_name):
             break
 
         config_list.append(file_name[3:].lower())
-
-        # Unzlib it if needed
-        file_path = os.path.join(itemfolder_path, file_name)
-        unzlib_file(file_path)
 
     # If any file was wrong
     if file_error:

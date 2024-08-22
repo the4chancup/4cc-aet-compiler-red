@@ -151,7 +151,6 @@ def faces_check(exportfolder_path, team_name, team_id):
             for file_name in folder_error_file_unrecognized_list:
                 logging.warning(f"- File name:      {file_name}")
             logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex, skl files are allowed")
-            logging.warning( "-")
             logging.warning( "- <After the next major update this will be an error which discards the folder>")
 
         # Set the main flag if any of the checks failed

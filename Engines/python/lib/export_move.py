@@ -38,6 +38,9 @@ def textures_id_change(subfolder_path, team_id):
         # Look for u0XXXp and replace it with the actual team ID
         texture_path_new = re.sub(r'u0([a-zA-Z0-9]){3}p', 'u0'+team_id+'p', texture_path)
 
+        # Look for u0XXXg and replace it with the actual team ID
+        texture_path_new = re.sub(r'u0([a-zA-Z0-9]){3}g', 'u0'+team_id+'g', texture_path)
+
         if texture_path_new == texture_path:
             continue
 

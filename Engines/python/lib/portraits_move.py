@@ -1,5 +1,6 @@
 import os
 import shutil
+import filecmp
 import logging
 
 from .utils.pausing import pause
@@ -47,10 +48,19 @@ def portraits_move(exportfolder_path, team_id):
                 portrait_name = f"player_{player_id}.dds"
 
                 # Check if a file with the same player number already exists in the portraits folder
-                if any(fname[-6:-4] == player_number for fname in os.listdir(portraits_path)):
+                existing_portrait = next((f for f in os.listdir(portraits_path) if f[-6:-4] == player_number), None)
+                if existing_portrait:
+                    portrait_destination_path = os.path.join(portraits_path, existing_portrait)
 
-                    # Add the face name to the list of conflicts
-                    portrait_conflicts.append(face_name)
+                    # Check if the portait files have the same contents
+                    if not (os.path.exists(portrait_destination_path) and
+                            filecmp.cmp(portrait_path, portrait_destination_path)):
+
+                        # If they do not, add the face name to the list of conflicts
+                        portrait_conflicts.append(face_name)
+                    else:
+                        # If they do, delete the portrait
+                        os.remove(portrait_path)
 
                 else:
                     # Move the portrait to the portraits folder

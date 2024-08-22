@@ -857,10 +857,6 @@ def gloves_check(exportfolder_path, team_name, team_id):
             print("-")
             pause()
 
-        # If the folder exists but is empty, delete it
-        else:
-            shutil.rmtree(itemfolder_path)
-
 
 # If an Other folder exists, check that it's not empty
 def other_check(exportfolder_path, team_name):

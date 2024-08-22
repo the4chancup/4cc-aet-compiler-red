@@ -87,6 +87,7 @@ def faces_check(exportfolder_path, team_name, team_id):
     ]
 
     folder_error_any = None
+    player_num_list = []
 
     # Prepare a list of subfolders
     subfolder_list = [subfolder for subfolder in os.listdir(itemfolder_path) if os.path.isdir(os.path.join(itemfolder_path, subfolder))]
@@ -97,7 +98,8 @@ def faces_check(exportfolder_path, team_name, team_id):
         subfolder_path = os.path.join(itemfolder_path, subfolder_name)
 
         # Initialize error subflags
-        folder_error_num = False
+        folder_error_num_bad = False
+        folder_error_num_repeated = False
         folder_error_edithairxml = False
         folder_error_hairxml = False
         folder_error_xml_format = False
@@ -106,7 +108,14 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error_file_unrecognized_list = []
 
         # Check that the player number is within the 01-23 range
-        folder_error_num = not (subfolder_name[3:5].isdigit() and '01' <= subfolder_name[3:5] <= '23')
+        player_num = int(subfolder_name[3:5])
+        folder_error_num_bad = not (subfolder_name[3:5].isdigit() and 1 <= player_num <= 23)
+
+        # Check if the player number is already in the list
+        if player_num in player_num_list:
+            folder_error_num_repeated = True
+
+        player_num_list.append(player_num)
 
         if not fox_mode:
             # Check if the folder has a face.xml or the unsupported face_edithair.xml and hair.xml
@@ -158,7 +167,8 @@ def faces_check(exportfolder_path, team_name, team_id):
 
         # Set the main flag if any of the checks failed
         folder_error = (
-            folder_error_num or
+            folder_error_num_bad or
+            folder_error_num_repeated or
             folder_error_edithairxml or
             folder_error_hairxml or
             folder_error_xml_format or
@@ -179,8 +189,10 @@ def faces_check(exportfolder_path, team_name, team_id):
             logging.error(f"- Face folder:    {subfolder_name}")
 
             # Give an error depending on the particular problem
-            if folder_error_num:
+            if folder_error_num_bad:
                 logging.error(f"- (player number {subfolder_name[3:5]} outside the 01-23 range)")
+            if folder_error_num_repeated:
+                logging.error(f"- (player number {subfolder_name[3:5]} already in use)")
             if folder_error_xml_format:
                 logging.error( "- (broken xml file)")
             if folder_error_edithairxml:

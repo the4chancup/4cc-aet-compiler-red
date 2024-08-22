@@ -135,12 +135,15 @@ def pes_download_path_check(settings_name, pes_download_path):
     exit()
 
 
-def cpk_name_check(settings_name, cpk_name, pes_download_path):
+def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
     '''Check if the cpk name is listed on the dpfl file'''
 
     dpfl_path = os.path.join(pes_download_path, "DpFileList.bin")
 
     if not os.path.exists(dpfl_path):
+        if not compulsory:
+            return
+
         logging.critical( "-")
         logging.critical( "- FATAL ERROR - DpFileList file not found in the PES download folder")
         logging.critical(f"- Path: {dpfl_path}")
@@ -156,6 +159,18 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path):
     dpfl_list = dpfl_scan(dpfl_path)
 
     if (cpk_name + ".cpk") in dpfl_list:
+        return
+
+    if not compulsory:
+        logging.warning( "-")
+        logging.warning( "- Warning - CPK name not listed on the DpFileList file")
+        logging.warning(f"- CPK name: {cpk_name}")
+        logging.warning( "-")
+        logging.warning( "- PES probably won't load this CPK if you move it to the PES download folder")
+        logging.warning( "- Changing the CPK name in the settings file back to the default name is")
+        logging.warning( "- recommended")
+        print("-")
+        pause()
         return
 
     logging.critical( "-")

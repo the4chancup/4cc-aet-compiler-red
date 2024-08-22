@@ -48,7 +48,7 @@ def file_exists(file_path):
     # Check if the filename contains the u0XXXg pattern
     elif re.search(r'u0[a-zA-Z0-9]{3}g', file_name):
 
-        # Search for a u0XXXp1 file in the folder where the file should be
+        # Search for a u0XXXg1 file in the folder where the file should be
         for file in os.listdir(file_folder):
             if re.search(r'u0[a-zA-Z0-9]{3}g1', file):
                 return True

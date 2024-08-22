@@ -582,6 +582,7 @@ def boots_check(exportfolder_path, team_name, team_id):
     ]
 
     folder_error_any = None
+    folder_num_list = []
 
     # Prepare a list of subfolders
     subfolder_list = [subfolder for subfolder in os.listdir(itemfolder_path) if os.path.isdir(os.path.join(itemfolder_path, subfolder))]
@@ -593,13 +594,21 @@ def boots_check(exportfolder_path, team_name, team_id):
 
         # Initialize error subflags
         folder_error_name = False
+        folder_error_num_repeated = False
         folder_error_model_disallowed_list = []
         folder_error_tex_format = False
         folder_error_mtl_format = False
         folder_error_file_unrecognized_list = []
 
         # Check that its name starts with a k and that the 4 characters after it are digits
+        folder_num = int(subfolder_name[1:5])
         folder_error_name = not (subfolder_name.startswith('k') and subfolder_name[1:5].isdigit())
+
+        # Check that the number is not repeated
+        if folder_num in folder_num_list:
+            folder_error_num_repeated = True
+
+        folder_num_list.append(folder_num)
 
         if not fox_mode:
             # If there's no xml, check that all of the .model files are allowed
@@ -647,6 +656,7 @@ def boots_check(exportfolder_path, team_name, team_id):
         # Set the main flag if any of the checks failed
         folder_error = (
             folder_error_name or
+            folder_error_num_repeated or
             folder_error_model_disallowed_list or
             folder_error_tex_format or
             folder_error_mtl_format
@@ -667,6 +677,8 @@ def boots_check(exportfolder_path, team_name, team_id):
             # Give an error depending on the particular problem
             if folder_error_name:
                 logging.error( "- (wrong folder name)")
+            if folder_error_num_repeated:
+                logging.error(f"- (folder number {subfolder_name[1:5]} already in use)")
             if folder_error_model_disallowed_list:
                 for model_name in folder_error_model_disallowed_list:
                     logging.error(f"- ({model_name} is not allowed)")
@@ -719,6 +731,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
     ]
 
     folder_error_any = None
+    folder_num_list = []
 
     # Prepare a list of subfolders
     subfolder_list = [subfolder for subfolder in os.listdir(itemfolder_path) if os.path.isdir(os.path.join(itemfolder_path, subfolder))]
@@ -730,6 +743,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
 
         # Initialize error subflags
         folder_error_name = False
+        folder_error_num_repeated = False
         folder_error_xml_format = False
         folder_error_model_disallowed_list = []
         folder_error_tex_format = False
@@ -737,7 +751,14 @@ def gloves_check(exportfolder_path, team_name, team_id):
         folder_error_file_unrecognized_list = []
 
         # Check that its name starts with a g and that the 4 characters after it are digits
+        folder_num = int(subfolder_name[1:5])
         folder_error_name = not (subfolder_name.startswith('g') and subfolder_name[1:5].isdigit())
+
+        # Check that the number is not repeated
+        if folder_num in folder_num_list:
+            folder_error_num_repeated = True
+
+        folder_num_list.append(folder_num)
 
         if not fox_mode:
             # Check if the folder has an xml
@@ -790,6 +811,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
         # Set the main flag if any of the checks failed
         folder_error = (
             folder_error_name or
+            folder_error_num_repeated or
             folder_error_xml_format or
             folder_error_model_disallowed_list or
             folder_error_tex_format or
@@ -811,6 +833,8 @@ def gloves_check(exportfolder_path, team_name, team_id):
             # Give an error depending on the particular problem
             if folder_error_name:
                 logging.error( "- (wrong folder name)")
+            if folder_error_num_repeated:
+                logging.error(f"- (folder number {subfolder_name[1:5]} already in use)")
             if folder_error_xml_format:
                 logging.error( "- (broken xml file)")
             if folder_error_model_disallowed_list:

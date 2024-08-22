@@ -206,8 +206,9 @@ def export_move(exportfolder_path, team_id, team_name):
             # Create a folder with the team ID in the main folder
             os.makedirs(main_itemfolder_team_path)
 
-            # Prepare the base texture filename
-            texname = "0" + team_id
+            # Prepare the team ID for the texture filenames
+            team_id_full = "0" + team_id
+            team_id_full_bytes = team_id_full.encode('utf-8')
 
             # For every file
             for file_name in [f for f in os.listdir(team_itemfolder_path) if f.endswith(".bin")]:
@@ -216,15 +217,15 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Unzlib it if needed
                 unzlib_file(file_path)
 
-                # Edit the texture names inside the config file so that they point to the proper textures
-                texname_bytes = texname.encode('utf-8')  # Convert to bytes
+                # Edit the texture filenames inside the config file
                 with open(file_path, 'rb+') as file:
                     for line in range(5):
                         position = 40 + line * 16
                         file.seek(position)
                         char = file.read(1)
                         if char == b'u':
-                            file.write(texname_bytes)  # Overwrite with the texture name
+                            # Update the team ID in the texture filename
+                            file.write(team_id_full_bytes)
 
                 # Replace the dummy team ID in the filename with the actual one
                 file_name_new = team_id + file_name[3:]

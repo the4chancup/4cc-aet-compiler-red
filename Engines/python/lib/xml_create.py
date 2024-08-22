@@ -27,6 +27,8 @@ def xml_create(folder_path, folder_type):
         "gloveL",
         "gloveR",
         "uniform",
+        "shirt",
+        "pants_nocloth",
     ]
     TYPE_DEFAULT = "parts"
 

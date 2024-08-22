@@ -4,8 +4,6 @@ setlocal EnableDelayedExpansion
 
 REM - Check if the Windows version is 7
 ver | find "6.1." > nul
-echo %ERRORLEVEL%
-
 if %ERRORLEVEL% == 0 (
   REM - Windows 7
   set "python_link=https://github.com/adang1345/PythonWin7"

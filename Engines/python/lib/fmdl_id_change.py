@@ -159,7 +159,8 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
                 texture_path_found = True
 
     if not texture_path_found:
-        logging.warning("- Warning: No texture paths with IDs found")
+        logging.warning( "-")
+        logging.warning( "- Warning: No texture paths with IDs found")
         logging.warning(f"- Folder:         {file_folder}")
         logging.warning(f"- File:           {file_name}")
         logging.warning(f"- Model ID:       {model_id}")
@@ -167,7 +168,7 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
             logging.warning(f"- Team ID:        {team_id}")
         for texture_path in texture_path_list:
             logging.warning(f"- Texture path:   {texture_path}")
-        logging.warning("- This model might work fine, double-check its texture paths if it doesn't")
+        logging.warning( "- This model might work fine, double-check its texture paths if it doesn't")
 
     # Re-open file for writing
     file_binary = open(file_path, "r+b")

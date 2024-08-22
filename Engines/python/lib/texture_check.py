@@ -104,14 +104,16 @@ def dimensions_check(dds_path):
 
         error = True
 
-    if not fox_mode and texture_type_kit and (height != 2048 or width != 2048):
-
+    if (
+        not fox_mode and texture_type_kit and
+        (height > 2048 or width > 2048 or height_bad or width_bad)
+    ):
         logging.error( "-")
         logging.error(f"- ERROR - Main Kit Texture file with invalid dimensions ({str(width)}x{str(height)})")
         logging.error(f"- Folder:         {dds_folder}")
         logging.error(f"- Texture name:   {dds_name}")
         logging.error( "- This texture will crash the game")
-        logging.error( "- Resize it so that both sizes are 2048x2048")
+        logging.error( "- Resize it so that both sizes are 2048x2048 or less, and powers of 2")
 
         error = True
 

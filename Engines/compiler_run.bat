@@ -43,12 +43,24 @@ REM - Run the log cleaner
 call py -3 .\Engines\log_username_clean.py
 
 
-REM - Pause if the compiler returned an error
+REM - Set the ESC character and colors for text coloring
+for /f "delims=" %%E in ('forfiles /p "%~dp0." /m "%~nx0" /c "cmd /c echo(0x1B"') do (
+    set "ESC=%%E"
+)
+if not defined NO_COLOR (
+    set "BRIGHT_MAGENTA=%ESC%[95m"
+    set "RESET=%ESC%[0m"
+) else (
+    set "BRIGHT_MAGENTA="
+    set "RESET="
+)
+
+REM - If the compiler returned an error
 if %crashed% GEQ 1 (
 
     echo -
     echo -
-    echo - CRASH - The compiler has run into an unexpected error and stopped
+    echo - %BRIGHT_MAGENTA%CRASH%RESET% - The compiler has run into an unexpected error and stopped
     if exist ".\crash.log" (
         echo - A log file crash.log has been saved to the compiler's folder
         echo - Please post it on the /aesco/ server or the cup thread

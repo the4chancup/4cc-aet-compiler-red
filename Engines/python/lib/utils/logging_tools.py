@@ -82,7 +82,7 @@ def logger_init(__name__):
 
     # Create a file handler which will only store INFO messages
     # It will only create a file when a message occurs
-    suggestions_log_handler = logging.FileHandler(SUGGESTIONS_LOG_PATH, delay=True)
+    suggestions_log_handler = logging.FileHandler(SUGGESTIONS_LOG_PATH, delay=True, encoding="utf-8")
     suggestions_log_handler.setLevel(logging.INFO)
     suggestions_log_handler.addFilter(lambda record: record.levelno == logging.INFO)
 
@@ -137,8 +137,8 @@ def logger_stop():
     # Check if any of the non-crash log files exist and add the program version to them
     for log_path in [SUGGESTIONS_LOG_PATH, ISSUES_LOG_PATH]:
         if os.path.isfile(log_path):
-            with open(log_path, "r") as log_file:
+            with open(log_path, "r", encoding="utf-8") as log_file:
                 previous_contents = log_file.read()
 
-            with open(log_path, "w") as log_file:
+            with open(log_path, "w", encoding="utf-8") as log_file:
                 log_file.write("- " + app_title(colorize=False) + "\n" + previous_contents)

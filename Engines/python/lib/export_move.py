@@ -1,8 +1,8 @@
 import os
-import re
 import time
 import shutil
 
+from .utils.id_change import path_id_change
 from .mtl_id_change import mtl_id_change
 from .fmdl_id_change import fmdl_id_change
 from .xml_create import xml_create
@@ -35,11 +35,8 @@ def textures_id_change(subfolder_path, team_id):
 
         texture_path = os.path.join(subfolder_path, texture_file)
 
-        # Look for u0XXXp and replace it with the actual team ID
-        texture_path_new = re.sub(r'u0([a-zA-Z0-9]){3}p', 'u0'+team_id+'p', texture_path)
-
-        # Look for u0XXXg and replace it with the actual team ID
-        texture_path_new = re.sub(r'u0([a-zA-Z0-9]){3}g', 'u0'+team_id+'g', texture_path)
+        # Look for u0XXXp and u0XXXg and replace them with the actual team ID
+        texture_path_new = path_id_change(texture_path, team_id, common_replace=False)
 
         if texture_path_new == texture_path:
             continue

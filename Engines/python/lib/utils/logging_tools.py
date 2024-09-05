@@ -95,7 +95,7 @@ def logger_init(__name__):
 
     # Create a file handler which which will only store WARNING messages or higher
     # It will only create a file when a message occurs
-    issues_log_handler = logging.FileHandler(ISSUES_LOG_PATH, delay=True)
+    issues_log_handler = logging.FileHandler(ISSUES_LOG_PATH, delay=True, encoding="utf-8")
     issues_log_handler.setLevel(logging.WARNING)
 
     # Add it to the root logger
@@ -118,7 +118,7 @@ def logger_init(__name__):
     logger = logging.getLogger(__name__)
 
     # Create a file handler which will only create a file when an exception occurs
-    crash_log_handler = logging.FileHandler(CRASH_LOG_PATH, delay=True)
+    crash_log_handler = logging.FileHandler(CRASH_LOG_PATH, delay=True, encoding="utf-8")
 
     # Create a formatter and add it to the handler
     formatter = logging.Formatter('%(asctime)-15s - %(name)s - %(levelname)s - %(message)s')

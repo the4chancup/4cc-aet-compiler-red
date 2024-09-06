@@ -1,3 +1,53 @@
+06/09/24 - Version 3.3.0
+- Important
+  - Added "shirt" and "pants_nocloth" to the list of .model types recognized
+    when generating an xml for xml-less face folders on pre-fox
+  - The kit textures check now allows textures with sizes smaller than
+    2048x2048, as long as the size of their sides is a power of 2
+- Fixes
+  - Fixed issue with some texture paths inside fmdl models not having the team
+    ID replaced
+  - Fixed the u0XXXg pattern on texture filenames not having its team ID
+    replaced
+  - Fixed crash when trying to compile teams not listed on the teams list, when
+    they do not have a note txt
+  - Fixed compiler not being able to install dependencies if the pip installer
+    is missing, by making the compiler install pip first
+  - Fixed some special characters (like @) not being recognized on team names on
+    exports without a note txt
+  - Fixed issue with diff xml getting accessed after it was deleted
+  - Fixed crash when any model folders with a unicode charcter on their name
+    caused an issue or suggestion message
+- New checks
+  - Checks if PES is open while running with "Move Cpks" enabled, and asks to
+    close it then tries again
+  - Checks if any of the exports have more than one note txt file
+  - Checks if ImageMagick is installed on linux systems before starting
+  - Checks if any of the face folders have an unsupported "hair.xml" file
+  - Checks if any of the exports have duplicate IDs on face, boots and glove
+    folders
+- Other new stuff
+  - The PES version chosen for compiling is now shown at startup, with a
+    different color for each version
+  - The error message shown when using ftex textures on pre-fox PES versions now
+    shows the chosen PES version
+  - The check for whether the "Cpk Name" written on the settings file is present
+    on the DpFileList file in the PES download folder is now active even if
+    "Move Cpks" is disabled, but gives a warning instead of an error in this
+    case
+  - When compiling the kit entries into the unicolor bin, the numbers of kits
+    are now distinguished between outfielder kits (P) and GK kits (GK)
+  - Added shebang line to compiler_main.py for linux users
+  - Color codes are no longer enabled on Windows versions below 10
+    (they are not supported)
+  - When python is missing and the Windows version is 7, an alternative download
+    link for a python release compatible with it is now opened instead
+  - The "extracted_exports" folder is now called "extracted"
+  - Portrait conflicts (player with portrait in both its face folder and in the
+    Portraits folder) will not lead to the export getting discarded anymore if
+    both files are equal
+
+
 19/05/24 - Version 3.2.0
 - Important
   - Updated the teams list file with the teams from VGL22

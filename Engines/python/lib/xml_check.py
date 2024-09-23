@@ -12,10 +12,6 @@ from .utils.pausing import pause
 from .utils.FILE_INFO import EXTRACTED_PATH
 
 
-# Read the necessary parameters
-pes_version = int(os.environ.get('PES_VERSION', '16'))
-
-
 def file_exists(file_path):
     """
     Check if the filename contains the u0XXXp or u0XXXg pattern.
@@ -59,6 +55,9 @@ def file_exists(file_path):
 
 
 def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, listed_file_type, team_id, material_name=None, sampler_name=None):
+
+    # Read the necessary parameters
+    pes_version = os.environ.get('PES_VERSION', '19')
 
     FILE_NAME_EXCEPTION_LIST = [
         'dummy_kit.dds',

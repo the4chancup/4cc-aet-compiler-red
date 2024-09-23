@@ -80,96 +80,95 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
 
         return True
 
+    # Check if the filename is in the list of exceptions
+    if os.path.basename(listed_file_path) in FILE_NAME_EXCEPTION_LIST:
+        return False
+
+    file_path_short = None
+    error_file_missing = False
+
+    # Check if the file path is a relative path and the file exists in the path indicated
+    if listed_file_path.startswith('./'):
+
+        # Remove the "./" from the path
+        file_subpath = listed_file_path[2:]
+        file_path = os.path.join(os.path.dirname(xml_path), file_subpath)
+
+        # Replace * in the path with "win32"
+        file_path = file_path.replace('*', 'win32')
+
+        error_file_missing = not file_exists(file_path)
+
+    # Check if the file path points to the uniform common folder and the file exists in the Common folder of the export
+    elif listed_file_path.startswith('model/character/uniform/common/'):
+
+        # If the PES version is 16 and the file is a model file, throw an error
+        if pes_version == 16 and listed_file_type == "Model":
+            logging.error( "-")
+            logging.error(f"- ERROR - {listed_file_type} files cannot be loaded from the Common folder on PES16")
+            logging.error(f"- Folder:         {xml_folder_name}")
+            logging.error(f"- {xml_extension} name:       {xml_name}")
+            logging.error(f"- Model path:     {listed_file_path}")
+
+            return True
+
+        # Remove the "file/character/uniform/common/XXX/" from the path
+        file_subpath = listed_file_path[35:]
+        common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))), "Common")
+        file_path = os.path.join(common_folder_path, file_subpath)
+
+        # Replace * in the path with "win32"
+        file_path = file_path.replace('*', 'win32')
+
+        if not file_exists(file_path):
+
+            # Search for the file in every midcup cpk and the faces cpk in the download folder
+            listed_file_path_real = "common/character1/" + path_id_change(listed_file_path, team_id).replace('p0', 'p1')
+            file_info_list = [
+                {'source_path': listed_file_path_real},
+            ]
+            cpk_names_list = ['midcup', 'uniform', 'faces']
+
+            error_file_missing = not files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=False)
+
+    # Check if the file path points to the face common folder
+    elif listed_file_path.startswith('model/character/face/common/'):
+        pass
+
+    # If the file path is not a relative path nor points to the common folders, it is unusable
     else:
-        # Check if the filename is in the list of exceptions
-        if os.path.basename(listed_file_path) in FILE_NAME_EXCEPTION_LIST:
-            return False
+        file_path_short = "Unknown"
 
-        file_path_short = None
-        error_file_missing = False
+        error_file_missing = True
 
-        # Check if the file path is a relative path and the file exists in the path indicated
-        if listed_file_path.startswith('./'):
+    if error_file_missing:
 
-            # Remove the "./" from the path
-            file_subpath = listed_file_path[2:]
-            file_path = os.path.join(os.path.dirname(xml_path), file_subpath)
+        if not file_path_short:
+            # Remove the extracted folder path and / from the path
+            extracted_path_length = len(EXTRACTED_PATH)
+            file_path_short = file_path[(extracted_path_length+1):]
 
-            # Replace * in the path with "win32"
-            file_path = file_path.replace('*', 'win32')
-
-            error_file_missing = not file_exists(file_path)
-
-        # Check if the file path points to the uniform common folder and the file exists in the Common folder of the export
-        elif listed_file_path.startswith('model/character/uniform/common/'):
-
-            # If the PES version is 16 and the file is a model file, throw an error
-            if pes_version == 16 and listed_file_type == "Model":
-                logging.error( "-")
-                logging.error(f"- ERROR - {listed_file_type} files cannot be loaded from the Common folder on PES16")
-                logging.error(f"- Folder:         {xml_folder_name}")
-                logging.error(f"- {xml_extension} name:       {xml_name}")
-                logging.error(f"- Model path:     {listed_file_path}")
-
-                return True
-
-            # Remove the "file/character/uniform/common/XXX/" from the path
-            file_subpath = listed_file_path[35:]
-            common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))), "Common")
-            file_path = os.path.join(common_folder_path, file_subpath)
-
-            # Replace * in the path with "win32"
-            file_path = file_path.replace('*', 'win32')
-
-            if not file_exists(file_path):
-
-                # Search for the file in every midcup cpk and the faces cpk in the download folder
-                listed_file_path_real = "common/character1/" + path_id_change(listed_file_path, team_id).replace('p0', 'p1')
-                file_info_list = [
-                    {'source_path': listed_file_path_real},
-                ]
-                cpk_names_list = ['midcup', 'uniform', 'faces']
-
-                error_file_missing = not files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=False)
-
-        # Check if the file path points to the face common folder
-        elif listed_file_path.startswith('model/character/face/common/'):
-            pass
-
-        # If the file path is not a relative path nor points to the common folders, it is unusable
+        ##TODO: Make error-only and merge once the templates have been updated
+        type_string_raw = f"{listed_file_type} path:"
+        type_string = type_string_raw + " " * (16 - len(type_string_raw))
+        if listed_file_type == "Texture":
+            logging.warning( "-")
+            logging.warning(f"- Warning - {listed_file_type} file does not exist in the path indicated")
+            logging.warning(f"- Folder:         {xml_folder_name}")
+            logging.warning(f"- {xml_extension} name:       {xml_name}")
+            logging.warning(f"- Material:       {material_name}")
+            logging.warning(f"- Sampler:        {sampler_name}")
+            logging.warning(f"- {type_string}{listed_file_path}")
+            logging.warning(f"- Full path:      {file_path_short}")
         else:
-            file_path_short = "Unknown"
+            logging.error( "-")
+            logging.error(f"- ERROR - {listed_file_type} file does not exist in the path indicated")
+            logging.error(f"- Folder:         {xml_folder_name}")
+            logging.error(f"- {xml_extension} name:       {xml_name}")
+            logging.error(f"- {type_string}{listed_file_path}")
+            logging.error(f"- Full path:      {file_path_short}")
 
-            error_file_missing = True
-
-        if error_file_missing:
-
-            if not file_path_short:
-                # Remove the extracted folder path and / from the path
-                extracted_path_length = len(EXTRACTED_PATH)
-                file_path_short = file_path[(extracted_path_length+1):]
-
-            ##TODO: Make error-only and merge once the templates have been updated
-            type_string_raw = f"{listed_file_type} path:"
-            type_string = type_string_raw + " " * (16 - len(type_string_raw))
-            if listed_file_type == "Texture":
-                logging.warning( "-")
-                logging.warning(f"- Warning - {listed_file_type} file does not exist in the path indicated")
-                logging.warning(f"- Folder:         {xml_folder_name}")
-                logging.warning(f"- {xml_extension} name:       {xml_name}")
-                logging.warning(f"- Material:       {material_name}")
-                logging.warning(f"- Sampler:        {sampler_name}")
-                logging.warning(f"- {type_string}{listed_file_path}")
-                logging.warning(f"- Full path:      {file_path_short}")
-            else:
-                logging.error( "-")
-                logging.error(f"- ERROR - {listed_file_type} file does not exist in the path indicated")
-                logging.error(f"- Folder:         {xml_folder_name}")
-                logging.error(f"- {xml_extension} name:       {xml_name}")
-                logging.error(f"- {type_string}{listed_file_path}")
-                logging.error(f"- Full path:      {file_path_short}")
-
-                error = True
+            error = True
 
     return error
 

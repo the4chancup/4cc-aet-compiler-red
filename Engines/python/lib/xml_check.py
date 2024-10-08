@@ -59,6 +59,10 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     # Read the necessary parameters
     pes_version = os.environ.get('PES_VERSION', '19')
 
+    UNIFORM_COMMON_PATH = 'model/character/uniform/common/'
+    UNIFORM_COMMON_PATH_LENGTH = len(UNIFORM_COMMON_PATH)
+    FACE_COMMON_PATH = 'model/character/face/common/'
+
     FILE_NAME_EXCEPTION_LIST = [
         'dummy_kit.dds',
         'dummy_gk_kit.dds',
@@ -92,19 +96,19 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         file_path = os.path.join(os.path.dirname(xml_path), file_subpath)
 
         # Replace * in the path with "win32"
-        file_path = file_path.replace('*', 'win32')
+        file_path_real = file_path.replace('*', 'win32')
 
-        if file_exists(file_path):
+        if file_exists(file_path_real):
             return False
 
     # Check if the file path points to the uniform common folder
-    elif listed_file_path.startswith('model/character/uniform/common/'):
+    elif listed_file_path.startswith(UNIFORM_COMMON_PATH):
 
         # Check if the file path contains any further subfolders
-        if '/' not in listed_file_path[31:]:
+        if '/' not in listed_file_path[UNIFORM_COMMON_PATH_LENGTH:]:
             return False
 
-        if 'XXX/' not in listed_file_path[31:]:
+        if 'XXX/' not in listed_file_path[UNIFORM_COMMON_PATH_LENGTH:]:
             logging.error( "-")
             logging.error( "- ERROR - Subfolders of the Common folder cannot be used without XXX on the path")
             logging.error(f"- Folder:         {xml_folder_name}")
@@ -124,14 +128,14 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             return True
 
         # Remove the "file/character/uniform/common/XXX/" from the path
-        file_subpath = listed_file_path[31:].replace('XXX/', '')
+        file_subpath = listed_file_path[UNIFORM_COMMON_PATH_LENGTH:].replace('XXX/', '')
         common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))), "Common")
         file_path = os.path.join(common_folder_path, file_subpath)
 
         # Replace * in the path with "win32"
-        file_path = file_path.replace('*', 'win32')
+        file_path_real = file_path.replace('*', 'win32')
 
-        if file_exists(file_path):
+        if file_exists(file_path_real):
             return False
 
         # Search for the file in every midcup cpk and the faces cpk in the download folder
@@ -145,7 +149,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             return False
 
     # Check if the file path points to the face common folder
-    elif listed_file_path.startswith('model/character/face/common/'):
+    elif listed_file_path.startswith(FACE_COMMON_PATH):
         return False
 
     # If the file path is not a relative path nor points to the common folders, it is unusable

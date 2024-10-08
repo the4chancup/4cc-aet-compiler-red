@@ -6,7 +6,7 @@ from .utils.id_change import path_id_change
 from .mtl_id_change import mtl_id_change
 from .fmdl_id_change import fmdl_id_change
 from .xml_create import xml_create
-from .utils.ftex import ddsToFtex
+from .texture_check import textures_convert
 from .utils.file_management import file_critical_check
 from .utils.zlib_plus import unzlib_file
 from .utils.FILE_INFO import (
@@ -14,18 +14,6 @@ from .utils.FILE_INFO import (
     KIT_MASK_NAME,
     FACE_DIFF_BIN_NAME,
 )
-
-
-def ftex_from_dds_multi(folder_path):
-    '''Convert all .dds files in the folder to .ftex files'''
-
-    for dds_file in [f for f in os.listdir(folder_path) if f.endswith('.dds')]:
-
-        dds_path = os.path.join(folder_path, dds_file)
-        ftex_path = os.path.splitext(dds_path)[0] + '.ftex'
-
-        ddsToFtex(dds_path, ftex_path, None)
-        os.remove(dds_path)
 
 
 def textures_id_change(subfolder_path, team_id):
@@ -154,9 +142,6 @@ def export_move(exportfolder_path, team_id, team_name):
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
 
-                    # Convert any dds textures to ftex if needed
-                    ftex_from_dds_multi(subfolder_path)
-
                     # If the face_diff.bin doesn't exist, copy the template one
                     face_diff_path = os.path.join(subfolder_path, FACE_DIFF_BIN_NAME)
                     if not os.path.exists(face_diff_path):
@@ -172,6 +157,9 @@ def export_move(exportfolder_path, team_id, team_name):
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
                     if not os.path.exists(xml_path):
                         xml_create(subfolder_path, object_type)
+
+                # Convert unsupported textures
+                textures_convert(subfolder_path, fox_mode, fox_19)
 
                 # Replace the dummy team ID with the actual one in any kit-dependent textures found
                 textures_id_change(subfolder_path, team_id)
@@ -243,13 +231,12 @@ def export_move(exportfolder_path, team_id, team_name):
             # Set the texture file extension to ftex or dds
             file_ext = 'ftex' if fox_mode else 'dds'
 
-            if fox_mode:
-                # Convert any dds textures to ftex
-                ftex_from_dds_multi(team_itemfolder_path)
-
-            else:
+            if not fox_mode:
                 # Add any missing kit masks
                 kit_masks_check(team_itemfolder_path, file_ext)
+
+            # Convert unsupported textures
+            textures_convert(team_itemfolder_path, fox_mode, fox_19)
 
             # Prepare a list of textures
             file_name_list = [f for f in os.listdir(team_itemfolder_path) if f.endswith(f".{file_ext}")]
@@ -342,13 +329,13 @@ def export_move(exportfolder_path, team_id, team_name):
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
 
-                    # Convert any dds textures to ftex if needed
-                    ftex_from_dds_multi(subfolder_path)
-
                 else:
                     # Change the texture IDs inside each mtl file
                     for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
                         mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+
+                # Convert unsupported textures
+                textures_convert(subfolder_path, fox_mode, fox_19)
 
                 # Replace the dummy team ID with the actual one in any kit-dependent textures found
                 textures_id_change(subfolder_path, team_id)
@@ -379,9 +366,6 @@ def export_move(exportfolder_path, team_id, team_name):
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
 
-                    # Convert any dds textures to ftex if needed
-                    ftex_from_dds_multi(subfolder_path)
-
                 else:
                     # Change the texture IDs inside each mtl file
                     for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
@@ -392,6 +376,9 @@ def export_move(exportfolder_path, team_id, team_name):
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
                     if not os.path.exists(xml_path):
                         xml_create(subfolder_path, object_type)
+
+                # Convert unsupported textures
+                textures_convert(subfolder_path, fox_mode, fox_19)
 
                 # Replace the dummy team ID with the actual one in any kit-dependent textures found
                 textures_id_change(subfolder_path, team_id)
@@ -435,9 +422,8 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Replace the dummy team ID with the actual one in any kit-dependent textures found
                 textures_id_change(team_itemfolder_path, team_id)
 
-                # Convert any dds textures to ftex if needed
-                if fox_mode:
-                    ftex_from_dds_multi(team_itemfolder_path)
+                # Convert unsupported textures
+                textures_convert(team_itemfolder_path, fox_mode, fox_19)
 
                 # Move everything to the team folder inside the main folder
                 for file in os.listdir(team_itemfolder_path):

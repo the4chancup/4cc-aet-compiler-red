@@ -100,6 +100,19 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     # Check if the file path points to the uniform common folder
     elif listed_file_path.startswith('model/character/uniform/common/'):
 
+        # Check if the file path contains any further subfolders
+        if '/' not in listed_file_path[31:]:
+            return False
+
+        if 'XXX/' not in listed_file_path[31:]:
+            logging.error( "-")
+            logging.error( "- ERROR - Subfolders of the Common folder cannot be used without XXX on the path")
+            logging.error(f"- Folder:         {xml_folder_name}")
+            logging.error(f"- {xml_extension} name:       {xml_name}")
+            logging.error(f"- Model path:     {listed_file_path}")
+
+            return True
+
         # If the PES version is 16 and the file is a model file, throw an error
         if pes_version == 16 and listed_file_type == "Model":
             logging.error( "-")
@@ -111,7 +124,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             return True
 
         # Remove the "file/character/uniform/common/XXX/" from the path
-        file_subpath = listed_file_path[35:]
+        file_subpath = listed_file_path[31:].replace('XXX/', '')
         common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))), "Common")
         file_path = os.path.join(common_folder_path, file_subpath)
 

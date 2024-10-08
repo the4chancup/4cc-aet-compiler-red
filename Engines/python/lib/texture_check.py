@@ -229,17 +229,23 @@ def texture_check(tex_path):
     # Store the name of the texture and its parent folder
     tex_name = os.path.join(tex_folder, os.path.basename(tex_path))
 
-    tex_zlibbed = False
-
-    error = False
-
-    tex_type = None
     if tex_name.lower().endswith("dds"):
-        tex_type = "dds"
+        tex_type = "DDS"
     elif tex_name.lower().endswith("ftex"):
-        tex_type = "ftex"
+        tex_type = "FTEX"
+    else:
+        logging.error( "-")
+        logging.error( "- ERROR - Texture is not dds nor ftex")
+        logging.error(f"- Folder:         {tex_folder}")
+        logging.error(f"- Texture name:   {tex_name}")
+        logging.error( "- The file will be deleted")
+        return True
 
-    if tex_type == "dds":
+    # DDS
+    if tex_type == "DDS":
+
+        error = False
+        tex_zlibbed = False
 
         # Prepare a temporary file path
         tex_unzlibbed_path = f"{tex_path}.unzlib"
@@ -257,7 +263,7 @@ def texture_check(tex_path):
         # Check if it is a real dds (DDS label starting from index 0)
         if not (get_bytes_ascii(tex_check_path, 0, 3) == "DDS"):
             logging.error( "-")
-            logging.error(f"- ERROR - Texture is not a real {tex_type}")
+            logging.error(f"- ERROR - Texture is not a real {tex_type} file")
             logging.error(f"- Folder:         {tex_folder}")
             logging.error(f"- Texture name:   {tex_name}")
             logging.error( "- The file will be deleted, please save it properly")
@@ -268,49 +274,49 @@ def texture_check(tex_path):
             # Make sure the dimensions are powers of 2
             error = dimensions_check(tex_check_path)
 
+        if not tex_zlibbed:
+            return error
+
         # If it was zlibbed
-        if tex_zlibbed:
+        if fox_mode:
+            # Delete the original file
+            os.remove(tex_path)
 
-            if fox_mode:
-                # Delete the original file
-                os.remove(tex_path)
+            # Rename the unzlibbed file
+            os.rename(tex_unzlibbed_path, tex_path)
 
-                # Rename the unzlibbed file
-                os.rename(tex_unzlibbed_path, tex_path)
+        else:
+            # Delete the unzlibbed file
+            os.remove(tex_unzlibbed_path)
 
-            else:
-                # Delete the unzlibbed file
-                os.remove(tex_unzlibbed_path)
+        return error
 
-    elif tex_type == 'ftex':
+    # FTEX
 
-        if not fox_mode:
+    # If fox mode is disabled, reject the texture
+    if not fox_mode:
+        logging.error( "-")
+        logging.error(f"- ERROR - Texture is an {tex_type} file")
+        logging.error(f"- Folder:         {tex_folder}")
+        logging.error(f"- Texture name:   {tex_name}")
+        logging.error(f"- ftex textures are not supported on the chosen PES version ({pes_version})")
+        return True
 
-            # If fox mode is disabled, reject the texture
-            logging.error( "-")
-            logging.error( "- ERROR - Texture is an ftex file")
-            logging.error(f"- Folder:         {tex_folder}")
-            logging.error(f"- Texture name:   {tex_name}")
-            logging.error(f"- ftex textures are not supported on the chosen PES version ({pes_version})")
-            error = True
+    # Check if it is a real ftex (FTEX label starting from index 0)
+    if not (get_bytes_ascii(tex_path, 0, 4) == "FTEX"):
+        logging.error( "-")
+        logging.error(f"- ERROR - Texture is not a real {tex_type} file")
+        logging.error(f"- Folder:         {tex_folder}")
+        logging.error(f"- Texture name:   {tex_name}")
+        logging.error( "- The file will be deleted, please save it properly")
+        return True
 
-        if not error:
-            # Check if it is a real ftex (FTEX label starting from index 0)
-            if not (get_bytes_ascii(tex_path, 0, 4) == "FTEX"):
-                logging.error( "-")
-                logging.error(f"- ERROR - Texture is not a real {tex_type}")
-                logging.error(f"- Folder:         {tex_folder}")
-                logging.error(f"- Texture name:   {tex_name}")
-                logging.error( "- The file will be deleted, please save it properly")
-                error = True
+    # Check if it has mipmaps (index 16)
+    if (get_bytes_hex(tex_path, 16, 1) == "00"):
+        logging.warning( "-")
+        logging.warning( "- Warning: Texture file without mipmaps")
+        logging.warning(f"- Folder:         {tex_folder}")
+        logging.warning(f"- Texture name:   {tex_name}")
+        logging.warning( "- This texture will probably not work, please resave it with mipmaps")
 
-        if not error:
-            # Check if it has mipmaps (index 16)
-            if (get_bytes_hex(tex_path, 16, 1) == "00"):
-                logging.warning( "-")
-                logging.warning( "- Warning: Texture file without mipmaps")
-                logging.warning(f"- Folder:         {tex_folder}")
-                logging.warning(f"- Texture name:   {tex_name}")
-                logging.warning( "- This texture will probably not work, please resave it with mipmaps")
-
-    return error
+    return False

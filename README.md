@@ -127,3 +127,5 @@ Tool by Shakes
 
 Special thanks for ideas and fixes, and for some of the libraries used:  
 Tomato4cc, Giovani1906, fg4cc, blu_ray_
+
+Huge thanks to Tim Peters.

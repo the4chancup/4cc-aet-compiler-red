@@ -83,7 +83,6 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         return False
 
     file_path_short = None
-    error_file_missing = False
 
     # Check if the file path is a relative path and the file exists in the path indicated
     if listed_file_path.startswith('./'):
@@ -95,7 +94,8 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         # Replace * in the path with "win32"
         file_path = file_path.replace('*', 'win32')
 
-        error_file_missing = not file_exists(file_path)
+        if file_exists(file_path):
+            return False
 
     # Check if the file path points to the uniform common folder
     elif listed_file_path.startswith('model/character/uniform/common/'):
@@ -128,7 +128,8 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         ]
         cpk_names_list = ['midcup', 'uniform', 'faces']
 
-        error_file_missing = not files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=False)
+        if files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=False):
+            return False
 
     # Check if the file path points to the face common folder
     elif listed_file_path.startswith('model/character/face/common/'):
@@ -137,11 +138,6 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     # If the file path is not a relative path nor points to the common folders, it is unusable
     else:
         file_path_short = "Unknown"
-
-        error_file_missing = True
-
-    if not error_file_missing:
-        return False
 
     if not file_path_short:
         # Remove the extracted folder path and / from the path

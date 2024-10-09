@@ -173,13 +173,15 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         logging.warning(f"- Sampler:        {sampler_name}")
         logging.warning(f"- {type_string}{listed_file_path}")
         logging.warning(f"- Full path:      {file_path_short}")
-    else:
-        logging.error( "-")
-        logging.error(f"- ERROR - {listed_file_type} file does not exist in the path indicated")
-        logging.error(f"- Folder:         {xml_folder_name}")
-        logging.error(f"- {xml_extension} name:       {xml_name}")
-        logging.error(f"- {type_string}{listed_file_path}")
-        logging.error(f"- Full path:      {file_path_short}")
+
+        return False
+
+    logging.error( "-")
+    logging.error(f"- ERROR - {listed_file_type} file does not exist in the path indicated")
+    logging.error(f"- Folder:         {xml_folder_name}")
+    logging.error(f"- {xml_extension} name:       {xml_name}")
+    logging.error(f"- {type_string}{listed_file_path}")
+    logging.error(f"- Full path:      {file_path_short}")
 
     return True
 

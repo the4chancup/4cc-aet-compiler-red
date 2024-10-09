@@ -219,6 +219,13 @@ def dimensions_check(dds_path):
 # Check if the texture is a proper dds or ftex and unzlib if needed
 def texture_check(tex_path):
 
+    if tex_path.lower().endswith("dds"):
+        tex_type = "DDS"
+    elif tex_path.lower().endswith("ftex"):
+        tex_type = "FTEX"
+    else:
+        return False
+
     # Read the necessary parameters
     pes_version = os.environ.get('PES_VERSION', '19')
     fox_mode = (int(pes_version) >= 18)
@@ -228,18 +235,6 @@ def texture_check(tex_path):
 
     # Store the name of the texture and its parent folder
     tex_name = os.path.join(tex_folder, os.path.basename(tex_path))
-
-    if tex_name.lower().endswith("dds"):
-        tex_type = "DDS"
-    elif tex_name.lower().endswith("ftex"):
-        tex_type = "FTEX"
-    else:
-        logging.error( "-")
-        logging.error( "- ERROR - Texture is not dds nor ftex")
-        logging.error(f"- Folder:         {tex_folder}")
-        logging.error(f"- Texture name:   {tex_name}")
-        logging.error( "- The file will be deleted")
-        return True
 
     # DDS
     if tex_type == "DDS":

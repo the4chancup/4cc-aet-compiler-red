@@ -1,3 +1,14 @@
+12/10/24 - Version 3.3.1
+- Set the default PES version to 17
+- Fixed issue with model files inside the common folder not being allowed on 17
+- Fixed error message shown when texture paths use default PES textures from the
+  "uniform/common/" folder
+- Added error message shown when using file paths in the deprecated
+  "common/teamname/" format instead of the new "common/XXX/" format
+- Fixed DX10 textures not being converted to DXT5 when compiling for 18 or lower
+  if the "Pass Through" setting was enabled, or if they were zlibbed
+
+
 06/09/24 - Version 3.3.0
 - Important
   - Added "shirt" and "pants_nocloth" to the list of .model types recognized

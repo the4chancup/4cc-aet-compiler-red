@@ -3,7 +3,7 @@ import time
 import shutil
 
 from .utils.id_change import path_id_change
-from .xml_id_change import mtl_id_change
+from .utils.id_change import txt_id_change
 from .fmdl_id_change import fmdl_id_change
 from .xml_create import xml_create
 from .texture_check import textures_convert
@@ -150,7 +150,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 else:
                     # Change the texture IDs inside each mtl file
                     for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                        mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+                        txt_id_change(os.path.join(subfolder_path, mtl_file), team_id)
 
                     # Create the .xml file if needed
                     object_type = "face"
@@ -332,7 +332,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 else:
                     # Change the texture IDs inside each mtl file
                     for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                        mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+                        txt_id_change(os.path.join(subfolder_path, mtl_file), team_id)
 
                 # Convert unsupported textures
                 textures_convert(subfolder_path, fox_mode, fox_19)
@@ -369,7 +369,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 else:
                     # Change the texture IDs inside each mtl file
                     for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                        mtl_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+                        txt_id_change(os.path.join(subfolder_path, mtl_file), team_id)
 
                     # Create the .xml file if needed
                     object_type = "glove"

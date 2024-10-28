@@ -1,4 +1,4 @@
-REM - Script to check if python is in the PATH and that its version is 3.12 or higher
+REM - Script to check if python is in the PATH and that its version is 3.12
 
 setlocal EnableDelayedExpansion
 
@@ -22,12 +22,7 @@ for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
 
   if "!python_version_line:~7,1!"=="3" (
     if "!python_version_line:~9,1!"=="1" (
-      if "!python_version_line:~10,1!" GEQ "2" (
-        set python_version_ok=1
-      )
-    )
-    if "!python_version_line:~9,1!" GEQ "2" (
-      if not "!python_version_line:~10,1!"=="." (
+      if "!python_version_line:~10,1!"=="2" (
         set python_version_ok=1
       )
     )
@@ -37,7 +32,7 @@ for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
 if not defined python_installed (
 
   echo -
-  echo - Python is missing from your pc, please install the latest version
+  echo - Python is missing from your pc, please install version 3.12 (not the latest)
   echo -
   echo - When running the installer, choose Modify, click Next and make sure to check
   echo - the "Add Python to environment variables" checkbox, then click Install
@@ -61,13 +56,13 @@ if not defined python_installed (
 if not defined python_version_ok (
 
   echo -
-  echo - Python is installed, but you need version 3.12+, please install it
+  echo - Python is installed, but you need version 3.12, please install it
   echo -
   echo - When running the installer, choose Modify, click Next and make sure to check
   echo - the "Add Python to environment variables" checkbox, then click Install
   echo -
   echo - If it is already installed, open the Programs manager in the Control Panel
-  echo - and uninstall any old versions listed there
+  echo - and uninstall any older and newer versions listed there
   echo -
   echo Press any key to open the Programs manager...
 

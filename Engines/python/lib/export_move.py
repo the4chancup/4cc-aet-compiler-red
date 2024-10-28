@@ -3,7 +3,7 @@ import time
 import shutil
 
 from .utils.id_change import path_id_change
-from .mtl_id_change import mtl_id_change
+from .xml_id_change import mtl_id_change
 from .fmdl_id_change import fmdl_id_change
 from .xml_create import xml_create
 from .texture_check import textures_convert

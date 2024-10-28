@@ -12,6 +12,12 @@ from .utils.pausing import pause
 from .utils.FILE_INFO import EXTRACTED_PATH
 
 
+def type_string_get(listed_file_type):
+    type_string_raw = f"{listed_file_type} path:"
+    type_string = type_string_raw + " " * (16 - len(type_string_raw))
+    return type_string
+
+
 def file_exists(file_path):
     """
     Check if the filename contains the u0XXXp or u0XXXg pattern.
@@ -108,12 +114,15 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         if '/' not in listed_file_path[UNIFORM_COMMON_PATH_LENGTH:]:
             return False
 
-        if 'XXX/' not in listed_file_path[UNIFORM_COMMON_PATH_LENGTH:]:
+        # Check for a three character folder in the common folder path
+        if not re.search(r'/[a-zA-Z0-9]{3}/', listed_file_path[:UNIFORM_COMMON_PATH_WITH_ID_LENGTH], flags=re.IGNORECASE):
+            type_string = type_string_get(listed_file_type)
             logging.error( "-")
-            logging.error( "- ERROR - Subfolders of the Common folder cannot be used without XXX on the path")
+            logging.error( "- ERROR - Files loaded from the Common folder must use a path with")
+            logging.error( "          a subfolder whose name is three characters long (e.g. /XXX/)")
             logging.error(f"- Folder:         {xml_folder_name}")
             logging.error(f"- {xml_extension} name:       {xml_name}")
-            logging.error(f"- Model path:     {listed_file_path}")
+            logging.error(f"- {type_string}{listed_file_path}")
 
             return True
 
@@ -162,8 +171,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         file_path_short = file_path[(extracted_path_length+1):]
 
     ##TODO: Make error-only and merge once the templates have been updated
-    type_string_raw = f"{listed_file_type} path:"
-    type_string = type_string_raw + " " * (16 - len(type_string_raw))
+    type_string = type_string_get(listed_file_type)
     if listed_file_type == "Texture":
         logging.warning( "-")
         logging.warning(f"- Warning - {listed_file_type} file does not exist in the path indicated")

@@ -32,7 +32,7 @@ for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
 if not defined python_installed (
 
   echo -
-  echo - Python is missing from your pc, please install version 3.12 (not the latest)
+  echo - Python is missing from your pc, please install version 3.12 (not the latest^)
   echo -
   echo - When running the installer, choose Modify, click Next and make sure to check
   echo - the "Add Python to environment variables" checkbox, then click Install

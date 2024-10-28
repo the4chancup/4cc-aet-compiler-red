@@ -67,6 +67,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
 
     UNIFORM_COMMON_PATH = 'model/character/uniform/common/'
     UNIFORM_COMMON_PATH_LENGTH = len(UNIFORM_COMMON_PATH)
+    UNIFORM_COMMON_PATH_WITH_ID_LENGTH = UNIFORM_COMMON_PATH_LENGTH + 4
     FACE_COMMON_PATH = 'model/character/face/common/'
 
     FILE_NAME_EXCEPTION_LIST = [
@@ -136,8 +137,8 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
 
             return True
 
-        # Remove the "file/character/uniform/common/XXX/" from the path
-        file_subpath = listed_file_path[UNIFORM_COMMON_PATH_LENGTH:].replace('XXX/', '')
+        # Remove the "file/character/uniform/common/XXX/" section from the path
+        file_subpath = listed_file_path[UNIFORM_COMMON_PATH_WITH_ID_LENGTH:]
         common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))), "Common")
         file_path = os.path.join(common_folder_path, file_subpath)
 

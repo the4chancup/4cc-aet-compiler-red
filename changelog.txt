@@ -1,3 +1,11 @@
+10/11/24 - Version 3.4.0
+- Added replacing of team IDs on custom face xmls on pre-fox
+- Added support for paths which point to the default uniform/common/ folder of
+  PES (instead of the team's subfolder)
+- Forced the required python version to 3.12, some of the external libraries are
+  not compatible with 3.13 yet
+
+
 12/10/24 - Version 3.3.1
 - Set the default PES version to 17
 - Fixed issue with model files inside the common folder not being allowed on 17

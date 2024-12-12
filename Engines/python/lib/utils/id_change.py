@@ -30,7 +30,7 @@ def txt_id_change(file_path, team_id = "000"):
         file_path (str): The path to the file.
         team_id (str, optional): The team ID to replace in the file. Defaults to "000".
 
-    This function looks for model/character/uniform/common/XXX/, u0XXXp and u0XXXg inside each line,
+    This function looks for common/XXX/, u0XXXp and u0XXXg inside each line,
     where XXX is any sequence of three characters, and replaces XXX with the team ID provided as parameter.
     """
 

@@ -30,7 +30,7 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
         # Prepare a dictionary of settings that need to be renamed
         settings_transfer_dict = {}
 
-        with open(transfer_table_path, 'r') as f:
+        with open(transfer_table_path, 'r', encoding='utf-8') as f:
             transfer_table = f.readlines()
         transfer_table = [line.strip() for line in transfer_table]
 
@@ -80,16 +80,16 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
                 settings_removed.append(section_old)
 
     # Write the new config to the file
-    with open(file_new_path, 'w') as configfile:
+    with open(file_new_path, 'w', encoding="utf8") as configfile:
         config_new.write(configfile)
 
     # Add a blank line after lines 1 and 4 to the new config file
     # to preserve the original formatting
-    with open(file_new_path, 'r') as f:
+    with open(file_new_path, 'r', encoding="utf8") as f:
         lines = f.readlines()
         lines.insert(1, '\n')
         lines.insert(4, '\n')
-    with open(file_new_path, 'w') as f:
+    with open(file_new_path, 'w', encoding="utf8") as f:
         f.writelines(lines)
 
     return settings_added, settings_removed, settings_renamed

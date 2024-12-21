@@ -9,7 +9,7 @@ from .utils.FILE_INFO import TEAMS_LIST_PATH
 
 def id_search(team_name):
 
-    with open(TEAMS_LIST_PATH, 'r') as team_file:
+    with open(TEAMS_LIST_PATH, 'r', encoding="utf8") as team_file:
         for line in team_file.readlines()[1:]:
             if team_name.lower() == line.split()[1].lower():
                 team_id = line.split()[0]

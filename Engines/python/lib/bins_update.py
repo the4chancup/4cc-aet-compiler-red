@@ -241,7 +241,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     team_name = data[-1]
 
                     # Search for the team name in the list of team IDs
-                    with open(TEAMS_LIST_PATH, 'r') as teams_list:
+                    with open(TEAMS_LIST_PATH, 'r', encoding="utf8") as teams_list:
 
                         for teams_list_line in teams_list:
                             if teams_list_line.split()[1] == team_name.lower():

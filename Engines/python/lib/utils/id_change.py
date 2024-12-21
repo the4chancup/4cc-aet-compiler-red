@@ -38,7 +38,7 @@ def txt_id_change(file_path, team_id = "000"):
     unzlib_file(file_path)
 
     # Read the file line by line
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         lines = file.readlines()
 
     modified = False
@@ -56,7 +56,7 @@ def txt_id_change(file_path, team_id = "000"):
     if not modified:
         return
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w', encoding="utf8") as file:
         file.writelines(lines)
 
     return

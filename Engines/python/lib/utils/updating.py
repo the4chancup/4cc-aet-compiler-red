@@ -147,8 +147,8 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
             print( "-")
             pause("Press any key to see the differences... ")
             # Print the differences between the two files
-            with open(teams_list_new_path, "r") as f1:
-                with open(TEAMS_LIST_PATH, "r") as f2:
+            with open(teams_list_new_path, "r", encoding='utf-8') as f1:
+                with open(TEAMS_LIST_PATH, "r", encoding='utf-8') as f2:
                     diff = difflib.unified_diff(f1.readlines(), f2.readlines(), fromfile=TEAMS_LIST_NAME + " current", tofile=TEAMS_LIST_NAME + " new")
                     for line in diff:
                         print(line, end="")
@@ -202,10 +202,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 def updates_disable():
     """Disables update checking"""
 
-    with open(SETTINGS_PATH, "r") as f:
+    with open(SETTINGS_PATH, "r", encoding='utf-8') as f:
         lines = f.readlines()
 
-    with open(SETTINGS_PATH, "w") as f:
+    with open(SETTINGS_PATH, "w", encoding='utf-8') as f:
         for line in lines:
             if line.startswith("updates_check"):
                 line = "updates_check = 0\n"
@@ -249,7 +249,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
     # Read the last check time
     if os.path.exists(CHECK_LAST_PATH) and not check_force:
-        with open(CHECK_LAST_PATH, "r") as f:
+        with open(CHECK_LAST_PATH, "r", encoding='utf-8') as f:
             check_last = f.read()
     else:
         check_last = None
@@ -270,7 +270,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         return None
 
     # Save the current time
-    with open(CHECK_LAST_PATH, "w") as f:
+    with open(CHECK_LAST_PATH, "w", encoding='utf-8') as f:
         f.write(now.strftime("%Y-%m-%d %H:%M:%S"))
 
     version_latest_list = version_latest.split(".")
@@ -296,7 +296,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
     # Read the last skipped version
     if os.path.exists(SKIP_LAST_PATH) and not check_force:
-        with open(SKIP_LAST_PATH, "r") as f:
+        with open(SKIP_LAST_PATH, "r", encoding='utf-8') as f:
             skip_last = f.read()
     else:
         skip_last = None
@@ -339,7 +339,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
         case "skip":
             # Save the latest version
-            with open(SKIP_LAST_PATH, "w") as f:
+            with open(SKIP_LAST_PATH, "w", encoding='utf-8') as f:
                 f.write(version_latest)
 
         case "fuckoff":

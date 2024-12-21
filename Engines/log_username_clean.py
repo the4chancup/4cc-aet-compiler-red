@@ -13,12 +13,12 @@ def log_username_clean(log_path):
 
     username = os.getenv("USERNAME", "unknown")
 
-    with open(log_path, "r") as f:
+    with open(log_path, "r", encoding='utf-8') as f:
         text = f.readlines()
 
     text = [line.replace(f"\\{username}\\", "\\<username>\\") for line in text]
 
-    with open(log_path, "w") as f:
+    with open(log_path, "w", encoding='utf-8') as f:
         f.writelines(text)
 
 

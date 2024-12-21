@@ -41,7 +41,7 @@ def note_txt_append(team_name, export_destination_path):
     if not os.path.exists(note_path):
         return
 
-    with open(TEAMNOTES_PATH, "a") as f2:
+    with open(TEAMNOTES_PATH, "a", encoding="utf8") as f2:
         f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
     with open(note_path, "r", encoding="utf8") as f:
         teamnotes = f.read()
@@ -79,7 +79,7 @@ def extracted_from_exports():
     team_id_max = 920
 
     # Reset the notes compilation
-    with open(TEAMNOTES_PATH, "w") as f:
+    with open(TEAMNOTES_PATH, "w", encoding="utf8") as f:
         f.write("--- 4cc txt notes compilation ---\n")
 
     EXPORT_FILE_TYPES_LIST = [".zip", ".7z"]

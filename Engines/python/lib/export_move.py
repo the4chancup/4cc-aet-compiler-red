@@ -16,22 +16,26 @@ from .utils.FILE_INFO import (
 )
 
 
-def textures_id_change(subfolder_path, team_id):
-    '''Replace the dummy team ID with the actual one in any kit-dependent textures found in the folder'''
+def files_id_replace(folder_path, team_id):
+    '''Replace the dummy team ID with the actual one in any files found in the folder'''
 
-    for texture_file in [f for f in os.listdir(subfolder_path) if f.endswith(('.dds', '.ftex'))]:
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
 
-        texture_path = os.path.join(subfolder_path, texture_file)
-
-        # Look for u0XXXp and u0XXXg and replace them with the actual team ID
-        texture_path_new = path_id_change(texture_path, team_id, common_replace=False)
-
-        if texture_path_new == texture_path:
+        if not os.path.isfile(file_path):
             continue
 
-        if os.path.exists(texture_path_new):
-            os.remove(texture_path_new)
-        os.rename(texture_path, texture_path_new)
+        # Look for u0XXXp and u0XXXg and replace them with the actual team ID
+        file_path_new = path_id_change(file_path, team_id, common_replace=False)
+
+        if file_path_new == file_path:
+            continue
+
+        if os.path.exists(file_path_new):
+            os.remove(file_path_new)
+        os.rename(file_path, file_path_new)
+
+
 
 
 def kit_masks_check(team_itemfolder_path, file_ext):
@@ -164,8 +168,8 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Convert unsupported textures
                 textures_convert(subfolder_path, fox_mode, fox_19)
 
-                # Replace the dummy team ID with the actual one in any kit-dependent textures found
-                textures_id_change(subfolder_path, team_id)
+                # Replace the dummy team ID with the actual one in any files found
+                files_id_replace(subfolder_path, team_id)
 
                 # Replace the dummy team ID with the actual one
                 subfolder_path_withname = os.path.join(team_itemfolder_path, subfolder_id_withname)
@@ -340,8 +344,8 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Convert unsupported textures
                 textures_convert(subfolder_path, fox_mode, fox_19)
 
-                # Replace the dummy team ID with the actual one in any kit-dependent textures found
-                textures_id_change(subfolder_path, team_id)
+                # Replace the dummy team ID with the actual one in any files found
+                files_id_replace(subfolder_path, team_id)
 
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)
@@ -386,8 +390,8 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Convert unsupported textures
                 textures_convert(subfolder_path, fox_mode, fox_19)
 
-                # Replace the dummy team ID with the actual one in any kit-dependent textures found
-                textures_id_change(subfolder_path, team_id)
+                # Replace the dummy team ID with the actual one in any files found
+                files_id_replace(subfolder_path, team_id)
 
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)
@@ -425,11 +429,11 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Create a folder with the team ID in the main folder
                 os.makedirs(main_itemfolder_team_path)
 
-                # Replace the dummy team ID with the actual one in any kit-dependent textures found
-                textures_id_change(team_itemfolder_path, team_id)
-
                 # Convert unsupported textures
                 textures_convert(team_itemfolder_path, fox_mode, fox_19)
+
+                # Replace the dummy team ID with the actual one in any files found
+                files_id_replace(team_itemfolder_path, team_id)
 
                 # Move everything to the team folder inside the main folder
                 for file in os.listdir(team_itemfolder_path):

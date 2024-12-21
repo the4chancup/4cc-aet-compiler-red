@@ -204,7 +204,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     kitcolor_bin = open(kitcolor_bin_path, 'rb+')
 
     # For every Note txt file
-    for file_name in [f for f in os.listdir(EXTRACTED_PATH) if f.endswith("Note.txt")]:
+    for file_name in [f for f in os.listdir(EXTRACTED_PATH) if f.lower().endswith("note.txt")]:
 
         # Initialize variables
         stop = None

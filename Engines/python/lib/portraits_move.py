@@ -3,6 +3,7 @@ import shutil
 import filecmp
 import logging
 
+from .texture_check import textures_convert
 from .utils.pausing import pause
 
 
@@ -20,11 +21,13 @@ def portraits_move(exportfolder_path, team_id):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
 
     TEX_NAME = "portrait.dds"
 
     portrait_conflicts = []
+    portraits_path = os.path.join(exportfolder_path, "Portraits")
 
     faces_path = os.path.join(exportfolder_path, "Faces")
     for face_name in [f for f in os.listdir(faces_path) if os.path.isdir(os.path.join(faces_path, f))]:
@@ -40,7 +43,6 @@ def portraits_move(exportfolder_path, team_id):
                 player_id = team_id + player_number
 
                 # Create a folder for portraits if not present
-                portraits_path = os.path.join(exportfolder_path, "Portraits")
                 if not os.path.exists(portraits_path):
                     os.makedirs(portraits_path)
 
@@ -91,5 +93,8 @@ def portraits_move(exportfolder_path, team_id):
 
         # Exit with error
         return True
+
+    # Convert the portraits if needed
+    textures_convert(portraits_path, fox_mode, fox_19)
 
     return False

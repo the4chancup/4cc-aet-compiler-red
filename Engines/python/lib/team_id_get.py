@@ -157,14 +157,58 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
 
     # If no usable team name was found even then
     if not team_id:
-        TEAMS_LIST_NAME = os.path.basename(TEAMS_LIST_PATH)
-
+        print("")
         logging.error( "-")
         logging.error( "- ERROR - Unusable team name")
         logging.error(f"- Team name:      {team_name}")
         logging.error( "- The team name was not found on the teams list file")
+
+        while True:
+            print("-")
+            team_id_new = input("- Enter a team ID for this team (or press Enter to skip the export): ")
+
+            if not team_id_new.strip():
+                break
+
+            if not team_id_new.isdigit() or int(team_id_new) not in range(team_id_min, team_id_max + 1):
+                print(f"- Error: Team ID must be a number between {team_id_min} and {team_id_max}")
+                continue
+
+            # Search for the line with the team ID on the list of team names and print it
+            with open(TEAMS_LIST_PATH, 'r', encoding="utf8") as f:
+                for line in f.readlines()[1:]:
+                    if line.split()[0] == team_id_new:
+                        team_name_old = ' '.join(line.split()[1:])
+                        print(f"- Team ID {team_id_new} is already in use by {team_name_old}")
+                        response = input("- Do you want to overwrite it? (Enter to confirm, \"no\" to try again): ")
+                        break
+                else:
+                    response = "yes"
+
+            if response.strip().lower() == "no":
+                continue
+
+            # Add the new team ID to teams_list.txt
+            with open(TEAMS_LIST_PATH, 'r+', encoding="utf8") as f:
+                lines = f.readlines()
+                for i, line in enumerate(lines):
+                    if line.startswith(f"{team_id_new} "):
+                        lines[i] = f"{team_id_new} {team_name}\n"
+                        break
+                else:
+                    lines.append(f"{team_id_new} {team_name}\n")
+                f.seek(0)
+                f.writelines(lines)
+                f.truncate()
+
+            team_id = team_id_new
+            logging.error(f"- Added team {team_name} with ID {team_id} to the teams list file")
+            print("-")
+            print(f"- {team_name} (ID: {team_id})")
+
+            return team_id, team_name
+
         logging.error( "- This export will be discarded to prevent conflicts")
-        logging.error(f"- Add the team name to the \"{TEAMS_LIST_NAME}\" file and restart")
 
         if pause_on_error:
             print("-")

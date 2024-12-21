@@ -36,6 +36,16 @@ def files_id_replace(folder_path, team_id):
         os.rename(file_path, file_path_new)
 
 
+def fix_mtl_paths(file_path, team_id):
+    '''Replace any relative paths with absolute ones to the team's common folder'''
+
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+    with open(file_path, 'w') as file:
+        for line in lines:
+            if line.startswith("./"):
+                file.write(f"model/character/uniform/common/{team_id}/")
+            file.write(line)
 
 
 def kit_masks_check(team_itemfolder_path, file_ext):
@@ -428,6 +438,16 @@ def export_move(exportfolder_path, team_id, team_name):
 
                 # Create a folder with the team ID in the main folder
                 os.makedirs(main_itemfolder_team_path)
+
+                if not fox_mode:
+                    for mtl_file in [f for f in os.listdir(team_itemfolder_path) if f.endswith(".mtl")]:
+                        mtl_path = os.path.join(team_itemfolder_path, mtl_file)
+
+                        # Change the texture IDs inside each mtl file
+                        txt_id_change(mtl_path, team_id)
+
+                        # Replace any relative paths with absolute ones
+                        fix_mtl_paths(mtl_path, team_id)
 
                 # Convert unsupported textures
                 textures_convert(team_itemfolder_path, fox_mode, fox_19)

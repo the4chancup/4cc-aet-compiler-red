@@ -1,3 +1,15 @@
+22/12/24 - Version 3.5.0
+- Fixed Linux compatibility issues
+- Fixed automatic conversion of BC7 textures to DXT5 when compiling for pre-fox
+  PES versions (the quality is not great so it should be used as a last resort)
+- Improved support for team note txts, mtls and xmls with special characters
+- Added replacing of team IDs on all the filenames in every folder
+- Added replacing of team IDs on mtls in the team's common folder, and replacing
+  of any relative paths with absolute ones to the team's common folder
+- Added prompt when compiling a team export whose name is not listed on the
+  teams list, which asks for the team ID to use and adds it to the teams list
+
+
 10/11/24 - Version 3.4.0
 - Added replacing of team IDs on custom face xmls on pre-fox
 - Added support for paths which point to the default uniform/common/ folder of

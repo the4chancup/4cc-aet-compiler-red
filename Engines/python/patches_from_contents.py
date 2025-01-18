@@ -24,11 +24,13 @@ def patches_from_contents():
     run_pes = int(os.environ.get('RUN_PES', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
+    refs_mode = int(os.environ.get('REFS_MODE', '0'))
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     cpk_name = os.environ.get('CPK_NAME', '4cc_69_midcup')
     faces_cpk_name = os.environ.get('FACES_CPK_NAME', '4cc_40_faces')
     uniform_cpk_name = os.environ.get('UNIFORM_CPK_NAME', '4cc_45_uniform')
     bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')
+    refs_cpk_name = os.environ.get('REFS_CPK_NAME', '4cc_35_referees')
     cache_clear = int(os.environ.get('CACHE_CLEAR', '0'))
 
     pes_download_path = os.path.join(pes_folder_path, "download")
@@ -37,7 +39,10 @@ def patches_from_contents():
     os.makedirs(PATCHES_OUTPUT_PATH, exist_ok=True)
 
     # Set the names for the folders to put stuff into and for the cpks
-    if not multicpk_mode:
+    if refs_mode:
+        folder_name_list = ["Refscpk"]
+        cpk_name_list = [refs_cpk_name]
+    elif not multicpk_mode:
         folder_name_list = ["Singlecpk"]
         cpk_name_list = [cpk_name]
     else:

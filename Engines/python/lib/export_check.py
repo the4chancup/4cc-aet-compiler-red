@@ -75,6 +75,10 @@ def faces_check(exportfolder_path, team_name, team_id):
         return
 
     ##TODO: After combining with the other model checks, make it specific to fox or pre-fox
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    refs_mode = int(os.environ.get('REFS_MODE', '0'))
+
     FILE_TYPE_ALLOWED_LIST = [
         ".bin",
         ".xml",
@@ -107,9 +111,24 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error_mtl_format = False
         folder_error_file_unrecognized_list = []
 
-        # Check that the player number is within the 01-23 range
-        player_num = int(subfolder_name[3:5])
-        folder_error_num_bad = not (subfolder_name[3:5].isdigit() and 1 <= player_num <= 23)
+        # Check player numbers differently for referee mode
+        if refs_mode:
+            # For referees, face folders should be refereeXXX where XXX is 001-035
+            if not subfolder_name.startswith("referee"):
+                folder_error_num_bad = True
+            else:
+                try:
+                    player_num = int(subfolder_name[7:10])  # Get number after "referee"
+                    folder_error_num_bad = not (1 <= player_num <= 35)
+                except ValueError:
+                    folder_error_num_bad = True
+        else:
+            # For teams, check that the player number is within the 01-23 range
+            try:
+                player_num = int(subfolder_name[3:5])
+                folder_error_num_bad = not (1 <= player_num <= 23)
+            except ValueError:
+                folder_error_num_bad = True
 
         # Check if the player number is already in the list
         if player_num in player_num_list:

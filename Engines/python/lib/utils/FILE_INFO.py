@@ -48,3 +48,6 @@ UNIPARAM_19_NAME             = "UniformParameter19.bin"
 
 # DirectXTex
 TEXCONV_PATH                 = "./Engines/directxtex/texconv.exe"
+
+# Compiler paths
+PATCHES_CONTENTS_REFS_PATH  = "./Engines/templates/patches_contents_refs"

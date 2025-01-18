@@ -11,6 +11,7 @@ from .lib.utils.logging_tools import logger_stop
 from .lib.utils.FILE_INFO import (
     EXTRACTED_PATH,
     PATCHES_CONTENTS_PATH,
+    PATCHES_CONTENTS_REFS_PATH,
     BIN_FOLDER_PATH,
     TEAMCOLOR_BIN_NAME,
     UNICOLOR_BIN_NAME,
@@ -26,12 +27,18 @@ def contents_from_extracted():
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
 
+    refs_mode = int(os.environ.get('REFS_MODE', '0'))
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
 
     # Set the name for the folders to put stuff into
-    if not multicpk_mode:
+    if refs_mode:
+        faces_foldername = "Refscpk"
+        uniform_foldername = "Refscpk"
+        bins_foldername = "Refscpk"
+
+    elif not multicpk_mode:
 
         faces_foldername = "Singlecpk"
         uniform_foldername = "Singlecpk"
@@ -44,18 +51,38 @@ def contents_from_extracted():
         bins_foldername = "Binscpk"
 
 
-    # Create folders just in case
-    os.makedirs(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", exist_ok=True)
-    os.makedirs(f"{PATCHES_CONTENTS_PATH}/{uniform_foldername}", exist_ok=True)
-
-
     print("-")
     print("- Preparing the patch folders")
     print("-")
 
 
+    if refs_mode:
+        # Delete the contents folder
+        if os.path.exists(PATCHES_CONTENTS_PATH):
+            shutil.rmtree(PATCHES_CONTENTS_PATH)
+
+        # Create the folder
+        os.makedirs(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", exist_ok=True)
+
+        # Copy patches_contents_refs
+        if os.path.exists(PATCHES_CONTENTS_REFS_PATH):
+            print("- Copying referee base files from patches_contents_refs")
+            for item in os.listdir(PATCHES_CONTENTS_REFS_PATH):
+                src_path = os.path.join(PATCHES_CONTENTS_REFS_PATH, item)
+                dst_path = os.path.join(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", item)
+                if os.path.isdir(src_path):
+                    shutil.copytree(src_path, dst_path)
+                else:
+                    shutil.copy2(src_path, dst_path)
+
+    else:
+        # Create folders just in case
+        os.makedirs(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", exist_ok=True)
+        os.makedirs(f"{PATCHES_CONTENTS_PATH}/{uniform_foldername}", exist_ok=True)
+
+
     # If Bins Updating is enabled and there's an "extracted" folder
-    if bins_updating and os.path.exists(EXTRACTED_PATH):
+    if not refs_mode and bins_updating and os.path.exists(EXTRACTED_PATH):
 
         print("-")
         print("- Bins Updating is enabled")

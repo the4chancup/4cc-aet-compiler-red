@@ -8,6 +8,7 @@ from .lib.portraits_move import portraits_move
 from .lib.export_move import export_move
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
+from .lib.referee_tools import referee_export_process
 from .lib.utils.zlib_plus import zlib_files_in_folder
 from .lib.utils.pausing import pause
 from .lib.utils import COLORS
@@ -57,9 +58,11 @@ def extracted_from_exports():
     dds_compression = int(os.environ.get('DDS_COMPRESSION', '0'))
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
-
+    refs_mode = int(os.environ.get('REFS_MODE', '0'))
 
     print("-")
+    if refs_mode:
+        print("- Looking for /refs/ export")
     print("- Extracting and checking the exports")
     print("-")
 
@@ -73,10 +76,6 @@ def extracted_from_exports():
     if os.path.exists(main_destination_path):
         shutil.rmtree(main_destination_path)
     os.makedirs(main_destination_path)
-
-    # Define the minimum and maximum team ids
-    team_id_min = 701
-    team_id_max = 920
 
     # Reset the notes compilation
     with open(TEAMNOTES_PATH, "w", encoding="utf8") as f:
@@ -139,8 +138,30 @@ def extracted_from_exports():
         # Remove the read-only flag from every item inside the export folder
         readonlybit_remove_tree(export_destination_path)
 
-        # Get the team ID and real name
-        team_id, team_name = team_id_get(export_destination_path, team_name_folder, team_id_min, team_id_max)
+        # Handle referee export
+        if team_name_folder == "/refs/":
+            if not refs_mode:
+                print("- Skipping referee export (not in referee mode)")
+                shutil.rmtree(export_destination_path)
+                continue
+
+            # Force team ID to 999 for referees
+            team_id = "999"
+            team_name = "/refs/"
+
+            # Process the referee export
+            referee_export_process(export_destination_path, fox_mode, pause_on_error)
+
+        elif refs_mode:
+            print("- Skipping non-referee export")
+            shutil.rmtree(export_destination_path)
+            continue
+
+        else:
+            # Get the team ID and real name for non-referee exports
+            team_id_min = 701
+            team_id_max = 920
+            team_id, team_name = team_id_get(export_destination_path, team_name_folder, team_id_min, team_id_max)
 
         # If the teamID was not found, proceed to the next export
         if not team_id:

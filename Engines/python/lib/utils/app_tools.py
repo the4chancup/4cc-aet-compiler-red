@@ -27,6 +27,16 @@ def app_title(colorize=True):
     return title_string
 
 
+def referee_title(colorize=True):
+
+    color_dark_magenta = COLORS.DARK_MAGENTA if colorize else ""
+    color_reset = COLORS.RESET if colorize else ""
+
+    title_string = f"{color_dark_magenta}referees{color_reset} "
+
+    return title_string
+
+
 def pes_title(pes_version, colorize=True):
 
     color_bright_red = COLORS.BRIGHT_RED if colorize else ""

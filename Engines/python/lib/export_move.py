@@ -81,6 +81,7 @@ def export_move(exportfolder_path, team_id, team_name):
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
+    refs_mode = int(os.environ.get('REFS_MODE', '0'))
 
     # The main folder path is the parent of the export folder
     mainfolder_path = os.path.dirname(exportfolder_path)
@@ -148,8 +149,14 @@ def export_move(exportfolder_path, team_id, team_name):
                 subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
 
                 # Replace the dummy team ID with the actual one
-                subfolder_id_withname = team_id + subfolder_name[3:]
-                subfolder_id = subfolder_id_withname[:5]
+                if refs_mode and subfolder_name.startswith("referee"):
+                    # For referees, face IDs are in the format "refereeXXX" where XXX is the ref number
+                    subfolder_id_withname = subfolder_name
+                    subfolder_id = subfolder_id_withname[:10]  # "referee001"
+                else:
+                    # Normal team face handling
+                    subfolder_id_withname = team_id + subfolder_name[3:]
+                    subfolder_id = subfolder_id_withname[:5]
 
                 if fox_mode:
                     # Change the texture IDs inside each fmdl file

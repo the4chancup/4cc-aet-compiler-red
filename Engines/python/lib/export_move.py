@@ -16,8 +16,8 @@ from .utils.FILE_INFO import (
 )
 
 
-def files_id_replace(folder_path, team_id):
-    '''Replace the dummy team ID with the actual one in any files found in the folder'''
+def filenames_id_replace(folder_path, team_id):
+    '''Replace the dummy team ID with the actual one in any filenames found in the folder'''
 
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
@@ -186,7 +186,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 textures_convert(subfolder_path, fox_mode, fox_19)
 
                 # Replace the dummy team ID with the actual one in any files found
-                files_id_replace(subfolder_path, team_id)
+                filenames_id_replace(subfolder_path, team_id)
 
                 # Replace the dummy team ID with the actual one
                 subfolder_path_withname = os.path.join(team_itemfolder_path, subfolder_id_withname)
@@ -362,7 +362,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 textures_convert(subfolder_path, fox_mode, fox_19)
 
                 # Replace the dummy team ID with the actual one in any files found
-                files_id_replace(subfolder_path, team_id)
+                filenames_id_replace(subfolder_path, team_id)
 
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)
@@ -408,7 +408,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 textures_convert(subfolder_path, fox_mode, fox_19)
 
                 # Replace the dummy team ID with the actual one in any files found
-                files_id_replace(subfolder_path, team_id)
+                filenames_id_replace(subfolder_path, team_id)
 
                 # Delete the destination folder if already present
                 subfolder_destination_path = os.path.join(main_itemfolder_path, subfolder_name)
@@ -460,7 +460,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 textures_convert(team_itemfolder_path, fox_mode, fox_19)
 
                 # Replace the dummy team ID with the actual one in any files found
-                files_id_replace(team_itemfolder_path, team_id)
+                filenames_id_replace(team_itemfolder_path, team_id)
 
                 # Move everything to the team folder inside the main folder
                 for file in os.listdir(team_itemfolder_path):

@@ -88,12 +88,18 @@ def ref_folder_process(ref_folder, ref_num, ref_name, extracted_path, fox_mode):
         common_dst = os.path.join(extracted_path, 'Common')
         os.makedirs(common_dst, exist_ok=True)
 
-        # Copy all files from common folder
+        # Copy all files and folders from common folder
         for item in os.listdir(common_src):
             src_path = os.path.join(common_src, item)
+            dst_path = os.path.join(common_dst, item)
+            if os.path.exists(dst_path):
+                continue
             if os.path.isfile(src_path):
-                shutil.copy2(src_path, common_dst)
+                shutil.copy2(src_path, dst_path)
                 logging.debug(f"Copied common file: {item}")
+            elif os.path.isdir(src_path):
+                shutil.copytree(src_path, dst_path)
+                logging.debug(f"Copied common folder: {item}")
     else:
         logging.debug(f"No common folder found for referee {ref_name}")
 

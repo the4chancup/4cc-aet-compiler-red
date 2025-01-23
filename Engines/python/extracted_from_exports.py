@@ -145,7 +145,7 @@ def extracted_from_exports():
                 shutil.rmtree(export_destination_path)
                 continue
 
-            # Force team ID to 999 for referees
+            # Force team ID to 999 for referee exports
             team_id = "999"
             team_name = "/refs/"
 

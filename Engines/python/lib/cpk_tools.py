@@ -12,7 +12,7 @@ from .utils.file_management import file_critical_check
 
 
 # Find the file in the cpk
-def cpk_file_extract(cpk_path, file_source_path):
+def cpk_file_search(cpk_path, file_source_path, fetch=False):
 
     file_contents = None
 
@@ -25,8 +25,11 @@ def cpk_file_extract(cpk_path, file_source_path):
 
         if file.name == file_source_path:
 
-            # Read the file contents
-            file_contents = cpk_search.readFile(file)
+            if fetch:
+                # Read the file contents
+                file_contents = cpk_search.readFile(file)
+            else:
+                file_contents = file.name
 
             break
 
@@ -76,9 +79,9 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
 
                     cpk_path = os.path.join(pes_download_path, cpk_file)
 
-                    file_data = cpk_file_extract(cpk_path, file_info['source_path'])
+                    file_data = cpk_file_search(cpk_path, file_info['source_path'], fetch)
 
-                    if file_data:
+                    if file_data is not None:
                         if fetch:
 
                             print(f"- {os.path.basename(file_info['source_path'])} found in {os.path.basename(cpk_path)}")

@@ -139,7 +139,7 @@ def main(run_type):
     os.environ['REFS_MODE'] = str(int(refs_mode))
 
     print("-")
-    print("- Compiling " + referee_title() + "for " + pes_title(pes_version) + "...")
+    print("- Compiling " + referee_title(refs_mode) + "for " + pes_title(pes_version) + "...")
     print("-")
 
     # Invoke the export extractor

@@ -27,12 +27,12 @@ def app_title(colorize=True):
     return title_string
 
 
-def referee_title(colorize=True):
+def referee_title(refs_mode, colorize=True):
 
     color_dark_magenta = COLORS.DARK_MAGENTA if colorize else ""
     color_reset = COLORS.RESET if colorize else ""
 
-    title_string = f"{color_dark_magenta}referees{color_reset} "
+    title_string = f"{color_dark_magenta}referees{color_reset} " if refs_mode else ""
 
     return title_string
 

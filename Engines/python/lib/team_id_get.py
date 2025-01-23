@@ -23,6 +23,23 @@ def id_search(team_name):
     return team_id
 
 
+def export_files_present(directory_path: str) -> bool:
+    """Check if the directory contains any export-related files or folders."""
+    return any([
+        any(f.endswith('.txt') for f in os.listdir(directory_path)),
+        os.path.exists(f"{directory_path}/Faces"),
+        os.path.exists(f"{directory_path}/Kit Configs"),
+        os.path.exists(f"{directory_path}/Kit Textures"),
+        os.path.exists(f"{directory_path}/Portraits"),
+        os.path.exists(f"{directory_path}/Boots"),
+        os.path.exists(f"{directory_path}/Gloves"),
+        os.path.exists(f"{directory_path}/Collars"),
+        os.path.exists(f"{directory_path}/Logo"),
+        os.path.exists(f"{directory_path}/Common"),
+        os.path.exists(f"{directory_path}/Other")
+    ])
+
+
 # Function for finding the team ID after receiving the foldername as parameter
 def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_max):
 
@@ -36,40 +53,17 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
     not_root = None
     team_id = None
 
-    if any([
-        os.path.exists(f"{exportfolder_path}/*.txt"),
-        os.path.exists(f"{exportfolder_path}/Faces"),
-        os.path.exists(f"{exportfolder_path}/Kit Configs"),
-        os.path.exists(f"{exportfolder_path}/Kit Textures"),
-        os.path.exists(f"{exportfolder_path}/Portraits"),
-        os.path.exists(f"{exportfolder_path}/Boots"),
-        os.path.exists(f"{exportfolder_path}/Gloves"),
-        os.path.exists(f"{exportfolder_path}/Collars"),
-        os.path.exists(f"{exportfolder_path}/Logo"),
-        os.path.exists(f"{exportfolder_path}/Common"),
-        os.path.exists(f"{exportfolder_path}/Other")
-    ]):
+    if export_files_present(exportfolder_path):
         root_found = True
-
 
     # If the folders aren't at the root
     if not root_found:
 
         # Look in every folder for a faces or kit configs folder
         for foldername_test in os.listdir(exportfolder_path):
-            if any([
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/*.txt"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Faces"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Kit Configs"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Kit Textures"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Portraits"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Boots"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Gloves"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Collars"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Logo"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Common"),
-                os.path.exists(f"{exportfolder_path}/{foldername_test}/Other")
-            ]):
+            test_path = os.path.join(exportfolder_path, foldername_test)
+
+            if export_files_present(test_path):
                 root_found = True
                 not_root = True
                 foldername_inside = foldername_test

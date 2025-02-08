@@ -6,32 +6,71 @@ import xml.etree.ElementTree as ET
 from .utils.file_management import file_critical_check
 from .utils.elements import dummy_element
 from .utils.elements import glove_element
+from .utils.id_change import txt_id_change
+
+
+# Global constants
+DIFF_NAME = "face_diff"
+MODEL_NAME_EXCEPTION_LIST = [
+    "hair_high_win32.model",
+]
+MTL_NAME_DEFAULT = "materials.mtl"
+TYPES_LIST = [
+    "face_neck",
+    "handL",
+    "handR",
+    "gloveL",
+    "gloveR",
+    "uniform",
+    "shirt",
+    "pants_nocloth",
+]
+TYPE_DEFAULT = "parts"
+
+
+def diff_data_decode(folder_path, diff_bin_path_default=None):
+    """
+    Decode diff data from either a bin or xml file.
+
+    Parameters:
+        folder_path (str): Path to the folder containing diff files
+        diff_bin_path_default (str, optional): Default path for the diff bin file
+
+    Returns:
+        ET.Element: The diff element or None if no diff data found
+    """
+    diff_bin_path_test = os.path.join(folder_path, f"{DIFF_NAME}.bin")
+    diff_xml_path = os.path.join(folder_path, f"{DIFF_NAME}.xml")
+
+    if os.path.isfile(diff_bin_path_test):
+        diff_bin_path = diff_bin_path_test
+        diff_type = "bin"
+    elif os.path.isfile(diff_xml_path):
+        diff_type = "xml"
+    else:
+        if diff_bin_path_default:
+            diff_bin_path = diff_bin_path_default
+            diff_type = "bin"
+        else:
+            return None
+
+    if diff_type == "xml":
+        diff_file = ET.ElementTree(file=diff_xml_path)
+        diff_temp = diff_file.getroot()
+        diff = copy.deepcopy(diff_temp)
+    else:
+        diff = ET.Element("dif")
+        diff_file = open(diff_bin_path, 'rb').read()
+        diff.text = "\n%s\n" % str(base64.b64encode(diff_file), 'utf-8')
+        diff.tail = "\n"
+
+    return diff
 
 
 def xml_create(folder_path, folder_type):
 
-    MODEL_NAME_EXCEPTION_LIST = [
-        "hair_high_win32.model",
-    ]
-
-    MTL_NAME_DEFAULT = "materials.mtl"
-
-    DIFF_NAME = "face_diff"
     DIFF_BIN_PATH_DEFAULT = os.path.join("Engines", "templates", f"{DIFF_NAME}.bin")
     file_critical_check(DIFF_BIN_PATH_DEFAULT)
-
-    TYPES_LIST = [
-        "face_neck",
-        "handL",
-        "handR",
-        "gloveL",
-        "gloveR",
-        "uniform",
-        "shirt",
-        "pants_nocloth",
-    ]
-    TYPE_DEFAULT = "parts"
-
 
     # Create a new root
     root_new = ET.Element('config')
@@ -108,29 +147,9 @@ def xml_create(folder_path, folder_type):
         ET.indent(root_new, '   ')
 
         # Decode the diff file and add it to the root
-        diff_bin_path_test = os.path.join(folder_path, f"{DIFF_NAME}.bin")
-        diff_xml_path = os.path.join(folder_path, f"{DIFF_NAME}.xml")
-
-        if os.path.isfile(diff_bin_path_test):
-            diff_bin_path = diff_bin_path_test
-            diff_type = "bin"
-        elif os.path.isfile(diff_xml_path):
-            diff_type = "xml"
-        else:
-            diff_bin_path = DIFF_BIN_PATH_DEFAULT
-            diff_type = "bin"
-
-        if diff_type == "xml":
-            diff_file = ET.ElementTree(file=diff_xml_path)
-            diff_temp = diff_file.getroot()
-            diff = copy.deepcopy(diff_temp)
-        else:
-            diff = ET.Element("dif")
-            diff_file = open(diff_bin_path, 'rb').read()
-            diff.text = "\n%s\n" % str(base64.b64encode(diff_file), 'utf-8')
-            diff.tail = "\n"
-
-        root_new.append(diff)
+        diff = diff_data_decode(folder_path, DIFF_BIN_PATH_DEFAULT)
+        if diff is not None:
+            root_new.append(diff)
 
     if folder_type == "glove":
 
@@ -156,3 +175,36 @@ def xml_create(folder_path, folder_type):
     tree_new.write(xml_path, encoding='UTF-8', xml_declaration=True)
 
     return
+
+
+def xml_process(xml_path):
+    """
+    Process a face xml file by updating IDs and merging any existing face_diff data.
+
+    Parameters:
+        xml_path (str): Path to the face xml file to process
+    """
+    folder_path = os.path.dirname(xml_path)
+
+    # First run txt_id_change on the xml
+    txt_id_change(xml_path)
+
+    # Search for a new diff block from either bin or xml source
+    diff_new = diff_data_decode(folder_path)
+    if diff_new is None:
+        return
+
+    # Parse the current xml
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+
+    # Remove any existing diff block
+    for diff in root.findall('dif'):
+        root.remove(diff)
+
+    # Add the new diff block
+    root.append(diff_new)
+
+    # Write back the modified xml
+    ET.indent(root, '   ')
+    tree.write(xml_path, encoding='utf-8', xml_declaration=True)

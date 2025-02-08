@@ -6,6 +6,7 @@ from .utils.id_change import path_id_change
 from .utils.id_change import txt_id_change
 from .fmdl_id_change import fmdl_id_change
 from .xml_create import xml_create
+from .xml_create import xml_process
 from .texture_check import textures_convert
 from .utils.file_management import file_critical_check
 from .utils.zlib_plus import unzlib_file
@@ -176,8 +177,8 @@ def export_move(exportfolder_path, team_id, team_name):
                     object_type = "face"
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
                     if os.path.exists(xml_path):
-                        # Change the team IDs inside the xml file
-                        txt_id_change(xml_path, team_id)
+                        # Process the xml file
+                        xml_process(xml_path)
                     else:
                         # Create the xml file
                         xml_create(subfolder_path, object_type)

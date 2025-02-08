@@ -5,8 +5,8 @@ import shutil
 from .utils.id_change import path_id_change
 from .utils.id_change import txt_id_change
 from .fmdl_id_change import fmdl_id_change
-from .xml_create import xml_create
-from .xml_create import xml_process
+from .xml_editing import xml_create
+from .xml_editing import xml_process
 from .texture_check import textures_convert
 from .utils.file_management import file_critical_check
 from .utils.zlib_plus import unzlib_file

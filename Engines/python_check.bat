@@ -12,7 +12,7 @@ if %ERRORLEVEL% == 0 (
   set "python_link=https://www.python.org/downloads/"
 )
 
-for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
+for /f "tokens=*" %%A in ('py -3.12 -V 2^>nul') do (
 
   set python_version_line=%%A
 

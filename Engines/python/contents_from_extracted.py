@@ -1,4 +1,5 @@
 import os
+import stat
 import shutil
 import logging
 
@@ -19,6 +20,12 @@ from .lib.utils.FILE_INFO import (
     UNIPARAM_18_NAME,
     UNIPARAM_19_NAME,
 )
+
+
+def remove_readonly(func, path, _):
+    "Clear the readonly bit and reattempt the removal"
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
 
 
 def contents_from_extracted():
@@ -59,7 +66,7 @@ def contents_from_extracted():
     if refs_mode:
         # Delete the contents folder
         if os.path.exists(PATCHES_CONTENTS_PATH):
-            shutil.rmtree(PATCHES_CONTENTS_PATH)
+            shutil.rmtree(PATCHES_CONTENTS_PATH, onexc=remove_readonly)
 
         # Create the folder
         os.makedirs(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", exist_ok=True)
@@ -181,7 +188,7 @@ def contents_from_extracted():
             print("-")
 
         # Delete the bins temp folder
-        shutil.rmtree(BINS_TEMP_FOLDER_PATH)
+        shutil.rmtree(BINS_TEMP_FOLDER_PATH, onexc=remove_readonly)
 
     faces_folder_path = os.path.join("./patches_contents", faces_foldername)
 
@@ -211,14 +218,14 @@ def contents_from_extracted():
 
             # If the target item path exists, remove it
             if os.path.exists(target_item_path):
-                shutil.rmtree(target_item_path)
+                shutil.rmtree(target_item_path, onexc=remove_readonly)
 
             # Move the item to the target directory
             shutil.move(item_path, items_dir)
 
         # Delete the main 'Kit Configs' folder
         if os.path.exists(main_dir):
-            shutil.rmtree(main_dir)
+            shutil.rmtree(main_dir, onexc=remove_readonly)
 
 
     # If there's a Kit Textures folder, move its stuff
@@ -248,7 +255,7 @@ def contents_from_extracted():
 
         # Delete the main 'Kit Textures' folder
         if os.path.exists(main_dir):
-            shutil.rmtree(main_dir)
+            shutil.rmtree(main_dir, onexc=remove_readonly)
 
 
     # If there's a Boots folder, move or pack its stuff
@@ -305,7 +312,7 @@ def contents_from_extracted():
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir)
+        shutil.rmtree(main_dir, onexc=remove_readonly)
 
 
     # If there's a Portraits folder, move its stuff
@@ -332,7 +339,7 @@ def contents_from_extracted():
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir)
+        shutil.rmtree(main_dir, onexc=remove_readonly)
 
 
     # If there's a Logo folder, move its stuff
@@ -359,7 +366,7 @@ def contents_from_extracted():
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir)
+        shutil.rmtree(main_dir, onexc=remove_readonly)
 
 
     # Set the common folder path depending on the fox mode setting
@@ -390,7 +397,7 @@ def contents_from_extracted():
 
                 # If the folder already exists, delete it
                 if os.path.exists(os.path.join(items_folder_path_full, item)):
-                    shutil.rmtree(os.path.join(items_folder_path_full, item))
+                    shutil.rmtree(os.path.join(items_folder_path_full, item), onexc=remove_readonly)
 
                 # Move the folder
                 shutil.move(os.path.join(main_dir, item), items_folder_path_full)
@@ -411,12 +418,12 @@ def contents_from_extracted():
                     shutil.move(os.path.join(main_dir, item, subitem), subfolder)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir)
+        shutil.rmtree(main_dir, onexc=remove_readonly)
 
 
     # Finally delete the "extracted" folder
     if os.path.exists(EXTRACTED_PATH):
-        shutil.rmtree(EXTRACTED_PATH)
+        shutil.rmtree(EXTRACTED_PATH, onexc=remove_readonly)
 
 
     if 'all_in_one' in os.environ:

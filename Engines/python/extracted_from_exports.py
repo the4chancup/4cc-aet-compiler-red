@@ -1,5 +1,6 @@
 import os
 import re
+import stat
 import py7zr
 import shutil
 
@@ -31,6 +32,12 @@ def readonlybit_remove_tree(path):
             os.chmod(filename, 0o700)
         for dir in dirs:
             readonlybit_remove_tree(os.path.join(root, dir))
+
+
+def remove_readonly(func, path, _):
+    "Clear the readonly bit and reattempt the removal"
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
 
 
 # Append the contents of a txt file to teamnotes.txt for quick reading
@@ -74,7 +81,7 @@ def extracted_from_exports():
     os.makedirs(main_source_path, exist_ok=True)
 
     if os.path.exists(main_destination_path):
-        shutil.rmtree(main_destination_path)
+        shutil.rmtree(main_destination_path, onexc=remove_readonly)
     os.makedirs(main_destination_path)
 
     # Reset the notes compilation
@@ -117,7 +124,7 @@ def extracted_from_exports():
 
         # Delete the export destination folder if present
         if os.path.exists(export_destination_path):
-            shutil.rmtree(export_destination_path)
+            shutil.rmtree(export_destination_path, onexc=remove_readonly)
 
         # Extract or copy the export into a new export folder, removing the .db and .ini files
         if not export_type == "folder":
@@ -131,7 +138,7 @@ def extracted_from_exports():
                     z.extractall(export_destination_path_temp)
 
             shutil.copytree(export_destination_path_temp, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
-            shutil.rmtree(export_destination_path_temp)
+            shutil.rmtree(export_destination_path_temp, onexc=remove_readonly)
         else:
             shutil.copytree(export_source_path, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
 
@@ -142,7 +149,7 @@ def extracted_from_exports():
         if team_name_folder == "/refs/":
             if not refs_mode:
                 print("- Skipping referee export (not in referee mode)")
-                shutil.rmtree(export_destination_path)
+                shutil.rmtree(export_destination_path, onexc=remove_readonly)
                 continue
 
             # Force team ID to 999 for referee exports
@@ -154,7 +161,7 @@ def extracted_from_exports():
 
         elif refs_mode:
             print("- Skipping non-referee export")
-            shutil.rmtree(export_destination_path)
+            shutil.rmtree(export_destination_path, onexc=remove_readonly)
             continue
 
         else:
@@ -192,7 +199,7 @@ def extracted_from_exports():
             dummy_kits_replace(team_id, team_name)
 
         # Delete the now empty export folder
-        shutil.rmtree(export_destination_path)
+        shutil.rmtree(export_destination_path, onexc=remove_readonly)
 
         print("-")
 

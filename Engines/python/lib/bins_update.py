@@ -7,6 +7,7 @@ from .utils.FILE_INFO import (
     EXTRACTED_PATH,
     TEAMS_LIST_PATH,
 )
+from .team_id_get import id_search
 
 
 def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
@@ -241,12 +242,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
                     team_name = data[-1]
 
                     # Search for the team name in the list of team IDs
-                    with open(TEAMS_LIST_PATH, 'r', encoding="utf8") as teams_list:
-
-                        for teams_list_line in teams_list:
-                            if teams_list_line.split()[1] == team_name.lower():
-                                team_id = teams_list_line.split()[0]
-                                break
+                    team_id = id_search(team_name)
 
                     # Print team name and ID if found
                     if team_id is not None:

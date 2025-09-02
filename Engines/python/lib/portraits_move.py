@@ -94,8 +94,4 @@ def portraits_move(exportfolder_path, team_id):
         # Exit with error
         return True
 
-    # Convert the portraits if needed
-    if os.path.exists(portraits_path):
-        textures_convert(portraits_path, fox_mode, fox_19)
-
     return False

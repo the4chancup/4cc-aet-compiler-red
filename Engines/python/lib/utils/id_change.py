@@ -22,13 +22,13 @@ def path_id_change(path, team_id, common_replace=True):
     return path
 
 
-def txt_id_change(file_path, team_id = "000"):
+def txt_id_change(file_path, team_id):
     """
     Change the team ID in the given text file.
 
     Parameters:
         file_path (str): The path to the file.
-        team_id (str, optional): The team ID to replace in the file. Defaults to "000".
+        team_id (str): The team ID to replace in the file.
 
     This function looks for common/XXX/, u0XXXp and u0XXXg inside each line,
     where XXX is any sequence of three characters, and replaces XXX with the team ID provided as parameter.

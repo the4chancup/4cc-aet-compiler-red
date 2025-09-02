@@ -177,17 +177,18 @@ def xml_create(folder_path, folder_type):
     return
 
 
-def xml_process(xml_path):
+def xml_process(xml_path, team_id):
     """
     Process a face xml file by updating IDs and merging any existing face_diff data.
 
     Parameters:
         xml_path (str): Path to the face xml file to process
+        team_id (str): The team ID to replace in the file
     """
     folder_path = os.path.dirname(xml_path)
 
     # First run txt_id_change on the xml
-    txt_id_change(xml_path)
+    txt_id_change(xml_path, team_id)
 
     # Search for a new diff block from either bin or xml source
     diff_new = diff_data_decode(folder_path)

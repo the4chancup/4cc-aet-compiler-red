@@ -178,7 +178,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
                     if os.path.exists(xml_path):
                         # Process the xml file
-                        xml_process(xml_path)
+                        xml_process(xml_path, team_id)
                     else:
                         # Create the xml file
                         xml_create(subfolder_path, object_type)

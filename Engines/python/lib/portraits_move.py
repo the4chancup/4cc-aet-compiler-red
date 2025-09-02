@@ -3,7 +3,6 @@ import shutil
 import filecmp
 import logging
 
-from .texture_check import textures_convert
 from .utils.pausing import pause
 
 
@@ -20,8 +19,6 @@ def portraits_move(exportfolder_path, team_id):
     """
 
     # Read the necessary parameters
-    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
 
     TEX_NAME = "portrait.dds"

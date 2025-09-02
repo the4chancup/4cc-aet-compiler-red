@@ -17,8 +17,8 @@ from .utils.FILE_INFO import (
 )
 
 
-def filenames_id_replace(folder_path, team_id):
-    '''Replace the dummy team ID with the actual one in any filenames found in the folder'''
+def filenames_id_replace(folder_path, team_id, include_subfolders=True):
+    '''Replace the dummy team ID with the actual one in any filenames found in the folder and its subfolders'''
 
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
@@ -35,6 +35,14 @@ def filenames_id_replace(folder_path, team_id):
         if os.path.exists(file_path_new):
             os.remove(file_path_new)
         os.rename(file_path, file_path_new)
+
+    if not include_subfolders:
+        return
+
+    for subfolder_name in os.listdir(folder_path):
+        subfolder_path = os.path.join(folder_path, subfolder_name)
+        if os.path.isdir(subfolder_path):
+            filenames_id_replace(subfolder_path, team_id, include_subfolders)
 
 
 def fix_mtl_paths(file_path, team_id):

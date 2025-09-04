@@ -33,7 +33,8 @@ def portraits_move(exportfolder_path, team_id):
         if face_name[3:5].isdigit() and '01' <= face_name[3:5] <= '23':
 
             # If the folder has a portrait
-            portrait_path = os.path.join(faces_path, face_name, TEX_NAME)
+            face_path = os.path.join(faces_path, face_name)
+            portrait_path = os.path.join(face_path, TEX_NAME)
             if os.path.exists(portrait_path):
 
                 player_number = face_name[3:5]
@@ -65,6 +66,12 @@ def portraits_move(exportfolder_path, team_id):
                     # Move the portrait to the portraits folder
                     portrait_destination_path = os.path.join(portraits_path, portrait_name)
                     os.rename(portrait_path, portrait_destination_path)
+
+                # Check if the "ingame_face" file is present and delete the folder if it is
+                ingame_face_path = os.path.join(face_path, "ingame_face")
+                ingame_face_txt_path = os.path.join(face_path, "ingame_face.txt")
+                if os.path.exists(ingame_face_path) or os.path.exists(ingame_face_txt_path):
+                    shutil.rmtree(face_path)
 
     # If there are any portrait conflicts
     if portrait_conflicts:

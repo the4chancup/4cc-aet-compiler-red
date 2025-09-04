@@ -123,8 +123,8 @@ def xml_create(folder_path, folder_type):
                     model_type = type
                     break
             else:
-                if "type_" in model_name_pure:
-                    model_type = model_name_pure.split("type_")[1].replace(".model", "")
+                if "model_type_" in model_name_pure:
+                    model_type = model_name_pure.split("model_type_")[1].replace(".model", "")
                 else:
                     model_type = TYPE_DEFAULT
 

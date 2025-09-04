@@ -38,7 +38,8 @@ def log_store(log_path):
     if not os.path.exists(log_path):
         return
 
-    log_path_old = log_path + ".old"
+    log_path_splitext = os.path.splitext(log_path)
+    log_path_old = log_path_splitext[0] + ".old" + log_path_splitext[1]
 
     log_name = os.path.basename(log_path)
 

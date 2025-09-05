@@ -11,6 +11,30 @@ from .xml_check import face_diff_xml_check
 from .txt_kits_count import txt_kits_count
 
 
+
+FILE_TYPE_ALLOWED_LIST = [
+    ".bin",
+    ".xml",
+    ".fmdl",
+    ".model",
+    ".mtl",
+    ".dds",
+    ".ftex",
+    ".skl",
+]
+
+PREFOX_FILE_TYPE_DISALLOWED_LIST = [
+    ".fmdl",
+    ".ftex",
+    ".skl",
+]
+
+FOX_FILE_TYPE_DISALLOWED_LIST = [
+    ".model",
+    ".mtl",
+]
+
+
 # Check for nested folders with repeating names
 def nested_folders_fix(exportfolder_path, team_name):
 
@@ -74,21 +98,10 @@ def faces_check(exportfolder_path, team_name, team_id):
         shutil.rmtree(itemfolder_path)
         return
 
-    ##TODO: After combining with the other model checks, make it specific to fox or pre-fox
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     refs_mode = int(os.environ.get('REFS_MODE', '0'))
-
-    FILE_TYPE_ALLOWED_LIST = [
-        ".bin",
-        ".xml",
-        ".fmdl",
-        ".model",
-        ".mtl",
-        ".dds",
-        ".ftex",
-        ".skl",
-    ]
+    strict_file_type_check = int(os.environ.get('STRICT_FILE_TYPE_CHECK', '1'))
 
     folder_error_any = None
     player_num_list = []
@@ -109,7 +122,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error_xml_format = False
         folder_error_tex_format = False
         folder_error_mtl_format = False
-        folder_error_file_unrecognized_list = []
+        folder_error_file_disallowed_list = []
 
         # Check player numbers differently for referee mode
         if refs_mode:
@@ -166,34 +179,55 @@ def faces_check(exportfolder_path, team_name, team_id):
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
 
-        # Check if any file is unrecognized
-        for file_name in os.listdir(subfolder_path):
-            if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
-                os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST):
+        # Make a list with the allowed and disallowed file types
+        file_type_disallowed_list = PREFOX_FILE_TYPE_DISALLOWED_LIST if not fox_mode else FOX_FILE_TYPE_DISALLOWED_LIST
+        file_type_allowed_list_filtered = [
+            file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
+        ]
+        # Check if any file is disallowed
+        for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
+            file_type = os.path.splitext(file_name)[1]
+            if file_type not in file_type_allowed_list_filtered:
+                folder_error_file_disallowed_list.append(file_name)
 
-                folder_error_file_unrecognized_list.append(file_name)
+        if folder_error_file_disallowed_list:
+            # Determine log level based on the parameter
+            if strict_file_type_check:
+                log_level = logging.ERROR
+                level_text = "ERROR"
+                action_text = "This folder will be discarded"
+            else:
+                log_level = logging.INFO
+                level_text = "Info"
+                action_text = "Consider removing these files for better compatibility"
 
-        ##TODO Make this an error, plus setting to turn it into a suggestion
-        if folder_error_file_unrecognized_list:
-            logging.warning( "-")
-            logging.warning( "- Warning - Unrecognized files")
-            logging.warning(f"- Team name:      {team_name}")
-            logging.warning(f"- Face folder:    {subfolder_name}")
-            for file_name in folder_error_file_unrecognized_list:
-                logging.warning(f"- File name:      {file_name}")
-            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex, skl files are allowed")
-            logging.warning( "- <After the next major update this will be an error which discards the folder>")
+            allowed_file_types = ", ".join(file_type_allowed_list_filtered)
+
+            logging.log(log_level, "-")
+            logging.log(log_level, f"- {level_text} - Disallowed files")
+            logging.log(log_level, f"- Team name:          {team_name}")
+            logging.log(log_level, f"- Face folder:        {subfolder_name}")
+            for file_name in folder_error_file_disallowed_list:
+                logging.log(log_level, f"- File name:          {file_name}")
+            logging.log(log_level, f"- Allowed file types: {allowed_file_types}")
+            logging.log(log_level, "-")
+            logging.log(log_level, f"- {action_text}")
+
+            # If strict file type check is disabled, clear the list
+            if not strict_file_type_check:
+                folder_error_file_disallowed_list = []
 
         # Set the main flag if any of the checks failed
-        folder_error = (
-            folder_error_num_bad or
-            folder_error_num_repeated or
-            folder_error_edithairxml or
-            folder_error_hairxml or
-            folder_error_xml_format or
-            folder_error_tex_format or
-            folder_error_mtl_format
-        )
+        folder_error = any((
+            folder_error_num_bad,
+            folder_error_num_repeated,
+            folder_error_edithairxml,
+            folder_error_hairxml,
+            folder_error_xml_format,
+            folder_error_tex_format,
+            folder_error_mtl_format,
+            folder_error_file_disallowed_list,
+        ))
 
         # If the face folder has something wrong
         if folder_error:
@@ -222,6 +256,9 @@ def faces_check(exportfolder_path, team_name, team_id):
                 logging.error( "- (bad textures)")
             if folder_error_mtl_format:
                 logging.error( "- (broken mtl files)")
+            if folder_error_file_disallowed_list:
+                for file_name in folder_error_file_disallowed_list:
+                    logging.error(f"- ({file_name} is not allowed)")
 
             # And skip it
             shutil.rmtree(subfolder_path)
@@ -584,20 +621,13 @@ def boots_check(exportfolder_path, team_name, team_id):
         shutil.rmtree(itemfolder_path)
         return
 
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    strict_file_type_check = int(os.environ.get('FILETYPE_CHECK_STRICT', '1'))
+
     MODEL_ALLOWED_LIST = [
         "boots.model",
         "boots_edit.model",
-    ]
-
-    FILE_TYPE_ALLOWED_LIST = [
-        ".bin",
-        ".xml",
-        ".fmdl",
-        ".model",
-        ".mtl",
-        ".dds",
-        ".ftex",
-        ".skl",
     ]
 
     folder_error_any = None
@@ -617,7 +647,7 @@ def boots_check(exportfolder_path, team_name, team_id):
         folder_error_model_disallowed_list = []
         folder_error_tex_format = False
         folder_error_mtl_format = False
-        folder_error_file_unrecognized_list = []
+        folder_error_file_disallowed_list = []
 
         # Check that its name starts with a k and that the 4 characters after it are digits
         folder_num = int(subfolder_name[1:5])
@@ -653,33 +683,53 @@ def boots_check(exportfolder_path, team_name, team_id):
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
 
-        # Check if any file is unrecognized
-        for file_name in os.listdir(subfolder_path):
-            if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
-                os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST):
+        # Make a list with the allowed and disallowed file types
+        file_type_disallowed_list = PREFOX_FILE_TYPE_DISALLOWED_LIST if not fox_mode else FOX_FILE_TYPE_DISALLOWED_LIST
+        file_type_allowed_list_filtered = [
+            file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
+        ]
+        # Check if any file is disallowed
+        for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
+            file_type = os.path.splitext(file_name)[1]
+            if file_type not in file_type_allowed_list_filtered:
+                folder_error_file_disallowed_list.append(file_name)
 
-                folder_error_file_unrecognized_list.append(file_name)
+        if folder_error_file_disallowed_list:
+            # Determine log level based on the parameter
+            if strict_file_type_check:
+                log_level = logging.ERROR
+                level_text = "ERROR"
+                action_text = "This folder will be discarded"
+            else:
+                log_level = logging.INFO
+                level_text = "Info"
+                action_text = "Consider removing these files for better compatibility"
 
-        ##TODO Make this an error, plus setting to turn it into a suggestion
-        if folder_error_file_unrecognized_list:
-            logging.warning( "-")
-            logging.warning( "- Warning - Unrecognized files")
-            logging.warning(f"- Team name:      {team_name}")
-            logging.warning(f"- Face folder:    {subfolder_name}")
-            for file_name in folder_error_file_unrecognized_list:
-                logging.warning(f"- File name:      {file_name}")
-            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex, skl files are allowed")
-            logging.warning( "-")
-            logging.warning( "- <After the next major update this will be an error which discards the folder>")
+            allowed_file_types = ", ".join(file_type_allowed_list_filtered)
+
+            logging.log(log_level, "-")
+            logging.log(log_level, f"- {level_text} - Disallowed files")
+            logging.log(log_level, f"- Team name:          {team_name}")
+            logging.log(log_level, f"- Boots folder:       {subfolder_name}")
+            for file_name in folder_error_file_disallowed_list:
+                logging.log(log_level, f"- File name:          {file_name}")
+            logging.log(log_level, f"- Allowed file types: {allowed_file_types}")
+            logging.log(log_level, "-")
+            logging.log(log_level, f"- {action_text}")
+
+            # If strict file type check is disabled, clear the list
+            if not strict_file_type_check:
+                folder_error_file_disallowed_list = []
 
         # Set the main flag if any of the checks failed
-        folder_error = (
-            folder_error_name or
-            folder_error_num_repeated or
-            folder_error_model_disallowed_list or
-            folder_error_tex_format or
-            folder_error_mtl_format
-        )
+        folder_error = any((
+            folder_error_name,
+            folder_error_num_repeated,
+            folder_error_model_disallowed_list,
+            folder_error_tex_format,
+            folder_error_mtl_format,
+            folder_error_file_disallowed_list,
+        ))
 
         # If the folder has something wrong
         if folder_error:
@@ -705,6 +755,9 @@ def boots_check(exportfolder_path, team_name, team_id):
                 logging.error(f"- ({file_name} is a bad texture)")
             if folder_error_mtl_format:
                 logging.error( "- (broken mtl files)")
+            if folder_error_file_disallowed_list:
+                for file_name in folder_error_file_disallowed_list:
+                    logging.error(f"- ({file_name} is not allowed)")
 
             # And skip it
             shutil.rmtree(subfolder_path)
@@ -732,21 +785,14 @@ def gloves_check(exportfolder_path, team_name, team_id):
         shutil.rmtree(itemfolder_path)
         return
 
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    strict_file_type_check = int(os.environ.get('STRICT_FILE_TYPE_CHECK', '1'))
+
     MODEL_ALLOWED_LIST = [
         "glove_l.model",
         "glove_r.model",
         "glove_edit.model",
-    ]
-
-    FILE_TYPE_ALLOWED_LIST = [
-        ".bin",
-        ".xml",
-        ".fmdl",
-        ".model",
-        ".mtl",
-        ".dds",
-        ".ftex",
-        ".skl",
     ]
 
     folder_error_any = None
@@ -767,7 +813,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
         folder_error_model_disallowed_list = []
         folder_error_tex_format = False
         folder_error_mtl_format = False
-        folder_error_file_unrecognized_list = []
+        folder_error_file_disallowed_list = []
 
         # Check that its name starts with a g and that the 4 characters after it are digits
         folder_num = int(subfolder_name[1:5])
@@ -808,34 +854,54 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
 
-        # Check if any file is unrecognized
-        for file_name in os.listdir(subfolder_path):
-            if (os.path.isfile(os.path.join(subfolder_path, file_name)) and
-                os.path.splitext(file_name)[1] not in FILE_TYPE_ALLOWED_LIST):
+        # Make a list with the allowed and disallowed file types
+        file_type_disallowed_list = PREFOX_FILE_TYPE_DISALLOWED_LIST if not fox_mode else FOX_FILE_TYPE_DISALLOWED_LIST
+        file_type_allowed_list_filtered = [
+            file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
+        ]
+        # Check if any file is disallowed
+        for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
+            file_type = os.path.splitext(file_name)[1]
+            if file_type not in file_type_allowed_list_filtered:
+                folder_error_file_disallowed_list.append(file_name)
 
-                folder_error_file_unrecognized_list.append(file_name)
+        if folder_error_file_disallowed_list:
+            # Determine log level based on the parameter
+            if strict_file_type_check:
+                log_level = logging.ERROR
+                level_text = "ERROR"
+                action_text = "This folder will be discarded"
+            else:
+                log_level = logging.INFO
+                level_text = "Info"
+                action_text = "Consider removing these files for better compatibility"
 
-        ##TODO Make this an error, plus setting to turn it into a suggestion
-        if folder_error_file_unrecognized_list:
-            logging.warning( "-")
-            logging.warning( "- Warning - Unrecognized files")
-            logging.warning(f"- Team name:      {team_name}")
-            logging.warning(f"- Face folder:    {subfolder_name}")
-            for file_name in folder_error_file_unrecognized_list:
-                logging.warning(f"- File name:      {file_name}")
-            logging.warning( "- Only bin, xml, fmdl, model, mtl, dds, ftex, skl files are allowed")
-            logging.warning( "-")
-            logging.warning( "- <After the next major update this will be an error which discards the folder>")
+            allowed_file_types = ", ".join(file_type_allowed_list_filtered)
+
+            logging.log(log_level, "-")
+            logging.log(log_level, f"- {level_text} - Disallowed files")
+            logging.log(log_level, f"- Team name:          {team_name}")
+            logging.log(log_level, f"- Gloves folder:      {subfolder_name}")
+            for file_name in folder_error_file_disallowed_list:
+                logging.log(log_level, f"- File name:          {file_name}")
+            logging.log(log_level, f"- Allowed file types: {allowed_file_types}")
+            logging.log(log_level, "-")
+            logging.log(log_level, f"- {action_text}")
+
+            # If strict file type check is disabled, clear the list
+            if not strict_file_type_check:
+                folder_error_file_disallowed_list = []
 
         # Set the main flag if any of the checks failed
-        folder_error = (
-            folder_error_name or
-            folder_error_num_repeated or
-            folder_error_xml_format or
-            folder_error_model_disallowed_list or
-            folder_error_tex_format or
-            folder_error_mtl_format
-        )
+        folder_error = any((
+            folder_error_name,
+            folder_error_num_repeated,
+            folder_error_xml_format,
+            folder_error_model_disallowed_list,
+            folder_error_tex_format,
+            folder_error_mtl_format,
+            folder_error_file_disallowed_list,
+        ))
 
         # If the folder has something wrong
         if folder_error:
@@ -863,6 +929,9 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 logging.error(f"- ({file_name} is a bad texture)")
             if folder_error_mtl_format:
                 logging.error( "- (broken mtl files)")
+            if folder_error_file_disallowed_list:
+                for file_name in folder_error_file_disallowed_list:
+                    logging.error(f"- ({file_name} is not allowed)")
 
             # And skip it
             shutil.rmtree(subfolder_path)

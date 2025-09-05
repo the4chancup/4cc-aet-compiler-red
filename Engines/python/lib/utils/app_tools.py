@@ -39,6 +39,7 @@ def referee_title(refs_mode, colorize=True):
 
 def pes_title(pes_version, colorize=True):
 
+    color_dark_cyan = COLORS.DARK_CYAN if colorize else ""
     color_bright_red = COLORS.BRIGHT_RED if colorize else ""
     color_bright_green = COLORS.BRIGHT_GREEN if colorize else ""
     color_bright_yellow = COLORS.BRIGHT_YELLOW if colorize else ""
@@ -48,6 +49,8 @@ def pes_title(pes_version, colorize=True):
     color_reset = COLORS.RESET if colorize else ""
 
     match pes_version:
+        case 15:
+            pes_color = color_dark_cyan
         case 16:
             pes_color = color_bright_magenta
         case 17:

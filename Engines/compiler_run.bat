@@ -31,6 +31,8 @@ if exist ".\Engines\python_check.bat" (
     echo - Please grab a clean compiler folder
     echo -
     pause
+
+    exit /b 1
 )
 
 REM - Set the running type from the first argument this script was called with
@@ -50,6 +52,8 @@ if exist ".\Engines\compiler_main.py" (
     echo - Please grab a clean compiler folder
     echo -
     pause
+
+    exit /b 1
 )
 
 set crashed=%ERRORLEVEL%
@@ -78,4 +82,6 @@ if %crashed% GEQ 1 (
 
     REM - Pause without message
     pause >nul
+
+    exit /b %crashed%
 )

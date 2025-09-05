@@ -36,6 +36,25 @@ def dds_dxt5_conv(tex_path):
         os.rename(dummy_tex_path, tex_path)
 
 
+def get_image_type(image_path):
+    '''Get the type of an image file based on its header'''
+    if not os.path.exists(image_path) or not os.path.isfile(image_path):
+        return None
+
+    if get_bytes_ascii(image_path, 0, 3) == "DDS":
+        return "DDS"
+    elif get_bytes_ascii(image_path, 0, 4) == "FTEX":
+        return "FTEX"
+    elif get_bytes_ascii(image_path, 1, 3) == "PNG":
+        return "PNG"
+    elif get_bytes_ascii(image_path, 6, 4) == "JFIF":
+        return "JPG"
+    elif get_bytes_ascii(image_path, 0, 3) == "GIF":
+        return "GIF"
+
+    return "Unknown"
+
+
 def textures_convert(folder_path, fox_mode=False, fox_19=False):
     '''If fox_mode is True, convert all .dds files in the folder to .ftex files
 
@@ -262,12 +281,14 @@ def texture_check(tex_path):
             # Set the original file as file to check
             tex_check_path = tex_path
 
-        # Check if it is a real dds (DDS label starting from index 0)
-        if not (get_bytes_ascii(tex_check_path, 0, 3) == "DDS"):
+        # Check if it is a real dds
+        tex_header_type = get_image_type(tex_check_path)
+        if not (tex_header_type == "DDS"):
             logging.error( "-")
             logging.error(f"- ERROR - Texture is not a real {tex_type} file")
             logging.error(f"- Folder:         {tex_folder}")
             logging.error(f"- Texture name:   {tex_name}")
+            logging.error(f"- Real type:      {tex_header_type}")
             logging.error( "- The file will be deleted, please save it properly")
             error = True
 
@@ -301,20 +322,23 @@ def texture_check(tex_path):
         logging.error(f"- ERROR - Texture is an {tex_type} file")
         logging.error(f"- Folder:         {tex_folder}")
         logging.error(f"- Texture name:   {tex_name}")
-        logging.error(f"- ftex textures are not supported on the chosen PES version ({pes_version})")
+        logging.error(f"- ftex textures are not supported on Pre-Fox PES versions ({pes_version} chosen)")
         return True
 
-    # Check if it is a real ftex (FTEX label starting from index 0)
-    if not (get_bytes_ascii(tex_path, 0, 4) == "FTEX"):
+    # Check if it is a real ftex
+    tex_header_type = get_image_type(tex_path)
+    if not (tex_header_type == "FTEX"):
         logging.error( "-")
         logging.error(f"- ERROR - Texture is not a real {tex_type} file")
         logging.error(f"- Folder:         {tex_folder}")
         logging.error(f"- Texture name:   {tex_name}")
+        logging.error(f"- Real type:      {tex_header_type}")
         logging.error( "- The file will be deleted, please save it properly")
         return True
 
     # Check if it has mipmaps (index 16)
-    if (get_bytes_hex(tex_path, 16, 1) == "00"):
+    ftex_mipmaps = get_bytes_hex(tex_path, 16, 1)
+    if (ftex_mipmaps == "00"):
         logging.warning( "-")
         logging.warning( "- Warning: Texture file without mipmaps")
         logging.warning(f"- Folder:         {tex_folder}")

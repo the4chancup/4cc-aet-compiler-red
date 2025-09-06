@@ -346,6 +346,7 @@ def kitconfigs_check(exportfolder_path, team_name):
         logging.error( "- ERROR - Wrong kit config names")
         logging.error(f"- Team name:      {team_name}")
         logging.error( "- The Kit Configs folder will be discarded since it's unusable")
+        logging.error( "- Check the AET wikipage for the proper naming convention")
 
         # Pause if needed
         if pause_on_error:
@@ -388,6 +389,8 @@ def kittextures_check(exportfolder_path, team_name):
         return
 
     file_error_tex_format = False
+    file_error_names = False
+    file_error_any = False
 
     # Check every texture
     for file_name in os.listdir(itemfolder_path):
@@ -397,7 +400,6 @@ def kittextures_check(exportfolder_path, team_name):
 
         if file_error_tex_format:
             break
-
 
     # If the folder has a non-dds texture
     if file_error_tex_format:
@@ -417,8 +419,6 @@ def kittextures_check(exportfolder_path, team_name):
 
         return
 
-    file_error_any = False
-
     # For every texture
     for file_name in os.listdir(itemfolder_path):
 
@@ -430,6 +430,7 @@ def kittextures_check(exportfolder_path, team_name):
                 logging.error( "-")
                 logging.error( "- ERROR - Bad kit texture names")
                 logging.error(f"- Team name:      {team_name}")
+                file_error_names = True
                 file_error_any = True
 
             logging.error(f"- Texture name:   {file_name}")
@@ -442,6 +443,8 @@ def kittextures_check(exportfolder_path, team_name):
     if file_error_any:
 
         logging.error( "- The kit textures mentioned above will be discarded since they're unusable")
+        if file_error_names:
+            logging.error( "- Check the AET wikipage for the proper naming convention")
 
         if pause_on_error:
             print("-")
@@ -496,6 +499,7 @@ def logo_check(exportfolder_path, team_name):
         logging.error( "- ERROR - Wrong logo filenames")
         logging.error(f"- Team name:      {team_name}")
         logging.error( "- The Logo folder will be discarded since it's unusable")
+        logging.error( "- Check the AET wikipage for the proper naming convention")
 
         if pause_on_error:
             print("-")

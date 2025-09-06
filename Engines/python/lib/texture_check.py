@@ -174,6 +174,9 @@ def dimensions_check(dds_path):
 
     mips_missing = (mips_count == 0 or mips_count == 1)
 
+    format = get_bytes_ascii(dds_path, 84, 4)
+    format_uncompressed = (format == "\0\0\0\0")
+
     # Power of 2 check
     # 2^n will always have exactly 1 bit set, (2^n)-1 will always have all but 1 bit set, & cancels them out
     height_bad = not ((height & (height-1) == 0) and height != 0)
@@ -236,6 +239,16 @@ def dimensions_check(dds_path):
         logging.error(f"- Texture name:   {dds_name}")
         logging.error( "- This texture will crash the game")
         logging.error( "- Resize it so that both sizes are 2048x2048 or less, and powers of 2")
+
+        error = True
+
+    if (not fox_mode and texture_type_kit and format_uncompressed):
+        logging.error( "-")
+        logging.error( "- ERROR - Main Kit Texture file in uncompressed format")
+        logging.error(f"- Folder:         {dds_folder}")
+        logging.error(f"- Texture name:   {dds_name}")
+        logging.error( "- This texture will crash the game")
+        logging.error( "- Resave it with a valid format like DXT5")
 
         error = True
 

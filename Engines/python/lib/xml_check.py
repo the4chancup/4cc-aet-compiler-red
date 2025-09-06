@@ -524,25 +524,25 @@ def mtl_check(mtl_path, team_id):
             # Check that if the value of alphablend is 1, then the value of alphatest is 0
             if state_name_dict['alphablend'] == '1' and not (state_name_dict['zwrite'] == '0'):
                 alphablend_recommended_string = 'recommended 1 if semitransparency is needed, 0 otherwise'
-                zwrite_recommended_string = 'recommended 0'
+                zwrite_recommended_string = 'recommended 0 if semitransparency is needed, 1 otherwise'
 
                 warning_nonrecvals = True
 
             # Check that if the value of alphablend is 0, then the value of zwrite is 1
             if state_name_dict['alphablend'] == '0' and not (state_name_dict['zwrite'] == '1'):
                 alphablend_recommended_string = 'recommended 0 if semitransparency is not needed, 1 otherwise'
-                zwrite_recommended_string = 'recommended 1'
+                zwrite_recommended_string = 'recommended 1 if semitransparency is not needed, 0 otherwise'
 
                 warning_nonrecvals = True
 
             if warning_nonrecvals:
-                logging.warning( "-")
-                logging.warning( "- Warning - Non-recommended values for states \"alphablend\" and \"zwrite\"")
-                logging.warning(f"- Folder:         {mtl_folder_name}")
-                logging.warning(f"- MTL name:       {mtl_name}")
-                logging.warning(f"- Material:       \"{material_name}\"")
-                logging.warning(f"- alphablend:     {state_name_dict['alphablend']} ({alphablend_recommended_string})")
-                logging.warning(f"- zwrite:         {state_name_dict['zwrite']} ({zwrite_recommended_string})")
+                logging.info( "-")
+                logging.info( "- Info - Non-recommended values for states \"alphablend\" and \"zwrite\"")
+                logging.info(f"- Folder:         {mtl_folder_name}")
+                logging.info(f"- MTL name:       {mtl_name}")
+                logging.info(f"- Material:       \"{material_name}\"")
+                logging.info(f"- alphablend:     {state_name_dict['alphablend']} ({alphablend_recommended_string})")
+                logging.info(f"- zwrite:         {state_name_dict['zwrite']} ({zwrite_recommended_string})")
 
         # Check, for each sampler, that the texture path corresponds to a texture file in the folder indicated
         for sampler in material.findall('sampler'):

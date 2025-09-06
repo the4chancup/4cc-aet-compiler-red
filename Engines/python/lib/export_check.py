@@ -131,15 +131,22 @@ def faces_check(exportfolder_path, team_name, team_id):
                 folder_error_num_bad = True
             else:
                 try:
-                    player_num = int(subfolder_name[7:10])  # Get number after "referee"
-                    folder_error_num_bad = not (1 <= player_num <= 35)
+                    player_num = subfolder_name[7:10]  # Get number after "referee"
+                    folder_error_num_bad = not all((
+                        subfolder_name.startswith("referee"),
+                        player_num.isdigit(),
+                        1 <= int(player_num) <= 35
+                    ))
                 except ValueError:
                     folder_error_num_bad = True
         else:
-            # For teams, check that the player number is within the 01-23 range
+            # For teams, face folders should be XXXxx where xx is 01-23
             try:
-                player_num = int(subfolder_name[3:5])
-                folder_error_num_bad = not (1 <= player_num <= 23)
+                player_num = subfolder_name[3:5] # Get number after the team ID's placeholder
+                folder_error_num_bad = not all((
+                    player_num.isdigit(),
+                    1 <= int(player_num) <= 23
+                ))
             except ValueError:
                 folder_error_num_bad = True
 
@@ -650,8 +657,8 @@ def boots_check(exportfolder_path, team_name, team_id):
         folder_error_file_disallowed_list = []
 
         # Check that its name starts with a k and that the 4 characters after it are digits
-        folder_num = int(subfolder_name[1:5])
-        folder_error_name = not (subfolder_name.startswith('k') and subfolder_name[1:5].isdigit())
+        folder_num = subfolder_name[1:5]
+        folder_error_name = not (subfolder_name.startswith('k') and folder_num.isdigit())
 
         # Check that the number is not repeated
         if folder_num in folder_num_list:
@@ -745,7 +752,7 @@ def boots_check(exportfolder_path, team_name, team_id):
 
             # Give an error depending on the particular problem
             if folder_error_name:
-                logging.error( "- (wrong folder name)")
+                logging.error( "- (wrong folder name, must start with k####)")
             if folder_error_num_repeated:
                 logging.error(f"- (folder number {subfolder_name[1:5]} already in use)")
             if folder_error_model_disallowed_list:
@@ -816,8 +823,8 @@ def gloves_check(exportfolder_path, team_name, team_id):
         folder_error_file_disallowed_list = []
 
         # Check that its name starts with a g and that the 4 characters after it are digits
-        folder_num = int(subfolder_name[1:5])
-        folder_error_name = not (subfolder_name.startswith('g') and subfolder_name[1:5].isdigit())
+        folder_num = subfolder_name[1:5]
+        folder_error_name = not (subfolder_name.startswith('g') and folder_num.isdigit())
 
         # Check that the number is not repeated
         if folder_num in folder_num_list:
@@ -917,7 +924,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
 
             # Give an error depending on the particular problem
             if folder_error_name:
-                logging.error( "- (wrong folder name)")
+                logging.error( "- (wrong folder name, must start with g####)")
             if folder_error_num_repeated:
                 logging.error(f"- (folder number {subfolder_name[1:5]} already in use)")
             if folder_error_xml_format:

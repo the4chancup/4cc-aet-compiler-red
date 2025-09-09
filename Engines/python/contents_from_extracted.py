@@ -38,6 +38,21 @@ def contents_from_extracted():
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
+    # Verify that the input folder exists, stop the program otherwise
+    if not os.path.exists(EXTRACTED_PATH):
+
+        logging.critical( "-")
+        logging.critical( "- FATAL ERROR - Input folder not found")
+        logging.critical(f"- Missing folder: {EXTRACTED_PATH}")
+        logging.critical( "-")
+        logging.critical( "- Please do not run this script before running the previous ones")
+        logger_stop()
+
+        print( "-")
+        pause("Press any key to exit... ")
+
+        exit()
+
 
     # Set the name for the folders to put stuff into
     if refs_mode:

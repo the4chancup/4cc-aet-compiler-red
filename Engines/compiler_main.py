@@ -39,7 +39,7 @@ while True:
             ISSUES_LOG_PATH,
             RUN_BATCH_PATH,
         )
-        from python.lib.utils.app_tools import app_title, referee_title, pes_title
+        from python.lib.utils.app_tools import app_title, pes_title
         from python.lib.utils.logging_tools import logger_init, logger_stop
         from python.lib.utils.settings_management import settings_init
         from python.lib.utils.admin_tools import admin_check, admin_request
@@ -62,14 +62,13 @@ def run_type_request():
     print("  1                         [main] extracted_from_exports mode, unpacks and checks exports")
     print("  2                         [main] contents_from_extracted mode, prepares the contents folder")
     print("  3                         [main] patches_from_contents mode, packs the patches")
-    print("  4                         [special] refs compilation mode, compiles a /refs/ export")
     print("")
 
     # Ask the user for a run type, read a single character input
     run_type = input("You can also choose a type now: ")
 
-    # Check if run_type is between 0 and 4, ask again otherwise
-    while run_type not in ["0", "1", "2", "3", "4"]:
+    # Check if run_type is between 0 and 3, ask again otherwise
+    while run_type not in ["0", "1", "2", "3"]:
         print("Invalid run type, please try again or close the program.")
         print("")
         run_type = input("Choose a type: ")
@@ -83,8 +82,7 @@ def main(run_type):
     os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
     # Check the running type
-    refs_mode = (run_type == "4")
-    all_in_one = (run_type == "0" or refs_mode)
+    all_in_one = (run_type == "0")
     extracted_from_exports_run = (run_type == "1" or all_in_one)
     contents_from_extracted_run = (run_type == "2" or all_in_one)
     patches_from_contents_run = (run_type == "3" or all_in_one)
@@ -94,8 +92,7 @@ def main(run_type):
 
     # Read the necessary parameters
     pes_version = int(os.environ.get('PES_VERSION', '19'))
-    cpk_name = os.environ.get('CPK_NAME', 'unknown')
-    refs_cpk_name = os.environ.get('REFS_CPK_NAME', 'unknown')
+    cpk_name = os.environ.get('CPK_NAME', '4cc_90_test')
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     run_pes = int(os.environ.get('RUN_PES', '0'))
@@ -103,7 +100,7 @@ def main(run_type):
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
     updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
 
-    cpk_used_name = refs_cpk_name if refs_mode else cpk_name
+    cpk_used_name = cpk_name
     pes_download_path = os.path.join(pes_folder_path, "download")
 
     # Check for updates
@@ -135,11 +132,8 @@ def main(run_type):
     # Save the all-in-one mode
     os.environ['ALL_IN_ONE'] = str(int(all_in_one))
 
-    # Save the refs mode
-    os.environ['REFS_MODE'] = str(int(refs_mode))
-
     print("-")
-    print("- Compiling " + referee_title(refs_mode) + "for " + pes_title(pes_version) + "...")
+    print("- Compiling for " + pes_title(pes_version) + "...")
     print("-")
 
     # Invoke the export extractor
@@ -189,8 +183,8 @@ if __name__ == "__main__":
     # Enable the loggers
     logger = logger_init(__name__)
 
-    # Check if an argument has been passed and its value is between 0 and 4
-    if len(sys.argv) > 1 and sys.argv[1] in ["0", "1", "2", "3", "4"]:
+    # Check if an argument has been passed and its value is between 0 and 3
+    if len(sys.argv) > 1 and sys.argv[1] in ["0", "1", "2", "3"]:
         run_type = sys.argv[1]
     else:
         run_type = run_type_request()

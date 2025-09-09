@@ -33,8 +33,6 @@ def contents_from_extracted():
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
-
-    refs_mode = int(os.environ.get('REFS_MODE', '0'))
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
@@ -53,14 +51,17 @@ def contents_from_extracted():
 
         exit()
 
+    # Check the items in the extracted folder
+    refs_present = False
+    teams_present = False
+    for item_folder in os.listdir(EXTRACTED_PATH):
+        if item_folder == "Referees":
+            refs_present = True
+        else:
+            teams_present = True
 
     # Set the name for the folders to put stuff into
-    if refs_mode:
-        faces_foldername = "Refscpk"
-        uniform_foldername = "Refscpk"
-        bins_foldername = "Refscpk"
-
-    elif not multicpk_mode:
+    if not multicpk_mode:
 
         faces_foldername = "Singlecpk"
         uniform_foldername = "Singlecpk"
@@ -72,39 +73,43 @@ def contents_from_extracted():
         uniform_foldername = "Uniformcpk"
         bins_foldername = "Binscpk"
 
+    refs_foldername = "Refscpk"
+
+    bins_folder_path = os.path.join(PATCHES_CONTENTS_PATH, bins_foldername)
+    refs_folder_path = os.path.join(PATCHES_CONTENTS_PATH, refs_foldername)
 
     print("-")
     print("- Preparing the patch folders")
     print("-")
 
 
-    if refs_mode:
+    if refs_present:
         # Delete the contents folder
-        if os.path.exists(PATCHES_CONTENTS_PATH):
-            shutil.rmtree(PATCHES_CONTENTS_PATH, onexc=remove_readonly)
+        if os.path.exists(refs_folder_path):
+            shutil.rmtree(refs_folder_path, onexc=remove_readonly)
 
         # Create the folder
-        os.makedirs(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", exist_ok=True)
+        os.makedirs(refs_folder_path, exist_ok=True)
 
         # Copy patches_contents_refs
         if os.path.exists(PATCHES_CONTENTS_REFS_PATH):
             print("- Copying referee base files from patches_contents_refs")
             for item in os.listdir(PATCHES_CONTENTS_REFS_PATH):
                 src_path = os.path.join(PATCHES_CONTENTS_REFS_PATH, item)
-                dst_path = os.path.join(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", item)
+                dst_path = os.path.join(refs_folder_path, item)
                 if os.path.isdir(src_path):
                     shutil.copytree(src_path, dst_path)
                 else:
                     shutil.copy2(src_path, dst_path)
 
-    else:
+    if teams_present:
         # Create folders just in case
         os.makedirs(f"{PATCHES_CONTENTS_PATH}/{faces_foldername}", exist_ok=True)
         os.makedirs(f"{PATCHES_CONTENTS_PATH}/{uniform_foldername}", exist_ok=True)
 
 
-    # If Bins Updating is enabled and there's an "extracted" folder
-    if not refs_mode and bins_updating and os.path.exists(EXTRACTED_PATH):
+    # If Bins Updating is enabled
+    if teams_present and bins_updating:
 
         print("-")
         print("- Bins Updating is enabled")
@@ -114,9 +119,8 @@ def contents_from_extracted():
         COMMON_ETC_PATH = "common/etc"
         UNIFORM_TEAM_PATH = "common/character0/model/character/uniform/team"
 
-        PATCH_BINS_PATH = os.path.join(PATCHES_CONTENTS_PATH, bins_foldername)
-        PATCH_BINS_COMMON_ETC_PATH = os.path.join(PATCH_BINS_PATH, COMMON_ETC_PATH)
-        PATCH_BINS_UNIFORM_TEAM_PATH = os.path.join(PATCH_BINS_PATH, UNIFORM_TEAM_PATH)
+        patch_bins_common_etc_path = os.path.join(bins_folder_path, COMMON_ETC_PATH)
+        patch_bins_uniform_team_path = os.path.join(bins_folder_path, UNIFORM_TEAM_PATH)
 
         # Prepare a list of sources and destination paths for the bin files
         BINS_TEMP_FOLDER_PATH = os.path.join(BIN_FOLDER_PATH, "temp")
@@ -150,8 +154,8 @@ def contents_from_extracted():
             )
 
         # Create the folders
-        os.makedirs(PATCH_BINS_COMMON_ETC_PATH, exist_ok=True)
-        os.makedirs(PATCH_BINS_UNIFORM_TEAM_PATH, exist_ok=True)
+        os.makedirs(patch_bins_common_etc_path, exist_ok=True)
+        os.makedirs(patch_bins_uniform_team_path, exist_ok=True)
         os.makedirs(BINS_TEMP_FOLDER_PATH, exist_ok=True)
 
         # Fetch the bin files from the cpks in the download folder and update their values
@@ -161,8 +165,8 @@ def contents_from_extracted():
         bins_update(TEAMCOLOR_BIN_TEMP_PATH, UNICOLOR_BIN_TEMP_PATH)
 
         # And copy them to the Bins cpk folder
-        shutil.copy(TEAMCOLOR_BIN_TEMP_PATH, PATCH_BINS_COMMON_ETC_PATH)
-        shutil.copy(UNICOLOR_BIN_TEMP_PATH, PATCH_BINS_UNIFORM_TEAM_PATH)
+        shutil.copy(TEAMCOLOR_BIN_TEMP_PATH, patch_bins_common_etc_path)
+        shutil.copy(UNICOLOR_BIN_TEMP_PATH, patch_bins_uniform_team_path)
 
         # If fox mode is enabled and there's a Kit Configs folder
         itemfolder_path = os.path.join(EXTRACTED_PATH, "Kit Configs")
@@ -198,7 +202,7 @@ def contents_from_extracted():
                 exit()
 
             # Copy the uniparam to the the Bins cpk folder with the proper filename
-            shutil.copy(UNIPARAM_BIN_TEMP_PATH, f"{PATCH_BINS_UNIFORM_TEAM_PATH}/{UNIPARAM_NAME}")
+            shutil.copy(UNIPARAM_BIN_TEMP_PATH, f"{patch_bins_uniform_team_path}/{UNIPARAM_NAME}")
 
             print("-")
 

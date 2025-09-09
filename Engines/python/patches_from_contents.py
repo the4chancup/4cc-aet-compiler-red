@@ -24,9 +24,7 @@ def patches_from_contents():
     run_pes = int(os.environ.get('RUN_PES', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
-    refs_mode = int(os.environ.get('REFS_MODE', '0'))
-    multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
-    cpk_name = os.environ.get('CPK_NAME', '4cc_69_midcup')
+    cpk_name = os.environ.get('CPK_NAME', '4cc_90_test')
     faces_cpk_name = os.environ.get('FACES_CPK_NAME', '4cc_40_faces')
     uniform_cpk_name = os.environ.get('UNIFORM_CPK_NAME', '4cc_45_uniform')
     bins_cpk_name = os.environ.get('BINS_CPK_NAME', '4cc_08_bins')
@@ -35,47 +33,66 @@ def patches_from_contents():
 
     pes_download_path = os.path.join(pes_folder_path, "download")
 
-    # Create output folder just in case
-    os.makedirs(PATCHES_OUTPUT_PATH, exist_ok=True)
+    # Check if the contents folder exists
+    if not os.path.exists(PATCHES_CONTENTS_PATH):
+        logging.critical( "-")
+        logging.critical( "- FATAL ERROR - \"patches_contents\" folder not found")
+        logging.critical( "-")
+        logging.critical( "- Please do not run this script before running the previous ones")
+        logger_stop()
+
+        print( "-")
+        pause("Press any key to exit... ")
+
+        exit()
+
+    folder_list = os.listdir(PATCHES_CONTENTS_PATH)
+
+    if not folder_list:
+        logging.critical( "-")
+        logging.critical( "- FATAL ERROR - No folders found in the \"patches_contents\" folder")
+        logging.critical( "-")
+        logging.critical( "- Please do not run this script before running the previous ones")
+        logger_stop()
+
+        print( "-")
+        pause("Press any key to exit... ")
+
+        exit()
+
+    # Create the output folder if needed
+    if not os.path.exists(PATCHES_OUTPUT_PATH):
+        os.makedirs(PATCHES_OUTPUT_PATH)
 
     # Set the names for the folders to put stuff into and for the cpks
-    if refs_mode:
-        folder_name_list = ["Refscpk"]
-        cpk_name_list = [refs_cpk_name]
-    elif not multicpk_mode:
-        folder_name_list = ["Singlecpk"]
-        cpk_name_list = [cpk_name]
-    else:
-        folder_name_list = ["Facescpk", "Uniformcpk"]
-        cpk_name_list = [faces_cpk_name, uniform_cpk_name]
-
-        if bins_updating:
-            folder_name_list.append("Binscpk")
-            cpk_name_list.append(bins_cpk_name)
+    folder_name_list = []
+    cpk_name_list = []
+    for folder_name in folder_list:
+        match folder_name:
+            case "Singlecpk":
+                folder_name_list.append(folder_name)
+                cpk_name_list.append(cpk_name)
+            case "Facescpk":
+                folder_name_list.append(folder_name)
+                cpk_name_list.append(faces_cpk_name)
+            case "Uniformcpk":
+                folder_name_list.append(folder_name)
+                cpk_name_list.append(uniform_cpk_name)
+            case "Binscpk" if bins_updating:
+                folder_name_list.append(folder_name)
+                cpk_name_list.append(bins_cpk_name)
+            case "Refscpk":
+                folder_name_list.append(folder_name)
+                cpk_name_list.append(refs_cpk_name)
 
     # Make the patches
-    cpk_string = "cpk" if not multicpk_mode else "cpks"
+    cpk_string = "cpk" if len(cpk_name_list) == 1 else "cpks"
     print( "-")
     print(f"- Packing the {cpk_string}...")
 
     for folder_name, cpk_name in zip(folder_name_list, cpk_name_list):
 
         folder_path = os.path.join(PATCHES_CONTENTS_PATH, folder_name)
-
-        # Verify that the input folder exists, stop the program otherwise
-        if not os.path.exists(folder_path):
-
-            logging.critical( "-")
-            logging.critical( "- FATAL ERROR - Input folder not found")
-            logging.critical(f"- Missing folder: {folder_path}")
-            logging.critical( "-")
-            logging.critical( "- Please do not run this script before running the previous ones")
-            logger_stop()
-
-            print( "-")
-            pause("Press any key to exit... ")
-
-            exit()
 
         # Make sure that the folder is not empty to avoid errors
         if not os.listdir(folder_path):
@@ -84,6 +101,7 @@ def patches_from_contents():
         source_contents_path_list = [os.path.join(folder_path, x) for x in os.listdir(folder_path)]
         cpk_path = os.path.join(PATCHES_OUTPUT_PATH, f"{cpk_name}.cpk")
 
+        print(f"- {cpk_name}")
         cpktool.main(cpk_path, source_contents_path_list, True)
 
     # Delete the patches contents folder

@@ -13,7 +13,7 @@ from .lib.referee_tools import referee_export_process
 from .lib.utils.zlib_plus import zlib_files_in_folder
 from .lib.utils.pausing import pause
 from .lib.utils import COLORS
-from .lib.utils.app_tools import log_presence_warn
+from .lib.utils.app_tools import referee_title, log_presence_warn
 from .lib.utils.FILE_INFO import (
     EXPORTS_TO_ADD_PATH,
     EXTRACTED_PATH,
@@ -65,11 +65,8 @@ def extracted_from_exports():
     dds_compression = int(os.environ.get('DDS_COMPRESSION', '0'))
     pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
-    refs_mode = int(os.environ.get('REFS_MODE', '0'))
 
     print("-")
-    if refs_mode:
-        print("- Looking for /refs/ export")
     print("- Extracting and checking the exports")
     print("-")
 
@@ -147,22 +144,19 @@ def extracted_from_exports():
 
         # Handle referee export
         if team_name_folder == "/refs/":
-            if not refs_mode:
-                print("- Skipping referee export (not in referee mode)")
-                shutil.rmtree(export_destination_path, onexc=remove_readonly)
-                continue
 
             # Force team ID to 999 for referee exports
             team_id = "999"
             team_name = "/refs/"
 
-            # Process the referee export
-            referee_export_process(export_destination_path, fox_mode, pause_on_error)
+            print(" - " + referee_title())
 
-        elif refs_mode:
-            print("- Skipping non-referee export")
-            shutil.rmtree(export_destination_path, onexc=remove_readonly)
-            continue
+            # Process the referee export
+            refs_error = referee_export_process(export_destination_path, pause_on_error)
+
+            if refs_error:
+                os.remove(export_destination_path)
+                continue
 
         else:
             # Get the team ID and real name for non-referee exports

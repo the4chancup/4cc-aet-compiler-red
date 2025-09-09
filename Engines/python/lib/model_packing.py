@@ -14,7 +14,6 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    refs_mode = (int(os.environ.get('REFS_MODE', '0')) == 1)
 
     temp_folder_path = os.path.join("temp")
 
@@ -38,7 +37,7 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
         # For every folder in the source directory
         for model_name in os.listdir(models_source_path):
 
-            if refs_mode and models_type == "face":
+            if models_type == "face" and model_name.startswith("referee"):
                 model_id = model_name[:10]
             else:
                 model_id = model_name[:5]
@@ -89,7 +88,11 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
         # For every folder in the source directory
         for model_name in os.listdir(models_source_path):
 
-            model_id = model_name[:5]
+            if models_type == "face" and model_name.startswith("referee"):
+                model_id = model_name[:10]
+            else:
+                model_id = model_name[:5]
+
             print(f"- {model_name}")
 
             model_path = os.path.join(models_source_path, model_name)
@@ -98,7 +101,7 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
             # Rename it with the proper id
             os.rename(model_path, model_path_nameless)
 
-            # Delete the old folder if present
+            # Delete the old subfolder if present
             model_destination_path = os.path.join(models_destination_path, model_id)
             if os.path.exists(model_destination_path):
                 shutil.rmtree(model_destination_path)

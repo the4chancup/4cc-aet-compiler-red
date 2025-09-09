@@ -100,7 +100,6 @@ def faces_check(exportfolder_path, team_name, team_id):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    refs_mode = int(os.environ.get('REFS_MODE', '0'))
     strict_file_type_check = int(os.environ.get('STRICT_FILE_TYPE_CHECK', '1'))
 
     folder_error_any = None
@@ -124,8 +123,8 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error_mtl_format = False
         folder_error_file_disallowed_list = []
 
-        # Check player numbers differently for referee mode
-        if refs_mode:
+        # Check player numbers differently for referee exports
+        if team_name == "/refs/":
             # For referees, face folders should be refereeXXX where XXX is 001-035
             if not subfolder_name.startswith("referee"):
                 folder_error_num_bad = True
@@ -137,7 +136,7 @@ def faces_check(exportfolder_path, team_name, team_id):
                         player_num.isdigit(),
                         1 <= int(player_num) <= 35
                     ))
-                except ValueError:
+                except Exception:
                     folder_error_num_bad = True
         else:
             # For teams, face folders should be XXXxx where xx is 01-23
@@ -147,7 +146,7 @@ def faces_check(exportfolder_path, team_name, team_id):
                     player_num.isdigit(),
                     1 <= int(player_num) <= 23
                 ))
-            except ValueError:
+            except Exception:
                 folder_error_num_bad = True
 
         # Check if the player number is already in the list

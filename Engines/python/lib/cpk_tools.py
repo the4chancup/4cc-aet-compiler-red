@@ -165,13 +165,13 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
         return
 
     if not compulsory:
-        logging.warning( "-")
-        logging.warning( "- Warning - CPK name not listed on the DpFileList file")
-        logging.warning(f"- CPK name: {cpk_name}")
-        logging.warning( "-")
-        logging.warning( "- PES probably won't load this CPK if you move it to the PES download folder")
-        logging.warning( "- Changing the CPK name in the settings file back to the default name is")
-        logging.warning( "- recommended")
+        logging.error( "-")
+        logging.error( "- ERROR - CPK name not listed on the DpFileList file")
+        logging.error(f"- CPK name: {cpk_name}")
+        logging.error( "-")
+        logging.error( "- PES probably won't load this CPK if you move it to the PES download folder")
+        logging.error( "- Changing the CPK name in the settings file back to the default name is")
+        logging.error( "- recommended")
         print("-")
         pause()
         return

@@ -44,10 +44,6 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
             print(f"- {model_name}")
 
             model_path = os.path.join(models_source_path, model_name)
-            model_path_nameless = os.path.join(models_source_path, model_id)
-
-            # Rename it with the proper id
-            os.rename(model_path, model_path_nameless)
 
             if models_type == "face":
 
@@ -55,8 +51,9 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
                 temp_path = os.path.join(temp_folder_path, model_id, "common", "character0", "model", "character", "face", "real")
                 os.makedirs(temp_path, exist_ok=True)
 
-                # Move the face folder to the temp folder
-                shutil.move(model_path_nameless, temp_path)
+                # Move the face folder to the temp folder, renaming it to the face ID
+                model_temp_path = os.path.join(temp_path, model_id)
+                shutil.move(model_path, model_temp_path)
 
                 # Make a cpk and put it in the Faces folder
                 cpk_source = os.path.join(temp_folder_path, model_id, "common")
@@ -69,8 +66,8 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
                 if os.path.exists(model_destination_path):
                     shutil.rmtree(model_destination_path)
 
-                # Move the folder
-                shutil.move(model_path_nameless, models_destination_path)
+                # Move the folder, renaming it to the model ID
+                shutil.move(model_path, model_destination_path)
 
     # Fox mode
     else:
@@ -96,24 +93,20 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
             print(f"- {model_name}")
 
             model_path = os.path.join(models_source_path, model_name)
-            model_path_nameless = os.path.join(models_source_path, model_id)
-
-            # Rename it with the proper id
-            os.rename(model_path, model_path_nameless)
 
             # Delete the old subfolder if present
             model_destination_path = os.path.join(models_destination_path, model_id)
             if os.path.exists(model_destination_path):
                 shutil.rmtree(model_destination_path)
 
-            # Make a temp folder and "windx11" folder for the textures
+            # Move the model folder to the temp folder, renaming it to the model ID
             temp_path = os.path.join(temp_folder_path, model_id)
+            model_temp_path = os.path.join(temp_path, model_id)
+            shutil.move(model_path, model_temp_path)
+
+            # Make a "windx11" folder for the textures
             textures_temp_path = os.path.join(temp_path, "#windx11")
             os.makedirs(textures_temp_path, exist_ok=True)
-
-            # Move the folder to the temp folder
-            shutil.move(model_path_nameless, temp_path)
-            model_temp_path = os.path.join(temp_path, model_id)
 
             # If the folder has textures, move them to the windx11 folder
             for texture_file in os.listdir(model_temp_path):

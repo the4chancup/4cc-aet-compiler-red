@@ -11,7 +11,7 @@ from .utils.pausing import pause
 from .utils.logging_tools import logger_stop
 from .utils.file_management import file_critical_check
 from .utils.FILE_INFO import (
-    EXTRACTED_PATH,
+    EXTRACTED_TEAMS_PATH,
     TEAMS_LIST_PATH,
     BIN_FOLDER_PATH,
     PATCHES_CONTENTS_PATH,
@@ -224,7 +224,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
     kitcolor_bin = open(kitcolor_bin_path, 'rb+')
 
     # For every Note txt file
-    for file_name in [f for f in os.listdir(EXTRACTED_PATH) if f.lower().endswith("note.txt")]:
+    for file_name in [f for f in os.listdir(EXTRACTED_TEAMS_PATH) if f.lower().endswith("note.txt")]:
 
         # Initialize variables
         stop = None
@@ -239,7 +239,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
         kitcols_player_cnt = 0
         kitcols_gk_cnt = 0
 
-        file_path = os.path.join(EXTRACTED_PATH, file_name)
+        file_path = os.path.join(EXTRACTED_TEAMS_PATH, file_name)
         with open(file_path, 'r', encoding="utf8") as file:
 
             for line in file:
@@ -343,7 +343,7 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
             kitcols_cnt = kitcols_player_cnt + kitcols_gk_cnt
 
             # Set the kit configs folder path
-            kit_configs_folder_path = os.path.join(EXTRACTED_PATH, 'Kit Configs', team_id)
+            kit_configs_folder_path = os.path.join(EXTRACTED_TEAMS_PATH, 'Kit Configs', team_id)
 
             # If there's a kit configs folder and we haven't checked the amount of kits before
             if os.path.exists(kit_configs_folder_path) and not all_in_one:
@@ -438,7 +438,7 @@ def bins_pack(bins_foldername):
     shutil.copy(UNICOLOR_BIN_TEMP_PATH, patch_bins_uniform_team_path)
 
     # If fox mode is enabled and there's a Kit Configs folder
-    itemfolder_path = os.path.join(EXTRACTED_PATH, "Kit Configs")
+    itemfolder_path = os.path.join(EXTRACTED_TEAMS_PATH, "Kit Configs")
     if fox_mode and os.path.exists(itemfolder_path):
 
         print("- \n- Compiling the kit config files into the UniformParameter bin")

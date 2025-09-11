@@ -14,15 +14,15 @@ def remove_readonly(func, path, _):
     func(path)
 
 
-def contents_pack(extracted_path, faces_foldername, uniform_foldername):
+def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_name: str):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
 
-    faces_folder_path = os.path.join(PATCHES_CONTENTS_PATH, faces_foldername)
-    uniform_folder_path = os.path.join(PATCHES_CONTENTS_PATH, uniform_foldername)
+    faces_folder_path = os.path.join(PATCHES_CONTENTS_PATH, faces_folder_name)
+    uniform_folder_path = os.path.join(PATCHES_CONTENTS_PATH, uniform_folder_name)
 
-    refs_mode = extracted_path.endswith("Referees")
+    refs_mode = extracted_path.endswith("referees")
     refs_string = "referee " if refs_mode else ""
 
     # Packing the face folders if 'Faces' directory exists
@@ -136,7 +136,7 @@ def contents_pack(extracted_path, faces_foldername, uniform_foldername):
         )
 
         # Create a "collars" folder if needed
-        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_foldername, items_folder_path)
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_folder_name, items_folder_path)
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
@@ -159,7 +159,7 @@ def contents_pack(extracted_path, faces_foldername, uniform_foldername):
             print(f'- Moving the other {refs_string}stuff')
 
         # Create a "player" folder if needed
-        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_foldername, 'common/render/symbol/player')
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_folder_name, 'common/render/symbol/player')
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
@@ -186,7 +186,7 @@ def contents_pack(extracted_path, faces_foldername, uniform_foldername):
             print(f'- Moving the other {refs_string}stuff')
 
         # Create a "flag" folder if needed
-        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, uniform_foldername, 'common/render/symbol/flag')
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, uniform_folder_name, 'common/render/symbol/flag')
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 
@@ -219,7 +219,7 @@ def contents_pack(extracted_path, faces_foldername, uniform_foldername):
             print(f'- Moving the other {refs_string}stuff')
 
         # Create a "common" folder if needed
-        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_foldername, common_path)
+        items_folder_path_full = os.path.join(PATCHES_CONTENTS_PATH, faces_folder_name, common_path)
         if not os.path.exists(items_folder_path_full):
             os.makedirs(items_folder_path_full)
 

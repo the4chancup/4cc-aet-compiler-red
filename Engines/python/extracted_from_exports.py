@@ -16,7 +16,8 @@ from .lib.utils import COLORS
 from .lib.utils.app_tools import referee_title, log_presence_warn
 from .lib.utils.FILE_INFO import (
     EXPORTS_TO_ADD_PATH,
-    EXTRACTED_PATH,
+    EXTRACTED_TEAMS_PATH,
+    EXTRACTED_REFEREES_PATH,
     TEAMNOTES_PATH,
 )
 
@@ -72,14 +73,16 @@ def extracted_from_exports():
 
     # Define the names of the main folders
     main_source_path = EXPORTS_TO_ADD_PATH
-    main_destination_path = EXTRACTED_PATH
+    teams_destination_path = EXTRACTED_TEAMS_PATH
+    referees_destination_path = EXTRACTED_REFEREES_PATH
 
     # Create folders as needed
     os.makedirs(main_source_path, exist_ok=True)
 
-    if os.path.exists(main_destination_path):
-        shutil.rmtree(main_destination_path, onexc=remove_readonly)
-    os.makedirs(main_destination_path)
+    if os.path.exists(teams_destination_path):
+        shutil.rmtree(teams_destination_path, onexc=remove_readonly)
+    if os.path.exists(referees_destination_path):
+        shutil.rmtree(referees_destination_path, onexc=remove_readonly)
 
     # Reset the notes compilation
     with open(TEAMNOTES_PATH, "w", encoding="utf8") as f:
@@ -103,8 +106,6 @@ def extracted_from_exports():
                 print(f"- \"{export_name}\" is unusable - Skipping")
                 continue
 
-        export_destination_path = os.path.join(main_destination_path, export_name_clean)
-
         # Split the words in the export
         export_name_words = re.findall(r"[^.\s\-\+\_]+", export_name)
 
@@ -118,6 +119,12 @@ def extracted_from_exports():
         # Print team without a new line
         print(f"- {team_name_folder} ", end='', flush=True)
 
+        if team_name_folder == "/refs/":
+            main_destination_path = referees_destination_path
+        else:
+            main_destination_path = teams_destination_path
+
+        export_destination_path = os.path.join(main_destination_path, export_name_clean)
 
         # Delete the export destination folder if present
         if os.path.exists(export_destination_path):
@@ -189,8 +196,8 @@ def extracted_from_exports():
         export_move(export_destination_path, team_id, team_name)
 
         # If fox mode is enabled and the team has a common folder replace the dummy textures with the kit 1 textures
-        if fox_mode and os.path.exists(os.path.join(os.path.dirname(export_destination_path), "Common", team_id)):
-            dummy_kits_replace(team_id, team_name)
+        if fox_mode and os.path.exists(os.path.join(os.path.dirname(main_destination_path), "Common", team_id)):
+            dummy_kits_replace(team_id, team_name, main_destination_path)
 
         # Delete the now empty export folder
         shutil.rmtree(export_destination_path, onexc=remove_readonly)
@@ -201,7 +208,7 @@ def extracted_from_exports():
         # zlib compress all the dds files
         print("- Compressing dds files...")
         print("-")
-        zlib_files_in_folder(main_destination_path, "dds")
+        zlib_files_in_folder(teams_destination_path, "dds")
 
     print("- Done")
     print("-")
@@ -211,8 +218,12 @@ def extracted_from_exports():
         print("-")
 
     # Check if the Other folder exists and there are files in it, if there are print a warning
-    other_path = os.path.join(EXTRACTED_PATH, "Other")
-    if os.path.exists(other_path) and len(os.listdir(other_path)) > 0:
+    teams_other_path = os.path.join(EXTRACTED_TEAMS_PATH, "Other")
+    referees_other_path = os.path.join(EXTRACTED_REFEREES_PATH, "Other")
+    if (
+        os.path.exists(teams_other_path) and len(os.listdir(teams_other_path)) > 0 or
+        os.path.exists(referees_other_path) and len(os.listdir(referees_other_path)) > 0
+    ):
         print( "-")
         print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are files in the Other folder")
         print( "- Please open it and check its contents")

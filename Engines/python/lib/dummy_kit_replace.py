@@ -2,14 +2,11 @@ import os
 import shutil
 
 
-from .utils.FILE_INFO import EXTRACTED_PATH
+def dummy_replace(dummytexture_filename, kittexture_filename, team_id, team_name, main_destination_path):
 
+    kittexture_filepath = os.path.join(main_destination_path, "Kit Textures", kittexture_filename.format(team_id))
 
-def dummy_replace(dummytexture_filename, kittexture_filename, team_id, team_name):
-
-    kittexture_filepath = os.path.join(EXTRACTED_PATH, "Kit Textures", kittexture_filename.format(team_id))
-
-    team_commonfolder_path = os.path.join(EXTRACTED_PATH, "Common", team_id)
+    team_commonfolder_path = os.path.join(main_destination_path, "Common", team_id)
     dummytexture_filepath = os.path.join(team_commonfolder_path, dummytexture_filename)
 
     if not os.path.exists(dummytexture_filepath):
@@ -24,7 +21,7 @@ def dummy_replace(dummytexture_filename, kittexture_filename, team_id, team_name
         print(f"- have a corresponding {kittexture_filename} texture. This dummy texture will not be replaced.")
 
 
-def dummy_kits_replace(team_id, team_name):
+def dummy_kits_replace(team_id, team_name, main_destination_path):
 
     kittexture_filenames = [
         "u0{}p1.ftex",
@@ -46,4 +43,4 @@ def dummy_kits_replace(team_id, team_name):
     ]
 
     for kittexture_filename, dummytexture_filename in zip(kittexture_filenames, dummytexture_filenames):
-        dummy_replace(dummytexture_filename, kittexture_filename, team_id, team_name)
+        dummy_replace(dummytexture_filename, kittexture_filename, team_id, team_name, main_destination_path)

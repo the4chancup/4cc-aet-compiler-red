@@ -128,10 +128,7 @@ def export_move(exportfolder_path, team_id, team_name):
         if team_itemfolder_name.lower() in itemfolder_name_known_list:
 
             team_itemfolder_path = os.path.join(exportfolder_path, team_itemfolder_name)
-            if not team_name == "/refs/":
-                main_itemfolder_path = os.path.join(mainfolder_path, team_itemfolder_name)
-            else:
-                main_itemfolder_path = os.path.join(mainfolder_path, "Referees", team_itemfolder_name)
+            main_itemfolder_path = os.path.join(mainfolder_path, team_itemfolder_name)
             main_itemfolder_team_path = os.path.join(main_itemfolder_path, team_id)
 
             # Create the main folder if not present

@@ -8,7 +8,8 @@ from .lib.contents_packing import contents_pack
 from .lib.utils.pausing import pause
 from .lib.utils.logging_tools import logger_stop
 from .lib.utils.FILE_INFO import (
-    EXTRACTED_PATH,
+    EXTRACTED_TEAMS_PATH,
+    EXTRACTED_REFEREES_PATH,
     PATCHES_CONTENTS_PATH,
     PATCHES_CONTENTS_REFS_PATH,
 )
@@ -27,11 +28,13 @@ def contents_from_extracted():
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
     # Verify that the input folder exists, stop the program otherwise
-    if not os.path.exists(EXTRACTED_PATH):
+    if all([
+        not os.path.exists(EXTRACTED_TEAMS_PATH),
+        not os.path.exists(EXTRACTED_REFEREES_PATH)
+    ]):
 
         logging.critical( "-")
-        logging.critical( "- FATAL ERROR - Input folder not found")
-        logging.critical(f"- Missing folder: {EXTRACTED_PATH}")
+        logging.critical( "- FATAL ERROR - No \"extracted\" input folder found")
         logging.critical( "-")
         logging.critical( "- Please do not run this script before running the previous ones")
         logger_stop()
@@ -41,14 +44,9 @@ def contents_from_extracted():
 
         exit()
 
-    # Check the items in the extracted folder
-    refs_present = False
-    teams_present = False
-    for item_folder in os.listdir(EXTRACTED_PATH):
-        if item_folder == "Referees":
-            refs_present = True
-        else:
-            teams_present = True
+    # Check the presence of the folders
+    refs_present = os.path.exists(EXTRACTED_REFEREES_PATH)
+    teams_present = os.path.exists(EXTRACTED_TEAMS_PATH)
 
     # Set the name for the folders to put stuff into
     if not multicpk_mode:
@@ -112,16 +110,19 @@ def contents_from_extracted():
 
     if teams_present:
         # Pack the teams' contents
-        contents_pack(EXTRACTED_PATH, faces_folder_name, uniform_folder_name)
+        contents_pack(EXTRACTED_TEAMS_PATH, faces_folder_name, uniform_folder_name)
+
+        # Delete the "extracted" folder
+        if os.path.exists(EXTRACTED_TEAMS_PATH):
+            shutil.rmtree(EXTRACTED_TEAMS_PATH, onexc=remove_readonly)
 
     if refs_present:
         # Pack the referees' contents
-        extracted_refs_path = os.path.join(EXTRACTED_PATH, "Referees")
-        contents_pack(extracted_refs_path, refs_folder_name, refs_folder_name)
+        contents_pack(EXTRACTED_REFEREES_PATH, refs_folder_name, refs_folder_name)
 
-    # Finally delete the "extracted" folder
-    if os.path.exists(EXTRACTED_PATH):
-        shutil.rmtree(EXTRACTED_PATH, onexc=remove_readonly)
+        # Delete the "extracted" folder
+        if os.path.exists(EXTRACTED_REFEREES_PATH):
+            shutil.rmtree(EXTRACTED_REFEREES_PATH, onexc=remove_readonly)
 
 
     if 'all_in_one' in os.environ:

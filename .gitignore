@@ -2,11 +2,13 @@
 *.log
 *.old
 teamnotes.txt
-extracted
+extracted_teams
+extracted_referees
 patches_contents
 patches_contents_refs
 patches_output
 sideload
+temp
 exports_to_add
 !exports_to_add/delete_me.txt
 Engines/admin_warned.txt

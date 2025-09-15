@@ -37,6 +37,10 @@ GENERIC_FPKD_NAME            = "generic.fpkd"
 KIT_MASK_NAME                = "kit_mask.dds"
 FACE_DIFF_BIN_NAME           = "face_diff.bin"
 
+# Refs template paths
+REFS_TEMPLATE_PREFOX_PATH    = os.path.join("Engines", "templates", "refscpk_prefox")
+REFS_TEMPLATE_FOX_PATH       = os.path.join("Engines", "templates", "refscpk_fox")
+
 # Settings tools
 SETTINGS_DEFAULT_PATH        = os.path.join("Engines", "templates", "settings_default.ini")
 SETTINGS_TRANSFER_TABLE_PATH = os.path.join("Engines", "templates", "settings_transfer_table.txt")
@@ -51,6 +55,3 @@ UNIPARAM_19_NAME             = "UniformParameter19.bin"
 
 # DirectXTex
 TEXCONV_PATH                 = os.path.join("Engines", "directxtex", "texconv.exe")
-
-# Compiler paths
-PATCHES_CONTENTS_REFS_PATH   = os.path.join("Engines", "templates", "patches_contents_refs")

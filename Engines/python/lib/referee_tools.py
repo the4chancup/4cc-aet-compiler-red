@@ -5,7 +5,8 @@ import logging
 
 from .utils.pausing import pause
 from .utils.FILE_INFO import (
-    PATCHES_CONTENTS_REFS_PATH,
+    REFS_TEMPLATE_PREFOX_PATH,
+    REFS_TEMPLATE_FOX_PATH,
 )
 
 
@@ -104,7 +105,13 @@ def ref_folder_process(ref_folder, ref_num, ref_name, export_destination_path):
         logging.debug(f"No common folder found for referee {ref_name}")
 
 
-def referee_export_process(export_destination_path, pause_on_error):
+def error_handle(pause_on_error):
+    logging.error("- Referee compilation will be skipped")
+    print("-")
+    if pause_on_error:
+        pause()
+
+def referee_export_process(export_destination_path, pause_on_error, fox_mode):
     """Process a referee export folder.
 
     Args:
@@ -115,33 +122,26 @@ def referee_export_process(export_destination_path, pause_on_error):
         bool: False if processing was successful, True otherwise
     """
 
-    # Check for patches_contents_refs immediately
-    if not os.path.exists(PATCHES_CONTENTS_REFS_PATH):
-        logging.error("- ERROR - \"patches_contents_refs\" folder not found in compiler root folder")
-        logging.error("- Referee compilation will be skipped")
-        print("-")
-        if pause_on_error:
-            pause()
+    # Check for refs template immediately
+    refs_template_path = REFS_TEMPLATE_FOX_PATH if fox_mode else REFS_TEMPLATE_PREFOX_PATH
+    if not os.path.exists(refs_template_path):
+        logging.error( "- ERROR - Refs template folder not found")
+        logging.error(f"- Folder path: {refs_template_path}")
+        error_handle(pause_on_error)
         return True
 
     # Check for a refs txt
     refs_txt_path = os.path.join(export_destination_path, "Refs.txt")
     if not os.path.exists(refs_txt_path):
         logging.error("- ERROR - Refs.txt not found in referee export")
-        logging.error("- Referee compilation will be skipped")
-        print("-")
-        if pause_on_error:
-            pause()
+        error_handle(pause_on_error)
         return True
 
     # Process refs
     ref_mappings = refs_list_process(refs_txt_path)
     if not ref_mappings:
         logging.error("- ERROR - No valid entries found in Refs.txt")
-        logging.error("- Referee compilation will be skipped")
-        print("-")
-        if pause_on_error:
-            pause()
+        error_handle(pause_on_error)
         return True
 
     # Process each referee folder according to the list

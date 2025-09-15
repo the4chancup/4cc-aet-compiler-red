@@ -11,7 +11,8 @@ from .lib.utils.FILE_INFO import (
     EXTRACTED_TEAMS_PATH,
     EXTRACTED_REFEREES_PATH,
     PATCHES_CONTENTS_PATH,
-    PATCHES_CONTENTS_REFS_PATH,
+    REFS_TEMPLATE_PREFOX_PATH,
+    REFS_TEMPLATE_FOX_PATH,
 )
 
 
@@ -24,6 +25,7 @@ def remove_readonly(func, path, _):
 def contents_from_extracted():
 
     # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
@@ -79,15 +81,20 @@ def contents_from_extracted():
         os.makedirs(refs_folder_path, exist_ok=True)
 
         # Copy patches_contents_refs
-        if os.path.exists(PATCHES_CONTENTS_REFS_PATH):
-            print("- Copying referee base files from patches_contents_refs")
-            for item in os.listdir(PATCHES_CONTENTS_REFS_PATH):
-                src_path = os.path.join(PATCHES_CONTENTS_REFS_PATH, item)
+        refs_template_path = REFS_TEMPLATE_FOX_PATH if fox_mode else REFS_TEMPLATE_PREFOX_PATH
+        refs_template_name = os.path.basename(refs_template_path)
+        if os.path.exists(refs_template_path):
+            print(f"- Copying referee base files from {refs_template_name}")
+            for item in os.listdir(refs_template_path):
+                src_path = os.path.join(refs_template_path, item)
                 dst_path = os.path.join(refs_folder_path, item)
                 if os.path.isdir(src_path):
                     shutil.copytree(src_path, dst_path)
                 else:
                     shutil.copy2(src_path, dst_path)
+        else:
+            logging.error( "- ERROR - Refs template folder not found")
+            logging.error(f"- Folder path: {refs_template_path}")
 
     if teams_present:
         # Create folders just in case

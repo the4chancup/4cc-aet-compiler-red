@@ -159,7 +159,7 @@ def extracted_from_exports():
             print(" - " + referee_title())
 
             # Process the referee export
-            refs_error = referee_export_process(export_destination_path, pause_on_error)
+            refs_error = referee_export_process(export_destination_path, pause_on_error, fox_mode)
 
             if refs_error:
                 os.remove(export_destination_path)

@@ -2,7 +2,7 @@ import os
 import sys
 
 
-def pause(message="Press any key to continue... "):
+def pause(message="Press any key to continue... ", print_hyphen=True, force=False):
     """
     Pauses the program and waits for Enter.
 
@@ -12,6 +12,12 @@ def pause(message="Press any key to continue... "):
     Returns:
         None
     """
+    pause_allow = os.environ.get('PAUSE_ALLOW', '1')
+    if pause_allow == '0' and not force:
+        return
+
+    if print_hyphen:
+        print("-")
 
     print(message, end='', flush=True)
 

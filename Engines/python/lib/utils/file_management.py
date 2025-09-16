@@ -68,8 +68,8 @@ def file_heal(file_path):
         logging.critical(f"- \"{file_path_new}\"")
         logging.critical( "-")
         logging.critical( "- Please report this error to the developer by posting the \"issues.log\" file")
-        print( "-")
-        pause("- Press Enter to exit... ")
+
+        pause("- Press Enter to exit... ", force=True)
 
         success = False
 
@@ -168,8 +168,8 @@ def file_critical_check(file_path, healing_allowed = True):
 
         print( "-")
         print( "- The program will now close")
-        print( "-")
-        pause()
+
+        pause(force=True)
 
     if not file_healed:
         logger_stop()

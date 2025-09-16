@@ -36,7 +36,6 @@ while True:
     try:
         from python.lib.utils.FILE_INFO import (
             SETTINGS_PATH,
-            ISSUES_LOG_PATH,
             RUN_BATCH_PATH,
         )
         from python.lib.utils.app_tools import app_title, pes_title
@@ -96,7 +95,6 @@ def main(run_type):
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     run_pes = int(os.environ.get('RUN_PES', '0'))
-    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
     updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
 
@@ -151,16 +149,11 @@ def main(run_type):
     # Stop the loggers
     logger_stop()
 
-    # Pause the script before exiting, unless PES is about to run
-    # Pause it anyway if there's a log file and Pause on Error is enabled
-    exit_pause_skip = (
-        run_pes and
-        patches_from_contents_run and
-        not (os.path.exists(ISSUES_LOG_PATH) and pause_allow)
-    )
+    # Pause the script before exiting, unless PES has been launched
+    exit_pause_skip = (run_pes and patches_from_contents_run)
 
     if not exit_pause_skip:
-        pause("Press any key to exit... ")
+        pause("Press any key to exit... ", print_hyphen=False)
 
 
 if __name__ == "__main__":

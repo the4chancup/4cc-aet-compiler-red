@@ -465,8 +465,7 @@ def bins_pack(bins_foldername):
             logging.critical("- Please report this issue to the developer")
             logger_stop()
 
-            print("-")
-            pause("Press any key to exit... ")
+            pause("Press any key to exit... ", force=True)
 
             exit()
 

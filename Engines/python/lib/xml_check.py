@@ -207,9 +207,6 @@ def face_diff_xml_check(xml_path):
         bool: False if the .xml file is valid, True otherwise.
     """
 
-    # Read the necessary parameters
-    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
-
     # Store the name of the file and its parent folder
     xml_name = os.path.basename(xml_path)
     xml_folder_path = os.path.dirname(xml_path)
@@ -232,15 +229,11 @@ def face_diff_xml_check(xml_path):
         logging.error(f"- Issue:          \"{error_string}\"")
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
         return True
 
     root = tree.getroot()
-
-    error = False
 
     # Check that the root tag is 'dif'
     if root.tag != 'dif':
@@ -251,13 +244,11 @@ def face_diff_xml_check(xml_path):
         logging.error(f"- Root tag:       <{root.tag}>")
         logging.error( "- Must be:        <dif>")
 
-        error = True
-
-    if error and pause_allow:
-        print("-")
         pause()
 
-    return error
+        return True
+
+    return False
 
 
 def xml_check(xml_path, team_id):
@@ -270,9 +261,6 @@ def xml_check(xml_path, team_id):
     Returns:
         bool: False if the .xml file is valid, True otherwise.
     """
-
-    # Read the necessary parameters
-    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     # Store the name of the file and its parent folder
     xml_name = os.path.basename(xml_path)
@@ -299,9 +287,7 @@ def xml_check(xml_path, team_id):
         logging.error(f"- Issue:          \"{error_string}\"")
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
         return True
 
@@ -401,9 +387,6 @@ def mtl_check(mtl_path, team_id):
         bool: False if the .mtl file is valid, True otherwise.
     """
 
-    # Read the necessary parameters
-    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
-
     # Store the name of the file and its parent folder
     mtl_name = os.path.basename(mtl_path)
     mtl_folder_name = os.path.basename(os.path.dirname(mtl_path))
@@ -425,9 +408,7 @@ def mtl_check(mtl_path, team_id):
         logging.error(f"- Issue:          \"{error_string}\"")
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
         return True
 

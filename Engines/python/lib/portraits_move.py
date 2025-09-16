@@ -18,9 +18,6 @@ def portraits_move(exportfolder_path, team_id):
     - bool: True if there are conflicts in portrait names, False otherwise.
     """
 
-    # Read the necessary parameters
-    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
-
     TEX_NAME = "portrait.dds"
 
     portrait_conflicts = []
@@ -90,9 +87,7 @@ def portraits_move(exportfolder_path, team_id):
             logging.error(f"- {portrait}")
         logging.error( "- The entire export will be skipped")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
         # Delete the entire export folder
         shutil.rmtree(exportfolder_path)

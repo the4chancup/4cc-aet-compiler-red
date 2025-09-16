@@ -66,8 +66,7 @@ def log_store(log_path):
             print(f"- {COLORS.DARK_RED}FATAL ERROR{COLORS.RESET} - Cannot rename the {log_name} file")
             print( "- Restart your PC and try again")
 
-            print( "-")
-            pause("Press any key to exit... ")
+            pause("Press any key to exit... ", force=True)
 
             exit()
 

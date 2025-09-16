@@ -126,13 +126,12 @@ def pes_download_path_check(settings_name, pes_download_path):
     # Stop the loggers
     logger_stop()
 
-    print("-")
     if sys.platform == "win32":
-        pause("Press any key to open the settings file and exit... ")
+        pause("Press any key to open the settings file and exit... ", force=True)
         # Open the settings file in an external text editor
         os.startfile(settings_name)
     else:
-        pause("Press any key to exit... ")
+        pause("Press any key to exit... ", force=True)
 
     # Exit the script
     exit()
@@ -154,8 +153,7 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
         logging.critical( "- Please make sure there is a DpFileList file in the PES download folder")
         logging.critical( "- and start again")
 
-        print("-")
-        pause("Press any key to exit... ")
+        pause("Press any key to exit... ", force=True)
 
         exit()
 
@@ -172,7 +170,6 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
         logging.error( "- PES probably won't load this CPK if you move it to the PES download folder")
         logging.error( "- Changing the CPK name in the settings file back to the default name is")
         logging.error( "- recommended")
-        print("-")
         pause()
         return
 
@@ -186,19 +183,17 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
     # Stop the loggers
     logger_stop()
 
-    print("-")
-    pause("Press any key to show the list of CPKs on the DpFileList... ")
+    pause("Press any key to show the list of CPKs on the DpFileList... ", force=True)
     print("-")
     for cpk_listed in dpfl_list:
         print("- " + cpk_listed[0:-4])
 
-    print("-")
     if sys.platform == "win32":
-        pause("Press any key to open the settings file and exit... ")
+        pause("Press any key to open the settings file and exit... ", force=True)
         # Open the settings file in an external text editor
         os.startfile(settings_name)
     else:
-        pause("Press any key to exit... ")
+        pause("Press any key to exit... ", force=True)
 
     # Exit the script
     exit()

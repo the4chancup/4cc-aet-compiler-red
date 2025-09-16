@@ -41,8 +41,7 @@ def patches_from_contents():
         logging.critical( "- Please do not run this script before running the previous ones")
         logger_stop()
 
-        print( "-")
-        pause("Press any key to exit... ")
+        pause("Press any key to exit... ", force=True)
 
         exit()
 
@@ -55,8 +54,7 @@ def patches_from_contents():
         logging.critical( "- Please do not run this script before running the previous ones")
         logger_stop()
 
-        print( "-")
-        pause("Press any key to exit... ")
+        pause("Press any key to exit... ", force=True)
 
         exit()
 
@@ -145,8 +143,7 @@ def patches_from_contents():
                         logging.critical( "- Restart your PC and try again")
                         logger_stop()
 
-                        print( "-")
-                        pause("Press any key to exit... ")
+                        pause("Press any key to exit... ", force=True)
 
                         exit()
 

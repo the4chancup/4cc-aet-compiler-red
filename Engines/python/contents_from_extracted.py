@@ -41,8 +41,7 @@ def contents_from_extracted():
         logging.critical( "- Please do not run this script before running the previous ones")
         logger_stop()
 
-        print( "-")
-        pause("Press any key to exit... ")
+        pause("Press any key to exit... ", force=True)
 
         exit()
 

@@ -42,9 +42,7 @@ def admin_request(run_path, run_type):
 
         if not os.path.exists(ADMIN_WARNED_PATH):
             print('Either accept the incoming request or disable Move Cpks mode in the settings file.')
-            print('-')
-
-            pause()
+            pause(force=True)
 
             with open(ADMIN_WARNED_PATH, 'w') as f:
                 f.write('This file tells the program that you know why the request for admin privileges is needed.')

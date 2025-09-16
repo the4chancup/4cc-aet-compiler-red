@@ -105,18 +105,15 @@ def ref_folder_process(ref_folder, ref_num, ref_name, export_destination_path):
         logging.debug(f"No common folder found for referee {ref_name}")
 
 
-def error_handle(pause_allow):
+def error_handle():
     logging.error("- Referee compilation will be skipped")
-    print("-")
-    if pause_allow:
-        pause()
+    pause()
 
-def referee_export_process(export_destination_path, pause_allow, fox_mode):
+def referee_export_process(export_destination_path, fox_mode):
     """Process a referee export folder.
 
     Args:
         export_destination_path: Path to the extracted referee export
-        pause_allow: Whether to pause on error
 
     Returns:
         bool: False if processing was successful, True otherwise
@@ -127,21 +124,21 @@ def referee_export_process(export_destination_path, pause_allow, fox_mode):
     if not os.path.exists(refs_template_path):
         logging.error( "- ERROR - Refs template folder not found")
         logging.error(f"- Folder path: {refs_template_path}")
-        error_handle(pause_allow)
+        error_handle()
         return True
 
     # Check for a refs txt
     refs_txt_path = os.path.join(export_destination_path, "Refs.txt")
     if not os.path.exists(refs_txt_path):
         logging.error("- ERROR - Refs.txt not found in referee export")
-        error_handle(pause_allow)
+        error_handle()
         return True
 
     # Process refs
     ref_mappings = refs_list_process(refs_txt_path)
     if not ref_mappings:
         logging.error("- ERROR - No valid entries found in Refs.txt")
-        error_handle(pause_allow)
+        error_handle()
         return True
 
     # Process each referee folder according to the list
@@ -152,13 +149,12 @@ def referee_export_process(export_destination_path, pause_allow, fox_mode):
         if not os.path.exists(ref_folder):
             logging.error(f"- ERROR - Referee folder {ref_name} not found in the Players folder")
             logging.error("- This referee will be skipped")
-            print("-")
             error_present = True
             continue
 
         ref_folder_process(ref_folder, ref_num, ref_name, export_destination_path)
 
-    if error_present and pause_allow:
+    if error_present:
         pause()
 
     # Delete the Players folder

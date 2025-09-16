@@ -275,9 +275,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         logging.error( "-")
         logging.error( "- These face folders will be discarded to avoid problems")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
 
 # If a Kit Configs folder exists and is not empty, check that the amount of kit config files is correct
@@ -347,10 +345,7 @@ def kitconfigs_check(exportfolder_path, team_name):
         logging.error( "- The Kit Configs folder will be discarded since it's unusable")
         logging.error( "- Check the AET wikipage for the proper naming convention")
 
-        # Pause if needed
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
         return
 
@@ -412,9 +407,7 @@ def kittextures_check(exportfolder_path, team_name):
         logging.error(f"- Team name:      {team_name}")
         logging.error( "- The Kit Textures folder will be discarded since it's unusable")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
         return
 
@@ -445,9 +438,7 @@ def kittextures_check(exportfolder_path, team_name):
         if file_error_names:
             logging.error( "- Check the AET wikipage for the proper naming convention")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
 
 # If a Logo folder exists and is not empty, check that the three logo images' filenames are correct
@@ -500,9 +491,7 @@ def logo_check(exportfolder_path, team_name):
         logging.error( "- The Logo folder will be discarded since it's unusable")
         logging.error( "- Check the AET wikipage for the proper naming convention")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
 
 # If a Portraits folder exists and is not empty, check that the portraits' filenames are correct
@@ -567,9 +556,7 @@ def portraits_check(exportfolder_path, team_name):
 
         logging.error( "- These portraits will be discarded since they're unusable")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
 
 # If a Common folder exists and is not empty, check that the textures inside are fine
@@ -613,9 +600,7 @@ def common_check(exportfolder_path, team_name):
 
         logging.error( "- The textures mentioned above will be discarded since they're unusable")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
 
 # If a Boots folder exists and is not empty, check that the boots folder names are correct
@@ -777,9 +762,7 @@ def boots_check(exportfolder_path, team_name, team_id):
 
         logging.error( "- The boots folders mentioned above will be discarded since they're unusable")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
 
 # If a Gloves folder exists and is not empty, check that the boots folder names are correct
@@ -951,9 +934,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
 
         logging.error( "- The gloves folders mentioned above will be discarded since they're unusable")
 
-        if pause_allow:
-            print("-")
-            pause()
+        pause()
 
 
 # If an Other folder exists, check that it's not empty
@@ -974,11 +955,10 @@ def other_check(exportfolder_path, team_name):
 def export_check(exportfolder_path, team_name, team_id):
 
     # Read the necessary parameters
-    global fox_mode, fox_19, fox_21, pause_allow
+    global fox_mode, fox_19, fox_21
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
-    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     nested_folders_fix(exportfolder_path, team_name)
     faces_check(exportfolder_path, team_name, team_id)

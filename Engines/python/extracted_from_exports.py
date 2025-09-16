@@ -64,7 +64,6 @@ def extracted_from_exports():
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     dds_compression = int(os.environ.get('DDS_COMPRESSION', '0'))
-    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
 
     print("-")
@@ -159,7 +158,7 @@ def extracted_from_exports():
             print("- " + referee_title())
 
             # Process the referee export
-            refs_error = referee_export_process(export_destination_path, pause_allow, fox_mode)
+            refs_error = referee_export_process(export_destination_path, fox_mode)
 
             if refs_error:
                 os.remove(export_destination_path)
@@ -227,6 +226,5 @@ def extracted_from_exports():
         print( "-")
         print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are files in the Other folder")
         print( "- Please open it and check its contents")
-        if pause_allow:
-            print("-")
-            pause()
+
+        pause()

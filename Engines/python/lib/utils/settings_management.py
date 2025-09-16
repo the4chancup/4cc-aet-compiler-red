@@ -174,8 +174,8 @@ def settings_init():
         logging.critical( "-")
         logging.critical( "- A clean settings file will be generated and opened")
         logging.critical( "- Please edit the settings as needed and restart the program")
-        print("-")
-        pause("Press any key to continue... ")
+
+        pause(force=True)
 
         settings_default_init(SETTINGS_PATH, SETTINGS_DEFAULT_PATH)
 

@@ -144,8 +144,9 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 
             print( "-")
             print(f"- A new different \"{TEAMS_LIST_NAME}\" file is available in the new version")
-            print( "-")
-            pause("Press any key to see the differences... ")
+
+            pause("Press any key to see the differences... ", force=True)
+
             # Print the differences between the two files
             with open(teams_list_new_path, "r", encoding='utf-8') as f1:
                 with open(TEAMS_LIST_PATH, "r", encoding='utf-8') as f2:
@@ -199,8 +200,7 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     print("-")
     print("- The old compiler folder has been preserved, so you can delete it later")
 
-    print("-")
-    pause("Press any key to open the new folder... ")
+    pause("Press any key to open the new folder... ", force=True)
 
     # Open the unpacked folder in the default file explorer
     os.startfile(app_new_folder)

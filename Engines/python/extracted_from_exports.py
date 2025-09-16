@@ -156,7 +156,7 @@ def extracted_from_exports():
             team_id = "999"
             team_name = "/refs/"
 
-            print(" - " + referee_title())
+            print("- " + referee_title())
 
             # Process the referee export
             refs_error = referee_export_process(export_destination_path, pause_on_error, fox_mode)

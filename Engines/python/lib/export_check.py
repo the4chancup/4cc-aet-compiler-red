@@ -275,7 +275,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         logging.error( "-")
         logging.error( "- These face folders will be discarded to avoid problems")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -348,7 +348,7 @@ def kitconfigs_check(exportfolder_path, team_name):
         logging.error( "- Check the AET wikipage for the proper naming convention")
 
         # Pause if needed
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -412,7 +412,7 @@ def kittextures_check(exportfolder_path, team_name):
         logging.error(f"- Team name:      {team_name}")
         logging.error( "- The Kit Textures folder will be discarded since it's unusable")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -445,7 +445,7 @@ def kittextures_check(exportfolder_path, team_name):
         if file_error_names:
             logging.error( "- Check the AET wikipage for the proper naming convention")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -500,7 +500,7 @@ def logo_check(exportfolder_path, team_name):
         logging.error( "- The Logo folder will be discarded since it's unusable")
         logging.error( "- Check the AET wikipage for the proper naming convention")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -567,7 +567,7 @@ def portraits_check(exportfolder_path, team_name):
 
         logging.error( "- These portraits will be discarded since they're unusable")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -613,7 +613,7 @@ def common_check(exportfolder_path, team_name):
 
         logging.error( "- The textures mentioned above will be discarded since they're unusable")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -777,7 +777,7 @@ def boots_check(exportfolder_path, team_name, team_id):
 
         logging.error( "- The boots folders mentioned above will be discarded since they're unusable")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -951,7 +951,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
 
         logging.error( "- The gloves folders mentioned above will be discarded since they're unusable")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -974,11 +974,11 @@ def other_check(exportfolder_path, team_name):
 def export_check(exportfolder_path, team_name, team_id):
 
     # Read the necessary parameters
-    global fox_mode, fox_19, fox_21, pause_on_error
+    global fox_mode, fox_19, fox_21, pause_allow
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     nested_folders_fix(exportfolder_path, team_name)
     faces_check(exportfolder_path, team_name, team_id)

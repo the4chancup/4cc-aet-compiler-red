@@ -208,7 +208,7 @@ def face_diff_xml_check(xml_path):
     """
 
     # Read the necessary parameters
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     # Store the name of the file and its parent folder
     xml_name = os.path.basename(xml_path)
@@ -232,7 +232,7 @@ def face_diff_xml_check(xml_path):
         logging.error(f"- Issue:          \"{error_string}\"")
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -253,7 +253,7 @@ def face_diff_xml_check(xml_path):
 
         error = True
 
-    if error and pause_on_error:
+    if error and pause_allow:
         print("-")
         pause()
 
@@ -272,7 +272,7 @@ def xml_check(xml_path, team_id):
     """
 
     # Read the necessary parameters
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     # Store the name of the file and its parent folder
     xml_name = os.path.basename(xml_path)
@@ -299,7 +299,7 @@ def xml_check(xml_path, team_id):
         logging.error(f"- Issue:          \"{error_string}\"")
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -402,7 +402,7 @@ def mtl_check(mtl_path, team_id):
     """
 
     # Read the necessary parameters
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     # Store the name of the file and its parent folder
     mtl_name = os.path.basename(mtl_path)
@@ -425,7 +425,7 @@ def mtl_check(mtl_path, team_id):
         logging.error(f"- Issue:          \"{error_string}\"")
         logging.error(f"- Location:       At or before line {line}, column {column}")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 

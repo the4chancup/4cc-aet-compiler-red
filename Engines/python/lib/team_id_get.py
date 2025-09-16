@@ -47,7 +47,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
     file_critical_check(TEAMS_LIST_PATH)
 
     # Read the necessary parameters
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     root_found = None
     not_root = None
@@ -80,7 +80,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
         # Skip the whole export
         shutil.rmtree(exportfolder_path)
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 
@@ -130,7 +130,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
                 logging.error(f"- Team name:      {team_name_folder}")
                 logging.error( "- This export will be discarded")
 
-                if pause_on_error:
+                if pause_allow:
                     print("-")
                     pause()
 
@@ -207,7 +207,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
 
         logging.error( "- This export will be discarded to prevent conflicts")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 

@@ -1,1 +1,2 @@
-pause_when_wrong -> pause_on_error
+pause_when_wrong -> pause_allow
+pause_allow -> pause_allow

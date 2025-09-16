@@ -19,7 +19,7 @@ def portraits_move(exportfolder_path, team_id):
     """
 
     # Read the necessary parameters
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
 
     TEX_NAME = "portrait.dds"
 
@@ -90,7 +90,7 @@ def portraits_move(exportfolder_path, team_id):
             logging.error(f"- {portrait}")
         logging.error( "- The entire export will be skipped")
 
-        if pause_on_error:
+        if pause_allow:
             print("-")
             pause()
 

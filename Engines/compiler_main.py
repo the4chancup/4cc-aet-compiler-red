@@ -96,7 +96,7 @@ def main(run_type):
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     run_pes = int(os.environ.get('RUN_PES', '0'))
-    pause_on_error = int(os.environ.get('PAUSE_ON_ERROR', '1'))
+    pause_allow = int(os.environ.get('PAUSE_ALLOW', '1'))
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
     updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
 
@@ -156,7 +156,7 @@ def main(run_type):
     exit_pause_skip = (
         run_pes and
         patches_from_contents_run and
-        not (os.path.exists(ISSUES_LOG_PATH) and pause_on_error)
+        not (os.path.exists(ISSUES_LOG_PATH) and pause_allow)
     )
 
     if not exit_pause_skip:

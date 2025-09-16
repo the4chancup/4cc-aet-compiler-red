@@ -108,6 +108,8 @@ def patches_from_contents():
     print("-")
     print("- The patches have been created")
 
+    log_presence_warn_done = False
+
     # If Move Cpks mode is enabled
     if move_cpks:
 
@@ -160,6 +162,12 @@ def patches_from_contents():
             pes_exe_path = os.environ.get('PES_EXE_PATH', 'null')
 
             if os.path.exists(pes_exe_path):
+
+                issues_log_present = log_presence_warn()
+                if issues_log_present:
+                    pause()
+                log_presence_warn_done = True
+
                 print( "-")
                 print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
                 subprocess.Popen([pes_exe_path], cwd=pes_folder_path)
@@ -170,7 +178,8 @@ def patches_from_contents():
                 print( "- PES won't be started")
 
     if all_in_one:
-        log_presence_warn()
+        if not log_presence_warn_done:
+            log_presence_warn()
 
         print( "-")
         print( "-")

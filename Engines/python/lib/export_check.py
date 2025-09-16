@@ -192,7 +192,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         ]
         # Check if any file is disallowed
         for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
-            file_type = os.path.splitext(file_name)[1]
+            file_type = os.path.splitext(file_name)[1].lower()
             if file_type not in file_type_allowed_list_filtered:
                 folder_error_file_disallowed_list.append(file_name)
 
@@ -700,7 +700,7 @@ def boots_check(exportfolder_path, team_name, team_id):
         ]
         # Check if any file is disallowed
         for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
-            file_type = os.path.splitext(file_name)[1]
+            file_type = os.path.splitext(file_name)[1].lower()
             if file_type not in file_type_allowed_list_filtered:
                 folder_error_file_disallowed_list.append(file_name)
 
@@ -871,7 +871,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
         ]
         # Check if any file is disallowed
         for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
-            file_type = os.path.splitext(file_name)[1]
+            file_type = os.path.splitext(file_name)[1].lower()
             if file_type not in file_type_allowed_list_filtered:
                 folder_error_file_disallowed_list.append(file_name)
 

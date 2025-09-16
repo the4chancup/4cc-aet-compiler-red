@@ -1,15 +1,9 @@
-import os
-
 from . import COLORS
 from .APP_DATA import (
     APP_VERSION_MAJOR,
     APP_VERSION_MINOR,
     APP_VERSION_PATCH,
     APP_VERSION_DEV,
-)
-from .FILE_INFO import (
-    SUGGESTIONS_LOG_PATH,
-    ISSUES_LOG_PATH,
 )
 
 
@@ -67,20 +61,3 @@ def pes_title(pes_version, colorize=True):
     title_string = f"{pes_color}PES20{pes_version}{color_reset}"
 
     return title_string
-
-
-def log_presence_warn():
-    if os.path.exists(ISSUES_LOG_PATH):
-        # Warn about there being some issues and about having to open the log
-        print( "-")
-        print(f"- {COLORS.DARK_YELLOW}Warning{COLORS.RESET}: There were some potential issues in the exports")
-        print( "- Please check the issues.log file for more details")
-    else:
-        print( "-")
-        print(f"- {COLORS.DARK_GREEN}No issues were found{COLORS.RESET}")
-
-    if os.path.exists(SUGGESTIONS_LOG_PATH):
-        # Warn about there being some suggestions
-        print( "-")
-        print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are some suggestions available")
-        print( "- Check the suggestions.log file to improve your aesthetics")

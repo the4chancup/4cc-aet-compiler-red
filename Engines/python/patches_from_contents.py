@@ -6,8 +6,7 @@ import subprocess
 from .lib import pes_cpk_pack as cpktool
 from .lib.utils import COLORS
 from .lib.utils.pausing import pause
-from .lib.utils.logging_tools import logger_stop
-from .lib.utils.app_tools import log_presence_warn
+from .lib.utils.logging_tools import logger_stop, log_presence_warn
 from .lib.utils.FILE_INFO import (
     PATCHES_CONTENTS_PATH,
     PATCHES_OUTPUT_PATH,

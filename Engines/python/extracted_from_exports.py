@@ -13,7 +13,8 @@ from .lib.referee_tools import referee_export_process
 from .lib.utils.zlib_plus import zlib_files_in_folder
 from .lib.utils.pausing import pause
 from .lib.utils import COLORS
-from .lib.utils.app_tools import referee_title, log_presence_warn
+from .lib.utils.app_tools import referee_title
+from .lib.utils.logging_tools import log_presence_warn
 from .lib.utils.FILE_INFO import (
     EXPORTS_TO_ADD_PATH,
     EXTRACTED_TEAMS_PATH,

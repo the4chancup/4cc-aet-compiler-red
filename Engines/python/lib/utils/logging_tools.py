@@ -145,7 +145,11 @@ def logger_stop():
 
 
 def log_presence_warn():
-    if os.path.exists(ISSUES_LOG_PATH):
+
+    issues_log_present = os.path.exists(ISSUES_LOG_PATH)
+    suggestions_log_present = os.path.exists(SUGGESTIONS_LOG_PATH)
+
+    if issues_log_present:
         # Warn about there being some issues and about having to open the log
         print( "-")
         print(f"- {COLORS.DARK_YELLOW}Warning{COLORS.RESET}: There were some potential issues in the exports")
@@ -154,8 +158,10 @@ def log_presence_warn():
         print( "-")
         print(f"- {COLORS.DARK_GREEN}No issues were found{COLORS.RESET}")
 
-    if os.path.exists(SUGGESTIONS_LOG_PATH):
+    if suggestions_log_present:
         # Warn about there being some suggestions
         print( "-")
         print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are some suggestions available")
         print( "- Check the suggestions.log file to improve your aesthetics")
+
+    return issues_log_present

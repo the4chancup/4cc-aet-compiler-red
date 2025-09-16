@@ -153,12 +153,19 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
                     for line in diff:
                         print(line, end="")
             print("-")
-            response = input("Type \"new\" to use the new file, or just press Enter to keep the current one... ")
 
-            if "new" not in response:
-                if os.path.exists(teams_list_new_path):
-                    os.remove(teams_list_new_path)
-                shutil.copy(TEAMS_LIST_PATH, app_new_folder)
+            while True:
+                response = input("Type \"new\" to use the new file, or just press Enter to keep the current one... ")
+
+                if "new" in response:
+                    break
+                elif "" in response:
+                    if os.path.exists(teams_list_new_path):
+                        os.remove(teams_list_new_path)
+                    shutil.copy(TEAMS_LIST_PATH, app_new_folder)
+                    break
+                else:
+                    print("Invalid response, please try again")
 
     # Move the contents of the exports_to_add folder to the new folder after deleting the one in the old folder
     EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)
@@ -172,7 +179,7 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     if not update_major:
         print("- The settings file has also been copied to the new folder")
     else:
-        print("- The settings file has been overhauled, but the settings")
+        print("- This is a major update so the settings file has been overhauled, but the settings")
         print("- from the current settings file have been transferred to it")
         if settings_renamed:
             print("-")
@@ -181,16 +188,16 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
                 print(f"- [{setting[0]}] -> [{setting[1]}]")
         if settings_removed:
             print("-")
-            print("- The following settings have been removed:")
+            print("- The following settings do not exist anymore, and have been removed:")
             for setting in settings_removed:
                 print(f"- [{setting}]")
         if settings_added:
             print("-")
-            print("- The following settings have been added:")
+            print("- The following settings are new, and have been added:")
             for setting in settings_added:
                 print(f"- [{setting}]")
     print("-")
-    print("- The old folder has been preserved, so you can delete it later")
+    print("- The old compiler folder has been preserved, so you can delete it later")
 
     print("-")
     pause("Press any key to open the new folder... ")

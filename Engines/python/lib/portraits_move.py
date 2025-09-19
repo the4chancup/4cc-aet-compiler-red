@@ -3,6 +3,7 @@ import shutil
 import filecmp
 import logging
 
+from .texture_check import textures_convert
 from .utils.pausing import pause
 
 
@@ -17,6 +18,9 @@ def portraits_move(exportfolder_path, team_id):
     Returns:
     - bool: True if there are conflicts in portrait names, False otherwise.
     """
+
+    # Read the necessary parameters
+    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
 
     TEX_NAME = "portrait.dds"
 
@@ -94,5 +98,10 @@ def portraits_move(exportfolder_path, team_id):
 
         # Exit with error
         return True
+
+    if os.path.exists(portraits_path):
+        # Convert the portraits if needed
+        # Fox mode is forced to False because the portraits need to stay in DDS format
+        textures_convert(portraits_path, False, fox_19)
 
     return False

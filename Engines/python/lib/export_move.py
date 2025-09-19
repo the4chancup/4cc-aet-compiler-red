@@ -7,8 +7,8 @@ from .utils.id_change import txt_id_change
 from .fmdl_id_change import fmdl_id_change
 from .xml_editing import xml_create
 from .xml_editing import xml_process
-from .texture_check import textures_convert
 from .utils.file_management import file_critical_check
+from .utils.texture_conversion import textures_convert
 from .utils.zlib_plus import unzlib_file
 from .utils.FILE_INFO import (
     TEMPLATE_FOLDER_PATH,

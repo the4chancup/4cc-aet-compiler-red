@@ -3,8 +3,8 @@ import shutil
 import filecmp
 import logging
 
-from .texture_check import textures_convert
 from .utils.pausing import pause
+from .utils.texture_conversion import textures_convert
 
 
 def portraits_move(exportfolder_path, team_id):

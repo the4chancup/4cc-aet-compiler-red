@@ -72,6 +72,9 @@ def xml_create(folder_path, folder_type):
     DIFF_BIN_PATH_DEFAULT = os.path.join("Engines", "templates", f"{DIFF_NAME}.bin")
     file_critical_check(DIFF_BIN_PATH_DEFAULT)
 
+    # Read the necessary parameters
+    pes_15 = (int(os.environ.get('PES_VERSION', '19')) == 15)
+
     # Create a new root
     root_new = ET.Element('config')
 
@@ -128,12 +131,18 @@ def xml_create(folder_path, folder_type):
                 else:
                     model_type = TYPE_DEFAULT
 
-            model_type_list.append(model_type)
+            # Replace "uniform" with "uniform_sub" if PES 15
+            if pes_15 and model_type == "uniform":
+                model_type_final = "uniform_sub"
+            else:
+                model_type_final = model_type
+
+            model_type_list.append(model_type_final)
 
             # Add a model entry to the root
             model = ET.Element('model')
             model.set('level', '0')
-            model.set('type', model_type)
+            model.set('type', model_type_final)
             model.set('path', model_path_xml)
             model.set('material', mtl_path_xml)
 

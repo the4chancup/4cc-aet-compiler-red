@@ -262,6 +262,9 @@ def xml_check(xml_path, team_id):
         bool: False if the .xml file is valid, True otherwise.
     """
 
+    # Read the necessary parameters
+    pes_15 = (int(os.environ.get('PES_VERSION', '19')) == 15)
+
     # Store the name of the file and its parent folder
     xml_name = os.path.basename(xml_path)
     xml_folder_path = os.path.dirname(xml_path)
@@ -294,6 +297,7 @@ def xml_check(xml_path, team_id):
     root = tree.getroot()
 
     error = False
+    xml_modified = False
 
     # Check that the root tag is 'config'
     if root.tag != 'config':
@@ -328,7 +332,16 @@ def xml_check(xml_path, team_id):
             model_type_error = True
 
         else:
-            model_type_list.append(model_type)
+            if pes_15 and model_type == "uniform":
+                # Replace with "uniform_sub" in the xml file
+                model_type_final = "uniform_sub"
+                model.set('type', model_type_final)
+
+                xml_modified = True
+            else:
+                model_type_final = model_type
+
+            model_type_list.append(model_type_final)
 
         # Check that the model path corresponds to a file in the folder indicated
         model_path_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model", team_id)
@@ -368,8 +381,14 @@ def xml_check(xml_path, team_id):
         for dif in root.findall('dif'):
             root_new.append(dif)
 
-        # Write the modified .xml file
         tree_new = ET.ElementTree(root_new)
+
+        xml_modified = True
+    else:
+        tree_new = tree
+
+    if xml_modified:
+        # Write the modified .xml file
         tree_new.write(xml_path, encoding='UTF-8', xml_declaration=True)
 
 

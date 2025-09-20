@@ -70,10 +70,10 @@ if %crashed% GEQ 1 (
     echo - %BRIGHT_MAGENTA%CRASH%RESET% - The compiler has run into an unexpected error and stopped
     if exist ".\crash.log" (
         echo - A log file crash.log has been saved to the compiler's folder
-        echo - Please post it on the /aesco/ server or the cup thread
+        echo - Please post it on the /aesco/ server or the divegrass thread
     ) else (
         echo - Please take a screenshot and post it on the /aesco/ server
-        echo - or the cup thread
+        echo - or the divegrass thread
     )
     echo -
 

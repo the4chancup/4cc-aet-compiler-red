@@ -78,7 +78,7 @@ def run_type_request():
 def main(run_type):
 
     # Set the working folder to the parent of the folder of this script
-    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0]))))
 
     # Check the running type
     all_in_one = (run_type == "0")

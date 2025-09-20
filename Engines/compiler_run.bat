@@ -58,8 +58,8 @@ if exist ".\Engines\compiler_main.py" (
 
 set crashed=%ERRORLEVEL%
 
-REM - Run the log cleaner
-call py -%python_version% .\Engines\log_username_clean.py
+REM - Run the log cleaner from the main script to remove the username from the logs
+call py -%python_version% .\Engines\compiler_main.py -1
 
 
 REM - If the compiler returned an error

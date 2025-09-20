@@ -172,6 +172,11 @@ def main(run_type):
 
 if __name__ == "__main__":
 
+    if len(sys.argv) > 1 and sys.argv[1] == "-1":
+        # Run the log cleaner to remove the username from the logs
+        username_clean_from_logs()
+        sys.exit()
+
     if sys.platform == "win32":
 
         # Set the console title

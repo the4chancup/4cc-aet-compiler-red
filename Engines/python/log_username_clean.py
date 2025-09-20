@@ -1,12 +1,12 @@
 import os
 
-from python.lib.utils.FILE_INFO import (
+from .lib.utils.FILE_INFO import (
     ISSUES_LOG_PATH,
     CRASH_LOG_PATH
 )
 
 
-def log_username_clean(log_path):
+def username_clean_from_log(log_path):
 
     if not os.path.exists(log_path):
         return
@@ -21,8 +21,11 @@ def log_username_clean(log_path):
     with open(log_path, "w", encoding='utf-8') as f:
         f.writelines(text)
 
+def username_clean_from_logs():
+    username_clean_from_log(ISSUES_LOG_PATH)
+    username_clean_from_log(CRASH_LOG_PATH)
+
 
 if __name__ == "__main__":
 
-    log_username_clean(ISSUES_LOG_PATH)
-    log_username_clean(CRASH_LOG_PATH)
+    username_clean_from_logs()

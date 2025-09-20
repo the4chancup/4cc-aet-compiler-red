@@ -1,6 +1,5 @@
 import sys
 import runpy
-import ensurepip
 import subprocess
 import importlib.util
 
@@ -54,7 +53,15 @@ def dependency_check_on_import():
 
         # Make sure pip is installed
         if importlib.util.find_spec("pip") is None:
-            ensurepip.bootstrap()
+            print("-")
+            print("- FATAL ERROR - The pip package installer was not found.")
+            print("-")
+            print("- Try reinstalling python, choose Customize installation and")
+            print("- make sure to tick the \"pip\" option.")
+            print("-")
+
+            input("Press Enter to exit... ")
+            exit()
 
         # Install the dependencies (closes the program automatically after the installation)
         sys.argv = ["pip", "install"] + dependencies_missing

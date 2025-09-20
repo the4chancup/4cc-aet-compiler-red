@@ -3,20 +3,9 @@ import os
 import sys
 import logging
 
-# Modules needed for self healing
-try:
-    from python.dependency_check import dependency_check_on_import as dependency_check_on_import
-    from python.lib.utils.APP_DATA import (
-        APP_OWNER,
-        APP_NAME,
-        APP_VERSION_MAJOR,
-        APP_VERSION_MINOR,
-        APP_VERSION_PATCH,
-        APP_VERSION_DEV as APP_VERSION_DEV,
-    )
-    from python.lib.utils.updating import update_check
-    from python.lib.utils.file_management import module_recover
-except ImportError as e:
+# Error handler for library errors
+def handle_library_error(e):
+    print("-")
     print("- FATAL ERROR - Library file not found:")
     print(e)
     print("-")
@@ -31,24 +20,49 @@ except ImportError as e:
 
     exit()
 
+# Modules needed for self healing
+try:
+    if "__compiled__" not in globals():
+        # If the script is not compiled, check for dependencies and allow self healing
+        from python.dependency_check import dependency_check_on_import as dependency_check_on_import
+        from python.lib.utils.file_management import module_recover
+    from python.lib.utils.updating import update_check
+    from python.lib.utils.APP_DATA import (
+        APP_OWNER,
+        APP_NAME,
+        APP_VERSION_MAJOR,
+        APP_VERSION_MINOR,
+        APP_VERSION_PATCH,
+        APP_VERSION_DEV as APP_VERSION_DEV,
+    )
+except ImportError as e:
+    handle_library_error(e)
+
 # Modules which can be self healed
 while True:
     try:
+        from python.log_username_clean import username_clean_from_logs
+        from python.extracted_from_exports import extracted_from_exports
+        from python.contents_from_extracted import contents_from_extracted
+        from python.patches_from_contents import patches_from_contents
+        from python.lib.cpk_tools import pes_download_path_check, cpk_name_check
+        from python.lib.utils.admin_tools import admin_check, admin_request
+        from python.lib.utils.app_tools import app_title, pes_title
+        from python.lib.utils.logging_tools import logger_init, logger_stop
+        from python.lib.utils.pausing import pause
+        from python.lib.utils.settings_management import settings_init
         from python.lib.utils.FILE_INFO import (
             SETTINGS_PATH,
             RUN_BATCH_PATH,
         )
-        from python.lib.utils.app_tools import app_title, pes_title
-        from python.lib.utils.logging_tools import logger_init, logger_stop
-        from python.lib.utils.settings_management import settings_init
-        from python.lib.utils.admin_tools import admin_check, admin_request
-        from python.lib.utils.pausing import pause
-        from python.lib.cpk_tools import pes_download_path_check, cpk_name_check
-        from python.extracted_from_exports import extracted_from_exports
-        from python.contents_from_extracted import contents_from_extracted
-        from python.patches_from_contents import patches_from_contents
     except ImportError as e:
-        module_recover(e)
+        if "__compiled__" not in globals():
+            # If the script is not compiled, try to self heal
+            module_recover(e)
+        else:
+            # It should not be possible to lack a library file if the script is compiled,
+            # but if it ever happens, show a library error
+            handle_library_error(e)
     else:
         break
 

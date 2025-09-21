@@ -1,5 +1,9 @@
 import os
+import sys
 import logging
+
+from rich.console import Console
+from rich.traceback import Traceback
 
 from . import COLORS
 from .pausing import pause
@@ -31,6 +35,54 @@ class ColorFilter(logging.Filter):
         record.msg = record.msg.replace(WARNING_STRING, WARNING_STRING_COLORED)
 
         return True
+
+
+def global_exception_handler(exc_type, exc_value, exc_traceback):
+    """
+    Global exception handler that logs unhandled exceptions directly to files with Rich formatting
+    while still displaying rich tracebacks on console.
+    """
+    if issubclass(exc_type, KeyboardInterrupt):
+        # Allow normal handling of KeyboardInterrupt
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+
+    # First, display the Rich traceback on console (this is what the user sees)
+    console = Console(stderr=True)
+    traceback_obj = Traceback.from_exception(
+        exc_type, exc_value, exc_traceback,
+        show_locals=True,
+        locals_max_length=None,
+        suppress=[],
+        max_frames=50
+    )
+    console.print(traceback_obj)
+
+    # Create console for file output (no color codes, no fancy characters)
+    file_console = Console(
+        file=None, width=120, legacy_windows=False, force_terminal=False,
+        no_color=True, safe_box=True
+    )
+
+    # Write to crash.log
+    try:
+        with open(CRASH_LOG_PATH, 'a', encoding='utf-8') as crash_file:
+            crash_file.write("\nUNHANDLED EXCEPTION:\n")
+            file_console.file = crash_file
+            file_console.print(traceback_obj)
+            file_console.file = None
+    except Exception:
+        pass  # Don't let logging errors crash the program
+
+    # Write to issues.log
+    try:
+        with open(ISSUES_LOG_PATH, 'a', encoding='utf-8') as issues_file:
+            issues_file.write("\nUNHANDLED EXCEPTION:\n")
+            file_console.file = issues_file
+            file_console.print(traceback_obj)
+            file_console.file = None
+    except Exception:
+        pass  # Don't let logging errors crash the program
 
 
 def log_store(log_path):
@@ -71,7 +123,7 @@ def log_store(log_path):
             exit()
 
 
-def logger_init(__name__):
+def logger_init():
 
     # Set the root logger level
     logging.getLogger().setLevel(logging.INFO)
@@ -114,20 +166,8 @@ def logger_init(__name__):
     # If a crash log file already exists, add .old to it
     log_store(CRASH_LOG_PATH)
 
-    # Create a logger
-    logger = logging.getLogger(__name__)
-
-    # Create a file handler which will only create a file when an exception occurs
-    crash_log_handler = logging.FileHandler(CRASH_LOG_PATH, delay=True, encoding="utf-8")
-
-    # Create a formatter and add it to the handler
-    formatter = logging.Formatter('%(asctime)-15s - %(name)s - %(levelname)s - %(message)s')
-    crash_log_handler.setFormatter(formatter)
-
-    # Add the handler to the logger
-    logger.addHandler(crash_log_handler)
-
-    return logger
+    # Install the global exception handler to capture unhandled exceptions
+    sys.excepthook = global_exception_handler
 
 
 def logger_stop():

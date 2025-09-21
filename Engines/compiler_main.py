@@ -189,11 +189,11 @@ if __name__ == "__main__":
     print("-")
 
     # Enable the advanced traceback handler
-    from traceback_with_variables import activate_by_import as activate_by_import
-    from traceback_with_variables import printing_exc, LoggerAsFile
+    from rich.traceback import install
+    install(show_locals=True, locals_max_length=None)
 
     # Enable the loggers
-    logger = logger_init(__name__)
+    logger_init()
 
     # Check if an argument has been passed and its value is between 0 and 3
     if len(sys.argv) > 1 and sys.argv[1] in ["0", "1", "2", "3"]:
@@ -201,6 +201,5 @@ if __name__ == "__main__":
     else:
         run_type = run_type_request()
 
-    # Run the main function with the exception logger
-    with printing_exc(file_=LoggerAsFile(logger)):
-        main(run_type)
+    # Run the main function
+    main(run_type)

@@ -13,4 +13,5 @@ exports_to_add
 !exports_to_add/delete_me.txt
 Engines/compiler_main.exe
 Engines/state
+!Engines/state/dummy.txt
 Engines/bins/temp

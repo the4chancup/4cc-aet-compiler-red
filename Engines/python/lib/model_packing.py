@@ -99,9 +99,9 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
             if os.path.exists(model_destination_path):
                 shutil.rmtree(model_destination_path)
 
-            # Move the model folder to the temp folder, renaming it to the model ID
+            # Move the model folder to the temp folder, renaming it with the model type
             temp_path = os.path.join(temp_folder_path, model_id)
-            model_temp_path = os.path.join(temp_path, model_id)
+            model_temp_path = os.path.join(temp_path, f"{models_type}_fpk")
             shutil.move(model_path, model_temp_path)
 
             # Make a "windx11" folder for the textures
@@ -122,14 +122,10 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
                 elif os.path.isdir(item_path):
                     shutil.rmtree(item_path)
 
-            # Rename the folder for packing
-            fpk_source_path = os.path.join(temp_path, f"{models_type}_fpk")
-            os.rename(model_temp_path, fpk_source_path)
-
             # Prepare an array with the files to pack
             file_path_list = []
-            for file_name in os.listdir(fpk_source_path):
-                file_path = os.path.join(fpk_source_path, file_name)
+            for file_name in os.listdir(model_temp_path):
+                file_path = os.path.join(model_temp_path, file_name)
                 file_path_list.append(file_path)
 
             # Pack the fpk

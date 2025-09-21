@@ -22,12 +22,11 @@ CRASH_LOG_PATH               = "crash.log"
 # Run batch
 RUN_BATCH_PATH               = os.path.join("Engines", "compiler_run.bat")
 
-# Update files
-CHECK_LAST_PATH              = os.path.join("Engines", "update_check_last.txt")
-SKIP_LAST_PATH               = os.path.join("Engines", "update_skip_last.txt")
-
-# Admin tools
-ADMIN_WARNED_PATH            = os.path.join("Engines", "admin_warned.txt")
+# State files
+STATE_FOLDER_PATH           = os.path.join("Engines", "state")
+CHECK_LAST_PATH              = os.path.join(STATE_FOLDER_PATH, "update_check_last.txt")
+SKIP_LAST_PATH               = os.path.join(STATE_FOLDER_PATH, "update_skip_last.txt")
+ADMIN_WARNED_PATH            = os.path.join(STATE_FOLDER_PATH, "admin_warned.txt")
 
 # Template files
 TEMPLATE_FOLDER_PATH         = os.path.join("Engines", "templates")
@@ -38,12 +37,12 @@ KIT_MASK_NAME                = "kit_mask.dds"
 FACE_DIFF_BIN_NAME           = "face_diff.bin"
 
 # Refs template paths
-REFS_TEMPLATE_PREFOX_PATH    = os.path.join("Engines", "templates", "refscpk_prefox")
-REFS_TEMPLATE_FOX_PATH       = os.path.join("Engines", "templates", "refscpk_fox")
+REFS_TEMPLATE_PREFOX_PATH    = os.path.join(TEMPLATE_FOLDER_PATH, "refscpk_prefox")
+REFS_TEMPLATE_FOX_PATH       = os.path.join(TEMPLATE_FOLDER_PATH, "refscpk_fox")
 
 # Settings tools
-SETTINGS_DEFAULT_PATH        = os.path.join("Engines", "templates", "settings_default.ini")
-SETTINGS_TRANSFER_TABLE_PATH = os.path.join("Engines", "templates", "settings_transfer_table.txt")
+SETTINGS_DEFAULT_PATH        = os.path.join(TEMPLATE_FOLDER_PATH, "settings_default.ini")
+SETTINGS_TRANSFER_TABLE_PATH = os.path.join(TEMPLATE_FOLDER_PATH, "settings_transfer_table.txt")
 
 # Bin files
 BIN_FOLDER_PATH              = os.path.join("Engines", "bins")

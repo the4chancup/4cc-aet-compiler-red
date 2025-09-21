@@ -18,6 +18,7 @@ from .FILE_INFO import (
     SETTINGS_TRANSFER_TABLE_PATH,
     CHECK_LAST_PATH,
     SKIP_LAST_PATH,
+    STATE_FOLDER_PATH,
 )
 
 
@@ -172,6 +173,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)
     for file in os.listdir(EXPORTS_TO_ADD_PATH):
         shutil.move(os.path.join(EXPORTS_TO_ADD_PATH, file), os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH))
+
+    # Copy the application state files to the new folder
+    for file in os.listdir(STATE_FOLDER_PATH):
+        shutil.copy(os.path.join(STATE_FOLDER_PATH, file), os.path.join(app_new_folder, STATE_FOLDER_PATH))
 
     print( "-")
     print( "- Successfully downloaded and unpacked the latest version")

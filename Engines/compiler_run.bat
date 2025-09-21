@@ -34,6 +34,8 @@ if exist ".\Engines\compiler_main.exe" (
     echo - The file compiler_main.exe was not found in the Engines folder
     echo -
     echo - Please grab a clean compiler folder
+    echo - Make sure to grab it from the "Releases" page of the GitHub repository:
+    echo - https://github.com/the4chancup/4cc-aet-compiler-red/releases
     echo -
     pause
 

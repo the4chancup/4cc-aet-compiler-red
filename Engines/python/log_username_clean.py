@@ -16,7 +16,16 @@ def username_clean_from_log(log_path):
     with open(log_path, "r", encoding='utf-8') as f:
         text = f.readlines()
 
-    text = [line.replace(f"\\{username}\\", "\\<username>\\") for line in text]
+    username_length = len(username)
+
+    if username_length > 10:
+        prefix_length = (username_length - 10) // 2
+        suffix_length = (username_length - 10) - prefix_length
+        dummy_name = " "*prefix_length + "<username>" + " "*suffix_length
+    else:
+        dummy_name = "<username"[:username_length-1] + ">"
+
+    text = [line.replace(f"\\{username}\\", f"\\{dummy_name}\\") for line in text]
 
     with open(log_path, "w", encoding='utf-8') as f:
         f.writelines(text)

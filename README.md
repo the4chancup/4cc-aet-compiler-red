@@ -95,8 +95,8 @@ Q: Why is my antivirus blocking the exe?
   A: The exe is a compiled version of the script and all the Python libraries
   it needs to run, so it has some tricks which might trigger some antivirus
   programs. If you don't trust it you can run the Python script directly from
-  the Engines folder instead. Use compiler_run_py.bat if you're on Windows or
-  compiler_main.py if you're on Linux.
+  the Engines folder instead. Use compiler_run_py.bat or 0_all_in_one_py.bat if
+  you're on Windows or compiler_main.py if you're on Linux.
 
 Q: I've got some other problem/question.  
   A: Feel free to contact the developer, preferably on the divegrass thread or

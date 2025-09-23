@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     # Enable the advanced traceback handler
     from rich.traceback import install
-    install(show_locals=True, locals_max_length=None)
+    install(show_locals=True)
 
     # Enable the loggers
     logger_init()

@@ -42,7 +42,7 @@ def pes_title(pes_version, colorize=True):
     color_bright_cyan = COLORS.BRIGHT_CYAN if colorize else ""
     color_reset = COLORS.RESET if colorize else ""
 
-    match pes_version:
+    match int(pes_version):
         case 15:
             pes_color = color_dark_cyan
         case 16:

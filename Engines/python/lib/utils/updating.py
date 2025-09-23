@@ -339,8 +339,12 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
         if response == "info":
             # Open the website in the default browser
             webbrowser.open(releases_url)
-        else:
+        elif response in ["up", "skip", "fuckoff"]:
             break
+        else:
+            print("-")
+            print("- Invalid response")
+            print("-")
 
     match response:
         case "up":

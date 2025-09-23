@@ -47,9 +47,10 @@ instead, keep in mind that you need to have Python 3.12 or 3.13 installed.
 A cpk will be created and copied automatically to your PES download folder.  
 Now you just need to run PES and check your stuff.
 
-Check the sections below if you run into trouble.  
+Check the Message types and Troubleshooting sections if you run into trouble.  
 Also, don't forget to read the advanced readme inside the Engines folder if you
-want to know more about how the compiler works.
+want to know more about how the compiler works, or if you want to compile a
+referees cpk.
 
 
 ## Message types
@@ -110,4 +111,4 @@ Tool by Shakes
 Special thanks for ideas and fixes, and for some of the libraries used:  
 Tomato4cc, Giovani1906, fg4cc, blu_ray_
 
-Huge thanks to Tim Peters for helping define Python’s design philosophy.
+Huge thanks to Tim Peters for helping define the design philosophy of Python.

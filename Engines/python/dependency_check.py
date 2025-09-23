@@ -23,7 +23,7 @@ def dependency_check_on_import():
         {"name": "py7zr"                   , "name_pip": "py7zr"                   },
         {"name": "requests"                , "name_pip": "requests"                },
         {"name": "commentedconfigparser"   , "name_pip": "commented-configparser"  },
-        {"name": "traceback_with_variables", "name_pip": "traceback_with_variables"},
+        {"name": "rich"                    , "name_pip": "rich"                    },
     ]
 
     dependencies_missing = []

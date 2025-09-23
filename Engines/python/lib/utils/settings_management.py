@@ -180,70 +180,70 @@ def settings_init():
 
         settings_default_init(SETTINGS_PATH, SETTINGS_DEFAULT_PATH)
 
-    else:
+        return
 
-        # Read the settings
-        config = configparser.ConfigParser()
-        config.read(SETTINGS_PATH)
+    # Read the settings
+    config = configparser.ConfigParser()
+    config.read(SETTINGS_PATH)
 
-        for section in config.sections():
-            for key, value in config.items(section):
-                os.environ[key.upper()] = value
+    for section in config.sections():
+        for key, value in config.items(section):
+            os.environ[key.upper()] = value
 
-        # Check if any required settings are missing
-        settings_missing = settings_missing_check(SETTINGS_DEFAULT_PATH)
-        if settings_missing:
+    # Check if any required settings are missing
+    settings_missing = settings_missing_check(SETTINGS_DEFAULT_PATH)
+    if settings_missing:
 
-            logging.critical( "-")
-            logging.critical( "- FATAL ERROR - Missing settings")
-            logging.critical(f"- The following required settings are missing from the \"{SETTINGS_NAME}\" file:")
-            # Log the list of missing required settings
-            for setting in settings_missing:
-                logging.critical(f"- \"{setting.lower()}\"")
-            logging.critical( "-")
-            logging.critical( "- Please edit the settings file as needed and restart the program")
-            print( "-")
-            print( "-")
-            print( "- If you type \"new\" and press Enter,")
-            print( "- a clean settings file will be generated and opened, and")
-            print( "- the old file will be renamed with \"_old\" at the end and opened too")
-            print("-")
-            choice = input("Type \"new\" and press Enter, or just press Enter to exit...")
+        logging.critical( "-")
+        logging.critical( "- FATAL ERROR - Missing settings")
+        logging.critical(f"- The following required settings are missing from the \"{SETTINGS_NAME}\" file:")
+        # Log the list of missing required settings
+        for setting in settings_missing:
+            logging.critical(f"- \"{setting.lower()}\"")
+        logging.critical( "-")
+        logging.critical( "- Please edit the settings file as needed and restart the program")
+        print( "-")
+        print( "-")
+        print( "- If you type \"new\" and press Enter,")
+        print( "- a clean settings file will be generated and opened, and")
+        print( "- the old file will be renamed with \"_old\" at the end and opened too")
+        print("-")
+        choice = input("Type \"new\" and press Enter, or just press Enter to exit...")
 
-            if "new" in choice:
-                settings_default_init(SETTINGS_PATH, SETTINGS_DEFAULT_PATH)
-            else:
-                exit()
-
-        # Check if the PES version is supported
-        pes_version = os.environ.get("PES_VERSION", '19')
-        if pes_version not in [15, 16, 17, 18, 19, 21]:
-            logging.critical("-")
-            logging.critical("- FATAL ERROR - Invalid PES version")
-            logging.critical("- PES version: " + str(pes_version))
-            logging.critical("- Supported versions: 15, 16, 17, 18, 19, 21")
-            logging.critical("-")
-            logging.critical("- Please edit the settings file as needed and restart the program")
-            logging.critical("-")
-
-            # Stop the loggers
-            logger_stop()
-
-            if sys.platform == "win32":
-                pause("Press any key to open the settings file and exit... ", force=True)
-                # Open the settings file in an external text editor
-                os.startfile(SETTINGS_PATH)
-            else:
-                pause("Press any key to exit... ", force=True)
-
-            # Exit the script
+        if "new" in choice:
+            settings_default_init(SETTINGS_PATH, SETTINGS_DEFAULT_PATH)
+        else:
             exit()
 
-        # Check if the PES download folder location contains the magic number ** and replace it with the pes version
-        pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')
-        if "**" in pes_folder_path:
-            os.environ["PES_FOLDER_PATH"] = pes_folder_path.replace("**", os.environ["PES_VERSION"])
+    # Check if the PES version is supported
+    pes_version = os.environ.get("PES_VERSION", '19')
+    if pes_version not in [15, 16, 17, 18, 19, 21]:
+        logging.critical("-")
+        logging.critical("- FATAL ERROR - Invalid PES version")
+        logging.critical("- PES version: " + str(pes_version))
+        logging.critical("- Supported versions: 15, 16, 17, 18, 19, 21")
+        logging.critical("-")
+        logging.critical("- Please edit the settings file as needed and restart the program")
+        logging.critical("-")
 
-        # Prepare the path to the PES exe in the parent folder of the PES download folder
-        pes_exe_name = "PES20" + os.environ["PES_VERSION"] + ".exe"
-        os.environ["PES_EXE_PATH"] = os.path.join(os.environ["PES_FOLDER_PATH"], pes_exe_name)
+        # Stop the loggers
+        logger_stop()
+
+        if sys.platform == "win32":
+            pause("Press any key to open the settings file and exit... ", force=True)
+            # Open the settings file in an external text editor
+            os.startfile(SETTINGS_PATH)
+        else:
+            pause("Press any key to exit... ", force=True)
+
+        # Exit the script
+        exit()
+
+    # Check if the PES download folder location contains the magic number ** and replace it with the pes version
+    pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')
+    if "**" in pes_folder_path:
+        os.environ["PES_FOLDER_PATH"] = pes_folder_path.replace("**", os.environ["PES_VERSION"])
+
+    # Prepare the path to the PES exe in the parent folder of the PES download folder
+    pes_exe_name = "PES20" + os.environ["PES_VERSION"] + ".exe"
+    os.environ["PES_EXE_PATH"] = os.path.join(os.environ["PES_FOLDER_PATH"], pes_exe_name)

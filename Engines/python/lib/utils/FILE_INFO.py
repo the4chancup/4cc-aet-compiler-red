@@ -23,10 +23,11 @@ CRASH_LOG_PATH               = "crash.log"
 RUN_BATCH_PATH               = os.path.join("Engines", "compiler_run.bat")
 
 # State files
-STATE_FOLDER_PATH           = os.path.join("Engines", "state")
+STATE_FOLDER_PATH            = os.path.join("Engines", "state")
 CHECK_LAST_PATH              = os.path.join(STATE_FOLDER_PATH, "update_check_last.txt")
 SKIP_LAST_PATH               = os.path.join(STATE_FOLDER_PATH, "update_skip_last.txt")
 ADMIN_WARNED_PATH            = os.path.join(STATE_FOLDER_PATH, "admin_warned.txt")
+FIRST_RUN_DONE_PATH          = os.path.join(STATE_FOLDER_PATH, "first_run_done.txt")
 
 # Template files
 TEMPLATE_FOLDER_PATH         = os.path.join("Engines", "templates")

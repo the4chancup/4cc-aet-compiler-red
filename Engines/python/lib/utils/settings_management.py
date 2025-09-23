@@ -5,13 +5,76 @@ import logging
 import configparser
 import commentedconfigparser
 
+from . import COLORS
+from .app_tools import pes_title
 from .file_management import file_critical_check
 from .logging_tools import logger_stop
 from .pausing import pause
 from .FILE_INFO import (
     SETTINGS_PATH,
     SETTINGS_DEFAULT_PATH,
+    FIRST_RUN_DONE_PATH,
 )
+
+
+def set_pes_version(version):
+    """
+    Set the PES version in the settings file.
+    """
+    # Update PES version in settings.ini
+    with open(SETTINGS_PATH, "r", encoding='utf-8') as f:
+        lines = f.readlines()
+
+    with open(SETTINGS_PATH, "w", encoding='utf-8') as f:
+        for line in lines:
+            if line.startswith("pes_version"):
+                line = f"pes_version = {version}\n"
+            f.write(line)
+
+    # Set the PES version environment variable
+    os.environ['PES_VERSION'] = str(version)
+
+def first_run_wizard():
+    """
+    First run wizard that asks the user to confirm or change the PES version setting.
+    Called during the first run of the compiler to help users set up their configuration.
+    """
+
+    # Read current PES version from settings
+    pes_version = int(os.environ.get('PES_VERSION', '19'))
+
+    print( "-")
+    print( "-")
+    print(f"- {COLORS.BRIGHT_GREEN}First run wizard.{COLORS.RESET}")
+    print( "-")
+    print(f"- The compiler is currently set to compile for {pes_title(pes_version)}")
+
+    while True:
+        print("-")
+        print("- Valid PES versions are: 15, 16, 17, 18, 19, 21")
+        response = input("Type in the PES version you want to compile for, or just press Enter to continue... ")
+
+        if response == "":
+            # Keep current version
+            print("-")
+            print("- Version kept")
+            break
+        elif response in ['15', '16', '17', '18', '19', '21']:
+            set_pes_version(response)
+            print("-")
+            print("- Version switched")
+            break
+        else:
+            print("-")
+            print("- Invalid version")
+            print("-")
+
+    # Create the first run done file
+    if not os.path.exists(os.path.dirname(FIRST_RUN_DONE_PATH)):
+        os.makedirs(os.path.dirname(FIRST_RUN_DONE_PATH))
+
+    with open(FIRST_RUN_DONE_PATH, 'w', encoding='utf-8') as f:
+        f.write('This file indicates that the first run wizard has been completed.')
 
 
 def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
@@ -216,11 +279,11 @@ def settings_init():
             exit()
 
     # Check if the PES version is supported
-    pes_version = os.environ.get("PES_VERSION", '19')
+    pes_version = int(os.environ.get("PES_VERSION", '19'))
     if pes_version not in [15, 16, 17, 18, 19, 21]:
         logging.critical("-")
         logging.critical("- FATAL ERROR - Invalid PES version")
-        logging.critical("- PES version: " + str(pes_version))
+        logging.critical(f"- PES version: {pes_version}")
         logging.critical("- Supported versions: 15, 16, 17, 18, 19, 21")
         logging.critical("-")
         logging.critical("- Please edit the settings file as needed and restart the program")

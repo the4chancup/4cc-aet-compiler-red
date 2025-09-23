@@ -50,10 +50,11 @@ while True:
         from python.lib.utils.app_tools import app_title, pes_title
         from python.lib.utils.logging_tools import logger_init, logger_stop
         from python.lib.utils.pausing import pause
-        from python.lib.utils.settings_management import settings_init
+        from python.lib.utils.settings_management import settings_init, first_run_wizard
         from python.lib.utils.FILE_INFO import (
             SETTINGS_PATH,
             RUN_BATCH_PATH,
+            FIRST_RUN_DONE_PATH,
         )
     except ImportError as e:
         if "__compiled__" not in globals():
@@ -103,6 +104,15 @@ def main(run_type):
     # Load the settings into the environment
     settings_init()
 
+    # Check for updates
+    updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
+    if updates_check:
+        update_check(APP_OWNER, APP_NAME, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH)
+
+    # Start the first run wizard on the first run
+    if not os.path.exists(FIRST_RUN_DONE_PATH):
+        first_run_wizard()
+
     # Read the necessary parameters
     pes_version = int(os.environ.get('PES_VERSION', '19'))
     cpk_name = os.environ.get('CPK_NAME', '4cc_90_test')
@@ -110,14 +120,7 @@ def main(run_type):
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     run_pes = int(os.environ.get('RUN_PES', '0'))
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
-    updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
-
-    cpk_used_name = cpk_name
     pes_download_path = os.path.join(pes_folder_path, "download")
-
-    # Check for updates
-    if updates_check:
-        update_check(APP_OWNER, APP_NAME, APP_VERSION_MAJOR, APP_VERSION_MINOR, APP_VERSION_PATCH)
 
     # If patches_from_contents_run is active and move_cpks mode is enabled
     if patches_from_contents_run and move_cpks:
@@ -126,7 +129,7 @@ def main(run_type):
         pes_download_path_check(SETTINGS_PATH, pes_download_path)
 
         # Check if the cpk name is listed on the dpfl file
-        cpk_name_check(SETTINGS_PATH, cpk_used_name, pes_download_path)
+        cpk_name_check(SETTINGS_PATH, cpk_name, pes_download_path)
 
         # If admin mode has been forced or is needed
         admin_needed = admin_mode or admin_check(pes_download_path)
@@ -139,7 +142,7 @@ def main(run_type):
     elif patches_from_contents_run:
 
         # Check if the cpk name is listed on the dpfl file
-        cpk_name_check(SETTINGS_PATH, cpk_used_name, pes_download_path, compulsory=False)
+        cpk_name_check(SETTINGS_PATH, cpk_name, pes_download_path, compulsory=False)
 
     # Save the all-in-one mode
     os.environ['ALL_IN_ONE'] = str(int(all_in_one))

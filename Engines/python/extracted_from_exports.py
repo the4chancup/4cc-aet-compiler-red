@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 import stat
 import py7zr
 import shutil
@@ -90,7 +91,23 @@ def extracted_from_exports():
 
     EXPORT_FILE_TYPES_LIST = [".zip", ".7z"]
 
-    for export_name in os.listdir(main_source_path):
+    exports_list = [
+        item for item in os.listdir(main_source_path) if (
+            os.path.isdir(os.path.join(main_source_path, item)) or (
+                os.path.isfile(os.path.join(main_source_path, item)) and
+                os.path.splitext(item)[1] in EXPORT_FILE_TYPES_LIST
+            )
+        )
+    ]
+
+    if not exports_list:
+        print("-")
+        print("- No exports found")
+        print("-")
+        pause("Press any key to exit... ", force=True)
+        sys.exit()
+
+    for export_name in exports_list:
 
         export_source_path = os.path.join(main_source_path, export_name)
 
@@ -100,11 +117,6 @@ def extracted_from_exports():
             export_name_clean = export_name
         else:
             export_name_clean, export_type = os.path.splitext(export_name)
-
-            if export_type not in EXPORT_FILE_TYPES_LIST:
-                # If the export is neither a folder nor an accepted type, skip it
-                print(f"- \"{export_name}\" is unusable - Skipping")
-                continue
 
         # Split the words in the export
         export_name_words = re.findall(r"[^.\s\-\+\_]+", export_name)

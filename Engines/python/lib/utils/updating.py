@@ -308,7 +308,7 @@ def updates_disable():
     print("- Updates Checking has been disabled")
 
 
-def update_check(app_owner, app_name, major, minor, patch, minutes_between_checks=120, check_force=False):
+def update_check(app_owner, app_name, major, minor, patch, minutes_between_checks=60, check_force=False):
     """
     Check for updates on GitHub for the specified application and provide user with options.
 
@@ -318,7 +318,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     - major (int): The major version number.
     - minor (int): The minor version number.
     - patch (int): The patch version number.
-    - minutes_between_checks (int): The minimum interval in minutes to wait between checks. Default is 120 minutes.
+    - minutes_between_checks (int): The minimum interval in minutes to wait between checks. Default is 60 minutes.
     - check_force (bool): If True, forces an update check regardless of the last check time.
 
     Returns:

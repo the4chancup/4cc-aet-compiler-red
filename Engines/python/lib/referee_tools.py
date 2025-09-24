@@ -135,6 +135,7 @@ def referee_export_process(export_destination_path, fox_mode):
         return True
 
     # Process refs
+    print("- Processing refs...")
     ref_mappings = refs_list_process(refs_txt_path)
     if not ref_mappings:
         logging.error("- ERROR - No valid entries found in Refs.txt")

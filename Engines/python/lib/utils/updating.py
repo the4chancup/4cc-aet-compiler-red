@@ -118,22 +118,16 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 
     settings_new_path = os.path.join(app_new_folder, os.path.basename(SETTINGS_PATH))
 
-    if not update_major:
-        # Copy the settings ini to the new folder after deleting the one in the old folder
-        if os.path.exists(settings_new_path):
-            os.remove(settings_new_path)
-        shutil.copy(SETTINGS_PATH, app_new_folder)
-
+    # Check if the new version has a transfer table
+    if update_major and os.path.exists(SETTINGS_TRANSFER_TABLE_PATH):
+        transfer_table_path = SETTINGS_TRANSFER_TABLE_PATH
     else:
-        # Check if the new version has a transfer table
         transfer_table_path = None
-        if os.path.exists(SETTINGS_TRANSFER_TABLE_PATH):
-            transfer_table_path = SETTINGS_TRANSFER_TABLE_PATH
 
-        # Transfer the settings from the old ini to the new one
-        settings_added, settings_removed, settings_renamed = (
-            settings_transfer(SETTINGS_PATH, settings_new_path, transfer_table_path)
-        )
+    # Transfer the settings from the old ini to the new one
+    settings_added, settings_removed, settings_renamed = (
+        settings_transfer(SETTINGS_PATH, settings_new_path, transfer_table_path)
+    )
 
     # Check if the teams_list.txt file is different from the new one
     if not update_major:
@@ -183,10 +177,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     print(f"- The exports in the \"{EXPORTS_TO_ADD_NAME}\" folder have been moved over")
     print( "-")
     if not update_major:
-        print("- The settings file has also been copied to the new folder")
+        print("- The current settings have also been copied over to the new folder")
     else:
-        print("- This is a major update so the settings file has been overhauled, but the settings")
-        print("- from the current settings file have been transferred to it")
+        print("- This is a major update so the settings file has been overhauled, but the")
+        print("- settings from the current settings file have been transferred to it")
         if settings_renamed:
             print("-")
             print("- The following settings have been renamed, and their values transferred:")
@@ -203,7 +197,9 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
             for setting in settings_added:
                 print(f"- [{setting}]")
     print("-")
-    print("- The old compiler folder has been preserved, so you can delete it later")
+    print("- The old compiler folder has been preserved,")
+    print("- you can use it if you find any issues with the new version")
+    print("-")
 
     pause("Press any key to open the new folder... ", force=True)
 

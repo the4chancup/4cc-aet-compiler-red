@@ -7,6 +7,9 @@ import requests
 import webbrowser
 from datetime import datetime
 from datetime import timedelta
+from rich.console import Console
+from rich.table import Table
+from rich.text import Text
 
 from .pausing import pause
 from .version_downloading import version_download
@@ -75,6 +78,68 @@ def version_latest_find(owner, repo):
     return version
 
 
+def _print_side_by_side_diff(lines_old, lines_new, title_left="current", title_right="new", context=2):
+    """
+    Render a side-by-side diff using Rich tables.
+    lines_old/new should be lists of strings (with or without trailing \n).
+    """
+    console = Console()
+
+    # Normalize lines (remove trailing newlines for cleaner rendering)
+    left = [line.rstrip("\n") for line in lines_old]
+    right = [line.rstrip("\n") for line in lines_new]
+
+    sm = difflib.SequenceMatcher(a=left, b=right)
+
+    table = Table(show_header=True, header_style="bold", box=None)
+    table.add_column(f"{title_left}", ratio=1, overflow="fold")
+    table.add_column(" ", width=3, justify="center")
+    table.add_column(f"{title_right}", ratio=1, overflow="fold")
+
+    def style_text(text: str, style: str):
+        return Text(text, style=style)
+
+    opcodes = sm.get_opcodes()
+
+    for idx, (tag, i1, i2, j1, j2) in enumerate(opcodes):
+        if tag == "equal":
+            # Only show limited context around changes; skip leading/trailing large equal blocks
+            length = i2 - i1
+            if idx == 0 or idx == len(opcodes) - 1:
+                # Skip equal blocks at the very start or end to reduce noise
+                continue
+            if length <= context * 2:
+                for k in range(length):
+                    table.add_row(left[i1 + k], style_text(" ", "dim"), right[j1 + k])
+            else:
+                # Head context
+                for k in range(context):
+                    table.add_row(left[i1 + k], style_text(" ", "dim"), right[j1 + k])
+                # Ellipsis separator
+                dots = style_text("…", "dim")
+                table.add_row(dots, dots, dots)
+                # Tail context
+                for k in range(context):
+                    table.add_row(left[i2 - context + k], style_text(" ", "dim"), right[j2 - context + k])
+        elif tag == "replace":
+            # Show pairs, pad shorter block
+            block_left = left[i1:i2]
+            block_right = right[j1:j2]
+            maxlen = max(len(block_left), len(block_right))
+            for k in range(maxlen):
+                ltxt = block_left[k] if k < len(block_left) else ""
+                rtxt = block_right[k] if k < len(block_right) else ""
+                table.add_row(style_text(ltxt, "yellow"), style_text("↔", "yellow"), style_text(rtxt, "yellow"))
+        elif tag == "delete":
+            for k in range(i1, i2):
+                table.add_row(style_text(left[k], "red"), style_text("-", "red"), "")
+        elif tag == "insert":
+            for k in range(j1, j2):
+                table.add_row("", style_text("+", "green"), style_text(right[k], "green"))
+
+    console.print(table)
+
+
 def update_get(app_owner, app_name, version_latest, update_major=False):
     """
     Download the latest version of the application to the parent folder of the program folder.
@@ -129,9 +194,9 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         settings_transfer(SETTINGS_PATH, settings_new_path, transfer_table_path)
     )
 
-    # Check if the teams_list.txt file is different from the new one
     if not update_major:
 
+        # Check if the teams_list.txt file is different from the new one
         TEAMS_LIST_NAME = os.path.basename(TEAMS_LIST_PATH)
         teams_list_new_path = os.path.join(app_new_folder, TEAMS_LIST_NAME)
 
@@ -142,26 +207,28 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 
             pause("Press any key to see the differences... ", force=True)
 
-            # Print the differences between the two files
-            with open(teams_list_new_path, "r", encoding='utf-8') as f1:
-                with open(TEAMS_LIST_PATH, "r", encoding='utf-8') as f2:
-                    diff = difflib.unified_diff(f1.readlines(), f2.readlines(), fromfile=TEAMS_LIST_NAME + " current", tofile=TEAMS_LIST_NAME + " new")
-                    for line in diff:
-                        print(line, end="")
+            # Print a side-by-side, colorized diff between the two files
+            with open(teams_list_new_path, "r", encoding='utf-8') as f_new, open(TEAMS_LIST_PATH, "r", encoding='utf-8') as f_old:
+                _print_side_by_side_diff(
+                    lines_old=f_old.readlines(),
+                    lines_new=f_new.readlines(),
+                    title_left=TEAMS_LIST_NAME + " current",
+                    title_right=TEAMS_LIST_NAME + " new",
+                )
             print("-")
 
             while True:
-                response = input("Type \"new\" to use the new file, or just press Enter to keep the current one... ")
+                response = input("Type \"n\" to use the new file, or just press Enter to keep the current one... ")
 
-                if "new" in response:
+                if response.lower().replace("\"", "") == "n":
                     break
-                elif "" in response:
+                elif response == "":
                     if os.path.exists(teams_list_new_path):
                         os.remove(teams_list_new_path)
                     shutil.copy(TEAMS_LIST_PATH, app_new_folder)
                     break
                 else:
-                    print("Invalid response, please try again")
+                    print("- Invalid response, please try again")
 
     # Move the contents of the exports_to_add folder to the new folder after deleting the one in the old folder
     EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)

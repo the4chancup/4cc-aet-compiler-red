@@ -194,41 +194,39 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         settings_transfer(SETTINGS_PATH, settings_new_path, transfer_table_path)
     )
 
-    if not update_major:
+    # Check if the teams_list.txt file is different from the new one
+    TEAMS_LIST_NAME = os.path.basename(TEAMS_LIST_PATH)
+    teams_list_new_path = os.path.join(app_new_folder, TEAMS_LIST_NAME)
 
-        # Check if the teams_list.txt file is different from the new one
-        TEAMS_LIST_NAME = os.path.basename(TEAMS_LIST_PATH)
-        teams_list_new_path = os.path.join(app_new_folder, TEAMS_LIST_NAME)
+    if not filecmp.cmp(TEAMS_LIST_PATH, teams_list_new_path):
 
-        if not filecmp.cmp(TEAMS_LIST_PATH, teams_list_new_path):
+        print( "-")
+        print(f"- A new different \"{TEAMS_LIST_NAME}\" file is available in the new version")
 
-            print( "-")
-            print(f"- A new different \"{TEAMS_LIST_NAME}\" file is available in the new version")
+        pause("Press any key to see the differences... ", force=True)
 
-            pause("Press any key to see the differences... ", force=True)
+        # Print a side-by-side, colorized diff between the two files
+        with open(teams_list_new_path, "r", encoding='utf-8') as f_new, open(TEAMS_LIST_PATH, "r", encoding='utf-8') as f_old:
+            _print_side_by_side_diff(
+                lines_old=f_old.readlines(),
+                lines_new=f_new.readlines(),
+                title_left=TEAMS_LIST_NAME + " current",
+                title_right=TEAMS_LIST_NAME + " new",
+            )
+        print("-")
 
-            # Print a side-by-side, colorized diff between the two files
-            with open(teams_list_new_path, "r", encoding='utf-8') as f_new, open(TEAMS_LIST_PATH, "r", encoding='utf-8') as f_old:
-                _print_side_by_side_diff(
-                    lines_old=f_old.readlines(),
-                    lines_new=f_new.readlines(),
-                    title_left=TEAMS_LIST_NAME + " current",
-                    title_right=TEAMS_LIST_NAME + " new",
-                )
-            print("-")
+        while True:
+            response = input("Type \"n\" to use the new file, or just press Enter to keep the current one... ")
 
-            while True:
-                response = input("Type \"n\" to use the new file, or just press Enter to keep the current one... ")
-
-                if response.lower().replace("\"", "") == "n":
-                    break
-                elif response == "":
-                    if os.path.exists(teams_list_new_path):
-                        os.remove(teams_list_new_path)
-                    shutil.copy(TEAMS_LIST_PATH, app_new_folder)
-                    break
-                else:
-                    print("- Invalid response, please try again")
+            if response.lower().replace("\"", "") == "n":
+                break
+            elif response == "":
+                if os.path.exists(teams_list_new_path):
+                    os.remove(teams_list_new_path)
+                shutil.copy(TEAMS_LIST_PATH, app_new_folder)
+                break
+            else:
+                print("- Invalid response, please try again")
 
     # Move the contents of the exports_to_add folder to the new folder after deleting the one in the old folder
     EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)

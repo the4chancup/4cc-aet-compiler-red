@@ -157,6 +157,25 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     # Download the latest version to the parent folder of the working folder
     app_folder = os.getcwd()
     app_folder_parent = os.path.dirname(app_folder)
+    app_name_new = app_name + " " + version_latest
+    app_new_folder = os.path.join(app_folder_parent, app_name_new)
+
+    # Check if the new folder already exists
+    if os.path.exists(app_new_folder):
+        print("-")
+        print("- The new folder already exists, do you want to overwrite it?")
+        print("-")
+        while True:
+            response = input("Type \"y\" to overwrite it, or just press Enter to cancel... ")
+            if response.lower().replace("\"", "") == "y":
+                break
+            elif response == "":
+                return
+            else:
+                print("- Invalid response, please try again")
+
+        # Delete the old folder
+        shutil.rmtree(app_new_folder)
 
     print("-")
     print("- Updating...")
@@ -178,11 +197,6 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     # Delete the 7z file
     os.remove(file_path)
 
-    app_name_new = app_name + " " + version_latest
-    app_new_folder = os.path.join(app_folder_parent, app_name_new)
-
-    settings_new_path = os.path.join(app_new_folder, os.path.basename(SETTINGS_PATH))
-
     # Check if the new version has a transfer table
     if update_major and os.path.exists(SETTINGS_TRANSFER_TABLE_PATH):
         transfer_table_path = SETTINGS_TRANSFER_TABLE_PATH
@@ -190,6 +204,7 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         transfer_table_path = None
 
     # Transfer the settings from the old ini to the new one
+    settings_new_path = os.path.join(app_new_folder, os.path.basename(SETTINGS_PATH))
     settings_added, settings_removed, settings_renamed = (
         settings_transfer(SETTINGS_PATH, settings_new_path, transfer_table_path)
     )
@@ -228,15 +243,19 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
             else:
                 print("- Invalid response, please try again")
 
-    # Move the contents of the exports_to_add folder to the new folder after deleting the one in the old folder
-    EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)
+    # Move the contents of the exports_to_add folder to the new folder
+    if not os.path.exists(os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH)):
+        os.makedirs(os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH))
     for file in os.listdir(EXPORTS_TO_ADD_PATH):
         shutil.move(os.path.join(EXPORTS_TO_ADD_PATH, file), os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH))
 
     # Copy the application state files to the new folder
+    if not os.path.exists(os.path.join(app_new_folder, STATE_FOLDER_PATH)):
+        os.makedirs(os.path.join(app_new_folder, STATE_FOLDER_PATH))
     for file in os.listdir(STATE_FOLDER_PATH):
         shutil.copy(os.path.join(STATE_FOLDER_PATH, file), os.path.join(app_new_folder, STATE_FOLDER_PATH))
 
+    EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)
     print( "-")
     print( "- Successfully downloaded and unpacked the latest version")
     print(f"- The exports in the \"{EXPORTS_TO_ADD_NAME}\" folder have been moved over")

@@ -17,7 +17,7 @@ def dds_dxt5_conv(tex_path):
     if sys.platform == "win32":
         # Convert the texture and store into its parent folder
         file_critical_check(TEXCONV_PATH)
-        texconv_args = [TEXCONV_PATH, "-f", "DXT5", "-nologo", "-y", "-o", tex_folder_path, tex_path]
+        texconv_args = [TEXCONV_PATH, "-f", "DXT5", "-nologo", "-srgb", "-y", "-o", tex_folder_path, tex_path]
         try:
             result = subprocess.run(texconv_args, capture_output=True, text=True)
             if result.returncode != 0:

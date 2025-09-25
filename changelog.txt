@@ -1,242 +1,244 @@
 22/12/24 - Version 3.5.0
-- Fixed Linux compatibility issues
+- Fixed Linux compatibility issues.
 - Fixed automatic conversion of BC7 textures to DXT5 when compiling for pre-fox
-  PES versions (the quality is not great so it should be used as a last resort)
-- Improved support for team note txts, mtls and xmls with special characters
-- Added replacing of team IDs on all the filenames in every folder
+  PES versions (the quality is not great so it should be used as a last resort).
+- Improved support for team note txts, mtls and xmls with special characters.
+- Added replacing of team IDs on all the filenames in every folder.
 - Added replacing of team IDs on mtls in the team's common folder, and replacing
-  of any relative paths with absolute ones to the team's common folder
+  of any relative paths with absolute ones to the team's common folder.
 - Added prompt when compiling a team export whose name is not listed on the
-  teams list, which asks for the team ID to use and adds it to the teams list
+  teams list, which asks for the team ID to use and adds it to the teams list.
 
 
 10/11/24 - Version 3.4.0
-- Added replacing of team IDs on custom face xmls on pre-fox
+- Added replacing of team IDs on custom face xmls on pre-fox.
 - Added support for paths which point to the default uniform/common/ folder of
-  PES (instead of the team's subfolder)
+  PES (instead of the team's subfolder).
 - Forced the required python version to 3.12, some of the external libraries are
-  not compatible with 3.13 yet
+  not compatible with 3.13 yet.
 
 
 12/10/24 - Version 3.3.1
-- Set the default PES version to 17
-- Fixed issue with model files inside the common folder not being allowed on 17
+- Set the default PES version to 17.
+- Fixed issue with model files inside the common folder not being allowed on 17.
 - Fixed error message shown when texture paths use default PES textures from the
-  "uniform/common/" folder
+  "uniform/common/" folder.
 - Added error message shown when using file paths in the deprecated
-  "common/teamname/" format instead of the new "common/XXX/" format
+  "common/teamname/" format instead of the new "common/XXX/" format.
 - Fixed DX10 textures not being converted to DXT5 when compiling for 18 or lower
-  if the "Pass Through" setting was enabled, or if they were zlibbed
+  if the "Pass Through" setting was enabled, or if they were zlibbed.
 
 
 06/09/24 - Version 3.3.0
 - Important
   - Added "shirt" and "pants_nocloth" to the list of .model types recognized
-    when generating an xml for xml-less face folders on pre-fox
+    when generating an xml for xml-less face folders on pre-fox.
   - The kit textures check now allows textures with sizes smaller than
-    2048x2048, as long as the size of their sides is a power of 2
+    2048x2048, as long as the size of their sides is a power of 2.
 - Fixes
   - Fixed issue with some texture paths inside fmdl models not having the team
-    ID replaced
+    ID replaced.
   - Fixed the u0XXXg pattern on texture filenames not having its team ID
-    replaced
+    replaced.
   - Fixed crash when trying to compile teams not listed on the teams list, when
-    they do not have a note txt
+    they do not have a note txt.
   - Fixed compiler not being able to install dependencies if the pip installer
-    is missing, by making the compiler install pip first
+    is missing, by making the compiler install pip first.
   - Fixed some special characters (like @) not being recognized on team names on
-    exports without a note txt
-  - Fixed issue with diff xml getting accessed after it was deleted
+    exports without a note txt.
+  - Fixed issue with diff xml getting accessed after it was deleted.
   - Fixed crash when any model folders with a unicode charcter on their name
-    caused an issue or suggestion message
+    caused an issue or suggestion message.
 - New checks
   - Checks if PES is open while running with "Move Cpks" enabled, and asks to
-    close it then tries again
-  - Checks if any of the exports have more than one note txt file
-  - Checks if ImageMagick is installed on linux systems before starting
-  - Checks if any of the face folders have an unsupported "hair.xml" file
+    close it then tries again.
+  - Checks if any of the exports have more than one note txt file.
+  - Checks if ImageMagick is installed on linux systems before starting.
+  - Checks if any of the face folders have an unsupported "hair.xml" file.
   - Checks if any of the exports have duplicate IDs on face, boots and glove
-    folders
+    folders.
 - Other new stuff
   - The PES version chosen for compiling is now shown at startup, with a
-    different color for each version
+    different color for each version.
   - The error message shown when using ftex textures on pre-fox PES versions now
-    shows the chosen PES version
+    shows the chosen PES version.
   - The check for whether the "Cpk Name" written on the settings file is present
     on the DpFileList file in the PES download folder is now active even if
     "Move Cpks" is disabled, but gives a warning instead of an error in this
-    case
+    case.
   - When compiling the kit entries into the unicolor bin, the numbers of kits
-    are now distinguished between outfielder kits (P) and GK kits (GK)
-  - Added shebang line to compiler_main.py for linux users
+    are now distinguished between outfielder kits (P) and GK kits (GK).
+  - Added shebang line to compiler_main.py for linux users.
   - Color codes are no longer enabled on Windows versions below 10
-    (they are not supported)
+    (They are not supported.)
   - When python is missing and the Windows version is 7, an alternative download
-    link for a python release compatible with it is now opened instead
-  - The "extracted_exports" folder is now called "extracted"
+    link for a python release compatible with it is now opened instead.
+  - The "extracted_exports" folder is now called "extracted".
   - Portrait conflicts (player with portrait in both its face folder and in the
     Portraits folder) will not lead to the export getting discarded anymore if
-    both files are equal
+    both files are equal.
 
 
 19/05/24 - Version 3.2.0
 - Important
-  - Updated the teams list file with the teams from VGL22
+  - Updated the teams list file with the teams from VGL22.
   - The readme file has been split into a simple one in the main folder and an
-    advanced one in the Engines folder, please read the simple one at least once
+    advanced one in the Engines folder, please read the simple one at least
+    once.
   - Team IDs are now also replaced on the texture filenames which have u0XXXp0
-    (or u0XXXg0) on them, both in model folders and in the common folder
-  - The same is done on the texture paths inside fmdl files
+    (or u0XXXg0) on them, both in model folders and in the common folder.
+  - The same is done on the texture paths inside fmdl files.
   - Kit textures without a mask file (srm) will get a dummy one added when
-    compiling for pre-fox PES versions
-    (This prevents the kits from turning black on some computers)
+    compiling for pre-fox PES versions.
+    (This prevents the kits from turning black on some computers.)
   - Face folders without a face_diff.bin file will get a dummy one added, which
     has the EEEE hidden, when compiling for Fox PES versions
-    (This allows you to use empty face folders on players with an FBM)
-    (Reminder: fpk.xml files are not needed anymore on face/boots/glove folders)
+    (This allows you to use empty face folders on players with an FBM.)
+    (Reminder: fpk.xml files are not needed anymore on face/boots/glove
+    folders.)
 - Fixes
-  - Fixed crash when updating bins without a proper "PES Folder Path" set
-  - Fixed unzipping of zip and 7z exports again
-  - Fixed cleaning of read-only permissions on exports for linux
-  - Fixed crash when using bin files from a compressed bins cpk
-  - Fixed crash when moving models from the Collars folder of the export
-  - Fixed crashes caused by irregular team note txt files, to a certain extent
+  - Fixed crash when updating bins without a proper "PES Folder Path" set.
+  - Fixed unzipping of zip and 7z exports again.
+  - Fixed cleaning of read-only permissions on exports for linux.
+  - Fixed crash when using bin files from a compressed bins cpk.
+  - Fixed crash when moving models from the Collars folder of the export.
+  - Fixed crashes caused by irregular team note txt files, to a certain extent.
   - Fixed non-DX10 textures getting converted to DXT5 instead of DX10 textures
-    when compiling for PES18
-  - Fixed crash when handling ftex textures saved with the CGPE tool
+    when compiling for PES18.
+  - Fixed crash when handling ftex textures saved with the CGPE tool.
   - Fixed crash when moving kit configs on exports which have duplicate kit
-    configs with different team IDs (for some reason)
+    configs with different team IDs (for some reason).
 - New checks
   - Checks for any unusable .model files in the boots and glove folders,
-    preventing misnamed models
+    preventing misnamed models.
   - Checks if model folders (face/boots/glove folders) contain any unrecognized
-    files and warns about them
+    files and warns about them.
     (In the future there will be a new setting, enabled by default, which will
-    turn this into an error and discard the entire model folder)
+    turn this into an error and discard the entire model folder.)
   - Checks if any compiler files are missing, and offers to "self-heal" them
-    if possible
-  - Checks for portrait files without powers of two as sides
-  - Checks for non-2048 main kit textures on pre-fox PES versions
-  - Checks if any exports have duplicate kit configs with different team IDs
+    if possible.
+  - Checks for portrait files without powers of two as sides.
+  - Checks for non-2048 main kit textures on pre-fox PES versions.
+  - Checks if any exports have duplicate kit configs with different team IDs.
   - Checks if the "Cpk Name" written on the settings file is present on the
-    DpFileList file in the PES download folder
+    DpFileList file in the PES download folder.
 - Other new stuff
-  - A new message type has been added: Info
+  - A new message type has been added: Info.
     These are just suggestions, they let you know about stuff which will always
-    work but isn't ideal, and which you can look into to improve your aesthetics
-    They will be written to the new suggestions.log file
-  - The missing mipmaps message is now an Info instead of a Warning
-  - A new message type has been added: Fatal Error
+    work but isn't ideal, and which you can look into to improve your
+    aesthetics. They will be written to the new suggestions.log file.
+  - The missing mipmaps message is now an Info instead of a Warning.
+  - A new message type has been added: Fatal Error.
     These happen when something is missing in the compiler's folder (for example
-    the teams list) or is badly configured, so the compiler can't run
+    the teams list) or is badly configured, so the compiler can't run.
   - The error.log file is now called crash.log, and your user name will be
     removed from it every time it is generated, so that you can post it without
-    doxing yourself
+    doxing yourself.
   - Stops asking for a button press to exit if "Run PES" is enabled
-    (Unless there were any issues in the exports)
+    (Unless there were any issues in the exports.)
   - Stops the loggers before asking for a button press to exit
-    (This prevents crashes if you run the compiler again without closing it)
-  - Allows the terminal to close on error on linux systems
+    (This prevents crashes if you run the compiler again without closing it.)
+  - Allows the terminal to close on error on linux systems.
   - The message for indicating an old version of python is installed has been
-    improved, with more details on what to do to fix the problem
+    improved, with more details on what to do to fix the problem.
   - Searches for bin files only on the cpks listed on the dpfl before the
-    one you are about to compile, allowing to rebuild past midcup cpks properly
+    one you are about to compile, allowing to rebuild past midcup cpks properly.
   - Converts any DX10 textures (e.g. BC7 textures) to DXT5 when compiling for
-    pre-fox PES versions, like done already for PES18
+    pre-fox PES versions, like done already for PES18.
   - Removes unrecognized files and folders from model folders when packing fpks
-    for Fox PES versions
+    for Fox PES versions.
   - Allows pressing any key to skip error messages or exit, instead of just
-    the Enter key
+    the Enter key.
   - Boots and gloves are packed to the faces cpk instead of the uniform cpk
-    when compiling for pre-fox PES versions, like done already for Fox versions
+    when compiling for pre-fox PES versions, like done already for Fox versions.
   - The auto-updater has been improved with a new settings transfer function,
     used when updating to a new major version, which compares the old and new
     settings files and transfers as many settings as possible, warning about
-    any new settings you need to pay attention to
+    any new settings you need to pay attention to.
 
 
 24/04/24 - Version 3.1.0
-- Update checking is now much faster
+- Update checking is now much faster.
 - New auto updating system, which downloads the new version and copies your
-  stuff automatically
+  stuff automatically.
 - Now allows skipping the latest version, or disabling update checking
-  directly from the compiler
+  directly from the compiler.
 - Now looks inside the midcup cpks and the faces and uniform cpk for any files
   whose path (listed on mtl and xml files) points to the common folder of the
   team, which prevents the compiler from giving errors when processing barebone
-  midcup exports
+  midcup exports.
 
 
 23/04/24 - Version 3.0.2
 - Added support for face folders with no mtl files, which would previously
-  crash the compiler
+  crash the compiler.
 - Now removes the extracted_exports folder when starting, if it is present
-  because of the compiler not closing cleanly after the previous run
+  because of the compiler not closing cleanly after the previous run.
 
 
 20/04/24 - Version 3.0.1
-- Fixed crash at start when certain libraries were missing from the user's PC
+- Fixed crash at start when certain libraries were missing from the user's PC.
 
 
 20/04/24 - Version 3.0.0
 - Important
-  - New teams_list txt with support for the new unified database
+  - New teams_list txt with support for the new unified database.
   - Generates an error.log file after crashing, which you should provide when
-    requesting support
+    requesting support.
   - Generates an issues.log file after compiling, if any of the exports had any
-    issues, with the list of warnings and errors
+    issues, with the list of warnings and errors.
   - Now checks mtl and xml pre-fox files for consistency, duplicated materials,
-    and missing listed textures and model files
+    and missing listed textures and model files.
   - Now allows pre-fox folders without an xml file (xml-less) and automatically
     generates an xml with the contents of the folder, this is required for
-    properly compiling the exports converted by the 4cc-aet-converter tool
+    properly compiling the exports converted by the 4cc-aet-converter tool.
 - Fixes
-  - Fixed unzlibbing of zlibbed textures
-  - Fixed unzipping of zip and 7z exports
-  - Fixed recognition of team names on exports without a Note txt
-  - Fixed errors when unpacking exports with read-only files or folders
+  - Fixed unzlibbing of zlibbed textures.
+  - Fixed unzipping of zip and 7z exports.
+  - Fixed recognition of team names on exports without a Note txt.
+  - Fixed errors when unpacking exports with read-only files or folders.
 - Other new stuff
   - When a pre-fox face folder without a model set as "face_neck" is found, a
     dummy model will be copied to the folder and added to the xml, to prevent
-    the default PES neck from showing up on the player
+    the default PES neck from showing up on the player .
   - Will give an error if any players have a portrait both in their face folder
-    and in the Portraits folder
-  - A few new texture checks have been added (powers of 2, mipmaps, too small)
+    and in the Portraits folder.
+  - A few new texture checks have been added (powers of 2, mipmaps, too small).
   - The Pes Path setting now accepts a ** magic number, which gets automatically
     replaced with the Pes Version number, eliminating the need to change both
-    every time you switch versions
+    every time you switch versions.
   - New setting for opening PES automatically after packing the cpk, disabled by
-    default
-  - Now suppports Note txt files in UTF8 format, weird symbols are now allowed
+    default.
+  - Now suppports Note txt files in UTF8 format, weird symbols are now allowed.
   - Team IDs now get replaced even in the texture paths inside mtl files,
-    necessary for supporting kit-dependent player-specific textures (u0XXXp0)
-  - Team IDs are also replaced in the textures' filenames themselves
+    necessary for supporting kit-dependent player-specific textures (u0XXXp0).
+  - Team IDs are also replaced in the textures' filenames themselves.
   - The DDS Compression feature has been reintroduced, useful for making a full
-    cup DLC that won't take 10GB on the drive
+    cup DLC that won't take 10GB on the drive.
   - For Bins Updating, it will automatically grab the bin files from the latest
     midcup cpk (or the Bins cpk if none were found), eliminating the need to
-    share the bin files when someone else has to make some midcup cpks
+    share the bin files when someone else has to make some midcup cpks.
   - Now checks for updates straight from github every time it's started, with a
-    cooldown of 2 hours
+    cooldown of 2 hours.
 
 
 19/03/24 - Version 2.0.0
-- Fixed some issues with packing fpk and cpk files
+- Fixed some issues with packing fpk and cpk files.
 - Converted the main compiler runner to python to allow move_cpks to work
-  properly when admin rights are needed
-- Converted the settings file to ini format to allow the above to work
+  properly when admin rights are needed.
+- Converted the settings file to ini format to allow the above to work.
 - Added new cache_clear setting (on by default) to allow deleting the
-  patches_contents folder every time a cpk is packed
+  patches_contents folder every time a cpk is packed.
 
 
 16/03/24 - Version 1.0.0
-- Converted almost all of the code to python
-  (Some bugs might be present, please report them with screenshots)
-- Merged the fox settings into a new pes version setting
-- Removed the setting for outputting compressed cpks
-- Removed the module for zlibbing all the textures
-- Removed the dpfl appender
-  (Please never modify your dpfl)
-- Updated the python version checker to have it check for 3.12+
+- Converted almost all of the code to python.
+  (Some bugs might be present, please report them with screenshots).
+- Merged the fox settings into a new pes version setting.
+- Removed the setting for outputting compressed cpks.
+- Removed the module for zlibbing all the textures.
+- Removed the dpfl appender.
+  (Please never modify your dpfl.)
+- Updated the python version checker to have it check for 3.12+.
 - Updated the texture checker to have it check for the DXT type and the ftex
-  version when the PES version is set to 18
+  version when the PES version is set to 18.

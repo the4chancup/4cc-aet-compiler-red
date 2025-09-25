@@ -72,10 +72,10 @@ def run_type_request():
     print("Usage:")
     print("  compiler_main <run type>")
     print("run type:")
-    print("  0                         all-in-one mode, runs every main step")
-    print("  1                         [main] extracted_from_exports mode, unpacks and checks exports")
-    print("  2                         [main] contents_from_extracted mode, prepares the contents folder")
-    print("  3                         [main] patches_from_contents mode, packs the patches")
+    print("  0                         all-in-one mode, runs every step")
+    print("  1                         extracted_from_exports mode, unpacks and checks exports")
+    print("  2                         contents_from_extracted mode, prepares the contents folder")
+    print("  3                         patches_from_contents mode, packs the patches")
     print("")
 
     # Ask the user for a run type, read a single character input

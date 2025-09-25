@@ -41,8 +41,17 @@ This allows each ref folder to be modular and independent of the others.
 
 The Refs.txt file must list the refs in the format "[slot number] [ref name]".  
 For example: 01 primal 02 primal 03 senturion 04 senturion 05 senturion  
-Remember there are always 35 slots, though some of them may not be used.  
+Remember that there are always 35 slots, though some of them may not be used.  
 PES 17 and latter seem not to use slots 11-15 nor 26-30 at all.
+
+Once the compiler recognizes a refs export, it first processes it to convert it
+into a regular team export, by reading the Refs.txt file and copying and
+splitting the referee folders across the Faces, Boots and Gloves folders.  
+Then, it compiles the resulting team export in the same way as any other, with
+the exception that it is extracted to the "extracted_refs" folder instead of
+"extracted_teams", then moved to a "Refscpk" folder (in the "patches_contents"
+folder), instead of "Singlecpk" or "Facescpk", and finally packed into a cpk
+file with the name listed for the Refs Cpk Name setting in the settings file.
 
 
 ## Scripts

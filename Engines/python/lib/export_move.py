@@ -317,6 +317,10 @@ def export_move(exportfolder_path, team_id, team_name):
         # Portraits folder
         if team_itemfolder_name.lower() == "portraits":
 
+            # Convert unsupported textures
+            # Fox mode is forced to False because the portraits need to stay in DDS format
+            textures_convert(team_itemfolder_path, False, fox_19)
+
             # For every file
             for file_name in os.listdir(team_itemfolder_path):
                 file_path = os.path.join(team_itemfolder_path, file_name)

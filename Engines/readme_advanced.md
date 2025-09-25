@@ -4,16 +4,16 @@ compiler to its full potential.
 
 Make sure to also read the settings file for further customization options.
 
-- Compiling referees
+- Compiling Referees
 - Scripts
   - 1_exports_to_extracted
   - 2_extracted_to_contents
   - 3_contents_to_patches
   - 0_all_in_one
-- Message types
+- Message Types
 
 
-## Compiling referees
+## Compiling Referees
 You first need a "refs export", which follows the next-generation format that
 will be introduced in the future for team exports.
 Here's an example:
@@ -184,7 +184,7 @@ It's the best choice if you just have a few clean exports and want to compile
 them quickly into a cpk.
 
 
-## Message types
+## Message Types
 
 Here is a more detailed list of the types of message the compiler can output,
 from least to most important:

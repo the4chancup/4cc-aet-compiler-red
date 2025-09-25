@@ -7,13 +7,13 @@ team's aesthetics so that you can check them on PES.
 You can also find an advanced readme in the Engines folder, with full details on
 how the compiler works. Read it if you're going to compile a full DLC for a cup.
 
-- Setting up
-- Compiling exports
-- Message types
+- Setting Up
+- Compiling Exports
+- Message Types
 - Troubleshooting
 
 
-## Setting up
+## Setting Up
 
 Just open the settings.ini file on notepad and set the following:
 - PES Version:  
@@ -27,7 +27,7 @@ take a look. The "Run PES" setting, in particular, opens PES automatically after
 packing a cpk.
 
 
-## Compiling exports
+## Compiling Exports
 
 First of all, you need to make sure that the name of the team whose export
 you're compiling is listed in the teams_list.txt file of the compiler, next to
@@ -47,13 +47,13 @@ instead, keep in mind that you need to have Python 3.12 or 3.13 installed.
 A cpk will be created and copied automatically to your PES download folder.  
 Now you just need to run PES and check your stuff.
 
-Check the Message types and Troubleshooting sections if you run into trouble.  
+Check the Message Types and Troubleshooting sections if you run into trouble.  
 Also, don't forget to read the advanced readme inside the Engines folder if you
 want to know more about how the compiler works, or if you want to compile a
 referees cpk.
 
 
-## Message types
+## Message Types
 
 Here are the types of message the compiler can output, from least to most
 important:

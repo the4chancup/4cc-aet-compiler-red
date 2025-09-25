@@ -101,26 +101,59 @@ def _print_side_by_side_diff(lines_old, lines_new, title_left="current", title_r
 
     opcodes = sm.get_opcodes()
 
+    # Preprocess opcodes into display rows
+    display_rows = []
     for idx, (tag, i1, i2, j1, j2) in enumerate(opcodes):
         if tag == "equal":
-            # Only show limited context around changes; skip leading/trailing large equal blocks
             length = i2 - i1
-            if idx == 0 or idx == len(opcodes) - 1:
-                # Skip equal blocks at the very start or end to reduce noise
-                continue
-            if length <= context * 2:
-                for k in range(length):
-                    table.add_row(left[i1 + k], style_text(" ", "dim"), right[j1 + k])
+
+            if idx == 0:
+                # First equal block - show trailing context and ellipsis if trimmed
+                if length <= context:
+                    for offset in range(length):
+                        display_rows.append(("equal", left[i1 + offset], right[j1 + offset]))
+                else:
+                    tail_len = min(context, length)
+                    if tail_len < length:
+                        display_rows.append(("ellipsis", "…", "…"))
+                    for offset in range(tail_len):
+                        left_idx = i2 - tail_len + offset
+                        right_idx = j2 - tail_len + offset
+                        display_rows.append(("equal", left[left_idx], right[right_idx]))
+
+            elif idx == len(opcodes) - 1:
+                # Last equal block - show leading context and ellipsis if trimmed
+                if length <= context:
+                    for offset in range(length):
+                        display_rows.append(("equal", left[i1 + offset], right[j1 + offset]))
+                else:
+                    head_len = min(context, length)
+                    for offset in range(head_len):
+                        left_idx = i1 + offset
+                        right_idx = j1 + offset
+                        display_rows.append(("equal", left[left_idx], right[right_idx]))
+                    if head_len < length:
+                        display_rows.append(("ellipsis", "…", "…"))
+
             else:
-                # Head context
-                for k in range(context):
-                    table.add_row(left[i1 + k], style_text(" ", "dim"), right[j1 + k])
-                # Ellipsis separator
-                dots = style_text("…", "dim")
-                table.add_row(dots, dots, dots)
-                # Tail context
-                for k in range(context):
-                    table.add_row(left[i2 - context + k], style_text(" ", "dim"), right[j2 - context + k])
+                # Middle equal block - show context around changes
+                if length <= context * 2:
+                    for offset in range(length):
+                        display_rows.append(("equal", left[i1 + offset], right[j1 + offset]))
+                else:
+                    head_len = min(context, length)
+                    tail_len = min(context, length - head_len)
+                    for offset in range(head_len):
+                        left_idx = i1 + offset
+                        right_idx = j1 + offset
+                        display_rows.append(("equal", left[left_idx], right[right_idx]))
+                    if head_len < length - tail_len:
+                        display_rows.append(("ellipsis", "…", "…"))
+                    for offset in range(tail_len):
+                        left_idx = i2 - tail_len + offset
+                        right_idx = j2 - tail_len + offset
+                        display_rows.append(("equal", left[left_idx], right[right_idx]))
+
         elif tag == "replace":
             # Show pairs, pad shorter block
             block_left = left[i1:i2]
@@ -129,15 +162,38 @@ def _print_side_by_side_diff(lines_old, lines_new, title_left="current", title_r
             for k in range(maxlen):
                 ltxt = block_left[k] if k < len(block_left) else ""
                 rtxt = block_right[k] if k < len(block_right) else ""
-                table.add_row(style_text(ltxt, "yellow"), style_text("↔", "yellow"), style_text(rtxt, "yellow"))
+                display_rows.append(("replace", ltxt, rtxt))
+
         elif tag == "delete":
             for k in range(i1, i2):
-                table.add_row(style_text(left[k], "red"), style_text("-", "red"), "")
+                display_rows.append(("delete", left[k], ""))
+
         elif tag == "insert":
             for k in range(j1, j2):
-                table.add_row("", style_text("+", "green"), style_text(right[k], "green"))
+                display_rows.append(("insert", "", right[k]))
 
+    # Now render the display rows to the table
+    space_text = style_text(" ", "dim")
+    plus_text = style_text("+", "green")
+    minus_text = style_text("-", "red")
+    arrow_text = style_text("↔", "yellow")
+    dots_text = style_text("…", "dim")
+
+    for row_type, left_text, right_text in display_rows:
+        if row_type == "equal":
+            table.add_row(left_text, space_text, right_text)
+        elif row_type == "ellipsis":
+            table.add_row(dots_text, space_text, dots_text)
+        elif row_type == "replace":
+            table.add_row(style_text(left_text, "yellow"), arrow_text, style_text(right_text, "yellow"))
+        elif row_type == "delete":
+            table.add_row(style_text(left_text, "red"), minus_text, "")
+        elif row_type == "insert":
+            table.add_row("", plus_text, style_text(right_text, "green"))
+
+    print("")
     console.print(table)
+    print("")
 
 
 def update_get(app_owner, app_name, version_latest, update_major=False):
@@ -215,8 +271,8 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 
     if not filecmp.cmp(TEAMS_LIST_PATH, teams_list_new_path):
 
-        print( "-")
-        print(f"- A new different \"{TEAMS_LIST_NAME}\" file is available in the new version")
+        print("-")
+        print("- A new Teams list is available in the new version")
 
         pause("Press any key to see the differences... ", force=True)
 
@@ -225,13 +281,12 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
             _print_side_by_side_diff(
                 lines_old=f_old.readlines(),
                 lines_new=f_new.readlines(),
-                title_left=TEAMS_LIST_NAME + " current",
-                title_right=TEAMS_LIST_NAME + " new",
+                title_left="Current list",
+                title_right="New list",
             )
-        print("-")
 
         while True:
-            response = input("Type \"n\" to use the new file, or just press Enter to keep the current one... ")
+            response = input("Type \"n\" to use the new list, or just press Enter to keep the current one... ")
 
             if response.lower().replace("\"", "") == "n":
                 break

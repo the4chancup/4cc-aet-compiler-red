@@ -222,7 +222,7 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         print("- The new folder already exists, do you want to overwrite it?")
         print("-")
         while True:
-            response = input("Type \"y\" to overwrite it, or just press Enter to cancel... ")
+            response = input("Type \"y\" to overwrite it, or just press Enter to cancel and exit... ")
             if response.lower().replace("\"", "") == "y":
                 break
             elif response == "":
@@ -241,6 +241,8 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     if file_name is None:
         print("-")
         print("- Failed to download the latest version")
+
+        pause("Press any key to exit... ", force=True)
 
         return
 

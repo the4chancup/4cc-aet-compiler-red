@@ -344,7 +344,7 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     print("- you can use it if you find any issues with the new version")
     print("-")
 
-    pause("Press any key to open the new folder... ", force=True)
+    pause("Press any key to exit and open the new folder... ", force=True)
 
     # Open the unpacked folder in the default file explorer
     os.startfile(app_new_folder)

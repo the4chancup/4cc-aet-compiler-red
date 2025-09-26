@@ -310,6 +310,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     for file in os.listdir(STATE_FOLDER_PATH):
         shutil.copy(os.path.join(STATE_FOLDER_PATH, file), os.path.join(app_new_folder, STATE_FOLDER_PATH))
 
+    # Save the latest version to the skip_last file to avoid being asked to update the old version again
+    with open(SKIP_LAST_PATH, "w", encoding='utf-8') as f:
+        f.write(version_latest)
+
     EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)
     print( "-")
     print( "- Successfully downloaded and unpacked the latest version")

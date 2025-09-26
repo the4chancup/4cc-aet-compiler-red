@@ -428,24 +428,34 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
 
     version_latest_list = version_latest.split(".")
 
-    update_major = False
-    if int(version_latest_list[0]) > major:
-        update_available = "Major"
-        update_major = True
-    elif int(version_latest_list[1]) > minor:
-        update_available = "Minor"
-    elif int(version_latest_list[2]) > patch:
-        update_available = "Bugfix"
-    else:
-        update_available = None
+    latest_major, latest_minor, latest_patch = [int(part) for part in version_latest_list[:3]]
 
-    if update_available is None:
+    update_major = False
+    if (major, minor, patch) == (latest_major, latest_minor, latest_patch):
+        update_type = None
+    elif (major, minor, patch) > (latest_major, latest_minor, latest_patch):
+        update_type = "Past"
+    elif major < latest_major:
+        update_type = "Major"
+        update_major = True
+    elif minor < latest_minor:
+        update_type = "Minor"
+    else:
+        update_type = "Bugfix"
+
+    if update_type is None:
         print("-")
         print("- You are running the latest version")
 
         return False
 
     print(f"- The latest version is {version_latest}")
+
+    if update_type == "Past":
+        print("-")
+        print("- You are running a future version")
+
+        return False
 
     # Read the last skipped version
     if os.path.exists(SKIP_LAST_PATH) and not check_force:
@@ -461,7 +471,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
             return True
 
     print("-")
-    print(f"- <{update_available} update available>")
+    print(f"- <{update_type} update available>")
     print("-")
     print("- You can still use the current version, but updating is recommended")
     print("- so you can stay up-to-date with the latest features and bugfixes")

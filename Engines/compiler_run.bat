@@ -34,12 +34,12 @@ if exist "%APP_DATA_PATH%" (
 )
 
 REM - Invoke the main compiler script
-if exist ".\Engines\compiler_main.exe" (
-    call .\Engines\compiler_main.exe %running_type_num%
+if exist ".\Engines\dist\compiler_main.exe" (
+    call .\Engines\dist\compiler_main.exe %running_type_num%
 ) else (
     echo -
     echo - %DARK_RED%FATAL ERROR%RESET% - Missing vital file
-    echo - The file compiler_main.exe was not found in the Engines folder
+    echo - The file compiler_main.exe was not found in the Engines\dist folder
     echo -
     if "%APP_VERSION_DEV%"=="False" (
         echo - Please grab a clean compiler folder
@@ -59,7 +59,7 @@ if exist ".\Engines\compiler_main.exe" (
 set crashed=%ERRORLEVEL%
 
 REM - Run the log cleaner from the main script to remove the username from the logs
-call .\Engines\compiler_main.exe -1
+call .\Engines\dist\compiler_main.exe -1
 
 
 REM - If the compiler returned an error

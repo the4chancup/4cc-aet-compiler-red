@@ -46,6 +46,7 @@ while True:
         from python.contents_from_extracted import contents_from_extracted
         from python.patches_from_contents import patches_from_contents
         from python.lib.cpk_tools import pes_download_path_check, cpk_name_check
+        from python.lib.utils import COLORS
         from python.lib.utils.admin_tools import admin_check, admin_request
         from python.lib.utils.app_tools import app_title, pes_title
         from python.lib.utils.logging_tools import logger_init, logger_stop
@@ -89,11 +90,34 @@ def run_type_request():
 
     return run_type
 
+def get_main_folder():
+
+    # Get the path of the folder containing the script
+    current_folder_path = os.path.dirname(os.path.abspath(sys.argv[0]))
+
+    # Go back one folder until the Engines folder is reached or the root is reached
+    while os.path.basename(current_folder_path) != "Engines":
+        parent_folder_path = os.path.dirname(current_folder_path)
+        if parent_folder_path == current_folder_path:
+            # If the root is reached, show a fatal error and exit to avoid an infinite loop
+            print( "-")
+            print(f"- {COLORS.DARK_RED}FATAL ERROR{COLORS.RESET} - Wrong script location")
+            print( "-")
+            print( "- Please grab a clean compiler folder")
+            print( "-")
+
+            pause("Press any key to exit... ")
+            sys.exit()
+
+        current_folder_path = parent_folder_path
+
+    # Return the folder containing the Engines folder
+    return os.path.dirname(current_folder_path)
 
 def main(run_type):
 
-    # Set the working folder to the parent of the folder of this script
-    os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0]))))
+    # Set the working folder to the main compiler folder
+    os.chdir(get_main_folder())
 
     # Check the running type
     all_in_one = (run_type == "0")

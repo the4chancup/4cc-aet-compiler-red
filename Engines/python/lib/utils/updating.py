@@ -256,8 +256,9 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     os.remove(file_path)
 
     # Check if the new version has a transfer table
-    if update_major and os.path.exists(SETTINGS_TRANSFER_TABLE_PATH):
-        transfer_table_path = SETTINGS_TRANSFER_TABLE_PATH
+    new_transfer_table_path = os.path.join(app_new_folder, SETTINGS_TRANSFER_TABLE_PATH)
+    if update_major and os.path.exists(new_transfer_table_path):
+        transfer_table_path = new_transfer_table_path
     else:
         transfer_table_path = None
 

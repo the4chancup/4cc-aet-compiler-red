@@ -37,7 +37,7 @@ def dependency_check_on_import():
         },
         {
             "name_package": "commentedconfigparser",
-            "version":      "any",
+            "version":      "~=3.0",
             "name_pip":     "commented-configparser",
             "name_user":    "Commented Config Parser (config file parser)",
         },

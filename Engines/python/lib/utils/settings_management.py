@@ -107,22 +107,30 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
         # Rename all the settings in the old config
         for section in config_old.sections():
             for key, value in config_old.items(section):
-                if key in settings_transfer_dict:
-                    key_new = settings_transfer_dict[key]
+                # Skip comment entries
+                if key.startswith('__comment_'):
+                    continue
+                if key not in settings_transfer_dict:
+                    continue
+                key_new = settings_transfer_dict[key]
 
-                    # Check if the new name exists in the new config
-                    for section_new in config_new.sections():
-                        if key_new in config_new[section_new]:
-                            settings_renamed.append((section, section_new))
-                            # Delete the old setting
-                            config_old.remove_option(section, key)
-                            # Recreate the setting with the new name
-                            config_old.set(section, key_new, value)
-                            break
+                # Check if the new name exists in the new config
+                for section_new in config_new.sections():
+                    if key_new not in config_new[section_new]:
+                        continue
+                    settings_renamed.append((section, section_new))
+                    # Delete the old setting
+                    config_old.remove_option(section, key)
+                    # Recreate the setting with the new name
+                    config_old.set(section, key_new, value)
+                    break
 
     # Iterate over all the settings in the new config
     for section_new in config_new.sections():
         for key_new, value_new in config_new.items(section_new):
+            # Skip comment entries
+            if key_new.startswith('__comment_'):
+                continue
 
             # Check if the setting exists in the old config
             for section_old in config_old.sections():
@@ -134,6 +142,9 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
     # Iterate over all the settings in the old config
     for section_old in config_old.sections():
         for key_old, value_old in config_old.items(section_old):
+            # Skip comment entries
+            if key_old.startswith('__comment_'):
+                continue
 
             # Check if the setting exists in the new config
             for section_new in config_new.sections():
@@ -146,15 +157,6 @@ def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
     # Write the new config to the file
     with open(file_new_path, 'w', encoding="utf8") as configfile:
         config_new.write(configfile)
-
-    # Add a blank line after lines 1 and 4 to the new config file
-    # to preserve the original formatting
-    with open(file_new_path, 'r', encoding="utf8") as f:
-        lines = f.readlines()
-        lines.insert(1, '\n')
-        lines.insert(4, '\n')
-    with open(file_new_path, 'w', encoding="utf8") as f:
-        f.writelines(lines)
 
     return settings_added, settings_removed, settings_renamed
 

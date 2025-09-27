@@ -2,6 +2,7 @@ import sys
 import runpy
 import subprocess
 import importlib.util
+import importlib.metadata
 
 from python.lib.utils import COLORS
 
@@ -21,35 +22,58 @@ def dependency_check_on_import():
             exit()
 
     # Prepare a list of dependencies as dictionaries with name and name_pip
-    dependencies = [
+    dependencies: list[dict[str, str]] = [
         {
             "name_package": "py7zr",
+            "version":      "any",
             "name_pip":     "py7zr",
             "name_user":    "Py7zr (7z extractor)",
         },
         {
             "name_package": "requests",
+            "version":      "any",
             "name_pip":     "requests",
             "name_user":    "Requests (HTTP library)",
         },
         {
             "name_package": "commentedconfigparser",
+            "version":      "any",
             "name_pip":     "commented-configparser",
             "name_user":    "Commented Config Parser (config file parser)",
         },
         {
             "name_package": "rich",
+            "version":      "any",
             "name_pip":     "rich",
             "name_user":    "Rich (rich text console output)",
         },
     ]
 
-    dependencies_missing = []
+    dependencies_missing: list[dict[str, str]] = []
 
     for dependency in dependencies:
-        if importlib.util.find_spec(dependency["name_package"]) is None:
+        spec = importlib.util.find_spec(dependency["name_package"])
+        if spec is None:
             # Add any missing dependencies to the list
             dependencies_missing.append(dependency)
+            continue
+
+        # Check version constraints if not "any"
+        if dependency["version"] != "any":
+            try:
+                installed_version = importlib.metadata.version(dependency["name_pip"])
+            except importlib.metadata.PackageNotFoundError:
+                dependencies_missing.append(dependency)
+                continue
+
+            if (
+                (dependency["version"].startswith("~=") and
+                not installed_version.startswith(dependency["version"][2:-1])) or
+                (dependency["version"].startswith("==") and
+                not installed_version.startswith(dependency["version"][2:]))
+            ):
+                dependencies_missing.append(dependency)
+                continue
 
     if dependencies_missing:
 
@@ -57,7 +81,13 @@ def dependency_check_on_import():
         print("- The following dependencies were not found:")
         # List the missing dependencies, one per line
         for dependency in dependencies_missing:
-            print(f"- \"{dependency['name_user']}\"")
+            if dependency["version"].startswith("~="):
+                version_string = f" (version {dependency['version'][2:-2]})"
+            elif dependency["version"].startswith("=="):
+                version_string = f" (version {dependency['version'][2:]})"
+            else:
+                version_string = ""
+            print(f"- {dependency['name_user']}{version_string}")
 
         print("-")
         print("- They will be installed now (or you can close the program now and install them manually).")
@@ -82,7 +112,14 @@ def dependency_check_on_import():
             exit()
 
         # Install the dependencies (closes the program automatically after the installation)
-        sys.argv = ["pip", "install"] + [dependency["name_pip"] for dependency in dependencies_missing]
+        pip_packages = []
+        for dependency in dependencies_missing:
+            if dependency["version"] == "any":
+                pip_packages.append(dependency["name_pip"])
+            else:
+                pip_packages.append(f"{dependency['name_pip']}{dependency['version']}")
+
+        sys.argv = ["pip", "install"] + pip_packages
 
         try:
             runpy.run_module("pip", run_name="__main__")

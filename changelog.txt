@@ -1,7 +1,7 @@
 26/09/25 - Version 4.0.0
 - Important
   - The compiler now supports Referee exports, which are automatically converted
-    to regular team exports then compiled into a separate referee cpk.
+    to regular team exports then compiled into a separate referees cpk.
     (Check the advanced readme in the Engines folder for more details.)
   - Added official support for PES15.
     PES15 mode is almost the same as PES17 mode, but it automatically replaces
@@ -10,19 +10,32 @@
   - The compiler now comes compiled (erm) into an exe file for Windows users.
     This means it can be run without having to install Python. It will also run
     slightly faster thanks to the tool (Nuitka) recompiling the code to C first.
-  - As pre-announced, the check for unsupported file types is now an error
-    instead of a warning, which means model folders with unsupported file types
-    will be discarded. A Strict File Type Check setting has been added which
-    allows turning this off.
+  - As pre-announced, the check for unsupported file types now gives out an
+    error instead of a warning, which means model folders with unsupported file
+    types will be discarded. A Strict File Type Check setting has been added
+    which allows turning this off.
+- Useful
+  - Introduced the "ingame_face" file, which allows having face folders with
+    just a portrait for players with an ingame face, without their faces getting
+    replaced with a blank model. Just create an empty txt file named
+    "ingame_face.txt" in the face folder.
+  - Automatic face xml generation now allows giving the model files you put
+    in the face folders any model type you want, by simply naming them
+    "[optional_]model_type_{type}.model" where {type} is the model type.
+    For example, "dagumi_model_type_sleeve_sub.model" gets "sleeve_sub" as type.
+  - Implemented merging onto custom face xmls of face_diff bin or xml files, if
+    any are present in the same face folder.
+  - Team IDs are now replaced inside every subfolder in every model folder and
+    in the common folder, recursively.
 - Fixes
   - Fixed the compiler crashing when processing exports which lack a Portraits
     folder and which also have a Faces folder none of whose folders contain a
     portrait.
   - Fixed portraits being wrongly converted to ftex on PES19 and PES21, and
     giving out name check errors as a consequence.
-  - Fixed portraits not being converted from BC7 to DXT5 on exports lacking a
-    Faces folder.
-  - Fixed bins updating crashing when a team entry on the teams list file had an
+  - Fixed BC7 portraits not being converted to DXT5 on exports lacking a Faces
+    folder.
+  - Fixed bins updating crashing when a team entry on the teams list file has an
     empty name.
   - Fixed custom face xmls not having the team ID replaced in their contents.
   - Fixed some rare path issues when running the compiler on Linux.
@@ -31,28 +44,16 @@
   - Reduced the number of rename operations during packing of model folders to
     prevent crashes caused by overzealous antivirus software.
   - Added a fallback function which removes the readonly bit when failing to
-    delete a folder.
+    delete a temporary folder.
 - New checks
-  - Made the texture type check more robust, it now also tells you the file type
+  - Made the texture type check more robust, it now also tells you the real type
     of the textures it finds not to match their extension.
   - Added validation for uncompressed kit textures on pre-fox PES versions.
   - Added a check on startup to make sure the PES Version set is supported.
 - Other new stuff
-  - Introduced the "ingame_face" file, which allows having face folders with
-    just a portrait for players with an ingame face, without their faces getting
-    replaced with a blank model. Just create an empty txt file named
-    "ingame_face.txt" in the face folder.
-  - Automatic face xml generation now allows giving the model files you put
-    in the face folders any model type you want, by simply naming them
-    "[optional_]model_type_<type>.model" where <type> is the model type.
-    For example, "dagumi_model_type_sleeve_sub.model" gets "sleeve_sub" as type.
-  - Implemented merging onto custom face xmls of face_diff bin or xml files, if
-    any are present in the same face folder.
-  - Team IDs are now replaced inside every subfolder in every model file and in
-    the common folder, recursively.
-  - Renamed the Pause on Error setting to Pause Allow. It also now covers every
-    type of pause, not just error pausing. Fatal errors still pause the script
-    regardless of this setting.
+  - Renamed the Pause on Error setting to Allow Pausing. It now also covers
+    every type of pause, not just error pausing. Fatal errors still pause the
+    script regardless of this setting.
   - Improved the appearance and usefulness of crash messages and logs.
   - Improved the quality of textures converted from BC7 to DXT5 by using
     the -srgb flag on ImageMagick.

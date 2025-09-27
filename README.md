@@ -99,6 +99,12 @@ Q: Why is my antivirus blocking the exe?
   the Engines folder instead. Use compiler_run_py.bat or 0_all_in_one_py.bat if
   you're on Windows or compiler_main.py if you're on Linux.
 
+Q: I just got an error window which says "The procedure entry point
+PssQuerySnapshot could not be located". How do I fix it?  
+  A: This error only shows up when you're using Windows 7, which doesn't support
+  the exe version of the script. You'll have to run the Python script directly
+  from the Engines folder, as described in the previous answer.
+
 Q: I've got some other problem/question.  
   A: Feel free to contact the developer, preferably on the divegrass thread or
   the /aesco/ discord, so that if someone else is having the same problem they

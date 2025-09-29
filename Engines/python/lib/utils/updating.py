@@ -1,12 +1,15 @@
 import os
+import json
 import py7zr
 import shutil
 import filecmp
 import difflib
-import requests
 import webbrowser
+import urllib.error
+import urllib.request
 from datetime import datetime
 from datetime import timedelta
+
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
@@ -38,9 +41,11 @@ def website_exist(url):
     """
 
     try:
-        response = requests.head(url)
-        exist = (response.status_code < 400)
-    except requests.exceptions.ConnectionError:
+        req = urllib.request.Request(url, method='HEAD')
+        response = urllib.request.urlopen(req)
+        exist = (response.status < 400)
+        response.close()
+    except (urllib.error.URLError, urllib.error.HTTPError):
         print("- Failed to connect to website, cannot check if it exists")
         exist = False
 
@@ -65,15 +70,14 @@ def version_latest_find(owner, repo):
     version = None
 
     try:
-        response = requests.get(url)
-
-    except requests.exceptions.ConnectionError:
+        response = urllib.request.urlopen(url)
+        if response.status == 200:
+            data = json.loads(response.read().decode('utf-8'))
+            version = data["tag_name"]
+        response.close()
+    except (urllib.error.URLError, urllib.error.HTTPError):
         print("- Failed to connect to GitHub API, cannot check for updates")
         return None
-
-    if response.status_code == 200:
-        data = response.json()
-        version = data["tag_name"]
 
     return version
 

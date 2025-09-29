@@ -30,12 +30,6 @@ def dependency_check_on_import():
             "name_user":    "Py7zr (7z extractor)",
         },
         {
-            "name_package": "requests",
-            "version":      "any",
-            "name_pip":     "requests",
-            "name_user":    "Requests (HTTP library)",
-        },
-        {
             "name_package": "commentedconfigparser",
             "version":      "~=3.0",
             "name_pip":     "commented-configparser",

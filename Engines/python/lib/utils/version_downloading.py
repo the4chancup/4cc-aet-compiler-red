@@ -1,4 +1,5 @@
-import requests
+import urllib.error
+import urllib.request
 
 
 def version_download(owner, repo, ver, ext, folder):
@@ -21,16 +22,15 @@ def version_download(owner, repo, ver, ext, folder):
     url = f"https://github.com/{owner}/{repo}/releases/download/{ver}/{file_name}"
 
     try:
-        response = requests.get(url)
-
-    except requests.exceptions.ConnectionError:
+        response = urllib.request.urlopen(url)
+        if response.status == 200:
+            with open(f"{folder}/{file_name}", "wb") as f:
+                f.write(response.read())
+            response.close()
+            return file_name
+        else:
+            response.close()
+            return None
+    except (urllib.error.URLError, urllib.error.HTTPError):
         print("- Failed to connect to GitHub API, cannot download package")
         return None
-
-    if response.status_code == 200:
-        with open(f"{folder}/{file_name}", "wb") as f:
-            f.write(response.content)
-
-        return file_name
-
-    return None

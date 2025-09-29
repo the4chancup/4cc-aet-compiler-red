@@ -296,6 +296,85 @@ def create_cryptodome_stub(site_packages_path):
     # Copy the entire stub directory structure
     shutil.copytree(stub_source, cryptodome_path)
 
+def _remove_library_files(directory_path, kept_files):
+    """Helper to remove files and their corresponding .pyc files from a library subdirectory.
+
+    Args:
+        directory_path: Path to the directory to clean
+        kept_files: List of filenames to keep (should include __pycache__)
+
+    Returns:
+        Number of files removed
+    """
+    if not os.path.exists(directory_path):
+        return 0
+
+    removed_count = 0
+    removed_files = []
+
+    # Remove source files that aren't in the keep list
+    for item in os.listdir(directory_path):
+        if item not in kept_files:
+            item_path = os.path.join(directory_path, item)
+            if os.path.isfile(item_path):
+                os.remove(item_path)
+                removed_files.append(os.path.splitext(item)[0])  # Store base name
+                removed_count += 1
+
+    # Remove corresponding .pyc files
+    pycache_path = os.path.join(directory_path, "__pycache__")
+    if os.path.exists(pycache_path):
+        for pyc_file in os.listdir(pycache_path):
+            if pyc_file.endswith('.pyc'):
+                base_name = pyc_file.split('.')[0]  # Get name before .cpython-313.pyc
+                if base_name in removed_files:
+                    os.remove(os.path.join(pycache_path, pyc_file))
+
+    return removed_count
+
+def optimize_pygments(site_packages_path):
+    """Remove unnecessary pygments lexers, styles, and formatters.
+
+    Rich only needs:
+    - Python lexer for traceback syntax highlighting
+    - Token definitions
+    - Core lexer infrastructure
+
+    This removes the unused lexers for 250+ languages.
+    """
+    pygments_path = os.path.join(site_packages_path, "pygments")
+
+    if not os.path.exists(pygments_path):
+        log("Warning: pygments not found, skipping optimization")
+        return
+
+    log("Optimizing pygments (removing unused lexers, styles, formatters)")
+
+    # Remove all styles (Rich uses its own ANSI color mappings)
+    styles_path = os.path.join(pygments_path, "styles")
+    _remove_library_files(styles_path, ["__init__.py", "_mapping.py", "__pycache__"])
+    log("  Removed styles and their .pyc files")
+
+    # Remove all formatters (Rich renders internally)
+    formatters_path = os.path.join(pygments_path, "formatters")
+    _remove_library_files(formatters_path, ["__init__.py", "_mapping.py", "__pycache__"])
+    log("  Removed formatters and their .pyc files")
+
+    # Remove all lexers except Python (Rich only highlights Python code in tracebacks)
+    lexers_path = os.path.join(pygments_path, "lexers")
+    kept_lexers = ["__init__.py", "_mapping.py", "python.py", "__pycache__"]
+    removed_count = _remove_library_files(lexers_path, kept_lexers)
+    log(f"  Removed {removed_count} unused lexers and their .pyc files (kept only python.py)")
+
+    # Remove command-line tools (only those not imported internally)
+    # Build kept files list by excluding the unnecessary modules
+    unnecessary_modules = ["cmdline.py", "__main__.py", "console.py", "sphinxext.py"]
+    all_items = set(os.listdir(pygments_path))
+    kept_files = list(all_items - set(unnecessary_modules))
+    _remove_library_files(pygments_path, kept_files)
+
+    log("Pygments optimization complete")
+
 def get_modules_with_pyd_files(site_packages_path):
     """Get list of modules that contain .pyd files."""
     modules_with_pyd = set()
@@ -482,10 +561,13 @@ def main():
     site_packages_path = os.path.join(embed_path, "Lib", "site-packages")
     create_cryptodome_stub(site_packages_path)
 
-    # Step 7: Create site-packages.zip
+    # Step 7: Optimize pygments (remove unused lexers, styles, formatters)
+    optimize_pygments(site_packages_path)
+
+    # Step 8: Create site-packages.zip
     zip_path = create_site_packages_zip(site_packages_path)
 
-    # Step 8: Finalize pth file with optimized configuration
+    # Step 9: Finalize pth file with optimized configuration
     setup_pth_file(embed_path, enable_site=False, include_zip=True)
 
     print("\n[bold green]✓ Embeddable Python preparation completed successfully[/bold green]")

@@ -115,6 +115,14 @@ def extracted_from_exports():
         if os.path.isdir(export_source_path):
             export_type = "folder"
             export_name_clean = export_name
+
+            # Skip the export if it has a NO_USE file
+            nouse_file_path = os.path.join(export_source_path, "NO_USE")
+            nouse_file_txt_path = os.path.join(export_source_path, "NO_USE.txt")
+            if os.path.exists(nouse_file_path) or os.path.exists(nouse_file_txt_path):
+                print(f"- \"{export_name}\" has a NO_USE file - Skipped")
+                print( "-")
+                continue
         else:
             export_name_clean, export_type = os.path.splitext(export_name)
 

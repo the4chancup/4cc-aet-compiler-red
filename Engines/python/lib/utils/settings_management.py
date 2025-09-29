@@ -69,6 +69,10 @@ def first_run_wizard():
             print("- Invalid version")
             print("-")
 
+    pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')
+    if "**" in pes_folder_path:
+        os.environ["PES_FOLDER_PATH"] = pes_folder_path.replace("**", os.environ["PES_VERSION"])
+
     # Create the first run done file
     if not os.path.exists(os.path.dirname(FIRST_RUN_DONE_PATH)):
         os.makedirs(os.path.dirname(FIRST_RUN_DONE_PATH))
@@ -76,6 +80,40 @@ def first_run_wizard():
     with open(FIRST_RUN_DONE_PATH, 'w', encoding='utf-8') as f:
         f.write('This file indicates that the first run wizard has been completed.')
 
+    move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
+    if not move_cpks:
+        return
+
+    # If move cpks mode is enabled, check if the PES folder exists
+    print("-")
+    print("- The current main PES folder location is:")
+    print(f"- \"{pes_folder_path}\"")
+
+    if os.path.exists(pes_folder_path):
+        print("-")
+        print("- Keep that in mind should you need to change it in the future")
+        pause()
+        return
+
+    print("-")
+    print("- But this location does not exist")
+    print("-")
+    print("- Please set the correct path to the main PES folder")
+    print("- in the settings file and start again")
+    print("-")
+
+    # Stop the loggers
+    logger_stop()
+
+    if sys.platform == "win32":
+        pause("Press any key to open the settings file and exit... ", force=True)
+        # Open the settings file in an external text editor
+        os.startfile(SETTINGS_PATH)
+    else:
+        pause("Press any key to exit... ", force=True)
+
+    # Exit the script
+    sys.exit()
 
 def settings_transfer(file_old_path, file_new_path, transfer_table_path = None):
 

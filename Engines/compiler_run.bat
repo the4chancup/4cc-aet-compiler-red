@@ -27,6 +27,9 @@ if not exist ".\Engines\embed\python.exe" (
     echo -
     echo - Please grab a clean compiler folder
     echo -
+    echo - Or, if you have got python installed, you can prepare an embed folder
+    echo - by running the embed_prepare.bat script in the Engines\build folder
+    echo -
     pause
 
     exit /b 1

@@ -134,7 +134,7 @@ def pes_download_path_check(settings_name, pes_download_path):
         pause("Press any key to exit... ", force=True)
 
     # Exit the script
-    exit()
+    sys.exit()
 
 
 def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
@@ -155,7 +155,7 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
 
         pause("Press any key to exit... ", force=True)
 
-        exit()
+        sys.exit()
 
     dpfl_list = dpfl_scan(dpfl_path)
 
@@ -196,4 +196,4 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
         pause("Press any key to exit... ", force=True)
 
     # Exit the script
-    exit()
+    sys.exit()

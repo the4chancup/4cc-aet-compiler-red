@@ -120,7 +120,7 @@ def log_store(log_path):
 
             pause("Press any key to exit... ", force=True)
 
-            exit()
+            sys.exit()
 
 
 def logger_init():

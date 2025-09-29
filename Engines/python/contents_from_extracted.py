@@ -1,4 +1,5 @@
 import os
+import sys
 import stat
 import shutil
 import logging
@@ -43,7 +44,7 @@ def contents_from_extracted():
 
         pause("Press any key to exit... ", force=True)
 
-        exit()
+        sys.exit()
 
     # Check the presence of the folders
     refs_present = os.path.exists(EXTRACTED_REFEREES_PATH)

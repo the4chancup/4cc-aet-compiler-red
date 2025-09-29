@@ -1,5 +1,6 @@
 ## Reads team and kit color entries from Note files and adds them to bin files
 import os
+import sys
 import stat
 import shutil
 import logging
@@ -467,7 +468,7 @@ def bins_pack(bins_foldername):
 
             pause("Press any key to exit... ", force=True)
 
-            exit()
+            sys.exit()
 
         # Copy the uniparam to the the Bins cpk folder with the proper filename
         shutil.copy(UNIPARAM_BIN_TEMP_PATH, f"{patch_bins_uniform_team_path}/{UNIPARAM_NAME}")

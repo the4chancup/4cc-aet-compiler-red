@@ -1,4 +1,5 @@
 import os
+import sys
 import py7zr
 import shutil
 import logging
@@ -143,7 +144,7 @@ def module_recover(module_exception):
         logging.critical("- Library file not found, self healing failed or not attempted.")
         logging.critical(module_exception)
 
-        exit()
+        sys.exit()
 
     return file_healed
 
@@ -173,4 +174,4 @@ def file_critical_check(file_path, healing_allowed = True):
 
     if not file_healed:
         logger_stop()
-        exit()
+        sys.exit()

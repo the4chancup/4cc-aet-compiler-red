@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 import py7zr
 import shutil
@@ -507,7 +508,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
             # Update the program
             update_get(app_owner, app_name, version_latest, update_major)
 
-            exit()
+            sys.exit()
 
         case "skip":
             # Save the latest version

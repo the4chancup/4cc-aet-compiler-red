@@ -9,11 +9,11 @@ def addFile(fpk, realFilename, packedFilename):
 	if packedFilename in fpk.entries:
 		print("Cannot pack duplicate filename '%s'" % packedFilename)
 		return False
-	
+
 	inputFile = open(realFilename, 'rb')
 	content = inputFile.read()
 	inputFile.close()
-	
+
 	fpk.entries[packedFilename] = content
 	return True
 
@@ -30,11 +30,11 @@ def addDirectoryRecursive(fpk, directory, pathPrefix):
 
 def main(fpkFile, packedFiles, allowOverwrite):
 	outputFile = fpk.FpkFile()
-	
+
 	if not allowOverwrite and os.path.exists(fpkFile):
 		print("Output file '%s' already exists, not overwriting" % fpkFile)
 		return
-	
+
 	for filename in packedFiles:
 		if os.path.isdir(filename):
 			if not addDirectoryRecursive(outputFile, filename, '/'):
@@ -45,10 +45,10 @@ def main(fpkFile, packedFiles, allowOverwrite):
 				effectiveFilename = effectiveFilename[effectiveFilename.rfind('/') + 1:]
 			if '\\' in effectiveFilename:
 				effectiveFilename = effectiveFilename[effectiveFilename.rfind('\\') + 1:]
-			
+
 			if not addFile(outputFile, filename, effectiveFilename):
 				return
-	
+
 	outputFile.writeFile(fpkFile)
 
 def usage():

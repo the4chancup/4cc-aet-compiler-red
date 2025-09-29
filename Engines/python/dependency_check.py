@@ -20,7 +20,7 @@ def dependency_check_on_import():
             print("-")
             print("- Please install ImageMagick and rerun the program.")
             print("-")
-            exit()
+            sys.exit()
 
     dependencies_missing: list[dict[str, str]] = []
 
@@ -82,7 +82,7 @@ def dependency_check_on_import():
             print( "-")
 
             input("Press Enter to exit... ")
-            exit()
+            sys.exit()
 
         # Install the dependencies (closes the program automatically after the installation)
         pip_packages = []
@@ -106,7 +106,7 @@ def dependency_check_on_import():
             print( "-")
 
             input("Press Enter to exit... ")
-            exit()
+            sys.exit()
 
 
 # Run the check when imported

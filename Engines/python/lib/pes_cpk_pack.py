@@ -9,15 +9,15 @@ from .utils import cpk
 def addFile(cpk, realFilename, packedFilename):
 	stat = os.stat(realFilename)
 	mtime = datetime.datetime.fromtimestamp(stat.st_mtime)
-	
+
 	inputFile = open(realFilename, 'rb')
 	content = inputFile.read()
 	inputFile.close()
-	
+
 	if not cpk.writeFile(packedFilename, content, mtime):
 		print("Cannot pack duplicate filename '%s'" % packedFilename)
 		return False
-	
+
 	return True
 
 def addFileRecursive(cpk, filename, pathPrefix):
@@ -35,14 +35,14 @@ def main(cpkFile, packedFiles, allowOverwrite):
 	if not allowOverwrite and os.path.exists(cpkFile):
 		print("Output file '%s' already exists, not overwriting" % cpkFile)
 		return
-	
+
 	outputFile = cpk.CpkWriter()
 	outputFile.open(cpkFile)
-	
+
 	for filename in packedFiles:
 		if not addFileRecursive(outputFile, filename, os.path.basename(filename.strip('/\\'))):
 			return
-	
+
 	outputFile.close()
 
 def usage():

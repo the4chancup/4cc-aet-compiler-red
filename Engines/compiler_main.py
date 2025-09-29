@@ -18,7 +18,7 @@ def handle_library_error(e):
     print("-")
     input("Press Enter to exit... ")
 
-    exit()
+    sys.exit()
 
 # Modules needed for self healing
 try:

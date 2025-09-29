@@ -222,7 +222,7 @@ def settings_default_init(file_path, default_file_path):
         os.startfile(file_path)
 
     # Exit the script
-    exit()
+    sys.exit()
 
 
 def settings_init():
@@ -278,7 +278,7 @@ def settings_init():
         if "new" in choice:
             settings_default_init(SETTINGS_PATH, SETTINGS_DEFAULT_PATH)
         else:
-            exit()
+            sys.exit()
 
     # Check if the PES version is supported
     pes_version = int(os.environ.get("PES_VERSION", '19'))
@@ -302,7 +302,7 @@ def settings_init():
             pause("Press any key to exit... ", force=True)
 
         # Exit the script
-        exit()
+        sys.exit()
 
     # Check if the PES download folder location contains the magic number ** and replace it with the pes version
     pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')

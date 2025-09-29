@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import logging
 import subprocess
@@ -42,7 +43,7 @@ def patches_from_contents():
 
         pause("Press any key to exit... ", force=True)
 
-        exit()
+        sys.exit()
 
     folder_list = os.listdir(PATCHES_CONTENTS_PATH)
 
@@ -55,7 +56,7 @@ def patches_from_contents():
 
         pause("Press any key to exit... ", force=True)
 
-        exit()
+        sys.exit()
 
     # Create the output folder if needed
     if not os.path.exists(PATCHES_OUTPUT_PATH):
@@ -146,7 +147,7 @@ def patches_from_contents():
 
                         pause("Press any key to exit... ", force=True)
 
-                        exit()
+                        sys.exit()
 
             # Move the cpk to the destination folder
             cpk_path = os.path.join(PATCHES_OUTPUT_PATH, f"{cpk_name}.cpk")

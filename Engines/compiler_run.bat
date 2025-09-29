@@ -11,28 +11,85 @@ for /f "delims=" %%E in ('forfiles /p "%~dp0." /m "%~nx0" /c "cmd /c echo(0x1B"'
 )
 if not defined NO_COLOR (
     set "DARK_RED=%ESC%[31m"
+    set "DARK_YELLOW=%ESC%[33m"
     set "BRIGHT_MAGENTA=%ESC%[95m"
     set "RESET=%ESC%[0m"
 ) else (
     set "DARK_RED="
+    set "DARK_YELLOW="
     set "BRIGHT_MAGENTA="
     set "RESET="
 )
 
+REM - Try to check if the version is dev from APP_DATA
+set "APP_DATA_PATH=.\Engines\python\lib\utils\APP_DATA.py"
+if exist "%APP_DATA_PATH%" (
+    for /f "tokens=3" %%A in ('findstr /c:"APP_VERSION_DEV" "%APP_DATA_PATH%"') do (
+        set "APP_VERSION_DEV=%%A"
+    )
+)
+
 REM - Check if python is in the embed folder
 if not exist ".\Engines\embed\python.exe" (
-    echo -
-    echo - %DARK_RED%FATAL ERROR%RESET% - Missing vital file
-    echo - The file python.exe was not found in the Engines\embed folder
-    echo -
-    echo - Please grab a clean compiler folder
-    echo -
-    echo - Or, if you have got python installed, you can prepare an embed folder
-    echo - by running the embed_prepare.bat script in the Engines\build folder
-    echo -
-    pause
+    if "%APP_VERSION_DEV%"=="False" (
+        echo -
+        echo - %DARK_RED%FATAL ERROR%RESET% - Missing embedded Python
+        echo - The file python.exe was not found in the Engines\embed folder
+        echo -
+        echo - Please grab a clean compiler folder
+        echo - Make sure to grab it from the "Releases" page of the GitHub repository:
+        echo - https://github.com/the4chancup/4cc-aet-compiler-red/releases
+        echo -
+        pause
 
-    exit /b 1
+        exit /b 1
+    )
+
+    if not exist ".\Engines\state\missing_embed_warned.txt" (
+        echo -
+        echo - %DARK_YELLOW%WARNING%RESET% - Missing embedded Python
+        echo - The file python.exe was not found in the Engines\embed folder
+        echo -
+        echo - This is a development version, so the embed folder was not included
+        echo - You can copy the embed folder from a release version or, if you have
+        echo - Python installed, you can prepare a new embed folder by running the
+        echo - embed_prepare.bat script from the Engines\build folder
+        echo -
+        echo - The compiler will now be run with the Python installed in your system,
+        echo - if avaliable
+        echo -
+        echo - You will not see this message again
+        echo -
+        pause
+
+        echo This file tells the compiler that the embedded Python was not found. > .\Engines\state\missing_embed_warned.txt
+    ) else (
+        echo - %DARK_YELLOW%WARNING%RESET% - Running on system Python
+    )
+
+    REM - Check if python is installed and was added to the PATH
+    if exist ".\Engines\python_check.bat" (
+        call .\Engines\python_check.bat
+        REM - This script sets the version on python_version
+    ) else (
+        echo -
+        echo - %DARK_RED%FATAL ERROR%RESET% - Missing vital file
+        echo - The file python_check.bat was not found in the Engines folder
+        echo -
+        echo - Please grab a clean compiler folder
+        echo -
+        pause
+
+        exit /b 1
+    )
+)
+
+REM - Set the python path
+if not exist ".\Engines\embed\python.exe" (
+    REM - This instruction is in a separate block to allow the python_version local to be read properly
+    set "python_path=py -%python_version%"
+) else (
+    set "python_path=.\Engines\embed\python.exe"
 )
 
 REM - Set the running type from the first argument this script was called with
@@ -43,7 +100,7 @@ set running_type_num=%running_type:~0,1%
 
 REM - Invoke the main compiler script
 if exist ".\Engines\compiler_main.py" (
-    call .\Engines\embed\python.exe .\Engines\compiler_main.py %running_type_num%
+    call %python_path% .\Engines\compiler_main.py %running_type_num%
 ) else (
     echo -
     echo - %DARK_RED%FATAL ERROR%RESET% - Missing vital file
@@ -59,7 +116,7 @@ if exist ".\Engines\compiler_main.py" (
 set crashed=%ERRORLEVEL%
 
 REM - Run the log cleaner from the main script to remove the username from the logs
-call .\Engines\embed\python.exe .\Engines\compiler_main.py -1
+call %python_path% .\Engines\compiler_main.py -1
 
 
 REM - If the compiler returned an error

@@ -1,3 +1,30 @@
+29/09/25 - Version 4.1.0
+- Important
+  - Switched from the compiled exe to a folder containing embeddable Python,
+    which still allows running the compiler without having to install Python but
+    also avoids triggering false positives on antivirus software. The folder
+    contains Python 3.13 instead of the 3.12 used in the exe, so the compiler
+    will run even faster.
+- Useful
+  - Added support for NO_USE files in export folders. If an export folder
+    contains a "NO_USE" or "NO_USE.txt" file, the compiler will skip it
+    during the extraction process. This allows you to disable exports without
+    having to move or delete them.
+- Fixes
+  - Added support for the new Commented Config Parser library (3.0.0), which
+    was getting installed recently on new systems and which was glitching the
+    comments on the settings file after updating across major versions.
+  - Fixed the transferring of values across renamed settings during major
+    updates. The Allow Pausing setting was not having its value transferred from
+    the old Pause on Error setting.
+  - Fixed crashes caused by the compiler using an unsupported exit function when
+    trying to exit after giving a Fatal Error message.
+  - Fixed crash when processing an export without any folders.
+- Other stuff
+  - Improved the First Run Wizard to show the currently set PES path (if Move
+    Cpks mode is enabled) and let you change it if it's invalid.
+
+
 26/09/25 - Version 4.0.0
 - Important
   - The compiler now supports Referee exports, which are automatically converted

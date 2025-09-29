@@ -5,6 +5,7 @@ import importlib.util
 import importlib.metadata
 
 from python.lib.utils import COLORS
+from python.lib.utils.REQUREMENTS import DEPENDENCIES
 
 
 def dependency_check_on_import():
@@ -21,31 +22,9 @@ def dependency_check_on_import():
             print("-")
             exit()
 
-    # Prepare a list of dependencies as dictionaries with name and name_pip
-    dependencies: list[dict[str, str]] = [
-        {
-            "name_package": "py7zr",
-            "version":      "any",
-            "name_pip":     "py7zr",
-            "name_user":    "Py7zr (7z extractor)",
-        },
-        {
-            "name_package": "commentedconfigparser",
-            "version":      "~=3.0",
-            "name_pip":     "commented-configparser",
-            "name_user":    "Commented Config Parser (config file parser)",
-        },
-        {
-            "name_package": "rich",
-            "version":      "any",
-            "name_pip":     "rich",
-            "name_user":    "Rich (rich text console output)",
-        },
-    ]
-
     dependencies_missing: list[dict[str, str]] = []
 
-    for dependency in dependencies:
+    for dependency in DEPENDENCIES:
         spec = importlib.util.find_spec(dependency["name_package"])
         if spec is None:
             # Add any missing dependencies to the list

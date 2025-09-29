@@ -57,7 +57,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
     if not root_found:
 
         # Look in every folder for a faces or kit configs folder
-        for foldername_test in os.listdir(exportfolder_path):
+        for foldername_test in (f for f in os.listdir(exportfolder_path) if os.path.isdir(os.path.join(exportfolder_path, f))):
             test_path = os.path.join(exportfolder_path, foldername_test)
 
             if export_files_present(test_path):
@@ -93,7 +93,7 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
 
     # Look for a txt file with Note in the filename
     note_name = None
-    for file in os.listdir(exportfolder_path):
+    for file in (f for f in os.listdir(exportfolder_path) if os.path.isfile(os.path.join(exportfolder_path, f))):
         if file.endswith(".txt") and "note" in file.lower():
             note_name = file
             break

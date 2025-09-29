@@ -19,37 +19,34 @@ if not defined NO_COLOR (
     set "RESET="
 )
 
+REM - Check if python is in the embed folder
+if not exist ".\Engines\embed\python.exe" (
+    echo -
+    echo - %DARK_RED%FATAL ERROR%RESET% - Missing vital file
+    echo - The file python.exe was not found in the Engines\embed folder
+    echo -
+    echo - Please grab a clean compiler folder
+    echo -
+    pause
+
+    exit /b 1
+)
+
 REM - Set the running type from the first argument this script was called with
 set running_type=%1
 
 REM - Grab the number from the first character from the running type
 set running_type_num=%running_type:~0,1%
 
-REM - Try to check if the version is dev from APP_DATA
-set "APP_DATA_PATH=.\Engines\python\lib\utils\APP_DATA.py"
-if exist "%APP_DATA_PATH%" (
-    for /f "tokens=3" %%A in ('findstr /c:"APP_VERSION_DEV" "%APP_DATA_PATH%"') do (
-        set "APP_VERSION_DEV=%%A"
-    )
-)
-
 REM - Invoke the main compiler script
-if exist ".\Engines\dist\compiler_main.exe" (
-    call .\Engines\dist\compiler_main.exe %running_type_num%
+if exist ".\Engines\compiler_main.py" (
+    call .\Engines\embed\python.exe .\Engines\compiler_main.py %running_type_num%
 ) else (
     echo -
     echo - %DARK_RED%FATAL ERROR%RESET% - Missing vital file
-    echo - The file compiler_main.exe was not found in the Engines\dist folder
+    echo - The file compiler_main.py was not found in the Engines folder
     echo -
-    if "%APP_VERSION_DEV%"=="False" (
-        echo - Please grab a clean compiler folder
-        echo - Make sure to grab it from the "Releases" page of the GitHub repository:
-        echo - https://github.com/the4chancup/4cc-aet-compiler-red/releases
-    ) else (
-        echo - This is a development version, so no exe is available
-        echo - You need to open the Engines folder and run compiler_run_py.bat
-        echo - or 0_all_in_one_py.bat instead
-    )
+    echo - Please grab a clean compiler folder
     echo -
     pause
 
@@ -59,7 +56,7 @@ if exist ".\Engines\dist\compiler_main.exe" (
 set crashed=%ERRORLEVEL%
 
 REM - Run the log cleaner from the main script to remove the username from the logs
-call .\Engines\dist\compiler_main.exe -1
+call .\Engines\embed\python.exe .\Engines\compiler_main.py -1
 
 
 REM - If the compiler returned an error

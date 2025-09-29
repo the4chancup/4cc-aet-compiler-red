@@ -11,7 +11,7 @@ sideload
 temp
 exports_to_add
 !exports_to_add/delete_me.txt
-Engines/dist
+Engines/embed
 Engines/state
 !Engines/state/dummy.txt
 Engines/bins/temp

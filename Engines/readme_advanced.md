@@ -285,7 +285,7 @@ List:
 - Error compiling UniformParameter
 - Missing vital file in clean package
 - compiler_run.bat not found in Engines (from the 0123_py bat scripts)
-- compiler_main.exe not found in Engines (from the 0123 bat scripts)
+- python.exe not found in Engines\embed (from the 0123 bat scripts)
 - python_check.bat not found in Engines (from compiler_run_py.bat)
 - compiler_main.py not found in Engines (from compiler_run_py.bat)
 - Python not installed (from python_check.bat)

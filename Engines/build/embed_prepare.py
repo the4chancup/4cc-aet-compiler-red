@@ -10,6 +10,7 @@ import re
 import sys
 import glob
 import json
+import time
 import shutil
 import zipfile
 import subprocess
@@ -564,7 +565,8 @@ def main():
     # Step 7: Optimize pygments (remove unused lexers, styles, formatters)
     optimize_pygments(site_packages_path)
 
-    # Step 8: Create site-packages.zip
+    # Step 8: Wait 2 seconds then create site-packages.zip
+    time.sleep(2)
     zip_path = create_site_packages_zip(site_packages_path)
 
     # Step 9: Finalize pth file with optimized configuration

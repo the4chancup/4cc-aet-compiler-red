@@ -23,7 +23,7 @@ if importlib.util.find_spec("rich") is not None:
     install_rich_traceback(show_locals=True)
 else:
     print("[WARNING] Rich not found, color tags will not be processed")
-    print("[WARNING] Run the compiler_run_py.bat file to install Rich")
+    print("[WARNING] Close this window and run \"pip install rich\" to install it")
     print("")
     input("Or press Enter to continue... ")
 

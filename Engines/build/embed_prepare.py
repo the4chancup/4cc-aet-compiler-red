@@ -225,7 +225,7 @@ def install_dependencies(embed_path, python_exe):
         return False
 
     try:
-        cmd = [python_exe, "-m", "pip", "install"] + dependencies
+        cmd = [python_exe, "-m", "pip", "install"] + dependencies + ["-t", ".\\Lib\\site-packages"]
         log(f"Running command: {' '.join(cmd)}")
         result = subprocess.run(cmd, cwd=embed_path, capture_output=True, text=True)
 

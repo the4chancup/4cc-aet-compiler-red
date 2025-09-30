@@ -130,7 +130,7 @@ def download_and_extract_python():
         return None
 
 def get_dependencies():
-    """Get dependencies by importing REQUREMENTS from the utils directory."""
+    """Get dependencies by importing REQUIREMENTS from the utils directory."""
     try:
         # Add the parent directory to Python path temporarily
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -139,8 +139,8 @@ def get_dependencies():
         if parent_dir not in sys.path:
             sys.path.insert(0, parent_dir)
 
-        # Import the DEPENDENCIES from REQUREMENTS.py
-        from python.lib.utils.REQUREMENTS import DEPENDENCIES
+        # Import the DEPENDENCIES from REQUIREMENTS.py
+        from python.lib.utils.REQUIREMENTS import DEPENDENCIES
 
         # Extract name_pip from each dependency dict
         dependencies = []
@@ -153,7 +153,7 @@ def get_dependencies():
         return dependencies
 
     except Exception as e:
-        log(f"Error getting dependencies from REQUREMENTS.py:\\n{e}")
+        log(f"Error getting dependencies from REQUIREMENTS.py:\\n{e}")
         sys.exit(1)
 
 def download_get_pip(embed_path):

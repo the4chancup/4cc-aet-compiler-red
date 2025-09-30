@@ -5,7 +5,7 @@ import importlib.util
 import importlib.metadata
 
 from python.lib.utils import COLORS
-from python.lib.utils.REQUREMENTS import DEPENDENCIES
+from python.lib.utils.REQUIREMENTS import DEPENDENCIES
 
 
 def dependency_check_on_import():

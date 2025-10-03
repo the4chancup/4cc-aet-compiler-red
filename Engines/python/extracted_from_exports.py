@@ -81,9 +81,9 @@ def extracted_from_exports():
     os.makedirs(main_source_path, exist_ok=True)
 
     if os.path.exists(teams_destination_path):
-        shutil.rmtree(teams_destination_path, onexc=remove_readonly)
+        shutil.rmtree(teams_destination_path, onerror=remove_readonly)
     if os.path.exists(referees_destination_path):
-        shutil.rmtree(referees_destination_path, onexc=remove_readonly)
+        shutil.rmtree(referees_destination_path, onerror=remove_readonly)
 
     # Reset the notes compilation
     with open(TEAMNOTES_PATH, "w", encoding="utf8") as f:
@@ -148,7 +148,7 @@ def extracted_from_exports():
 
         # Delete the export destination folder if present
         if os.path.exists(export_destination_path):
-            shutil.rmtree(export_destination_path, onexc=remove_readonly)
+            shutil.rmtree(export_destination_path, onerror=remove_readonly)
 
         # Extract or copy the export into a new export folder, removing the .db and .ini files
         if not export_type == "folder":
@@ -162,7 +162,7 @@ def extracted_from_exports():
                     z.extractall(export_destination_path_temp)
 
             shutil.copytree(export_destination_path_temp, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
-            shutil.rmtree(export_destination_path_temp, onexc=remove_readonly)
+            shutil.rmtree(export_destination_path_temp, onerror=remove_readonly)
         else:
             shutil.copytree(export_source_path, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
 
@@ -220,7 +220,7 @@ def extracted_from_exports():
             dummy_kits_replace(team_id, team_name, main_destination_path)
 
         # Delete the now empty export folder
-        shutil.rmtree(export_destination_path, onexc=remove_readonly)
+        shutil.rmtree(export_destination_path, onerror=remove_readonly)
 
         print("-")
 

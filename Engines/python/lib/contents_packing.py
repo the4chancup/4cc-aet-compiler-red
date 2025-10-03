@@ -51,14 +51,14 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
 
             # If the target item path exists, remove it
             if os.path.exists(target_item_path):
-                shutil.rmtree(target_item_path, onexc=remove_readonly)
+                shutil.rmtree(target_item_path, onerror=remove_readonly)
 
             # Move the item to the target directory
             shutil.move(item_path, items_dir)
 
         # Delete the main 'Kit Configs' folder
         if os.path.exists(main_dir):
-            shutil.rmtree(main_dir, onexc=remove_readonly)
+            shutil.rmtree(main_dir, onerror=remove_readonly)
 
 
     # If there's a Kit Textures folder, move its stuff
@@ -88,7 +88,7 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
 
         # Delete the main 'Kit Textures' folder
         if os.path.exists(main_dir):
-            shutil.rmtree(main_dir, onexc=remove_readonly)
+            shutil.rmtree(main_dir, onerror=remove_readonly)
 
 
     # If there's a Boots folder, move or pack its stuff
@@ -145,7 +145,7 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir, onexc=remove_readonly)
+        shutil.rmtree(main_dir, onerror=remove_readonly)
 
 
     # If there's a Portraits folder, move its stuff
@@ -172,7 +172,7 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir, onexc=remove_readonly)
+        shutil.rmtree(main_dir, onerror=remove_readonly)
 
 
     # If there's a Logo folder, move its stuff
@@ -199,7 +199,7 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir, onexc=remove_readonly)
+        shutil.rmtree(main_dir, onerror=remove_readonly)
 
 
     # Set the common folder path depending on the fox mode setting
@@ -230,7 +230,7 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
 
                 # If the folder already exists, delete it
                 if os.path.exists(os.path.join(items_folder_path_full, item)):
-                    shutil.rmtree(os.path.join(items_folder_path_full, item), onexc=remove_readonly)
+                    shutil.rmtree(os.path.join(items_folder_path_full, item), onerror=remove_readonly)
 
                 # Move the folder
                 shutil.move(os.path.join(main_dir, item), items_folder_path_full)
@@ -251,4 +251,4 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
                     shutil.move(os.path.join(main_dir, item, subitem), subfolder)
 
         # Then delete the main folder
-        shutil.rmtree(main_dir, onexc=remove_readonly)
+        shutil.rmtree(main_dir, onerror=remove_readonly)

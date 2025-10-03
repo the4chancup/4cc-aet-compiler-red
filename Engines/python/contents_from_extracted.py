@@ -75,7 +75,7 @@ def contents_from_extracted():
         # Delete the contents folder
         refs_folder_path = os.path.join(PATCHES_CONTENTS_PATH, refs_folder_name)
         if os.path.exists(refs_folder_path):
-            shutil.rmtree(refs_folder_path, onexc=remove_readonly)
+            shutil.rmtree(refs_folder_path, onerror=remove_readonly)
 
         # Create the folder
         os.makedirs(refs_folder_path, exist_ok=True)
@@ -121,7 +121,7 @@ def contents_from_extracted():
 
         # Delete the "extracted" folder
         if os.path.exists(EXTRACTED_TEAMS_PATH):
-            shutil.rmtree(EXTRACTED_TEAMS_PATH, onexc=remove_readonly)
+            shutil.rmtree(EXTRACTED_TEAMS_PATH, onerror=remove_readonly)
 
     if refs_present:
         # Pack the referees' contents
@@ -129,7 +129,7 @@ def contents_from_extracted():
 
         # Delete the "extracted" folder
         if os.path.exists(EXTRACTED_REFEREES_PATH):
-            shutil.rmtree(EXTRACTED_REFEREES_PATH, onexc=remove_readonly)
+            shutil.rmtree(EXTRACTED_REFEREES_PATH, onerror=remove_readonly)
 
 
     if 'all_in_one' in os.environ:

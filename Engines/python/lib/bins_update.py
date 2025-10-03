@@ -476,4 +476,4 @@ def bins_pack(bins_foldername):
         print("-")
 
     # Delete the bins temp folder
-    shutil.rmtree(BINS_TEMP_FOLDER_PATH, onexc=remove_readonly)
+    shutil.rmtree(BINS_TEMP_FOLDER_PATH, onerror=remove_readonly)

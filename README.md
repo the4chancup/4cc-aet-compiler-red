@@ -4,8 +4,9 @@ New python-based version, three times faster.
 
 This is a short readme, with just the information you need to compile your
 team's aesthetics so that you can check them on PES.  
-You can also find an advanced readme in the Engines folder, with full details on
-how the compiler works. Read it if you're going to compile a full DLC for a cup.
+You can also find an advanced readme in the Engines folder, with instructions on
+how to compile referees and full details on how the compiler works. Read it if
+you're going to compile a full DLC for a cup.
 
 - Setting Up
 - Compiling Exports

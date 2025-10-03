@@ -1,5 +1,6 @@
 import os
 import sys
+import stat
 import py7zr
 import shutil
 import logging
@@ -175,3 +176,21 @@ def file_critical_check(file_path, healing_allowed = True):
     if not file_healed:
         logger_stop()
         sys.exit()
+
+
+def remove_readonly(func, path, _):
+    "Clear the readonly bit and reattempt the removal"
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+def readonlybit_remove_tree(path):
+    "Clear the readonly bit on an entire tree"
+    for root, dirs, files in os.walk(path, topdown=False):
+        for name in files:
+            filename = os.path.join(root, name)
+            os.chmod(filename, 0o600)
+        for name in dirs:
+            filename = os.path.join(root, name)
+            os.chmod(filename, 0o700)
+        for dir in dirs:
+            readonlybit_remove_tree(os.path.join(root, dir))

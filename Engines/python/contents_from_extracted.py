@@ -1,13 +1,13 @@
 import os
 import sys
-import stat
 import shutil
 import logging
 
 from .lib.bins_update import bins_pack
 from .lib.contents_packing import contents_pack
-from .lib.utils.pausing import pause
+from .lib.utils.file_management import remove_readonly
 from .lib.utils.logging_tools import logger_stop
+from .lib.utils.pausing import pause
 from .lib.utils.FILE_INFO import (
     EXTRACTED_TEAMS_PATH,
     EXTRACTED_REFEREES_PATH,
@@ -15,12 +15,6 @@ from .lib.utils.FILE_INFO import (
     REFS_TEMPLATE_PREFOX_PATH,
     REFS_TEMPLATE_FOX_PATH,
 )
-
-
-def remove_readonly(func, path, _):
-    "Clear the readonly bit and reattempt the removal"
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
 
 
 def contents_from_extracted():

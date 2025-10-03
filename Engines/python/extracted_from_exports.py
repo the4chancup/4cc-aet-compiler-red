@@ -1,46 +1,27 @@
 import os
 import re
 import sys
-import stat
 import py7zr
 import shutil
 
-from .lib.team_id_get import team_id_get
-from .lib.portraits_move import portraits_move
-from .lib.export_move import export_move
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
+from .lib.export_move import export_move
+from .lib.portraits_move import portraits_move
 from .lib.referee_tools import referee_export_process
-from .lib.utils.zlib_plus import zlib_files_in_folder
-from .lib.utils.pausing import pause
+from .lib.team_id_get import team_id_get
 from .lib.utils import COLORS
 from .lib.utils.app_tools import referee_title
+from .lib.utils.file_management import remove_readonly, readonlybit_remove_tree
 from .lib.utils.logging_tools import log_presence_warn
+from .lib.utils.pausing import pause
+from .lib.utils.zlib_plus import zlib_files_in_folder
 from .lib.utils.FILE_INFO import (
     EXPORTS_TO_ADD_PATH,
     EXTRACTED_TEAMS_PATH,
     EXTRACTED_REFEREES_PATH,
     TEAMNOTES_PATH,
 )
-
-
-def readonlybit_remove_tree(path):
-    "Clear the readonly bit on an entire tree"
-    for root, dirs, files in os.walk(path, topdown=False):
-        for name in files:
-            filename = os.path.join(root, name)
-            os.chmod(filename, 0o600)
-        for name in dirs:
-            filename = os.path.join(root, name)
-            os.chmod(filename, 0o700)
-        for dir in dirs:
-            readonlybit_remove_tree(os.path.join(root, dir))
-
-
-def remove_readonly(func, path, _):
-    "Clear the readonly bit and reattempt the removal"
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
 
 
 # Append the contents of a txt file to teamnotes.txt for quick reading

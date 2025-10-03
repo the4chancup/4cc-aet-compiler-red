@@ -1,16 +1,15 @@
 ## Reads team and kit color entries from Note files and adds them to bin files
 import os
 import sys
-import stat
 import shutil
 import logging
 
 from . import pes_uniparam_edit as uniparamtool
 from .cpk_tools import files_fetch_from_cpks
 from .team_id_get import id_search
-from .utils.pausing import pause
+from .utils.file_management import file_critical_check, remove_readonly
 from .utils.logging_tools import logger_stop
-from .utils.file_management import file_critical_check
+from .utils.pausing import pause
 from .utils.FILE_INFO import (
     EXTRACTED_TEAMS_PATH,
     TEAMS_LIST_PATH,
@@ -22,12 +21,6 @@ from .utils.FILE_INFO import (
     UNIPARAM_18_NAME,
     UNIPARAM_19_NAME,
 )
-
-
-def remove_readonly(func, path, _):
-    "Clear the readonly bit and reattempt the removal"
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
 
 
 def bytes_from_color(color_entry_parts, index, colors_type_hex=False):

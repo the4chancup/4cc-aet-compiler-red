@@ -1,17 +1,11 @@
 import os
-import stat
 import shutil
 
 from .model_packing import models_pack
+from .utils.file_management import remove_readonly
 from .utils.FILE_INFO import (
     PATCHES_CONTENTS_PATH,
 )
-
-
-def remove_readonly(func, path, _):
-    "Clear the readonly bit and reattempt the removal"
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
 
 
 def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_name: str):

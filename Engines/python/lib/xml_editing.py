@@ -245,7 +245,6 @@ def xml_create(model_folder_path, model_folder_type):
 
         model_type_list = []
         model_file_path_list = []
-        mtl_file_path_list = []
 
         # Recursively find all .model files in the folder and subfolders
         model_files = find_model_files_recursive(model_folder_path)
@@ -336,8 +335,6 @@ def xml_create(model_folder_path, model_folder_type):
 
             mtl_file_name_xml = mtl_file_name
             mtl_file_path_xml = f"{mtl_base_path}{mtl_dir_xml}{mtl_file_name_xml}"
-
-            mtl_file_path_list.append(mtl_file_path_xml)
 
             # Check if any of the types in the list are in the start of the model name's core
             model_file_name_core_simple = model_file_name_core.replace("_", "").lower()

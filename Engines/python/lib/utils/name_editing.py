@@ -5,6 +5,34 @@ from .zlib_plus import unzlib_file
 from .FILE_INFO import UNIFORM_COMMON_PREFOX_PATH
 
 
+def model_names_fix(folder_path, include_subfolders=True):
+    '''Add "oral_" and "_win32" to any model names found in the folder and its subfolders'''
+
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
+
+        if not os.path.isfile(file_path) or not file_name.endswith(".model"):
+            continue
+
+        # Check if the file name starts with "oral_" and ends with "_win32"
+        file_name_noext = os.path.splitext(file_name)[0]
+        if file_name_noext.startswith("oral_") and file_name_noext.endswith("_win32"):
+            continue
+
+        file_path_new = os.path.join(folder_path, f"oral_{file_name_noext}_win32.model")
+        if os.path.exists(file_path_new):
+            os.remove(file_path_new)
+        os.rename(file_path, file_path_new)
+
+    if not include_subfolders:
+        return
+
+    for subfolder_name in os.listdir(folder_path):
+        subfolder_path = os.path.join(folder_path, subfolder_name)
+        if os.path.isdir(subfolder_path):
+            model_names_fix(subfolder_path, include_subfolders)
+
+
 def filenames_id_replace(folder_path, team_id, include_subfolders=True):
     '''Replace the dummy team ID with the actual one in any filenames found in the folder and its subfolders'''
 

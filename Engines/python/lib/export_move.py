@@ -9,9 +9,10 @@ from .utils.file_management import file_critical_check
 from .utils.texture_conversion import textures_convert
 from .utils.zlib_plus import unzlib_file
 from .utils.name_editing import (
-    txt_id_change,
+    model_names_fix,
     filenames_id_replace,
     fix_mtl_paths,
+    txt_id_change,
 )
 from .utils.FILE_INFO import (
     TEMPLATE_FOLDER_PATH,
@@ -434,6 +435,9 @@ def export_move(exportfolder_path, team_id, team_name):
 
                 # Replace the dummy team ID with the actual one in any files found
                 filenames_id_replace(team_itemfolder_path, team_id)
+
+                # Add oral_ and _win32 to any lacking model file names found in the folder
+                model_names_fix(team_itemfolder_path)
 
                 # Move everything to the team folder inside the main folder
                 for file in os.listdir(team_itemfolder_path):

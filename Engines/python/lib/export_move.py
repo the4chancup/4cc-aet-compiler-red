@@ -184,12 +184,11 @@ def export_move(exportfolder_path, team_id, team_name):
 
                     object_type = "face"
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
-                    if os.path.exists(xml_path):
-                        # Process the xml file
-                        xml_process(xml_path, team_id)
-                    else:
+                    if not os.path.exists(xml_path):
                         # Create the xml file
                         xml_create(subfolder_path, object_type)
+                    # Process the xml file
+                    xml_process(xml_path, team_id)
 
                 # Convert unsupported textures
                 textures_convert(subfolder_path, fox_mode, fox_19)
@@ -410,12 +409,11 @@ def export_move(exportfolder_path, team_id, team_name):
 
                     object_type = "glove"
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
-                    if os.path.exists(xml_path):
-                        # Change the team IDs inside the xml file
-                        txt_id_change(xml_path, team_id)
-                    else:
+                    if not os.path.exists(xml_path):
                         # Create the xml file
                         xml_create(subfolder_path, object_type)
+                    # Process the xml file
+                    xml_process(xml_path, team_id)
 
                 # Convert unsupported textures
                 textures_convert(subfolder_path, fox_mode, fox_19)

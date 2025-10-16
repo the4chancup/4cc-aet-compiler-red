@@ -5,7 +5,7 @@ import struct
 import fnmatch
 import logging
 
-from .utils.id_change import path_id_change
+from .utils.name_editing import path_id_change
 
 
 def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):

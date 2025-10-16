@@ -7,7 +7,7 @@ import xml.parsers.expat
 from .cpk_tools import files_fetch_from_cpks
 from .utils.zlib_plus import unzlib_file
 from .utils.elements import dummy_element
-from .utils.id_change import path_id_change
+from .utils.name_editing import path_id_change
 from .utils.pausing import pause
 from .utils.FILE_INFO import (
     UNIFORM_COMMON_PREFOX_PATH,

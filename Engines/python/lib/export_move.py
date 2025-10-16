@@ -8,7 +8,7 @@ from .xml_editing import xml_process
 from .utils.file_management import file_critical_check
 from .utils.texture_conversion import textures_convert
 from .utils.zlib_plus import unzlib_file
-from .utils.id_change import (
+from .utils.name_editing import (
     txt_id_change,
     filenames_id_replace,
     fix_mtl_paths,

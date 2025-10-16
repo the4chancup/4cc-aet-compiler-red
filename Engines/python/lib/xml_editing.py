@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 from .utils.file_management import file_critical_check
 from .utils.elements import dummy_element
 from .utils.elements import glove_element
-from .utils.id_change import txt_id_change
+from .utils.name_editing import txt_id_change
 from .utils.FILE_INFO import UNIFORM_COMMON_PREFOX_PATH
 
 

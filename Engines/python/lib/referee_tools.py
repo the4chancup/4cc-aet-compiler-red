@@ -34,18 +34,18 @@ def get_ref_ids(ref_num):
     return face_id, boots_id, gloves_id
 
 
-def get_common_files_list(folder_path):
-    """Get a list of files in the Common folder of the folder indicated."""
-    common_src = os.path.join(folder_path, 'common')
-    if not os.path.exists(common_src):
+def get_files_list(folder_path):
+    """Get a list of files in the folder indicated."""
+    if not os.path.exists(folder_path):
         return []
 
-    common_files = []
-    for item in os.listdir(common_src):
-        src_path = os.path.join(common_src, item)
+    files_list = []
+    for item in os.listdir(folder_path):
+        src_path = os.path.join(folder_path, item)
         if os.path.isfile(src_path):
-            common_files.append(item)
-    return common_files
+            files_list.append(item)
+
+    return files_list
 
 
 def update_file_paths(file_path, ref_name, ref_common_files, common_files):
@@ -132,25 +132,31 @@ def update_referee_source_paths(ref_folder_path, ref_name, common_files):
         ref_name: Name of the referee (for subfolder)
         common_files: List of files that are in the export's Common folder
     """
-    # Get list of files in the Common folder of the referee's source folder
-    ref_common_files = get_common_files_list(ref_folder_path)
+    # Get list of files in the common folder of the referee's source folder
+    ref_common_files = get_files_list(os.path.join(ref_folder_path, 'common'))
     if not ref_common_files:
         return
+
+    # Get list of files in the common_shared folder of the referee's source folder
+    ref_common_shared_files = get_files_list(os.path.join(ref_folder_path, 'common_shared'))
+
+    # Combine the list of files from common_shared and the list of files in the export's Common folder
+    common_files_withshared = common_files + ref_common_shared_files
 
     # Update paths in face folder
     face_src = os.path.join(ref_folder_path, 'face')
     if os.path.exists(face_src):
-        update_folder_paths(face_src, ref_name, ref_common_files, common_files)
+        update_folder_paths(face_src, ref_name, ref_common_files, common_files_withshared)
 
     # Update paths in boots folder
     boots_src = os.path.join(ref_folder_path, 'boots')
     if os.path.exists(boots_src):
-        update_folder_paths(boots_src, ref_name, ref_common_files, common_files)
+        update_folder_paths(boots_src, ref_name, ref_common_files, common_files_withshared)
 
     # Update paths in gloves folder
     gloves_src = os.path.join(ref_folder_path, 'gloves')
     if os.path.exists(gloves_src):
-        update_folder_paths(gloves_src, ref_name, ref_common_files, common_files)
+        update_folder_paths(gloves_src, ref_name, ref_common_files, common_files_withshared)
 
 
 def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_path):
@@ -211,6 +217,23 @@ def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_pa
             elif os.path.isdir(src_path):
                 shutil.copytree(src_path, dst_path)
 
+    # Process common_shared folder if it exists - copy to the export's Common folder
+    common_shared_src = os.path.join(ref_folder_path, 'common_shared')
+    if os.path.exists(common_shared_src):
+        common_shared_dst = os.path.join(export_destination_path, 'Common')
+        os.makedirs(common_shared_dst, exist_ok=True)
+
+        # Copy all files and folders from common_shared folder to Common folder
+        for item in os.listdir(common_shared_src):
+            src_path = os.path.join(common_shared_src, item)
+            dst_path = os.path.join(common_shared_dst, item)
+            if os.path.exists(dst_path):
+                continue
+            if os.path.isfile(src_path):
+                shutil.copy2(src_path, dst_path)
+            elif os.path.isdir(src_path):
+                shutil.copytree(src_path, dst_path)
+
 
 def error_handle():
     logging.error("- Referee compilation will be skipped")
@@ -252,7 +275,7 @@ def referee_export_process(export_destination_path, fox_mode):
     export_players_path = os.path.join(export_destination_path, "Players")
 
     # First pass: Update paths in source folders (once per unique referee)
-    common_files = get_common_files_list(export_destination_path)
+    common_files = get_files_list(os.path.join(export_destination_path, 'Common'))
     for ref_name in set(ref_mappings.values()):
         ref_folder_path = os.path.join(export_players_path, ref_name)
         if os.path.exists(ref_folder_path):

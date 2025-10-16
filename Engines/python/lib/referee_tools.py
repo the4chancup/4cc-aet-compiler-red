@@ -313,11 +313,14 @@ def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_pa
             )
             os.makedirs(folder_dst)
 
-            # Copy all files from folder
+            # Copy all files and subdirectories
             for item in os.listdir(folder_src):
                 src_path = os.path.join(folder_src, item)
+                dst_path = os.path.join(folder_dst, item)
                 if os.path.isfile(src_path):
-                    shutil.copy2(src_path, folder_dst)
+                    shutil.copy2(src_path, dst_path)
+                elif os.path.isdir(src_path):
+                    shutil.copytree(src_path, dst_path)
         elif config['required']:
             logging.warning(f"- Warning - No {folder_name} folder found for referee {ref_name}")
 

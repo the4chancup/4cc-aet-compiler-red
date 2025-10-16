@@ -230,6 +230,8 @@ def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_pa
         for item in os.listdir(common_src):
             src_path = os.path.join(common_src, item)
             dst_path = os.path.join(common_dst, item)
+            if os.path.exists(dst_path):
+                continue
             if os.path.isfile(src_path):
                 shutil.copy2(src_path, dst_path)
             elif os.path.isdir(src_path):

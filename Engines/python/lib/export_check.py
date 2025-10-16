@@ -21,6 +21,8 @@ FILE_TYPE_ALLOWED_LIST = [
     ".dds",
     ".ftex",
     ".skl",
+    ".common",
+    ".txt",
 ]
 
 PREFOX_FILE_TYPE_DISALLOWED_LIST = [

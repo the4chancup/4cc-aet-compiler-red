@@ -34,16 +34,34 @@ def get_ref_ids(ref_num):
     return face_id, boots_id, gloves_id
 
 
-def get_files_list(folder_path):
-    """Get a list of files in the folder indicated."""
+def get_files_list(folder_path, recursive=False):
+    """Get a list of files in the folder indicated.
+
+    Args:
+        folder_path: Path to the folder
+        recursive: If True, include files in subdirectories with relative paths
+
+    Returns:
+        List of filenames (or relative paths if recursive=True)
+    """
     if not os.path.exists(folder_path):
         return []
 
     files_list = []
-    for item in os.listdir(folder_path):
-        src_path = os.path.join(folder_path, item)
-        if os.path.isfile(src_path):
-            files_list.append(item)
+    if recursive:
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                # Get relative path from folder_path
+                full_path = os.path.join(root, file)
+                rel_path = os.path.relpath(full_path, folder_path)
+                # Use forward slashes for consistency
+                rel_path = rel_path.replace('\\', '/')
+                files_list.append(rel_path)
+    else:
+        for item in os.listdir(folder_path):
+            src_path = os.path.join(folder_path, item)
+            if os.path.isfile(src_path):
+                files_list.append(item)
 
     return files_list
 
@@ -132,13 +150,13 @@ def update_referee_source_paths(ref_folder_path, ref_name, common_files):
         ref_name: Name of the referee (for subfolder)
         common_files: List of files that are in the export's Common folder
     """
-    # Get list of files in the common folder of the referee's source folder
-    ref_common_files = get_files_list(os.path.join(ref_folder_path, 'common'))
+    # Get list of files in the common folder (including subdirectories)
+    ref_common_files = get_files_list(os.path.join(ref_folder_path, 'common'), recursive=True)
     if not ref_common_files:
         return
 
     # Get list of files in the common_shared folder of the referee's source folder
-    ref_common_shared_files = get_files_list(os.path.join(ref_folder_path, 'common_shared'))
+    ref_common_shared_files = get_files_list(os.path.join(ref_folder_path, 'common_shared'), recursive=True)
 
     # Combine the list of files from common_shared and the list of files in the export's Common folder
     common_files_withshared = common_files + ref_common_shared_files
@@ -275,7 +293,7 @@ def referee_export_process(export_destination_path, fox_mode):
     export_players_path = os.path.join(export_destination_path, "Players")
 
     # First pass: Update paths in source folders (once per unique referee)
-    common_files = get_files_list(os.path.join(export_destination_path, 'Common'))
+    common_files = get_files_list(os.path.join(export_destination_path, 'Common'), recursive=True)
     for ref_name in set(ref_mappings.values()):
         ref_folder_path = os.path.join(export_players_path, ref_name)
         if os.path.exists(ref_folder_path):

@@ -4,10 +4,14 @@ import shutil
 import logging
 
 from .utils.pausing import pause
+from .utils.zlib_plus import unzlib_file
 from .utils.FILE_INFO import (
     REFS_TEMPLATE_PREFOX_PATH,
     REFS_TEMPLATE_FOX_PATH,
 )
+
+
+UNIFORM_COMMON_PATH = 'model/character/uniform/common/'
 
 
 def refs_list_process(refs_txt_path):
@@ -76,6 +80,9 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
         common_files: List of files that are in the export's Common folder (for checking shared files)
     """
     try:
+        # Unzlib file if needed
+        unzlib_file(file_path)
+
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
 
@@ -91,16 +98,24 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
             path_value = match.group(2)
             suffix = match.group(3)
 
-            # Extract filename from path
-            filename = os.path.basename(path_value)
+            # Normalize to forward slashes
+            path_value_normalized = path_value.replace('\\', '/')
 
-            # Check if this file is in the referee's common folder
-            # and it's not in the export's common folder
-            if filename in ref_common_files and filename not in common_files:
-                # Update to use referee-specific subfolder
-                new_path = f"model/character/uniform/common/XXX/{ref_name}/{filename}"
-                logging.debug(f"Updated path: {path_value} -> {new_path}")
-                return prefix + new_path + suffix
+            # Check if path points to Common folder (with XXX subfolder pattern)
+            # Pattern: model/character/uniform/common/XXX/ where XXX is 3 alphanumeric chars
+            common_pattern = re.match(
+                rf'{re.escape(UNIFORM_COMMON_PATH)}[a-zA-Z0-9]{{3}}/(.*)', path_value_normalized
+            )
+            if common_pattern:
+                # Extract the part after common/XXX/
+                common_part = common_pattern.group(1)
+
+                # Check if this file is in the referee's common folder
+                if common_part in ref_common_files and common_part not in common_files:
+                    # Update to use referee-specific subfolder
+                    new_path = f"{UNIFORM_COMMON_PATH}XXX/{ref_name}/{common_part}"
+                    logging.debug(f"Updated path: {path_value} -> {new_path}")
+                    return prefix + new_path + suffix
 
             return match.group(0)
 
@@ -142,14 +157,113 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
                 update_file_paths(item_path, ref_name, ref_common_files, common_files)
 
 
-def update_referee_source_paths(ref_folder_path, ref_name, common_files):
+def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):
+    """Update MTL file paths after textures have been moved to common subfolder.
+
+    Args:
+        mtl_path: Path to the MTL file
+        texture_files: List of texture filenames that were moved
+        subfolder_name: Name of the subfolder in common (e.g., 'face')
+    """
+    try:
+        # Unzlib file if needed
+        unzlib_file(mtl_path)
+
+        with open(mtl_path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        modified = False
+        new_lines = []
+
+        for line in lines:
+            new_line = line
+            # Check for texture references
+            for texture in texture_files:
+                if not ('path=' in line and f'./{texture}' in line):
+                    continue
+                # Replace texture path to point to common/XXX/[subfolder]/
+                new_path = f"{UNIFORM_COMMON_PATH}XXX/{subfolder_name}/{texture}"
+                new_line = re.sub(
+                    rf'(path=")\./{re.escape(texture)}(")',
+                    rf'\1{new_path}\2',
+                    new_line
+                )
+                if new_line != line:
+                    modified = True
+                    logging.debug(f"Updated MTL texture reference: ./{texture} -> {new_path}")
+                    break
+            new_lines.append(new_line)
+
+        if modified:
+            with open(mtl_path, 'w', encoding='utf-8') as f:
+                f.writelines(new_lines)
+            logging.debug(f"Updated MTL paths in: {mtl_path}")
+
+    except Exception as e:
+        logging.error(f"- ERROR - Failed to update MTL paths in {mtl_path}: {e}")
+        pause()
+
+def move_textures_to_common(ref_folder_path, folder_name):
+    """Move texture files from face/boots/gloves folder to common subfolder and update MTL paths.
+
+    Args:
+        ref_folder_path: Path to the referee's source folder
+        folder_name: Name of the folder ('face', 'boots', or 'gloves')
+
+    Returns:
+        List of moved texture filenames
+    """
+    TEXTURE_EXTENSIONS = ['.dds', '.ftex']
+
+    src_folder = os.path.join(ref_folder_path, folder_name)
+    if not os.path.exists(src_folder):
+        return []
+
+    # Find texture files in the source folder
+    texture_files = []
+    for item in os.listdir(src_folder):
+        if any(item.lower().endswith(ext) for ext in TEXTURE_EXTENSIONS):
+            texture_files.append(item)
+
+    if not texture_files:
+        return []
+
+    # Create common/[folder_name] subfolder
+    common_subfolder = os.path.join(ref_folder_path, 'common', folder_name)
+    os.makedirs(common_subfolder, exist_ok=True)
+
+    # Move textures
+    for texture in texture_files:
+        src_path = os.path.join(src_folder, texture)
+        dst_path = os.path.join(common_subfolder, texture)
+        shutil.move(src_path, dst_path)
+        logging.debug(f"Moved texture {texture} to common/{folder_name}/")
+
+    # Update MTL file paths in the source folder
+    for item in os.listdir(src_folder):
+        if item.endswith('.mtl'):
+            mtl_path = os.path.join(src_folder, item)
+            update_mtl_for_moved_textures(mtl_path, texture_files, folder_name)
+
+    return texture_files
+
+
+def update_referee_source_paths(ref_folder_path, ref_name, common_files, fox_mode):
     """Update paths in the source referee folder's face, boots, and gloves folders.
 
     Args:
         ref_folder_path: Path to the referee's source folder
         ref_name: Name of the referee (for subfolder)
         common_files: List of files that are in the export's Common folder
+        fox_mode: Whether fox mode is enabled
     """
+    # First: Auto-move textures to common subfolders (only when fox_mode is False)
+    if not fox_mode:
+        logging.debug(f"Auto-moving textures to common subfolders for {ref_name}")
+        move_textures_to_common(ref_folder_path, 'face')
+        move_textures_to_common(ref_folder_path, 'boots')
+        move_textures_to_common(ref_folder_path, 'gloves')
+
     # Get list of files in the common folder (including subdirectories)
     ref_common_files = get_files_list(os.path.join(ref_folder_path, 'common'), recursive=True)
     if not ref_common_files:
@@ -299,7 +413,7 @@ def referee_export_process(export_destination_path, fox_mode):
     for ref_name in set(ref_mappings.values()):
         ref_folder_path = os.path.join(export_players_path, ref_name)
         if os.path.exists(ref_folder_path):
-            update_referee_source_paths(ref_folder_path, ref_name, common_files)
+            update_referee_source_paths(ref_folder_path, ref_name, common_files, fox_mode)
             logging.debug(f"Preprocessed referee folder: {ref_name}")
 
     # Second pass: Process each referee folder according to the list

@@ -9,6 +9,9 @@ from .utils.zlib_plus import unzlib_file
 from .utils.elements import dummy_element
 from .utils.id_change import path_id_change
 from .utils.pausing import pause
+from .utils.FILE_INFO import (
+    UNIFORM_COMMON_PREFOX_PATH,
+)
 
 
 def type_string_get(listed_file_type):
@@ -64,8 +67,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     # Read the necessary parameters
     pes_version = os.environ.get('PES_VERSION', '19')
 
-    UNIFORM_COMMON_PATH = 'model/character/uniform/common/'
-    UNIFORM_COMMON_PATH_LENGTH = len(UNIFORM_COMMON_PATH)
+    UNIFORM_COMMON_PATH_LENGTH = len(UNIFORM_COMMON_PREFOX_PATH)
     UNIFORM_COMMON_PATH_WITH_ID_LENGTH = UNIFORM_COMMON_PATH_LENGTH + 4
     FACE_COMMON_PATH = 'model/character/face/common/'
 
@@ -108,7 +110,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
             return False
 
     # Check if the file path points to the uniform common folder
-    elif listed_file_path.startswith(UNIFORM_COMMON_PATH):
+    elif listed_file_path.startswith(UNIFORM_COMMON_PREFOX_PATH):
 
         # Check if the file path contains any further subfolders
         if '/' not in listed_file_path[UNIFORM_COMMON_PATH_LENGTH:]:

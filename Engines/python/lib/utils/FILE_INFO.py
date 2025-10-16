@@ -53,5 +53,9 @@ UNIPARAM_NAME                = "UniformParameter.bin"
 UNIPARAM_18_NAME             = "UniformParameter18.bin"
 UNIPARAM_19_NAME             = "UniformParameter19.bin"
 
+# PES-specific paths
+UNIFORM_COMMON_PREFOX_PATH   = 'model/character/uniform/common/'
+UNIFORM_COMMON_FOX_PATH      = '/Assets/pes16/model/character/common/'
+
 # DirectXTex
 TEXCONV_PATH                 = os.path.join("Engines", "directxtex", "texconv.exe")

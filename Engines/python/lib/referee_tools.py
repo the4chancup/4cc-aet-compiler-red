@@ -8,10 +8,8 @@ from .utils.zlib_plus import unzlib_file
 from .utils.FILE_INFO import (
     REFS_TEMPLATE_PREFOX_PATH,
     REFS_TEMPLATE_FOX_PATH,
+    UNIFORM_COMMON_PREFOX_PATH,
 )
-
-
-UNIFORM_COMMON_PATH = 'model/character/uniform/common/'
 
 
 def refs_list_process(refs_txt_path):
@@ -104,7 +102,7 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
             # Check if path points to Common folder (with XXX subfolder pattern)
             # Pattern: model/character/uniform/common/XXX/ where XXX is 3 alphanumeric chars
             common_pattern = re.match(
-                rf'{re.escape(UNIFORM_COMMON_PATH)}[a-zA-Z0-9]{{3}}/(.*)', path_value_normalized
+                rf'{re.escape(UNIFORM_COMMON_PREFOX_PATH)}[a-zA-Z0-9]{{3}}/(.*)', path_value_normalized
             )
             if common_pattern:
                 # Extract the part after common/XXX/
@@ -113,7 +111,7 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
                 # Check if this file is in the referee's common folder
                 if common_part in ref_common_files and common_part not in common_files:
                     # Update to use referee-specific subfolder
-                    new_path = f"{UNIFORM_COMMON_PATH}XXX/{ref_name}/{common_part}"
+                    new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/{common_part}"
                     logging.debug(f"Updated path: {path_value} -> {new_path}")
                     return prefix + new_path + suffix
 
@@ -182,7 +180,7 @@ def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):
                 if not ('path=' in line and f'./{texture}' in line):
                     continue
                 # Replace texture path to point to common/XXX/[subfolder]/
-                new_path = f"{UNIFORM_COMMON_PATH}XXX/{subfolder_name}/{texture}"
+                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{subfolder_name}/{texture}"
                 new_line = re.sub(
                     rf'(path=")\./{re.escape(texture)}(")',
                     rf'\1{new_path}\2',

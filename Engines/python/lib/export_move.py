@@ -14,6 +14,7 @@ from .utils.FILE_INFO import (
     TEMPLATE_FOLDER_PATH,
     KIT_MASK_NAME,
     FACE_DIFF_BIN_NAME,
+    UNIFORM_COMMON_PREFOX_PATH,
 )
 
 
@@ -53,7 +54,7 @@ def fix_mtl_paths(file_path, team_id):
     with open(file_path, 'w') as file:
         for line in lines:
             if line.startswith("./"):
-                file.write(f"model/character/uniform/common/{team_id}/")
+                file.write(f"{UNIFORM_COMMON_PREFOX_PATH}{team_id}/")
             file.write(line)
 
 

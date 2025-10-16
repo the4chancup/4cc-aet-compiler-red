@@ -48,27 +48,25 @@ def glove_element(folder_path, glove_side):
     glove_name = f"glove_{glove_side}.model"
     glove_path = os.path.join(folder_path, glove_name)
 
-    if os.path.isfile(glove_path):
-
-        glove_type = f"glove{glove_side.upper()}"
-        glove_path_xml = f"./{glove_name}"
-
-        mtl_test_name = glove_name.replace('.model', '.mtl')
-        mtl_test_path = os.path.join(folder_path, mtl_test_name)
-
-        if os.path.isfile(mtl_test_path):
-            mtl_path_xml = f"./{mtl_test_name}"
-        else:
-            mtl_path_xml = f"./{MTL_DEFAULT_NAME}"
-
-        # Add a model entry to the root
-        model = ET.Element('model')
-        model.set('level', '0')
-        model.set('type', glove_type)
-        model.set('path', glove_path_xml)
-        model.set('material', mtl_path_xml)
-
-        return model
-
-    else:
+    if not os.path.isfile(glove_path):
         return None
+
+    glove_type = f"glove{glove_side.upper()}"
+    glove_path_xml = f"./{glove_name}"
+
+    mtl_test_name = glove_name.replace('.model', '.mtl')
+    mtl_test_path = os.path.join(folder_path, mtl_test_name)
+
+    if os.path.isfile(mtl_test_path):
+        mtl_path_xml = f"./{mtl_test_name}"
+    else:
+        mtl_path_xml = f"./{MTL_DEFAULT_NAME}"
+
+    # Add a model entry to the root
+    model = ET.Element('model')
+    model.set('level', '0')
+    model.set('type', glove_type)
+    model.set('path', glove_path_xml)
+    model.set('material', mtl_path_xml)
+
+    return model

@@ -180,8 +180,20 @@ def file_critical_check(file_path, healing_allowed = True):
 
 def remove_readonly(func, path, _):
     "Clear the readonly bit and reattempt the removal"
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
+    try:
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    except PermissionError:
+        print( "-")
+        logging.error( "- ERROR - Permission error")
+        if os.path.isfile(path):
+            logging.error(f"- File path: {path}")
+            pause("- Close the file if open and press Enter to try again... ")
+        else:
+            logging.error(f"- Folder path: {path}")
+            pause("- Close any opened files from the folder and press Enter to try again... ")
+        print( "-")
+        remove_readonly(func, path, _)
 
 def readonlybit_remove_tree(path):
     "Clear the readonly bit on an entire tree"

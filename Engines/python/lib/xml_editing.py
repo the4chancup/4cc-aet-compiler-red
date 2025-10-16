@@ -189,7 +189,8 @@ def find_model_files_recursive(folder_path):
 
 def diff_data_decode(folder_path, diff_bin_path_default=None):
     """
-    Decode diff data from either a bin or xml file.
+    Decodes diff data from either a bin or xml file then returns the diff element.
+    If the file is not default, deletes it.
 
     Parameters:
         folder_path (str): Path to the folder containing diff files
@@ -209,7 +210,7 @@ def diff_data_decode(folder_path, diff_bin_path_default=None):
     else:
         if diff_bin_path_default:
             diff_bin_path = diff_bin_path_default
-            diff_type = "bin"
+            diff_type = "bin_default"
         else:
             return None
 
@@ -217,11 +218,14 @@ def diff_data_decode(folder_path, diff_bin_path_default=None):
         diff_file = ET.ElementTree(file=diff_xml_path)
         diff_temp = diff_file.getroot()
         diff = copy.deepcopy(diff_temp)
+        os.remove(diff_xml_path)
     else:
         diff = ET.Element("dif")
         diff_file = open(diff_bin_path, 'rb').read()
         diff.text = "\n%s\n" % str(base64.b64encode(diff_file), 'utf-8')
         diff.tail = "\n"
+        if diff_type != "bin_default":
+            os.remove(diff_bin_path)
 
     return diff
 

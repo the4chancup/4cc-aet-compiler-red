@@ -5,6 +5,10 @@ import logging
 
 from .utils.pausing import pause
 from .utils.zlib_plus import unzlib_file
+from .utils.name_editing import (
+    is_common_file,
+    normalize_kit_dependent_file,
+)
 from .utils.FILE_INFO import (
     REFS_TEMPLATE_PREFOX_PATH,
     REFS_TEMPLATE_FOX_PATH,
@@ -37,7 +41,8 @@ def get_ref_ids(ref_num):
 
 
 def get_files_list(folder_path, recursive=False):
-    """Get a list of files in the folder indicated.
+    """
+    Get a list of files in the folder indicated.
 
     Args:
         folder_path: Path to the folder
@@ -69,7 +74,8 @@ def get_files_list(folder_path, recursive=False):
 
 
 def update_file_paths(file_path, ref_name, ref_common_files, common_files):
-    """Update paths in XML or MTL file to reference referee-specific Common subfolder.
+    """
+    Update paths in XML or MTL file to reference referee-specific Common subfolder.
 
     Args:
         file_path: Path to the file to update (XML or MTL)
@@ -140,7 +146,8 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
 
 
 def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
-    """Update paths in all XML and MTL files in a folder.
+    """
+    Update paths in all XML and MTL files in a folder.
 
     Args:
         folder_path: Path to the folder containing XML and MTL files
@@ -156,7 +163,8 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
 
 
 def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):
-    """Update MTL file paths after textures have been moved to common subfolder.
+    """
+    Update MTL file paths after textures have been moved to common subfolder.
 
     Args:
         mtl_path: Path to the MTL file
@@ -202,7 +210,8 @@ def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):
         pause()
 
 def move_textures_to_common(ref_folder_path, model_folder_name):
-    """Move texture files from face/boots/gloves folder to common subfolder and update MTL paths.
+    """
+    Move texture files from face/boots/gloves folder to common subfolder and update MTL paths.
 
     Args:
         ref_folder_path: Path to the referee's source folder
@@ -245,8 +254,51 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
 
     return texture_files
 
+def move_markers_to_subfolder(ref_folder_path, model_folder_name):
+    """
+    Move common file markers to a subfolder with the referee name if they correspond to a file in
+    the referee's common folder.
+
+    Args:
+        ref_folder_path: Path to the referee's source folder
+        model_folder_name: Name of the model folder ('face', 'boots', or 'gloves')
+
+    Returns:
+        List of moved marker filenames
+    """
+    src_folder_path = os.path.join(ref_folder_path, model_folder_name)
+    if not os.path.exists(src_folder_path):
+        return []
+
+    ref_folder_name = os.path.basename(ref_folder_path)
+    src_files = get_files_list(src_folder_path, recursive=True)
+    common_files = get_files_list(os.path.join(ref_folder_path, 'common'), recursive=True)
+    for item_path_rel in src_files:
+        item_common_cleaned = is_common_file(item_path_rel)
+        if not item_common_cleaned:
+            continue
+
+        if normalize_kit_dependent_file(item_common_cleaned, reverse=True) not in common_files:
+            continue
+
+        marker_file_path = os.path.join(src_folder_path, os.path.normpath(item_path_rel))
+
+        # Create destination folder including any subdirectories from item_path_rel
+        dst_folder_path = os.path.join(
+            ref_folder_path, model_folder_name, ref_folder_name, os.path.dirname(item_path_rel)
+        )
+        os.makedirs(dst_folder_path, exist_ok=True)
+
+        dst_path = os.path.join(dst_folder_path, os.path.basename(item_path_rel))
+        shutil.move(marker_file_path, dst_path)
+        logging.debug(f"Moved common file marker {item_path_rel} to {model_folder_name}/{ref_folder_name}/")
+
+    return common_files
+
+
 def move_models_to_common(ref_folder_path, model_folder_name):
-    """Move model and mtl files from face/boots/gloves folder to common subfolder and create markers.
+    """
+    Move model and mtl files from face/boots/gloves folder to common subfolder and create markers.
 
     Args:
         ref_folder_path: Path to the referee's source folder
@@ -312,6 +364,7 @@ def ref_folder_preprocess(ref_folder_path, ref_name, common_files, fox_mode):
         for model_folder_name in ['face', 'boots', 'gloves']:
             move_textures_to_common(ref_folder_path, model_folder_name)
             if pes_version != 16:
+                move_markers_to_subfolder(ref_folder_path, model_folder_name)
                 move_models_to_common(ref_folder_path, model_folder_name)
 
     # Get list of files in the referee's common folder

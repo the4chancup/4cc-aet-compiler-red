@@ -5,21 +5,30 @@ from .zlib_plus import unzlib_file
 from .FILE_INFO import UNIFORM_COMMON_PREFOX_PATH
 
 
-def normalize_kit_dependent_file(file_name):
+def normalize_kit_dependent_file(file_name, reverse=False):
     """
     Check if a file is kit-dependent (u0XXXp1-9) and return the normalized p0 version.
 
     Parameters:
         file_name (str): The filename to check
+        reverse (bool): If True, reverse the normalization (p0 -> p1)
 
     Returns:
         str: The normalized filename with p0, or the original filename if not kit-dependent
     """
+    if reverse:
+        before_pattern = r'(u0[a-zA-Z0-9]{3}p)[0]'
+        after_pattern = r'\g<1>1'
+    else:
+        before_pattern = r'(u0[a-zA-Z0-9]{3}p)[1-9]'
+        after_pattern = r'\g<1>0'
+
     # Match u0XXXp[1-9] where XXX is any three alphanumeric characters
-    match = re.search(r'u0([a-zA-Z0-9]{3})p[1-9]', file_name)
+    match = re.search(before_pattern, file_name)
     if match:
         # Replace the kit number with 0
-        return re.sub(r'(u0[a-zA-Z0-9]{3}p)[1-9]', r'\g<1>0', file_name)
+        return re.sub(before_pattern, after_pattern, file_name)
+
     return file_name
 
 

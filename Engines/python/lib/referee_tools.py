@@ -248,8 +248,8 @@ def move_textures_to_common(ref_folder_path, folder_name):
     return texture_files
 
 
-def update_referee_source_paths(ref_folder_path, ref_name, common_files, fox_mode):
-    """Update paths in the source referee folder's face, boots, and gloves folders.
+def ref_folder_preprocess(ref_folder_path, ref_name, common_files, fox_mode):
+    """Preprocess a referee folder by moving textures to common subfolders and updating paths.
 
     Args:
         ref_folder_path: Path to the referee's source folder
@@ -257,110 +257,92 @@ def update_referee_source_paths(ref_folder_path, ref_name, common_files, fox_mod
         common_files: List of files that are in the export's Common folder
         fox_mode: Whether fox mode is enabled
     """
-    # First: Auto-move textures to common subfolders (only when fox_mode is False)
     if not fox_mode:
+        # Auto-move textures to common subfolders
         logging.debug(f"Auto-moving textures to common subfolders for {ref_name}")
-        move_textures_to_common(ref_folder_path, 'face')
-        move_textures_to_common(ref_folder_path, 'boots')
-        move_textures_to_common(ref_folder_path, 'gloves')
+        for folder_name in ['face', 'boots', 'gloves']:
+            move_textures_to_common(ref_folder_path, folder_name)
 
-    # Get list of files in the common folder (including subdirectories)
+    # Get list of files in the referee's common folder
     ref_common_files = get_files_list(os.path.join(ref_folder_path, 'common'), recursive=True)
     if not ref_common_files:
         return
 
-    # Get list of files in the common_shared folder of the referee's source folder
+    # Get list of files in the referee's common_shared folder
     ref_common_shared_files = get_files_list(os.path.join(ref_folder_path, 'common_shared'), recursive=True)
 
     # Combine the list of files from common_shared and the list of files in the export's Common folder
     common_files_withshared = common_files + ref_common_shared_files
 
-    # Update paths in face folder
-    face_src = os.path.join(ref_folder_path, 'face')
-    if os.path.exists(face_src):
-        update_folder_paths(face_src, ref_name, ref_common_files, common_files_withshared)
-
-    # Update paths in boots folder
-    boots_src = os.path.join(ref_folder_path, 'boots')
-    if os.path.exists(boots_src):
-        update_folder_paths(boots_src, ref_name, ref_common_files, common_files_withshared)
-
-    # Update paths in gloves folder
-    gloves_src = os.path.join(ref_folder_path, 'gloves')
-    if os.path.exists(gloves_src):
-        update_folder_paths(gloves_src, ref_name, ref_common_files, common_files_withshared)
+    # Update paths in the model folders
+    for folder_name in ['face', 'boots', 'gloves']:
+        folder_src = os.path.join(ref_folder_path, folder_name)
+        if os.path.exists(folder_src):
+            update_folder_paths(folder_src, ref_name, ref_common_files, common_files_withshared)
 
 
 def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_path):
     """Process a referee folder, handling face, boots, gloves and common folders."""
     face_id, boots_id, gloves_id = get_ref_ids(ref_num)
 
-    # Process face folder
-    face_src = os.path.join(ref_folder_path, 'face')
-    if os.path.exists(face_src):
-        face_dst = os.path.join(export_destination_path, 'Faces', f'{face_id} - {ref_name}')
-        os.makedirs(face_dst)
+    # Configuration for each model folder type
+    model_folder_configs = {
+        'face': {
+            'id': face_id,
+            'destination_parent': 'Faces',
+            'required': True
+        },
+        'boots': {
+            'id': boots_id,
+            'destination_parent': 'Boots',
+            'required': False
+        },
+        'gloves': {
+            'id': gloves_id,
+            'destination_parent': 'Gloves',
+            'required': False
+        }
+    }
 
-        # Copy all files from face folder
-        for item in os.listdir(face_src):
-            src_path = os.path.join(face_src, item)
-            if os.path.isfile(src_path):
-                shutil.copy2(src_path, face_dst)
-    else:
-        logging.warning(f"No face folder found for referee {ref_name}")
+    # Process model folders
+    for folder_name, config in model_folder_configs.items():
+        folder_src = os.path.join(ref_folder_path, folder_name)
+        if os.path.exists(folder_src):
+            folder_dst = os.path.join(
+                export_destination_path,
+                config['destination_parent'],
+                f"{config['id']} - {ref_name}"
+            )
+            os.makedirs(folder_dst)
 
-    # Process boots folder if it exists
-    boots_src = os.path.join(ref_folder_path, 'boots')
-    if os.path.exists(boots_src):
-        boots_dst = os.path.join(export_destination_path, 'Boots', f'{boots_id} - {ref_name}')
-        os.makedirs(boots_dst)
+            # Copy all files from folder
+            for item in os.listdir(folder_src):
+                src_path = os.path.join(folder_src, item)
+                if os.path.isfile(src_path):
+                    shutil.copy2(src_path, folder_dst)
+        elif config['required']:
+            logging.warning(f"- Warning - No {folder_name} folder found for referee {ref_name}")
 
-        # Copy all files from boots folder
-        for item in os.listdir(boots_src):
-            src_path = os.path.join(boots_src, item)
-            if os.path.isfile(src_path):
-                shutil.copy2(src_path, boots_dst)
+    # Configuration for each common folder type
+    common_folder_configs = {
+        # Files from "common" are copied to a referee-specific subfolder in Common
+        'common': os.path.join(export_destination_path, 'Common', ref_name),
+        # Files from "common_shared" are copied directly to the Common folder
+        'common_shared': os.path.join(export_destination_path, 'Common')
+    }
 
-    # Process gloves folder if it exists
-    gloves_src = os.path.join(ref_folder_path, 'gloves')
-    if os.path.exists(gloves_src):
-        gloves_dst = os.path.join(export_destination_path, 'Gloves', f'{gloves_id} - {ref_name}')
-        os.makedirs(gloves_dst)
+    # Process common folders
+    for folder_name, destination in common_folder_configs.items():
+        src_folder = os.path.join(ref_folder_path, folder_name)
+        if not os.path.exists(src_folder):
+            continue
 
-        # Copy all files from gloves folder
-        for item in os.listdir(gloves_src):
-            src_path = os.path.join(gloves_src, item)
-            if os.path.isfile(src_path):
-                shutil.copy2(src_path, gloves_dst)
+        os.makedirs(destination, exist_ok=True)
 
-    # Process common folder if it exists - copy to referee-specific subfolder
-    common_src = os.path.join(ref_folder_path, 'common')
-    if os.path.exists(common_src):
-        # Create referee-specific subfolder in Common
-        common_dst = os.path.join(export_destination_path, 'Common', ref_name)
-        os.makedirs(common_dst, exist_ok=True)
-
-        # Copy all files and subdirectories from common folder to referee-specific subfolder
-        for item in os.listdir(common_src):
-            src_path = os.path.join(common_src, item)
-            dst_path = os.path.join(common_dst, item)
-            if os.path.exists(dst_path):
-                continue
-            if os.path.isfile(src_path):
-                shutil.copy2(src_path, dst_path)
-            elif os.path.isdir(src_path):
-                shutil.copytree(src_path, dst_path)
-
-    # Process common_shared folder if it exists - copy to the export's Common folder
-    common_shared_src = os.path.join(ref_folder_path, 'common_shared')
-    if os.path.exists(common_shared_src):
-        common_shared_dst = os.path.join(export_destination_path, 'Common')
-        os.makedirs(common_shared_dst, exist_ok=True)
-
-        # Copy all files and folders from common_shared folder to Common folder
-        for item in os.listdir(common_shared_src):
-            src_path = os.path.join(common_shared_src, item)
-            dst_path = os.path.join(common_shared_dst, item)
+        # Copy all files and subdirectories
+        for item in os.listdir(src_folder):
+            src_path = os.path.join(src_folder, item)
+            dst_path = os.path.join(destination, item)
             if os.path.exists(dst_path):
                 continue
             if os.path.isfile(src_path):
@@ -408,13 +390,15 @@ def referee_export_process(export_destination_path, fox_mode):
 
     export_players_path = os.path.join(export_destination_path, "Players")
 
-    # First pass: Update paths in source folders (once per unique referee)
+    # First pass: Move textures to common subfolders and update paths in source folders
     common_files = get_files_list(os.path.join(export_destination_path, 'Common'), recursive=True)
     for ref_name in set(ref_mappings.values()):
         ref_folder_path = os.path.join(export_players_path, ref_name)
-        if os.path.exists(ref_folder_path):
-            update_referee_source_paths(ref_folder_path, ref_name, common_files, fox_mode)
-            logging.debug(f"Preprocessed referee folder: {ref_name}")
+        if not os.path.exists(ref_folder_path):
+            continue
+
+        ref_folder_preprocess(ref_folder_path, ref_name, common_files, fox_mode)
+        logging.debug(f"Preprocessed referee folder: {ref_name}")
 
     # Second pass: Process each referee folder according to the list
     error_present = False

@@ -10,29 +10,28 @@ from .FILE_INFO import (
 )
 
 
-def dummy_element(folder_path, mtl_path_list):
+def dummy_element(folder_path):
 
     DUMMY_MODEL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, DUMMY_MODEL_NAME)
     DUMMY_MTL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, DUMMY_MTL_NAME)
 
-    # Copy the oral_dummy_win32.model file from the templates folder to the xml folder
     dummy_model_destination = os.path.join(folder_path, DUMMY_MODEL_NAME)
-    file_critical_check(DUMMY_MODEL_PATH)
-    shutil.copyfile(DUMMY_MODEL_PATH, dummy_model_destination)
+    if not os.path.isfile(dummy_model_destination):
+        file_critical_check(DUMMY_MODEL_PATH)
+        # Copy the oral_dummy_win32.model file from the templates folder to the xml folder
+        shutil.copyfile(DUMMY_MODEL_PATH, dummy_model_destination)
 
     dummy_model_path_xml = f"./{DUMMY_MODEL_NAME.replace('win32', '*')}"
 
-    if mtl_path_list:
-        dummy_mtl_path_xml = mtl_path_list[0]
-    else:
-        # Copy the dummy.mtl file from the templates folder to the xml folder
-        dummy_mtl_destination = os.path.join(folder_path, DUMMY_MTL_NAME)
+    dummy_mtl_destination = os.path.join(folder_path, DUMMY_MTL_NAME)
+    if not os.path.isfile(dummy_mtl_destination):
         file_critical_check(DUMMY_MTL_PATH)
+        # Copy the dummy.mtl file from the templates folder to the xml folder
         shutil.copyfile(DUMMY_MTL_PATH, dummy_mtl_destination)
 
-        dummy_mtl_path_xml = f"./{DUMMY_MTL_NAME}"
+    dummy_mtl_path_xml = f"./{DUMMY_MTL_NAME}"
 
-    # Then add a model entry to the .xml file, with the type "face_neck" and the first mtl path from the list
+    # Add a model entry to the .xml file, with the type "face_neck" and the first mtl path from the list
     dummy_model = ET.Element('model')
     dummy_model.set('level', '0')
     dummy_model.set('type', 'face_neck')

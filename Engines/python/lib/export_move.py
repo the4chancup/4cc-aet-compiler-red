@@ -2,60 +2,22 @@ import os
 import time
 import shutil
 
-from .utils.id_change import path_id_change
-from .utils.id_change import txt_id_change
 from .fmdl_id_change import fmdl_id_change
 from .xml_editing import xml_create
 from .xml_editing import xml_process
 from .utils.file_management import file_critical_check
 from .utils.texture_conversion import textures_convert
 from .utils.zlib_plus import unzlib_file
+from .utils.id_change import (
+    txt_id_change,
+    filenames_id_replace,
+    fix_mtl_paths,
+)
 from .utils.FILE_INFO import (
     TEMPLATE_FOLDER_PATH,
     KIT_MASK_NAME,
     FACE_DIFF_BIN_NAME,
-    UNIFORM_COMMON_PREFOX_PATH,
 )
-
-
-def filenames_id_replace(folder_path, team_id, include_subfolders=True):
-    '''Replace the dummy team ID with the actual one in any filenames found in the folder and its subfolders'''
-
-    for file_name in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, file_name)
-
-        if not os.path.isfile(file_path):
-            continue
-
-        # Look for u0XXXp and u0XXXg and replace them with the actual team ID
-        file_path_new = path_id_change(file_path, team_id, common_replace=False)
-
-        if file_path_new == file_path:
-            continue
-
-        if os.path.exists(file_path_new):
-            os.remove(file_path_new)
-        os.rename(file_path, file_path_new)
-
-    if not include_subfolders:
-        return
-
-    for subfolder_name in os.listdir(folder_path):
-        subfolder_path = os.path.join(folder_path, subfolder_name)
-        if os.path.isdir(subfolder_path):
-            filenames_id_replace(subfolder_path, team_id, include_subfolders)
-
-
-def fix_mtl_paths(file_path, team_id):
-    '''Replace any relative paths with absolute ones to the team's common folder'''
-
-    with open(file_path, 'r') as file:
-        lines = file.readlines()
-    with open(file_path, 'w') as file:
-        for line in lines:
-            if line.startswith("./"):
-                file.write(f"{UNIFORM_COMMON_PREFOX_PATH}{team_id}/")
-            file.write(line)
 
 
 def kit_masks_check(team_itemfolder_path, file_ext):

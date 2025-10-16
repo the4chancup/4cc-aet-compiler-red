@@ -201,19 +201,19 @@ def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):
         logging.error(f"- ERROR - Failed to update MTL paths in {mtl_path}: {e}")
         pause()
 
-def move_textures_to_common(ref_folder_path, folder_name):
+def move_textures_to_common(ref_folder_path, model_folder_name):
     """Move texture files from face/boots/gloves folder to common subfolder and update MTL paths.
 
     Args:
         ref_folder_path: Path to the referee's source folder
-        folder_name: Name of the folder ('face', 'boots', or 'gloves')
+        model_folder_name: Name of the model folder ('face', 'boots', or 'gloves')
 
     Returns:
         List of moved texture filenames
     """
     TEXTURE_EXTENSIONS = ['.dds', '.ftex']
 
-    src_folder = os.path.join(ref_folder_path, folder_name)
+    src_folder = os.path.join(ref_folder_path, model_folder_name)
     if not os.path.exists(src_folder):
         return []
 
@@ -227,7 +227,7 @@ def move_textures_to_common(ref_folder_path, folder_name):
         return []
 
     # Create common/[folder_name] subfolder
-    common_subfolder = os.path.join(ref_folder_path, 'common', folder_name)
+    common_subfolder = os.path.join(ref_folder_path, 'common', model_folder_name)
     os.makedirs(common_subfolder, exist_ok=True)
 
     # Move textures
@@ -235,15 +235,64 @@ def move_textures_to_common(ref_folder_path, folder_name):
         src_path = os.path.join(src_folder, texture)
         dst_path = os.path.join(common_subfolder, texture)
         shutil.move(src_path, dst_path)
-        logging.debug(f"Moved texture {texture} to common/{folder_name}/")
+        logging.debug(f"Moved texture {texture} to common/{model_folder_name}/")
 
     # Update MTL file paths in the source folder
     for item in os.listdir(src_folder):
         if item.endswith('.mtl'):
             mtl_path = os.path.join(src_folder, item)
-            update_mtl_for_moved_textures(mtl_path, texture_files, folder_name)
+            update_mtl_for_moved_textures(mtl_path, texture_files, model_folder_name)
 
     return texture_files
+
+def move_models_to_common(ref_folder_path, model_folder_name):
+    """Move model and mtl files from face/boots/gloves folder to common subfolder and create markers.
+
+    Args:
+        ref_folder_path: Path to the referee's source folder
+        model_folder_name: Name of the model folder ('face', 'boots', or 'gloves')
+
+    Returns:
+        List of moved model filenames
+    """
+    MODEL_EXTENSIONS = ['.model', '.mtl']
+
+    src_folder = os.path.join(ref_folder_path, model_folder_name)
+    if not os.path.exists(src_folder):
+        return []
+
+    # Find model files in the source folder
+    model_files = []
+    for item in os.listdir(src_folder):
+        if any(item.lower().endswith(ext) for ext in MODEL_EXTENSIONS):
+            model_files.append(item)
+
+    if not model_files:
+        return []
+
+    # Create common/[folder_name] subfolder
+    common_subfolder = os.path.join(ref_folder_path, 'common', model_folder_name)
+    os.makedirs(common_subfolder, exist_ok=True)
+
+    # Create [folder_name]/[ref_name]/[folder_name] subfolder
+    ref_folder_name = os.path.basename(ref_folder_path)
+    folder_subfolder = os.path.join(ref_folder_path, model_folder_name, ref_folder_name, model_folder_name)
+    os.makedirs(folder_subfolder, exist_ok=True)
+
+    # Move models
+    for model in model_files:
+        src_path = os.path.join(src_folder, model)
+        dst_path = os.path.join(common_subfolder, model)
+        shutil.move(src_path, dst_path)
+        logging.debug(f"Moved model {model} to common/{model_folder_name}/")
+
+        # Create empty .common marker in the composite subfolder
+        common_marker_path = os.path.join(folder_subfolder, f"{model}.common")
+        with open(common_marker_path, 'w'):
+            pass
+        logging.debug(f"Created .common marker for model {model} in {folder_subfolder}")
+
+    return model_files
 
 
 def ref_folder_preprocess(ref_folder_path, ref_name, common_files, fox_mode):
@@ -255,11 +304,15 @@ def ref_folder_preprocess(ref_folder_path, ref_name, common_files, fox_mode):
         common_files: List of files that are in the export's Common folder
         fox_mode: Whether fox mode is enabled
     """
+    pes_version = int(os.environ.get('PES_VERSION', '19'))
+
     if not fox_mode:
-        # Auto-move textures to common subfolders
-        logging.debug(f"Auto-moving textures to common subfolders for {ref_name}")
-        for folder_name in ['face', 'boots', 'gloves']:
-            move_textures_to_common(ref_folder_path, folder_name)
+        # Auto-move files to common subfolders
+        logging.debug(f"Auto-moving files to common subfolders for {ref_name}")
+        for model_folder_name in ['face', 'boots', 'gloves']:
+            move_textures_to_common(ref_folder_path, model_folder_name)
+            if pes_version != 16:
+                move_models_to_common(ref_folder_path, model_folder_name)
 
     # Get list of files in the referee's common folder
     ref_common_files = get_files_list(os.path.join(ref_folder_path, 'common'), recursive=True)
@@ -273,8 +326,8 @@ def ref_folder_preprocess(ref_folder_path, ref_name, common_files, fox_mode):
     common_files_withshared = common_files + ref_common_shared_files
 
     # Update paths in the model folders
-    for folder_name in ['face', 'boots', 'gloves']:
-        folder_src = os.path.join(ref_folder_path, folder_name)
+    for model_folder_name in ['face', 'boots', 'gloves']:
+        folder_src = os.path.join(ref_folder_path, model_folder_name)
         if os.path.exists(folder_src):
             update_folder_paths(folder_src, ref_name, ref_common_files, common_files_withshared)
 

@@ -28,7 +28,7 @@ else:
     input("Or press Enter to continue... ")
 
 
-PYTHON_VERSION = "3.13"
+PYTHON_VERSION = "3.14"
 PYTHON_GITHUB_SOURCE = "adang1345/PythonVista"
 PYTHON_SUFFIX = "embed-amd64"
 

@@ -369,7 +369,7 @@ def xml_check(xml_path, team_id):
     if folder_type == "face" and ("face_neck" not in model_type_list):
 
         # Create a dummy model element and add it to the root
-        dummy_model = dummy_element(xml_folder_path, model_material_path_list)
+        dummy_model = dummy_element(xml_folder_path)
         root.append(dummy_model)
 
         # Create a new root

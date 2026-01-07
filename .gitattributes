@@ -1,0 +1,5 @@
+# Python scripts must be LF
+*.py text eol=lf
+
+# Windows batch scripts must be CRLF
+*.bat text eol=crlf

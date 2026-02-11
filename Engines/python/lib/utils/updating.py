@@ -428,6 +428,10 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
     if version_latest is None:
         return None
 
+    # Create a "state" folder if it doesn't exist
+    if not os.path.exists(STATE_FOLDER_PATH):
+        os.makedirs(STATE_FOLDER_PATH)
+
     # Save the current time
     with open(CHECK_LAST_PATH, "w", encoding='utf-8') as f:
         f.write(now.strftime("%Y-%m-%d %H:%M:%S"))

@@ -1,4 +1,4 @@
-REM - Script for checking if python is in the PATH and that its version is 3.12 or 3.13
+REM - Script for checking if python is in the PATH and that its version is 3.12 or newer
 
 REM - Check if the Windows version is 7
 ver | find "6.1." > nul
@@ -10,44 +10,30 @@ if %ERRORLEVEL% == 0 (
   set "python_link=https://www.python.org/downloads/"
 )
 
-REM - Check if python 3.13 is installed
-for /f "tokens=*" %%A in ('py -3.13 -V 2^>nul') do (
+REM - Check if python 3.12 or newer is installed
+set python_version_line=
+for /f "tokens=*" %%A in ('py -3 -V 2^>nul') do (
   set python_version_line=%%A
 )
 
-set "python_version=%python_version_line:~7,4%"
+if not "%python_version_line:~0,6%"=="Python" goto python_missing
+set python_installed=1
 
-if "%python_version_line:~0,6%"=="Python" (
-  set python_installed=1
+REM - Parse the minor version number from the version string (e.g. "Python 3.12.1" -> "12")
+for /f "tokens=2 delims=." %%M in ("%python_version_line:~7%") do (
+  set python_minor=%%M
+)
 
-  if "%python_version%"=="3.13" (
-    goto python_version_ok
+REM - Check if the minor version is 12 or higher
+if %python_minor% GEQ 12 (
+  REM - Set python_version to the major.minor format (e.g. "3.12")
+  for /f "tokens=1,2 delims=." %%A in ("%python_version_line:~7%") do (
+    set "python_version=%%A.%%B"
   )
+  goto python_version_ok
 )
 
-REM - Check if python 3.12 is installed
-for /f "tokens=*" %%A in ('py -3.12 -V 2^>nul') do (
-  set python_version_line=%%A
-)
-
-set "python_version=%python_version_line:~7,4%"
-
-if "%python_version_line:~0,6%"=="Python" (
-  set python_installed=1
-
-  if "%python_version%"=="3.12" (
-    goto python_version_ok
-  )
-)
-
-
-if not defined python_installed (
-  goto python_missing
-)
-
-if not defined python_version_ok (
-  goto python_version_bad
-)
+goto python_version_bad
 
 
 :python_version_ok
@@ -58,8 +44,7 @@ exit /b 0
 if not defined python_installed (
 
   echo -
-  echo - Python is missing from your pc, please install version 3.13
-  echo - (watch out, it might not be the latest^)
+  echo - Python is missing from your pc, please install version 3.12 or newer
   echo -
   echo - When running the installer, choose Modify, click Next and make sure to check
   echo - the "Add Python to environment variables" checkbox, then click Install
@@ -85,7 +70,7 @@ if not defined python_installed (
 if not defined python_version_ok (
 
   echo -
-  echo - Python is installed, but you need version 3.12 or 3.13, please install one
+  echo - Python is installed, but you need version 3.12 or newer, please install one
   echo -
   echo - When running the installer, choose Modify, click Next and make sure to check
   echo - the "Add Python to environment variables" checkbox, then click Install

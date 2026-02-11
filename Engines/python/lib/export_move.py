@@ -54,6 +54,7 @@ def export_move(exportfolder_path, team_id, team_name):
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
+    pes_15 = (int(os.environ.get('PES_VERSION', '19')) == 15)
 
     # The main folder path is the parent of the export folder
     mainfolder_path = os.path.dirname(exportfolder_path)
@@ -190,6 +191,25 @@ def export_move(exportfolder_path, team_id, team_name):
             team_id_full = "0" + team_id
             team_id_full_bytes = team_id_full.encode('utf-8')
 
+            def change_pattern(file_path):
+
+                # Check the last three bits of byte 0x24 (shirt pattern)
+                with open(file_path, 'rb+') as file:
+                    file.seek(0x24)
+                    val_byte = file.read(1)
+                    val_int = ord(val_byte)
+
+                    if val_int & 0xE0 == 0xC0:
+                        # Change 6 to 5
+                        new_pattern = 0xA0
+                    else:
+                        return
+
+                    new_int = val_int & 0x1F | new_pattern
+                    new_byte = bytes([new_int])
+                    file.seek(0x24)
+                    file.write(new_byte)
+
             # For every file
             for file_name in [f for f in os.listdir(team_itemfolder_path) if f.endswith(".bin")]:
                 file_path = os.path.join(team_itemfolder_path, file_name)
@@ -206,6 +226,9 @@ def export_move(exportfolder_path, team_id, team_name):
                         if char == b'u':
                             # Update the team ID in the texture filename
                             file.write(team_id_full_bytes)
+
+                if pes_15:
+                    change_pattern(file_path)
 
                 # Replace the dummy team ID in the filename with the actual one
                 file_name_new = team_id + file_name[3:]

@@ -269,13 +269,17 @@ def faces_check(exportfolder_path, team_name, team_id):
                     logging.error(f"- ({file_name} is not allowed)")
 
             # And skip it
-            shutil.rmtree(subfolder_path)
+            if not pass_through:
+                shutil.rmtree(subfolder_path)
 
     # If there were any bad folders
     if folder_error_any:
 
         logging.error( "-")
-        logging.error( "- These face folders will be discarded to avoid problems")
+        if pass_through:
+            logging.error( "- These face folders have problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- These face folders will be discarded to avoid problems")
 
         pause()
 
@@ -338,13 +342,17 @@ def kitconfigs_check(exportfolder_path, team_name):
     if file_error:
 
         # Skip the whole folder
-        shutil.rmtree(os.path.join(exportfolder_path, "Kit Configs"))
+        if not pass_through:
+            shutil.rmtree(os.path.join(exportfolder_path, "Kit Configs"))
 
         # Log the issue
         logging.error( "-")
         logging.error( "- ERROR - Wrong kit config names")
         logging.error(f"- Team name:      {team_name}")
-        logging.error( "- The Kit Configs folder will be discarded since it's unusable")
+        if pass_through:
+            logging.error( "- The Kit Configs folder has problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- The Kit Configs folder will be discarded since it's unusable")
         logging.error( "- Check the AET wikipage for the proper naming convention")
 
         pause()
@@ -401,13 +409,17 @@ def kittextures_check(exportfolder_path, team_name):
     if file_error_tex_format:
 
         # Skip the whole Kit Textures folder
-        shutil.rmtree(itemfolder_path)
+        if not pass_through:
+            shutil.rmtree(itemfolder_path)
 
         # Log the issue
         logging.error( "-")
         logging.error( "- ERROR - Bad kit textures")
         logging.error(f"- Team name:      {team_name}")
-        logging.error( "- The Kit Textures folder will be discarded since it's unusable")
+        if pass_through:
+            logging.error( "- The Kit Textures folder has problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- The Kit Textures folder will be discarded since it's unusable")
 
         pause()
 
@@ -430,13 +442,17 @@ def kittextures_check(exportfolder_path, team_name):
             logging.error(f"- Texture name:   {file_name}")
 
             # And skip it
-            file_path = os.path.join(itemfolder_path, file_name)
-            os.remove(file_path)
+            if not pass_through:
+                file_path = os.path.join(itemfolder_path, file_name)
+                os.remove(file_path)
 
     # If the team has bad files close the previously opened message
     if file_error_any:
 
-        logging.error( "- The kit textures mentioned above will be discarded since they're unusable")
+        if pass_through:
+            logging.error( "- The kit textures mentioned above have problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- The kit textures mentioned above will be discarded since they're unusable")
         if file_error_names:
             logging.error( "- Check the AET wikipage for the proper naming convention")
 
@@ -484,13 +500,17 @@ def logo_check(exportfolder_path, team_name):
     if file_error:
 
         # Skip the whole folder
-        shutil.rmtree(itemfolder_path)
+        if not pass_through:
+            shutil.rmtree(itemfolder_path)
 
         # Log the issue
         logging.error( "-")
         logging.error( "- ERROR - Wrong logo filenames")
         logging.error(f"- Team name:      {team_name}")
-        logging.error( "- The Logo folder will be discarded since it's unusable")
+        if pass_through:
+            logging.error( "- The Logo folder has problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- The Logo folder will be discarded since it's unusable")
         logging.error( "- Check the AET wikipage for the proper naming convention")
 
         pause()
@@ -551,12 +571,16 @@ def portraits_check(exportfolder_path, team_name):
                 logging.error( "- (bad format)")
 
             # And skip it
-            os.remove(os.path.join(itemfolder_path, file_name))
+            if not pass_through:
+                os.remove(os.path.join(itemfolder_path, file_name))
 
     # If the team has bad files close the previously opened message
     if file_error_any:
 
-        logging.error( "- These portraits will be discarded since they're unusable")
+        if pass_through:
+            logging.error( "- These portraits have problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- These portraits will be discarded since they're unusable")
 
         pause()
 
@@ -595,12 +619,16 @@ def common_check(exportfolder_path, team_name):
             logging.error(f"- Texture name:   {file_name}")
 
             # And skip it
-            os.remove(os.path.join(itemfolder_path, file_name))
+            if not pass_through:
+                os.remove(os.path.join(itemfolder_path, file_name))
 
     # If the team has bad common textures close the previously opened message
     if file_error_any:
 
-        logging.error( "- The textures mentioned above will be discarded since they're unusable")
+        if pass_through:
+            logging.error( "- The textures mentioned above have problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- The textures mentioned above will be discarded since they're unusable")
 
         pause()
 
@@ -757,12 +785,16 @@ def boots_check(exportfolder_path, team_name, team_id):
                     logging.error(f"- ({file_name} is not allowed)")
 
             # And skip it
-            shutil.rmtree(subfolder_path)
+            if not pass_through:
+                shutil.rmtree(subfolder_path)
 
     # If there were any bad folders
     if folder_error_any:
 
-        logging.error( "- The boots folders mentioned above will be discarded since they're unusable")
+        if pass_through:
+            logging.error( "- The boots folders mentioned above have problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- The boots folders mentioned above will be discarded since they're unusable")
 
         pause()
 
@@ -929,12 +961,16 @@ def gloves_check(exportfolder_path, team_name, team_id):
                     logging.error(f"- ({file_name} is not allowed)")
 
             # And skip it
-            shutil.rmtree(subfolder_path)
+            if not pass_through:
+                shutil.rmtree(subfolder_path)
 
     # If there were any bad folders
     if folder_error_any:
 
-        logging.error( "- The gloves folders mentioned above will be discarded since they're unusable")
+        if pass_through:
+            logging.error( "- The gloves folders mentioned above have problems but will be kept (pass through mode)")
+        else:
+            logging.error( "- The gloves folders mentioned above will be discarded since they're unusable")
 
         pause()
 
@@ -957,10 +993,11 @@ def other_check(exportfolder_path, team_name):
 def export_check(exportfolder_path, team_name, team_id):
 
     # Read the necessary parameters
-    global fox_mode, fox_19, fox_21
+    global fox_mode, fox_19, fox_21, pass_through
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
     fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
+    pass_through = int(os.environ.get('PASS_THROUGH', '0'))
 
     nested_folders_fix(exportfolder_path, team_name)
     faces_check(exportfolder_path, team_name, team_id)

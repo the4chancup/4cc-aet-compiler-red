@@ -47,7 +47,6 @@ def extracted_from_exports():
     all_in_one = int(os.environ.get('ALL_IN_ONE', '0'))
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
     dds_compression = int(os.environ.get('DDS_COMPRESSION', '0'))
-    pass_through = int(os.environ.get('PASS_THROUGH', '0'))
 
     print("-")
     print("- Extracting and checking the exports")
@@ -187,8 +186,7 @@ def extracted_from_exports():
                 continue
 
         # Check the export for all kinds of errors
-        if not pass_through:
-            export_check(export_destination_path, team_name, team_id)
+        export_check(export_destination_path, team_name, team_id)
 
         # If the export has a Note.txt file, append it to the teamnotes.txt file
         note_txt_append(team_name, export_destination_path)

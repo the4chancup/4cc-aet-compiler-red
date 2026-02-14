@@ -4,6 +4,7 @@ import logging
 import subprocess
 
 from .file_management import file_critical_check
+from .file_management import get_files_list
 from .zlib_plus import get_bytes_hex
 from .zlib_plus import get_bytes_ascii
 from .zlib_plus import unzlib_file
@@ -35,16 +36,15 @@ def dds_dxt5_conv(tex_path):
         os.rename(dummy_tex_path, tex_path)
 
 def textures_convert(folder_path, fox_mode=False, fox_19=False):
-    '''If fox_mode is True, convert all .dds files in the folder to .ftex files
+    '''If fox_mode is True, convert all .dds files in the folder and subfolders to .ftex files
 
-    If fox_19 is False, convert all DX10 files in the folder to DXT5 files'''
+    If fox_19 is False, convert all DX10 files in the folder and subfolders to DXT5 files'''
 
-    dds_file_list = [f for f in os.listdir(folder_path) if f.endswith('.dds')]
-    ftex_file_list = [f for f in os.listdir(folder_path) if f.endswith('.ftex')]
+    file_list_rel = get_files_list(folder_path, recursive=True)
 
-    for tex_file in dds_file_list:
+    for tex_file_rel in [f for f in file_list_rel if f.endswith(".dds")]:
 
-        tex_path = os.path.join(folder_path, tex_file)
+        tex_path = os.path.join(folder_path, tex_file_rel)
         tex_reconvert_needed = False
 
         # Prepare a temporary file path
@@ -90,9 +90,9 @@ def textures_convert(folder_path, fox_mode=False, fox_19=False):
     if fox_19 or not fox_mode:
         return
 
-    for tex_file in ftex_file_list:
+    for tex_file_rel in [f for f in file_list_rel if f.endswith(".ftex")]:
 
-        tex_path = os.path.join(folder_path, tex_file)
+        tex_path = os.path.join(folder_path, tex_file_rel)
         tex_reconvert_needed = False
 
         # Check the ftex version number (2.03 in float starting from index 4)

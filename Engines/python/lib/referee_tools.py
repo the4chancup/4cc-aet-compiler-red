@@ -14,6 +14,7 @@ from .utils.FILE_INFO import (
     REFS_TEMPLATE_FOX_PATH,
     UNIFORM_COMMON_PREFOX_PATH,
 )
+from .utils.file_management import get_files_list
 
 
 def refs_list_process(refs_txt_path):
@@ -38,39 +39,6 @@ def get_ref_ids(ref_num):
     boots_id = f'k99{ref_num.zfill(2)}'  # e.g. k9901
     gloves_id = f'g99{ref_num.zfill(2)}'  # e.g. g9901
     return face_id, boots_id, gloves_id
-
-
-def get_files_list(folder_path, recursive=False):
-    """
-    Get a list of files in the folder indicated.
-
-    Args:
-        folder_path: Path to the folder
-        recursive: If True, include files in subdirectories with relative paths
-
-    Returns:
-        List of filenames (or relative paths if recursive=True)
-    """
-    if not os.path.exists(folder_path):
-        return []
-
-    files_list = []
-    if recursive:
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                # Get relative path from folder_path
-                full_path = os.path.join(root, file)
-                rel_path = os.path.relpath(full_path, folder_path)
-                # Use forward slashes for consistency
-                rel_path = rel_path.replace('\\', '/')
-                files_list.append(rel_path)
-    else:
-        for item in os.listdir(folder_path):
-            src_path = os.path.join(folder_path, item)
-            if os.path.isfile(src_path):
-                files_list.append(item)
-
-    return files_list
 
 
 def update_file_paths(file_path, ref_name, ref_common_files, common_files):

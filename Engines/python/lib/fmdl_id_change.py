@@ -6,6 +6,7 @@ import fnmatch
 import logging
 
 from .utils.name_editing import path_id_change
+from .utils.FmdlFile import FmdlContainer
 
 
 def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
@@ -185,6 +186,121 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
     file_binary.close()
 
     return
+
+
+def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str, model_folder_name: str):
+    """
+    Change all texture directory paths in an FMDL file to point to the
+    player's common subfolders.
+
+    Unlike fmdl_id_change which only modifies IDs within existing paths,
+    this function can change the entire texture directory path, handling
+    variable-length string changes by rewriting the file structure.
+
+    Paths that match a model-type structure (face, boots, gloves, etc.)
+    get model_folder_name appended, while paths that already point to
+    common (shorter structure) only get player_name inserted.
+
+    Args:
+        file_path: Path to the .fmdl file
+        common_base: Common folder base path
+            (e.g. '/Assets/pes16/model/character/common/')
+        player_name: Name of the player (e.g. 'marisa')
+        model_folder_name: Name of the model folder (e.g. 'boots')
+    """
+    if not os.path.exists(file_path):
+        return
+
+    logging.debug("Changing texture paths in " + file_path)
+
+    fmdl = FmdlContainer()
+    fmdl.readFile(file_path)
+
+    # Need block 12 (string descriptors) and segment1 block 3 (string data)
+    if 12 not in fmdl.segment0Blocks or 3 not in fmdl.segment1Blocks:
+        logging.debug("No string data found in file")
+        return
+
+    # Need block 6 (texture definitions)
+    if 6 not in fmdl.segment0Blocks:
+        logging.debug("No texture data found in file")
+        return
+
+    # Parse all strings
+    string_block = fmdl.segment1Blocks[3]
+    strings = []
+    for definition in fmdl.segment0Blocks[12]:
+        (block_id, length, offset) = struct.unpack('< H H I', definition)
+        bytestring = string_block[offset : offset + length]
+        strings.append(bytestring.decode('utf-8'))
+
+    # Find texture directory string indices from block 6
+    dir_string_indices = set()
+    for definition in fmdl.segment0Blocks[6]:
+        (filename_id, directory_id) = struct.unpack('< H H', definition)
+        dir_string_indices.add(directory_id)
+
+    if not dir_string_indices:
+        logging.debug("No texture entries found in file")
+        return
+
+    # Model folder names that indicate a model-type path (face, boots, glove)
+    model_folder_names = {'face', 'boots', 'glove'}
+    # Team common path: has common/ followed by a 3-digit team ID
+    team_common_pattern = re.compile(r'/common/[0-9]{3}/')
+
+    # Replace directory strings with the appropriate new texture directory
+    modified = False
+    for idx in dir_string_indices:
+        if idx >= len(strings):
+            continue
+
+        old_path = strings[idx]
+        old_path_sections = [s for s in old_path.split("/") if s]
+
+        # Check if the path contains a model folder name (face, boots, glove)
+        is_model_type = any(section in model_folder_names for section in old_path_sections)
+
+        if is_model_type:
+            # Model-type paths -> replace with per-model per-player path
+            new_path = f"{common_base}000/{player_name}/{model_folder_name}/sourceimages/"
+        elif team_common_pattern.search(old_path):
+            # Team common paths -> replace with per-player path
+            new_path = f"{common_base}000/{player_name}/sourceimages/"
+        else:
+            # Game common paths -> leave unchanged
+            continue
+
+        if old_path != new_path:
+            logging.debug(f"  {old_path} -> {new_path}")
+            strings[idx] = new_path
+            modified = True
+
+    if not modified:
+        return
+
+    # Rebuild string data (segment1 block 3) and descriptors (segment0 block 12)
+    new_string_data = bytearray()
+    new_descriptors = []
+    for string in strings:
+        encoded = string.encode('utf-8')
+        offset = len(new_string_data)
+        new_string_data += encoded + b'\0'
+        new_descriptors.append(bytearray(struct.pack('< H H I', 3, len(encoded), offset)))
+
+    # Preserve any extension header data that may follow the last string
+    if fmdl.segment0Blocks[12]:
+        last_desc = fmdl.segment0Blocks[12][-1]
+        (_, last_len, last_offset) = struct.unpack('< H H I', last_desc)
+        original_strings_end = last_offset + last_len + 1  # +1 for null terminator
+        if original_strings_end < len(string_block):
+            new_string_data += string_block[original_strings_end:]
+
+    fmdl.segment1Blocks[3] = new_string_data
+    fmdl.segment0Blocks[12] = new_descriptors
+
+    fmdl.writeFile(file_path)
+    logging.debug(f"Updated texture directory paths in: {file_path}")
 
 
 def main():

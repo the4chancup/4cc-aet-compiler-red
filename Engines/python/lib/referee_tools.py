@@ -37,9 +37,10 @@ def refs_list_process(refs_txt_path):
 
 def get_ref_ids(ref_num):
     """Get the IDs for face, boots and gloves for a given ref number."""
-    face_id = f'referee{ref_num.zfill(3)}'  # e.g. referee001
-    boots_id = f'k99{ref_num.zfill(2)}'  # e.g. k9901
-    gloves_id = f'g99{ref_num.zfill(2)}'  # e.g. g9901
+    ref_num_padded = ref_num.zfill(2)     # e.g. 01
+    face_id = f'referee0{ref_num_padded}' # e.g. referee001
+    boots_id = f'k99{ref_num_padded}'     # e.g. k9901
+    gloves_id = f'g99{ref_num_padded}'    # e.g. g9901
     return face_id, boots_id, gloves_id
 
 

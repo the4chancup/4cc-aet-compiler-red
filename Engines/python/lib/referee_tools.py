@@ -362,17 +362,11 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
     if not ref_common_files:
         return
 
-    # Get list of files in the referee's common_shared folder
-    ref_common_shared_files = get_files_list(os.path.join(ref_folder_path, 'common_shared'), recursive=True)
-
-    # Combine the list of files from common_shared and the list of files in the export's Common folder
-    common_files_withshared = common_files + ref_common_shared_files
-
     # Update paths in the model folders
     for model_folder_name in ['face', 'boots', 'gloves']:
         folder_src = os.path.join(ref_folder_path, model_folder_name)
         if os.path.exists(folder_src):
-            update_folder_paths(folder_src, ref_name, ref_common_files, common_files_withshared)
+            update_folder_paths(folder_src, ref_name, ref_common_files, common_files)
 
 
 def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_path):
@@ -420,32 +414,24 @@ def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_pa
         elif config['required']:
             logging.warning(f"- Warning - No {folder_name} folder found for referee {ref_name}")
 
-    # Configuration for each common folder type
-    common_folder_configs = {
-        # Files from "common" are copied to a referee-specific subfolder in Common
-        'common': os.path.join(export_destination_path, 'Common', ref_name),
-        # Files from "common_shared" are copied directly to the Common folder
-        'common_shared': os.path.join(export_destination_path, 'Common')
-    }
+    # Process common folder
+    src_folder = os.path.join(ref_folder_path, 'common')
+    dst_folder = os.path.join(export_destination_path, 'Common', ref_name)
+    if not os.path.exists(src_folder):
+        return
 
-    # Process common folders
-    for folder_name, destination in common_folder_configs.items():
-        src_folder = os.path.join(ref_folder_path, folder_name)
-        if not os.path.exists(src_folder):
+    os.makedirs(dst_folder, exist_ok=True)
+
+    # Copy all files and subdirectories
+    for item in os.listdir(src_folder):
+        src_path = os.path.join(src_folder, item)
+        dst_path = os.path.join(dst_folder, item)
+        if os.path.exists(dst_path):
             continue
-
-        os.makedirs(destination, exist_ok=True)
-
-        # Copy all files and subdirectories
-        for item in os.listdir(src_folder):
-            src_path = os.path.join(src_folder, item)
-            dst_path = os.path.join(destination, item)
-            if os.path.exists(dst_path):
-                continue
-            if os.path.isfile(src_path):
-                shutil.copy2(src_path, dst_path)
-            elif os.path.isdir(src_path):
-                shutil.copytree(src_path, dst_path)
+        if os.path.isfile(src_path):
+            shutil.copy2(src_path, dst_path)
+        elif os.path.isdir(src_path):
+            shutil.copytree(src_path, dst_path)
 
 
 def error_handle():

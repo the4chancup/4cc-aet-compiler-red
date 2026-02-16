@@ -145,55 +145,9 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
             fmdl_texture_paths_change(file_path, UNIFORM_COMMON_FOX_PATH, ref_name)
 
 
-def update_mtl_for_moved_textures(mtl_path, texture_files):
-    """
-    Update MTL file paths after textures have been moved to common subfolder.
-
-    Args:
-        mtl_path: Path to the MTL file
-        texture_files: List of texture filenames that were moved
-    """
-    try:
-        # Unzlib file if needed
-        unzlib_file(mtl_path)
-
-        with open(mtl_path, 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-
-        modified = False
-        new_lines = []
-
-        for line in lines:
-            new_line = line
-            # Check for texture references
-            for texture in texture_files:
-                if not ('path=' in line and f'./{texture}' in line):
-                    continue
-                # Replace texture path to point to common/XXX/
-                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{texture}"
-                new_line = re.sub(
-                    rf'(path=")\./{re.escape(texture)}(")',
-                    rf'\1{new_path}\2',
-                    new_line
-                )
-                if new_line != line:
-                    modified = True
-                    logging.debug(f"Updated MTL texture reference: ./{texture} -> {new_path}")
-                    break
-            new_lines.append(new_line)
-
-        if modified:
-            with open(mtl_path, 'w', encoding='utf-8') as f:
-                f.writelines(new_lines)
-            logging.debug(f"Updated MTL paths in: {mtl_path}")
-
-    except Exception as e:
-        logging.error(f"- ERROR - Failed to update MTL paths in {mtl_path}: {e}")
-        pause()
-
 def move_textures_to_common(ref_folder_path, model_folder_name):
     """
-    Move texture files from face/boots/gloves folder to common subfolder and update MTL paths.
+    Move texture files from face/boots/gloves folder to common subfolder.
 
     Args:
         ref_folder_path: Path to the referee's source folder
@@ -233,12 +187,6 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
         dst_path = os.path.join(dst_folder_path, os.path.basename(texture_path_rel))
         shutil.move(src_path, dst_path)
         logging.debug(f"Moved texture {texture_path_rel} to common/")
-
-    # Update MTL file paths in the source folder (recursive)
-    mtl_files = [f for f in src_files if f.endswith('.mtl')]
-    for mtl_path_rel in mtl_files:
-        mtl_path = os.path.join(src_folder, os.path.normpath(mtl_path_rel))
-        update_mtl_for_moved_textures(mtl_path, texture_files)
 
     return texture_files
 

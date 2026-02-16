@@ -363,8 +363,8 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
     if not ref_common_files:
         return
 
-    # Update paths in the model folders
-    for model_folder_name in ['face', 'boots', 'gloves']:
+    # Update paths in the folders
+    for model_folder_name in ['face', 'boots', 'gloves', 'common']:
         folder_src = os.path.join(ref_folder_path, model_folder_name)
         if os.path.exists(folder_src):
             update_folder_paths(folder_src, ref_name, ref_common_files, common_files)

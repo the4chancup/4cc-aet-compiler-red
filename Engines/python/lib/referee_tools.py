@@ -133,14 +133,13 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
             update_file_paths(file_path, ref_name, ref_common_files, common_files)
 
 
-def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):
+def update_mtl_for_moved_textures(mtl_path, texture_files):
     """
     Update MTL file paths after textures have been moved to common subfolder.
 
     Args:
         mtl_path: Path to the MTL file
         texture_files: List of texture filenames that were moved
-        subfolder_name: Name of the subfolder in common (e.g., 'face')
     """
     try:
         # Unzlib file if needed
@@ -158,8 +157,8 @@ def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):
             for texture in texture_files:
                 if not ('path=' in line and f'./{texture}' in line):
                     continue
-                # Replace texture path to point to common/XXX/[subfolder]/
-                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{subfolder_name}/{texture}"
+                # Replace texture path to point to common/XXX/
+                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{texture}"
                 new_line = re.sub(
                     rf'(path=")\./{re.escape(texture)}(")',
                     rf'\1{new_path}\2',
@@ -209,13 +208,13 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
     fmdl_files = [f for f in src_files if f.endswith('.fmdl')]
     for fmdl_path_rel in fmdl_files:
         fmdl_path = os.path.join(src_folder, os.path.normpath(fmdl_path_rel))
-        fmdl_texture_paths_change(fmdl_path, UNIFORM_COMMON_FOX_PATH, ref_name, model_folder_name)
+        fmdl_texture_paths_change(fmdl_path, UNIFORM_COMMON_FOX_PATH, ref_name)
 
     if not texture_files:
         return []
 
-    # Create common/[folder_name] subfolder
-    common_subfolder = os.path.join(ref_folder_path, 'common', model_folder_name)
+    # Create common subfolder
+    common_subfolder = os.path.join(ref_folder_path, 'common')
     os.makedirs(common_subfolder, exist_ok=True)
 
     # Move textures
@@ -228,13 +227,13 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
 
         dst_path = os.path.join(dst_folder_path, os.path.basename(texture_path_rel))
         shutil.move(src_path, dst_path)
-        logging.debug(f"Moved texture {texture_path_rel} to common/{model_folder_name}/")
+        logging.debug(f"Moved texture {texture_path_rel} to common/")
 
     # Update MTL file paths in the source folder (recursive)
     mtl_files = [f for f in src_files if f.endswith('.mtl')]
     for mtl_path_rel in mtl_files:
         mtl_path = os.path.join(src_folder, os.path.normpath(mtl_path_rel))
-        update_mtl_for_moved_textures(mtl_path, texture_files, model_folder_name)
+        update_mtl_for_moved_textures(mtl_path, texture_files)
 
     return texture_files
 
@@ -262,7 +261,8 @@ def move_markers_to_subfolder(ref_folder_path, model_folder_name):
         if not item_common_cleaned:
             continue
 
-        if normalize_kit_dependent_file(item_common_cleaned, reverse=True) not in common_files:
+        item_normalized = normalize_kit_dependent_file(item_common_cleaned, reverse=True)
+        if item_normalized is not None and item_normalized not in common_files:
             continue
 
         marker_file_path = os.path.join(src_folder_path, os.path.normpath(item_path_rel))
@@ -275,7 +275,7 @@ def move_markers_to_subfolder(ref_folder_path, model_folder_name):
 
         dst_path = os.path.join(dst_folder_path, os.path.basename(item_path_rel))
         shutil.move(marker_file_path, dst_path)
-        logging.debug(f"Moved common file marker {item_path_rel} to {model_folder_name}/{ref_folder_name}/")
+        logging.debug(f"Moved common file marker {item_path_rel} to {ref_folder_name}/{os.path.dirname(item_path_rel)}/")
 
     return common_files
 
@@ -307,13 +307,13 @@ def move_models_to_common(ref_folder_path, model_folder_name):
     if not model_files:
         return []
 
-    # Create common/[folder_name] subfolder
-    common_subfolder = os.path.join(ref_folder_path, 'common', model_folder_name)
+    # Create common subfolder
+    common_subfolder = os.path.join(ref_folder_path, 'common')
     os.makedirs(common_subfolder, exist_ok=True)
 
-    # Create [folder_name]/[ref_name]/[folder_name] subfolder
+    # Create [folder_name]/[ref_name] subfolder
     ref_folder_name = os.path.basename(ref_folder_path)
-    folder_subfolder = os.path.join(ref_folder_path, model_folder_name, ref_folder_name, model_folder_name)
+    folder_subfolder = os.path.join(src_folder, ref_folder_name)
     os.makedirs(folder_subfolder, exist_ok=True)
 
     # Move models
@@ -326,7 +326,7 @@ def move_models_to_common(ref_folder_path, model_folder_name):
 
         dst_path = os.path.join(dst_folder_path, os.path.basename(model_path_rel))
         shutil.move(src_path, dst_path)
-        logging.debug(f"Moved model {model_path_rel} to common/{model_folder_name}/")
+        logging.debug(f"Moved model {model_path_rel} to common/")
 
         # Create empty .common marker in the composite subfolder including subdirectories
         marker_dir = os.path.join(folder_subfolder, os.path.dirname(model_path_rel))

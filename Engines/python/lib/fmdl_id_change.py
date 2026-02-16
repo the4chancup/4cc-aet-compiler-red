@@ -188,7 +188,7 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
     return
 
 
-def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str, model_folder_name: str):
+def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str):
     """
     Change all texture directory paths in an FMDL file to point to the
     player's common subfolders.
@@ -206,7 +206,6 @@ def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str
         common_base: Common folder base path
             (e.g. '/Assets/pes16/model/character/common/')
         player_name: Name of the player (e.g. 'marisa')
-        model_folder_name: Name of the model folder (e.g. 'boots')
     """
     if not os.path.exists(file_path):
         return
@@ -261,11 +260,8 @@ def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str
         # Check if the path contains a model folder name (face, boots, glove)
         is_model_type = any(section in model_folder_names for section in old_path_sections)
 
-        if is_model_type:
-            # Model-type paths -> replace with per-model per-player path
-            new_path = f"{common_base}000/{player_name}/{model_folder_name}/sourceimages/"
-        elif team_common_pattern.search(old_path):
-            # Team common paths -> replace with per-player path
+        if is_model_type or team_common_pattern.search(old_path):
+            # Model-type paths and Team common paths -> replace with per-player common path
             new_path = f"{common_base}000/{player_name}/sourceimages/"
         else:
             # Game common paths -> leave unchanged

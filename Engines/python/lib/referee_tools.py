@@ -126,11 +126,11 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
         ref_common_files: List of files that are in the referee's Common folder
         common_files: List of files that are in the export's Common folder
     """
-    for item in os.listdir(folder_path):
-        item_path = os.path.join(folder_path, item)
-        if os.path.isfile(item_path):
-            if item.endswith('.xml') or item.endswith('.mtl'):
-                update_file_paths(item_path, ref_name, ref_common_files, common_files)
+    files = get_files_list(folder_path, recursive=True)
+    for file_path_rel in files:
+        file_path = os.path.join(folder_path, file_path_rel)
+        if file_path_rel.endswith('.xml') or file_path_rel.endswith('.mtl'):
+            update_file_paths(file_path, ref_name, ref_common_files, common_files)
 
 
 def update_mtl_for_moved_textures(mtl_path, texture_files, subfolder_name):

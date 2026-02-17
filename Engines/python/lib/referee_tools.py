@@ -100,6 +100,13 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
                 logging.debug(f"Updated path: {path_value} -> {new_path}")
                 return prefix + new_path + suffix
 
+            # Check if this file (with p1 instead of p0) is in the export's common folder
+            file_path_rel_denormalized = normalize_kit_dependent_file(file_path_rel, reverse=True)
+            if file_path_rel_denormalized in ref_common_files and file_path_rel_denormalized not in common_files:
+                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/{file_path_rel_denormalized}"
+                logging.debug(f"Updated path: {path_value} -> {new_path}")
+                return prefix + new_path + suffix
+
             return match.group(0)
 
         for line in lines:

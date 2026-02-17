@@ -76,21 +76,29 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
             # Normalize to forward slashes
             path_value_normalized = path_value.replace('\\', '/')
 
+            file_path_rel = None
+
+            # Check if path is a relative path starting with ./
+            relative_match = re.match(r'./(.+)', path_value_normalized)
+
             # Check if path points to Common folder (with XXX subfolder pattern)
             # Pattern: model/character/uniform/common/XXX/ where XXX is 3 alphanumeric chars
-            common_pattern = re.match(
+            common_match = re.match(
                 rf'{re.escape(UNIFORM_COMMON_PREFOX_PATH)}[a-zA-Z0-9]{{3}}/(.*)', path_value_normalized
             )
-            if common_pattern:
-                # Extract the part after common/XXX/
-                common_part = common_pattern.group(1)
 
-                # Check if this file is in the referee's common folder
-                if common_part in ref_common_files and common_part not in common_files:
-                    # Update to use referee-specific subfolder
-                    new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/{common_part}"
-                    logging.debug(f"Updated path: {path_value} -> {new_path}")
-                    return prefix + new_path + suffix
+            if relative_match:
+                file_path_rel = relative_match.group(1)
+            elif common_match:
+                file_path_rel = common_match.group(1)
+            else:
+                return match.group(0)
+
+            # Check if this file is in the referee's common folder
+            if file_path_rel and file_path_rel in ref_common_files and file_path_rel not in common_files:
+                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/{file_path_rel}"
+                logging.debug(f"Updated path: {path_value} -> {new_path}")
+                return prefix + new_path + suffix
 
             return match.group(0)
 

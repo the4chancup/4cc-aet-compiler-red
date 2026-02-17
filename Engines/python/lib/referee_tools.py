@@ -118,10 +118,10 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
 
 def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
     """
-    Update paths in all XML and MTL files in a folder.
+    Update paths in all XML, MTL and FMDL files in a folder.
 
     Args:
-        folder_path: Path to the folder containing XML and MTL files
+        folder_path: Path to the folder containing XML, MTL or FMDL files
         ref_name: Name of the referee (for subfolder)
         ref_common_files: List of files that are in the referee's Common folder
         common_files: List of files that are in the export's Common folder
@@ -129,8 +129,12 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
     files = get_files_list(folder_path, recursive=True)
     for file_path_rel in files:
         file_path = os.path.join(folder_path, file_path_rel)
+
         if file_path_rel.endswith('.xml') or file_path_rel.endswith('.mtl'):
             update_file_paths(file_path, ref_name, ref_common_files, common_files)
+
+        if file_path_rel.endswith('.fmdl'):
+            fmdl_texture_paths_change(file_path, UNIFORM_COMMON_FOX_PATH, ref_name)
 
 
 def update_mtl_for_moved_textures(mtl_path, texture_files):
@@ -192,7 +196,6 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
     """
     TEXTURE_EXTENSIONS = ['.dds', '.ftex']
 
-    ref_name = os.path.basename(ref_folder_path)
     src_folder = os.path.join(ref_folder_path, model_folder_name)
     if not os.path.exists(src_folder):
         return []
@@ -203,12 +206,6 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
     for item_path_rel in src_files:
         if any(item_path_rel.lower().endswith(ext) for ext in TEXTURE_EXTENSIONS):
             texture_files.append(item_path_rel)
-
-    # Update FMDL file paths in the source folder (recursive)
-    fmdl_files = [f for f in src_files if f.endswith('.fmdl')]
-    for fmdl_path_rel in fmdl_files:
-        fmdl_path = os.path.join(src_folder, os.path.normpath(fmdl_path_rel))
-        fmdl_texture_paths_change(fmdl_path, UNIFORM_COMMON_FOX_PATH, ref_name)
 
     if not texture_files:
         return []

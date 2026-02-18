@@ -196,9 +196,9 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
 
     return texture_files
 
-def move_markers_to_subfolder(ref_folder_path, model_folder_name, common_files):
+def move_links_to_subfolder(ref_folder_path, model_folder_name, common_files):
     """
-    Move common file markers to a subfolder with the referee name if they correspond to a file in
+    Move common file links to a subfolder with the referee name if they correspond to a file in
     the referee's common folder.
 
     Args:
@@ -206,7 +206,7 @@ def move_markers_to_subfolder(ref_folder_path, model_folder_name, common_files):
         model_folder_name: Name of the model folder ('face', 'boots', or 'gloves')
 
     Returns:
-        List of moved marker filenames
+        List of moved link filenames
     """
     src_folder_path = os.path.join(ref_folder_path, model_folder_name)
     if not os.path.exists(src_folder_path):
@@ -223,7 +223,7 @@ def move_markers_to_subfolder(ref_folder_path, model_folder_name, common_files):
         if item_normalized is not None and item_normalized not in common_files:
             continue
 
-        marker_file_path = os.path.join(src_folder_path, os.path.normpath(item_path_rel))
+        link_file_path = os.path.join(src_folder_path, os.path.normpath(item_path_rel))
 
         # Create destination folder including any subdirectories from item_path_rel
         dst_folder_path = os.path.join(
@@ -232,15 +232,15 @@ def move_markers_to_subfolder(ref_folder_path, model_folder_name, common_files):
         os.makedirs(dst_folder_path, exist_ok=True)
 
         dst_path = os.path.join(dst_folder_path, os.path.basename(item_path_rel))
-        shutil.move(marker_file_path, dst_path)
-        logging.debug(f"Moved common file marker {item_path_rel} to {ref_folder_name}/{os.path.dirname(item_path_rel)}/")
+        shutil.move(link_file_path, dst_path)
+        logging.debug(f"Moved common file link {item_path_rel} to {ref_folder_name}/{os.path.dirname(item_path_rel)}/")
 
     return common_files
 
 
 def move_models_to_common(ref_folder_path, model_folder_name):
     """
-    Move model and mtl files from face/boots/gloves folder to common subfolder and create markers.
+    Move model and mtl files from face/boots/gloves folder to common subfolder and create links.
 
     Args:
         ref_folder_path: Path to the referee's source folder
@@ -286,13 +286,13 @@ def move_models_to_common(ref_folder_path, model_folder_name):
         shutil.move(src_path, dst_path)
         logging.debug(f"Moved model {model_path_rel} to common/")
 
-        # Create empty .common marker in the composite subfolder including subdirectories
-        marker_dir = os.path.join(folder_subfolder, os.path.dirname(model_path_rel))
-        os.makedirs(marker_dir, exist_ok=True)
-        common_marker_path = os.path.join(marker_dir, f"{os.path.basename(model_path_rel)}.common")
-        with open(common_marker_path, 'w'):
+        # Create empty .common link in the composite subfolder including subdirectories
+        link_dir = os.path.join(folder_subfolder, os.path.dirname(model_path_rel))
+        os.makedirs(link_dir, exist_ok=True)
+        common_link_path = os.path.join(link_dir, f"{os.path.basename(model_path_rel)}.common")
+        with open(common_link_path, 'w'):
             pass
-        logging.debug(f"Created .common marker for model {model_path_rel} in {marker_dir}")
+        logging.debug(f"Created .common link for model {model_path_rel} in {link_dir}")
 
     return model_files
 
@@ -313,7 +313,7 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
     for model_folder_name in ['face', 'boots', 'gloves']:
         move_textures_to_common(ref_folder_path, model_folder_name)
         if not (fox_mode or pes_version == 16):
-            move_markers_to_subfolder(ref_folder_path, model_folder_name, common_files)
+            move_links_to_subfolder(ref_folder_path, model_folder_name, common_files)
             move_models_to_common(ref_folder_path, model_folder_name)
 
     # Get list of files in the referee's common folder

@@ -32,18 +32,18 @@ def normalize_kit_dependent_file(file_name, reverse=False):
     return file_name
 
 
-def is_common_file(file_name):
+def resolve_link_to_common(file_name):
     """
-    Check if a file should be loaded from the Common folder and return the cleaned filename.
+    Check if a file should be loaded from the Common folder and return the resolved filename.
 
     Parameters:
         file_name (str): The filename, possibly with .common or .common.txt extension
 
     Returns:
-        str or None: The cleaned filename (without .common/.common.txt) if it's a common file
+        str or None: The resolved filename (without .common/.common.txt) if it's a common file
             marker, None otherwise
     """
-    # If the file is a marker file, return the cleaned name
+    # If the file is a marker file, return the resolved name
     if file_name.endswith('.common.txt'):
         return file_name[:-11]
     elif file_name.endswith('.common'):

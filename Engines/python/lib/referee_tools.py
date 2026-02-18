@@ -6,7 +6,7 @@ import logging
 from .utils.pausing import pause
 from .utils.zlib_plus import unzlib_file
 from .utils.name_editing import (
-    is_common_file,
+    resolve_link_to_common,
     normalize_kit_dependent_file,
 )
 from .utils.FILE_INFO import (
@@ -215,11 +215,11 @@ def move_links_to_subfolder(ref_folder_path, model_folder_name, common_files):
     ref_folder_name = os.path.basename(ref_folder_path)
     src_files = get_files_list(src_folder_path, recursive=True)
     for item_path_rel in src_files:
-        item_common_cleaned = is_common_file(item_path_rel)
-        if not item_common_cleaned:
+        item_resolved = resolve_link_to_common(item_path_rel)
+        if not item_resolved:
             continue
 
-        item_normalized = normalize_kit_dependent_file(item_common_cleaned, reverse=True)
+        item_normalized = normalize_kit_dependent_file(item_resolved, reverse=True)
         if item_normalized is not None and item_normalized not in common_files:
             continue
 

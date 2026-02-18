@@ -8,7 +8,7 @@ from .utils.elements import dummy_element
 from .utils.elements import glove_element
 from .utils.name_editing import (
     normalize_kit_dependent_file,
-    is_common_file,
+    resolve_link_to_common,
     txt_id_change,
 )
 from .utils.FILE_INFO import UNIFORM_COMMON_PREFOX_PATH
@@ -46,20 +46,18 @@ def find_mtl_file(model_folder_path, model_dir_full, model_file_name_core):
         tuple: (mtl_file_name, mtl_in_model_file_dir) where mtl_file_name is the filename
             and mtl_in_model_file_dir indicates if it's in the model's directory
     """
-    def check_mtl_file_name(file_name, match_name=True):
-        file_common_cleaned = is_common_file(file_name)
-        if file_common_cleaned:
-            file_name_cleaned = file_common_cleaned
+    def check_mtl_file_name(file_name_raw, match_name=True):
+        file_name_resolved_test = resolve_link_to_common(file_name_raw)
+        if file_name_resolved_test is not None:
+            file_name_resolved = file_name_resolved_test
         else:
-            file_name_cleaned = file_name
+            file_name_resolved = file_name_raw
         # Check if the model name starts with the file name
         if (
-            model_file_name_core.startswith(os.path.splitext(file_name_cleaned)[0]) or
+            model_file_name_core.startswith(os.path.splitext(file_name_resolved)[0]) or
             not match_name
         ) and (
-            file_name.endswith(".mtl") or
-            file_name.endswith(".mtl.common") or
-            file_name.endswith(".mtl.common.txt")
+            file_name_resolved.endswith(".mtl")
         ):
             return True
         return False
@@ -71,9 +69,9 @@ def find_mtl_file(model_folder_path, model_dir_full, model_file_name_core):
         os.path.isfile(os.path.join(model_dir_full, f))
     ]
     # Find matching .mtl file in the same directory as the model file
-    for file_name in model_dir_file_name_list:
-        if check_mtl_file_name(file_name):
-            mtl_file_name_raw = file_name
+    for file_name_raw in model_dir_file_name_list:
+        if check_mtl_file_name(file_name_raw):
+            mtl_file_name_raw = file_name_raw
             mtl_in_model_file_dir = True
             break
 
@@ -86,9 +84,9 @@ def find_mtl_file(model_folder_path, model_dir_full, model_file_name_core):
 
     if not mtl_file_name_raw:
         # Find any .mtl file in the same directory as the model file
-        for file_name in model_dir_file_name_list:
-            if check_mtl_file_name(file_name, match_name=False):
-                mtl_file_name_raw = file_name
+        for file_name_raw in model_dir_file_name_list:
+            if check_mtl_file_name(file_name_raw, match_name=False):
+                mtl_file_name_raw = file_name_raw
                 mtl_in_model_file_dir = True
                 break
 
@@ -100,9 +98,9 @@ def find_mtl_file(model_folder_path, model_dir_full, model_file_name_core):
             os.path.isfile(os.path.join(model_folder_path, f))
         ]
         # Find matching .mtl file in the main model folder
-        for file_name in model_dir_file_name_list:
-            if check_mtl_file_name(file_name):
-                mtl_file_name_raw = file_name
+        for file_name_raw in model_dir_file_name_list:
+            if check_mtl_file_name(file_name_raw):
+                mtl_file_name_raw = file_name_raw
                 break
 
     if not mtl_file_name_raw:
@@ -114,9 +112,9 @@ def find_mtl_file(model_folder_path, model_dir_full, model_file_name_core):
 
     if not mtl_file_name_raw:
         # Find any .mtl file in the main model folder
-        for file_name in model_dir_file_name_list:
-            if check_mtl_file_name(file_name, match_name=False):
-                mtl_file_name_raw = file_name
+        for file_name_raw in model_dir_file_name_list:
+            if check_mtl_file_name(file_name_raw, match_name=False):
+                mtl_file_name_raw = file_name_raw
                 break
 
     if not mtl_file_name_raw:
@@ -222,10 +220,9 @@ def xml_create(model_folder_path, model_folder_type):
             model_dir_full = os.path.dirname(model_full_path)
 
             # Check if this is a common folder file
-            model_common_cleaned = is_common_file(model_file_name_raw)
-
-            if model_common_cleaned:
-                model_file_name = model_common_cleaned
+            model_file_name_resolved_test = resolve_link_to_common(model_file_name_raw)
+            if model_file_name_resolved_test is not None:
+                model_file_name = model_file_name_resolved_test
             else:
                 model_file_name = model_file_name_raw
 
@@ -247,7 +244,7 @@ def xml_create(model_folder_path, model_folder_type):
                 model_file_name_core = model_file_name.replace(".model", "")
                 model_file_name_full = "oral_" + model_file_name.replace(".model", "_win32.model")
 
-                if not model_common_cleaned:
+                if model_file_name_resolved_test is None:
                     # Rename the file if it's not a marker
                     new_full_path = os.path.join(model_dir_full, model_file_name_full)
                     os.rename(model_full_path, new_full_path)
@@ -257,7 +254,7 @@ def xml_create(model_folder_path, model_folder_type):
             model_file_name_norm = normalize_kit_dependent_file(model_file_name_full)
 
             # Build the model path for XML
-            if model_common_cleaned:
+            if model_file_name_resolved_test is not None:
                 model_base_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/"
             else:
                 model_base_path = "./"
@@ -282,12 +279,12 @@ def xml_create(model_folder_path, model_folder_type):
             )
 
             # Check if the mtl file is a common file
-            mtl_common_cleaned = is_common_file(mtl_file_name_raw)
+            mtl_file_name_resolved = resolve_link_to_common(mtl_file_name_raw)
 
             # Build the mtl path for XML
-            if mtl_common_cleaned:
+            if mtl_file_name_resolved is not None:
                 mtl_base_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/"
-                mtl_file_name = mtl_common_cleaned
+                mtl_file_name = mtl_file_name_resolved
             else:
                 mtl_base_path = "./"
                 mtl_file_name = mtl_file_name_raw

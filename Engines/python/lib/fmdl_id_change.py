@@ -5,8 +5,12 @@ import struct
 import fnmatch
 import logging
 
-from .utils.name_editing import path_id_change
 from .utils.FmdlFile import FmdlContainer
+from .utils.FILE_INFO import UNIFORM_COMMON_FOX_PATH
+from .utils.name_editing import (
+    path_id_change,
+    normalize_kit_dependent_file,
+)
 
 
 def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
@@ -188,24 +192,25 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
     return
 
 
-def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str):
+def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_files: list, common_files: list):
     """
-    Change all texture directory paths in an FMDL file to point to the
-    player's common subfolders.
+    Change texture directory paths in an FMDL file for textures found in the
+    player's common folder.
 
     Unlike fmdl_id_change which only modifies IDs within existing paths,
     this function can change the entire texture directory path, handling
     variable-length string changes by rewriting the file structure.
 
-    Paths that match a model-type structure (face, boots, gloves, etc.)
-    get model_folder_name appended, while paths that already point to
-    common (shorter structure) only get player_name inserted.
+    Each texture entry is checked individually: if its filename is found in
+    player_common_files (and not in the export's shared common_files), the
+    directory path is updated to point to the player's common subfolder.
+    Other textures are left unchanged.
 
     Args:
         file_path: Path to the .fmdl file
-        common_base: Common folder base path
-            (e.g. '/Assets/pes16/model/character/common/')
         player_name: Name of the player (e.g. 'marisa')
+        player_common_files: List of files that are in the player's Common folder
+        common_files: List of files that are in the export's Common folder (for checking shared files)
     """
     if not os.path.exists(file_path):
         return
@@ -220,7 +225,7 @@ def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str
         logging.debug("No string data found in file")
         return
 
-    # Need block 6 (texture definitions)
+    # Need block 6 (texture definitions: filename_id, directory_id pairs)
     if 6 not in fmdl.segment0Blocks:
         logging.debug("No texture data found in file")
         return
@@ -233,47 +238,82 @@ def fmdl_texture_paths_change(file_path: str, common_base: str, player_name: str
         bytestring = string_block[offset : offset + length]
         strings.append(bytestring.decode('utf-8'))
 
-    # Find texture directory string indices from block 6
-    dir_string_indices = set()
+    # Build filename sets for quick lookup
+    player_common_file_names = {os.path.basename(f) for f in player_common_files}
+    common_file_names = {os.path.basename(f) for f in common_files}
+
+    # New directory for player-specific common textures
+    common_player_dir = f"{UNIFORM_COMMON_FOX_PATH}000/{player_name}/sourceimages/"
+    common_dir = f"{UNIFORM_COMMON_FOX_PATH}000/sourceimages/"
+
+    # Process each texture entry individually (block 6 has filename_id, directory_id pairs)
+    # New strings are appended (never modifying existing ones in-place) so that
+    # other blocks referencing strings by index remain valid
+    modified = False
+    new_string_cache = {}  # new_dir_value -> string_index
+    new_block6 = []
+
     for definition in fmdl.segment0Blocks[6]:
         (filename_id, directory_id) = struct.unpack('< H H', definition)
-        dir_string_indices.add(directory_id)
 
-    if not dir_string_indices:
-        logging.debug("No texture entries found in file")
-        return
-
-    # Model folder names that indicate a model-type path (face, boots, glove)
-    model_folder_names = {'face', 'boots', 'glove'}
-    # Team common path: has common/ followed by a 3-digit team ID
-    team_common_pattern = re.compile(r'/common/[0-9]{3}/')
-
-    # Replace directory strings with the appropriate new texture directory
-    modified = False
-    for idx in dir_string_indices:
-        if idx >= len(strings):
+        if filename_id >= len(strings) or directory_id >= len(strings):
+            new_block6.append(definition)
             continue
 
-        old_path = strings[idx]
-        old_path_sections = [s for s in old_path.split("/") if s]
+        tex_dir = strings[directory_id]
+        tex_name = strings[filename_id]
+        tex_name_denormalized = normalize_kit_dependent_file(tex_name, reverse=True)
 
-        # Check if the path contains a model folder name (face, boots, glove)
-        is_model_type = any(section in model_folder_names for section in old_path_sections)
-
-        if is_model_type or team_common_pattern.search(old_path):
-            # Model-type paths and Team common paths -> replace with per-player common path
-            new_path = f"{common_base}000/{player_name}/sourceimages/"
+        # Check if this texture's file is in the player's common folder
+        # or in the export's shared common folder
+        new_dir = None
+        use_denormalized_name = False
+        if tex_name in player_common_file_names:
+            new_dir = common_player_dir
+        elif tex_name in common_file_names:
+            new_dir = common_dir
+        # (with p1 instead of p0)
+        elif tex_name_denormalized in player_common_file_names:
+            new_dir = common_player_dir
+            use_denormalized_name = True
+        elif tex_name_denormalized in common_file_names:
+            new_dir = common_dir
+            use_denormalized_name = True
         else:
-            # Game common paths -> leave unchanged
+            # Leave this texture's directory unchanged
+            new_block6.append(definition)
             continue
 
-        if old_path != new_path:
-            logging.debug(f"  {old_path} -> {new_path}")
-            strings[idx] = new_path
-            modified = True
+        if use_denormalized_name:
+            # Replace the filename with the denormalized version (p0 -> p1)
+            if tex_name_denormalized not in new_string_cache:
+                new_string_cache[tex_name_denormalized] = len(strings)
+                strings.append(tex_name_denormalized)
+            new_filename_idx = new_string_cache[tex_name_denormalized]
+        else:
+            new_filename_idx = filename_id
+
+        if new_dir == tex_dir and new_filename_idx == filename_id:
+            new_block6.append(definition)
+            continue
+
+        modified = True
+        new_tex_name = tex_name_denormalized if use_denormalized_name else tex_name
+        logging.debug(f"  {tex_dir}{tex_name} -> {new_dir}{new_tex_name}")
+
+        # Get or create string index for the new directory
+        if new_dir not in new_string_cache:
+            new_string_cache[new_dir] = len(strings)
+            strings.append(new_dir)
+
+        new_dir_idx = new_string_cache[new_dir]
+        new_block6.append(bytearray(struct.pack('< H H', new_filename_idx, new_dir_idx)))
 
     if not modified:
         return
+
+    # Update block 6 with the new texture entries
+    fmdl.segment0Blocks[6] = new_block6
 
     # Rebuild string data (segment1 block 3) and descriptors (segment0 block 12)
     new_string_data = bytearray()

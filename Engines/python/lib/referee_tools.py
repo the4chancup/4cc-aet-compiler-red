@@ -13,7 +13,6 @@ from .utils.FILE_INFO import (
     REFS_TEMPLATE_PREFOX_PATH,
     REFS_TEMPLATE_FOX_PATH,
     UNIFORM_COMMON_PREFOX_PATH,
-    UNIFORM_COMMON_FOX_PATH,
 )
 from .fmdl_id_change import fmdl_texture_paths_change
 from .utils.file_management import get_files_list
@@ -149,7 +148,7 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
             update_file_paths(file_path, ref_name, ref_common_files, common_files)
 
         if file_path_rel.endswith('.fmdl'):
-            fmdl_texture_paths_change(file_path, UNIFORM_COMMON_FOX_PATH, ref_name)
+            fmdl_texture_paths_change(file_path, ref_name, ref_common_files, common_files)
 
 
 def move_textures_to_common(ref_folder_path, model_folder_name):
@@ -197,7 +196,7 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
 
     return texture_files
 
-def move_markers_to_subfolder(ref_folder_path, model_folder_name):
+def move_markers_to_subfolder(ref_folder_path, model_folder_name, common_files):
     """
     Move common file markers to a subfolder with the referee name if they correspond to a file in
     the referee's common folder.
@@ -215,7 +214,6 @@ def move_markers_to_subfolder(ref_folder_path, model_folder_name):
 
     ref_folder_name = os.path.basename(ref_folder_path)
     src_files = get_files_list(src_folder_path, recursive=True)
-    common_files = get_files_list(os.path.join(ref_folder_path, 'common'), recursive=True)
     for item_path_rel in src_files:
         item_common_cleaned = is_common_file(item_path_rel)
         if not item_common_cleaned:
@@ -315,7 +313,7 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
     for model_folder_name in ['face', 'boots', 'gloves']:
         move_textures_to_common(ref_folder_path, model_folder_name)
         if not (fox_mode or pes_version == 16):
-            move_markers_to_subfolder(ref_folder_path, model_folder_name)
+            move_markers_to_subfolder(ref_folder_path, model_folder_name, common_files)
             move_models_to_common(ref_folder_path, model_folder_name)
 
     # Get list of files in the referee's common folder

@@ -239,8 +239,9 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
         strings.append(bytestring.decode('utf-8'))
 
     # Build filename sets for quick lookup
-    player_common_file_names = {os.path.basename(f) for f in player_common_files}
-    common_file_names = {os.path.basename(f) for f in common_files}
+    # Extensions are removed because PES ignores them in texture paths
+    player_common_file_names = {os.path.splitext(os.path.basename(f))[0] for f in player_common_files}
+    common_file_names = {os.path.splitext(os.path.basename(f))[0] for f in common_files}
 
     # New directory for player-specific common textures
     common_player_dir = f"{UNIFORM_COMMON_FOX_PATH}000/{player_name}/sourceimages/"
@@ -261,7 +262,7 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
             continue
 
         tex_dir = strings[directory_id]
-        tex_name = strings[filename_id]
+        tex_name = os.path.splitext(strings[filename_id])[0]
         tex_name_denormalized = normalize_kit_dependent_file(tex_name, reverse=True)
 
         # Check if this texture's file is in the player's common folder

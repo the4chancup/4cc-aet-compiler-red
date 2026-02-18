@@ -14,7 +14,7 @@ from .utils.FILE_INFO import (
     REFS_TEMPLATE_FOX_PATH,
     UNIFORM_COMMON_PREFOX_PATH,
 )
-from .fmdl_id_change import fmdl_texture_paths_change
+from .fmdl_editing import fmdl_texture_paths_change
 from .utils.file_management import get_files_list
 
 

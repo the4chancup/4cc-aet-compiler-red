@@ -2,7 +2,7 @@ import os
 import time
 import shutil
 
-from .fmdl_id_change import fmdl_id_change
+from .fmdl_editing import fmdl_id_change
 from .xml_editing import xml_create
 from .xml_editing import xml_process
 from .utils.file_management import file_critical_check

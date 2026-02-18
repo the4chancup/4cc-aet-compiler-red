@@ -64,6 +64,10 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
         lines = content.split('\n')
         new_lines = []
 
+        # New directory for player-specific common textures
+        common_player_dir = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/"
+        common_dir = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/"
+
         # Match path="..." or material="..."
         pattern = re.compile(r'((?:path|material)=")([^"]+)(")')
 
@@ -93,20 +97,33 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
             else:
                 return match.group(0)
 
-            # Check if this file is in the referee's common folder
-            if file_path_rel and file_path_rel in ref_common_files and file_path_rel not in common_files:
-                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/{file_path_rel}"
-                logging.debug(f"Updated path: {path_value} -> {new_path}")
-                return prefix + new_path + suffix
-
-            # Check if this file (with p1 instead of p0) is in the export's common folder
             file_path_rel_denormalized = normalize_kit_dependent_file(file_path_rel, reverse=True)
-            if file_path_rel_denormalized in ref_common_files and file_path_rel_denormalized not in common_files:
-                new_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/{file_path_rel_denormalized}"
-                logging.debug(f"Updated path: {path_value} -> {new_path}")
-                return prefix + new_path + suffix
 
-            return match.group(0)
+            # Check if this file is in the referee's common folder
+            # or in the export's shared common folder
+            new_dir = None
+            use_denormalized_name = False
+            if file_path_rel in ref_common_files:
+                new_dir = common_player_dir
+            elif file_path_rel in common_files:
+                new_dir = common_dir
+            # (with p1 instead of p0)
+            elif file_path_rel_denormalized in ref_common_files:
+                new_dir = common_player_dir
+                use_denormalized_name = True
+            elif file_path_rel_denormalized in common_files:
+                new_dir = common_dir
+                use_denormalized_name = True
+            else:
+                return match.group(0)
+
+            if use_denormalized_name:
+                new_path = f'{new_dir}{file_path_rel_denormalized}'
+            else:
+                new_path = f'{new_dir}{file_path_rel}'
+
+            logging.debug(f"Updated path: {path_value} -> {new_path}")
+            return prefix + new_path + suffix
 
         for line in lines:
             # Check for lines containing path= or material=

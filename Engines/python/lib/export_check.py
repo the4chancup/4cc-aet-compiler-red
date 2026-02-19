@@ -11,7 +11,6 @@ from .xml_check import face_diff_xml_check
 from .txt_kits_count import txt_kits_count
 
 
-
 FILE_TYPE_ALLOWED_LIST = [
     ".bin",
     ".xml",
@@ -23,6 +22,8 @@ FILE_TYPE_ALLOWED_LIST = [
     ".skl",
     ".common",
     ".txt",
+    ".fox",
+    ".prefox",
 ]
 
 PREFOX_FILE_TYPE_DISALLOWED_LIST = [

@@ -189,7 +189,6 @@ def export_move(exportfolder_path, team_id, team_name):
 
             # Prepare the team ID for the texture filenames
             team_id_full = "0" + team_id
-            team_id_full_bytes = team_id_full.encode('utf-8')
 
             def change_pattern(file_path):
 
@@ -217,15 +216,25 @@ def export_move(exportfolder_path, team_id, team_name):
                 # Unzlib it if needed
                 unzlib_file(file_path)
 
+                # Prepare kit char and number
+                if "_GK" in file_name:
+                    kit_char = 'g'
+                    kit_num = file_name[10]
+                else:
+                    kit_char = 'p'
+                    kit_num = file_name[8]
+
                 # Edit the texture filenames inside the config file
                 with open(file_path, 'rb+') as file:
                     for line in range(5):
                         position = 40 + line * 16
                         file.seek(position)
-                        char = file.read(1)
-                        if char == b'u':
-                            # Update the team ID in the texture filename
-                            file.write(team_id_full_bytes)
+                        char_team_type = file.read(1)
+                        if char_team_type != b'u':
+                            continue
+
+                        # Update the team ID and kit char and number in the texture filename
+                        file.write(f"{team_id_full}{kit_char}{kit_num}".encode('utf-8'))
 
                 if pes_15:
                     change_pattern(file_path)

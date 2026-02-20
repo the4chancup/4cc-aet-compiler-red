@@ -29,6 +29,7 @@ TYPES_LIST = [
     "uniform",
     "shirt",
     "pants_nocloth",
+    "eye",
 ]
 TYPE_DEFAULT = "parts"
 

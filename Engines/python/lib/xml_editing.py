@@ -300,14 +300,16 @@ def xml_create(model_folder_path, model_folder_type):
             mtl_file_path_xml = f"{mtl_base_path}{mtl_dir_xml}{mtl_file_name_xml}"
 
             # Check if any of the types in the list are in the start of the model name's core
-            model_file_name_core_simple = model_file_name_core.replace("_", "").lower()
+            model_file_name_core_simple = model_file_name_core.replace("_", "")
             for type in TYPES_LIST:
                 type_simple = type.replace("_", "").lower()
                 if model_file_name_core_simple.startswith(type_simple):
                     model_type = type
                     break
             else:
+                # Check if the model name contains "model_type_"
                 if "model_type_" in model_file_name_core:
+                    # Get the type after "model_type_"
                     model_type = model_file_name_core.split("model_type_")[1]
                 else:
                     model_type = TYPE_DEFAULT
@@ -326,6 +328,13 @@ def xml_create(model_folder_path, model_folder_type):
             model.set('type', model_type_xml)
             model.set('path', model_file_path_xml)
             model.set('material', mtl_file_path_xml)
+
+            # Check if the model name contains "ratio_"
+            if "ratio_" in model_file_name_core:
+                # Get the ratio after "ratio_"
+                ratio = model_file_name_core.split("ratio_")[1]
+                # Add ratio attribute
+                model.set('ratio', ratio)
 
             root_new.append(model)
 

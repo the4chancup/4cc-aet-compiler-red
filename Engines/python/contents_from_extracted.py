@@ -5,6 +5,7 @@ import logging
 
 from .lib.bins_update import bins_pack
 from .lib.contents_packing import contents_pack
+from .lib.utils.app_tools import app_title
 from .lib.utils.file_management import remove_readonly
 from .lib.utils.logging_tools import logger_stop
 from .lib.utils.pausing import pause
@@ -63,6 +64,10 @@ def contents_from_extracted():
     print("-")
     print("- Preparing the patch folders")
     print("-")
+
+    if sys.platform == "win32":
+        # Set the console title
+        os.system("title " + "2 - " + app_title(colorize=False))
 
 
     if refs_present:

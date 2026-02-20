@@ -1,5 +1,6 @@
 import os
 import sys
+from .app_tools import app_title
 
 
 def pause(message="Press any key to continue... ", print_hyphen=True, force=False):
@@ -22,7 +23,14 @@ def pause(message="Press any key to continue... ", print_hyphen=True, force=Fals
     print(message, end='', flush=True)
 
     if sys.platform == 'win32':
+        if print_hyphen:
+            os.system("title " + "Paused - " + app_title(colorize=False))
+
         os.system('pause >nul')
+
+        if print_hyphen:
+            os.system("title " + "_ - " + app_title(colorize=False))
+
         print("")
 
     else:

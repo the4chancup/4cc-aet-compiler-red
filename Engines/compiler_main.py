@@ -194,6 +194,10 @@ def main(run_type):
     exit_pause_skip = (run_pes and patches_from_contents_run)
 
     if not exit_pause_skip:
+        if sys.platform == "win32":
+            # Set the console title
+            os.system("title " + "Done - " + app_title(colorize=False))
+
         pause("Press any key to exit... ", print_hyphen=False)
 
 

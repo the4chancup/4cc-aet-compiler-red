@@ -11,7 +11,10 @@ from .lib.portraits_move import portraits_move
 from .lib.referee_tools import referee_export_process
 from .lib.team_id_get import team_id_get
 from .lib.utils import COLORS
-from .lib.utils.app_tools import referee_title
+from .lib.utils.app_tools import (
+    app_title,
+    referee_title,
+)
 from .lib.utils.file_management import remove_readonly, readonlybit_remove_tree
 from .lib.utils.logging_tools import log_presence_warn
 from .lib.utils.pausing import pause
@@ -51,6 +54,10 @@ def extracted_from_exports():
     print("-")
     print("- Extracting and checking the exports")
     print("-")
+
+    if sys.platform == "win32":
+        # Set the console title
+        os.system("title " + "1 - " + app_title(colorize=False))
 
     # Define the names of the main folders
     main_source_path = EXPORTS_TO_ADD_PATH

@@ -6,6 +6,7 @@ import subprocess
 
 from .lib import pes_cpk_pack as cpktool
 from .lib.utils import COLORS
+from .lib.utils.app_tools import app_title
 from .lib.utils.pausing import pause
 from .lib.utils.logging_tools import logger_stop, log_presence_warn
 from .lib.utils.FILE_INFO import (
@@ -88,6 +89,11 @@ def patches_from_contents():
     cpk_string = "cpk" if len(cpk_name_list) == 1 else "cpks"
     print( "-")
     print(f"- Packing the {cpk_string}...")
+
+    if sys.platform == "win32":
+        # Set the console title
+        os.system("title " + "3 - " + app_title(colorize=False))
+
 
     for folder_name, cpk_name in zip(folder_name_list, cpk_name_list):
 

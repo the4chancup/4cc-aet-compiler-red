@@ -140,9 +140,9 @@ def find_model_files_recursive(folder_path):
         for file in files:
             # Find .model files and .model.common / .model.common.txt markers
             if (
-                file.endswith(".model") or
-                file.endswith(".model.common") or
-                file.endswith(".model.common.txt")
+                file.lower().endswith(".model") or
+                file.lower().endswith(".model.common") or
+                file.lower().endswith(".model.common.txt")
             ):
                 full_path = os.path.join(root, file)
                 # Calculate relative path from folder_path
@@ -223,9 +223,9 @@ def xml_create(model_folder_path, model_folder_type):
             # Check if this is a common folder file
             model_file_name_resolved_test = resolve_link_to_common(model_file_name_raw)
             if model_file_name_resolved_test is not None:
-                model_file_name = model_file_name_resolved_test
+                model_file_name = model_file_name_resolved_test.lower()
             else:
-                model_file_name = model_file_name_raw
+                model_file_name = model_file_name_raw.lower()
 
             # Check if the model filename is in the exception list
             if model_file_name in MODEL_NAME_EXCEPTION_LIST:

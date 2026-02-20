@@ -44,9 +44,9 @@ def resolve_link_to_common(file_name):
             marker, None otherwise
     """
     # If the file is a marker file, return the resolved name
-    if file_name.endswith('.common.txt'):
+    if file_name.lower().endswith('.common.txt'):
         return file_name[:-11]
-    elif file_name.endswith('.common'):
+    elif file_name.lower().endswith('.common'):
         return file_name[:-7]
 
     return None

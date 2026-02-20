@@ -11,6 +11,7 @@ from .lib.utils.logging_tools import logger_stop, log_presence_warn
 from .lib.utils.FILE_INFO import (
     PATCHES_CONTENTS_PATH,
     PATCHES_OUTPUT_PATH,
+    MOVED_CPKS_TXT_NAME,
 )
 
 
@@ -157,26 +158,37 @@ def patches_from_contents():
         print("- Done")
         print("-")
 
-        # If Run PES mode is enabled, start the pes exe from PES_EXE_PATH
-        if run_pes:
+        # Create a txt file with the list of cpks that were moved
+        with open(os.path.join(PATCHES_OUTPUT_PATH, MOVED_CPKS_TXT_NAME), "w") as f:
+            f.write("The following cpks were moved to the download folder:\n")
+            for cpk_name in cpk_name_list:
+                f.write(f"{cpk_name}.cpk\n")
 
-            pes_exe_path = os.environ.get('PES_EXE_PATH', 'null')
+    else:
+        # Remove the moved cpks txt file if it exists
+        if os.path.exists(os.path.join(PATCHES_OUTPUT_PATH, MOVED_CPKS_TXT_NAME)):
+            os.remove(os.path.join(PATCHES_OUTPUT_PATH, MOVED_CPKS_TXT_NAME))
 
-            if os.path.exists(pes_exe_path):
+    # If Run PES mode is enabled, start the pes exe from PES_EXE_PATH
+    if move_cpks and run_pes:
 
-                issues_log_present = log_presence_warn()
-                if issues_log_present:
-                    pause()
-                log_presence_warn_done = True
+        pes_exe_path = os.environ.get('PES_EXE_PATH', 'null')
 
-                print( "-")
-                print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
-                subprocess.Popen([pes_exe_path], cwd=pes_folder_path)
-            else:
-                print( "-")
-                print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
-                print(f"- in the {pes_folder_path} folder")
-                print( "- PES won't be started")
+        if os.path.exists(pes_exe_path):
+
+            issues_log_present = log_presence_warn()
+            if issues_log_present:
+                pause()
+            log_presence_warn_done = True
+
+            print( "-")
+            print(f"- Run PES mode is enabled, starting PES20{pes_version}...")
+            subprocess.Popen([pes_exe_path], cwd=pes_folder_path)
+        else:
+            print( "-")
+            print(f"- Run PES mode is enabled but the PES20{pes_version} exe was not found")
+            print(f"- in the {pes_folder_path} folder")
+            print( "- PES won't be started")
 
     if all_in_one:
         if not log_presence_warn_done:

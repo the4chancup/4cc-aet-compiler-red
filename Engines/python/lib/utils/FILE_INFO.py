@@ -59,3 +59,6 @@ UNIFORM_COMMON_FOX_PATH      = '/Assets/pes16/model/character/common/'
 
 # DirectXTex
 TEXCONV_PATH                 = os.path.join("Engines", "directxtex", "texconv.exe")
+
+# Other
+MOVED_CPKS_TXT_NAME          = "these_cpks_were_moved_to_download_folder.txt"

@@ -198,6 +198,10 @@ def main(run_type):
             # Set the console title
             os.system("title " + "Done - " + app_title(colorize=False))
 
+            # Flash the console window
+            import ctypes
+            ctypes.windll.user32.FlashWindow(ctypes.windll.kernel32.GetConsoleWindow(), True)
+
         pause("Press any key to exit... ", print_hyphen=False)
 
 

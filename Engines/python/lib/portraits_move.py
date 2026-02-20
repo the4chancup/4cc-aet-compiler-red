@@ -18,59 +18,63 @@ def portraits_move(exportfolder_path, team_id):
     - bool: True if there are conflicts in portrait names, False otherwise.
     """
 
-    TEX_NAME = "portrait.dds"
+    TEX_SUFFIX = "portrait.dds"
 
     portrait_conflicts = []
-    portraits_path = os.path.join(exportfolder_path, "Portraits")
+    portraits_folder_path = os.path.join(exportfolder_path, "Portraits")
 
-    faces_path = os.path.join(exportfolder_path, "Faces")
-    for face_name in [f for f in os.listdir(faces_path) if os.path.isdir(os.path.join(faces_path, f))]:
+    faces_folder_path = os.path.join(exportfolder_path, "Faces")
+    for face_folder_name in [f for f in os.listdir(faces_folder_path) if os.path.isdir(os.path.join(faces_folder_path, f))]:
 
         # Check that the player number is a number within the 01-23 range
-        if not (face_name[3:5].isdigit() and '01' <= face_name[3:5] <= '23'):
+        if not (face_folder_name[3:5].isdigit() and '01' <= face_folder_name[3:5] <= '23'):
             continue
 
         # Check if the folder has a portrait
-        face_path = os.path.join(faces_path, face_name)
-        portrait_path = os.path.join(face_path, TEX_NAME)
-        if not os.path.exists(portrait_path):
+        face_folder_path = os.path.join(faces_folder_path, face_folder_name)
+        file_name_list = os.listdir(face_folder_path)
+        for file_name in file_name_list:
+            if file_name.lower().endswith(TEX_SUFFIX):
+                portrait_path = os.path.join(face_folder_path, file_name)
+                break
+        else:
             continue
 
-        player_number = face_name[3:5]
+        player_number = face_folder_name[3:5]
         player_id = team_id + player_number
 
         # Create a folder for portraits if not present
-        if not os.path.exists(portraits_path):
-            os.makedirs(portraits_path)
+        if not os.path.exists(portraits_folder_path):
+            os.makedirs(portraits_folder_path)
 
         # Rename the portrait with the player id
         portrait_name = f"player_{player_id}.dds"
 
         # Check if a file with the same player number already exists in the portraits folder
-        existing_portrait = next((f for f in os.listdir(portraits_path) if f[-6:-4] == player_number), None)
+        existing_portrait = next((f for f in os.listdir(portraits_folder_path) if f[-6:-4] == player_number), None)
         if existing_portrait:
-            portrait_destination_path = os.path.join(portraits_path, existing_portrait)
+            portrait_destination_path = os.path.join(portraits_folder_path, existing_portrait)
 
             # Check if the portait files have the same contents
             if not (os.path.exists(portrait_destination_path) and
                     filecmp.cmp(portrait_path, portrait_destination_path)):
 
                 # If they do not, add the face name to the list of conflicts
-                portrait_conflicts.append(face_name)
+                portrait_conflicts.append(face_folder_name)
             else:
                 # If they do, delete the portrait
                 os.remove(portrait_path)
 
         else:
             # Move the portrait to the portraits folder
-            portrait_destination_path = os.path.join(portraits_path, portrait_name)
+            portrait_destination_path = os.path.join(portraits_folder_path, portrait_name)
             os.rename(portrait_path, portrait_destination_path)
 
         # Check if the "ingame_face" file is present and delete the folder if it is
-        ingame_face_path = os.path.join(face_path, "ingame_face")
-        ingame_face_txt_path = os.path.join(face_path, "ingame_face.txt")
+        ingame_face_path = os.path.join(face_folder_path, "ingame_face")
+        ingame_face_txt_path = os.path.join(face_folder_path, "ingame_face.txt")
         if os.path.exists(ingame_face_path) or os.path.exists(ingame_face_txt_path):
-            shutil.rmtree(face_path)
+            shutil.rmtree(face_folder_path)
 
     # If there are any portrait conflicts
     if portrait_conflicts:

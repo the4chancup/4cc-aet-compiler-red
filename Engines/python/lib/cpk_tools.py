@@ -2,6 +2,7 @@ import os
 import sys
 import shutil
 import logging
+import tempfile
 
 from .utils import cpk
 from .utils.pausing import pause
@@ -9,6 +10,45 @@ from .utils.dpfl_scan import dpfl_scan
 from .utils.zlib_plus import tryDecompress
 from .utils.logging_tools import logger_stop
 from .utils.file_management import file_critical_check
+
+
+# Write a file to a cpk
+def cpk_file_write(cpk_path, file_source_path, file_destination_path):
+
+    # Read the new file's content
+    with open(file_source_path, "rb") as f:
+        new_file_data = f.read()
+
+    # Create a cpk writer object
+    cpk_writer = cpk.CpkWriter()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".cpk") as temp_file:
+        temp_cpk_path = temp_file.name
+    cpk_writer.open(temp_cpk_path)
+
+    # If the cpk already exists, copy all files except the one we are overwriting
+    if os.path.exists(cpk_path):
+        cpk_reader = cpk.CpkReader()
+        cpk_reader.open(cpk_path)
+
+        for file in cpk_reader.files:
+            if file.name != file_destination_path:
+                file_data = cpk_reader.readFile(file)
+                cpk_writer.writeFile(file.name, file_data, file.modificationTime)
+
+        cpk_reader.close()
+
+    # Write the new file
+    cpk_writer.writeFile(file_destination_path, new_file_data)
+
+    cpk_writer.close()
+
+    # Replace the old cpk with the new one
+    try:
+        os.replace(temp_cpk_path, cpk_path)
+    except OSError:
+        # Fallback if temp directory is on a different drive
+        shutil.copyfile(temp_cpk_path, cpk_path)
+        os.remove(temp_cpk_path)
 
 
 # Find the file in the cpk

@@ -231,7 +231,7 @@ def extracted_from_exports():
         os.path.exists(referees_other_path) and len(os.listdir(referees_other_path)) > 0
     ):
         print( "-")
-        print(f"- {COLORS.DARK_CYAN}Info{COLORS.RESET}: There are files in the Other folder")
+        print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET}: There are files in the Other folder")
         print( "- Please open it and check its contents")
 
         pause()

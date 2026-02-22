@@ -30,6 +30,7 @@ TYPES_LIST = [
     "shirt",
     "pants_nocloth",
     "eye",
+    "mouth",
 ]
 TYPE_DEFAULT = "parts"
 

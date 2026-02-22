@@ -28,6 +28,7 @@ CHECK_LAST_PATH              = os.path.join(STATE_FOLDER_PATH, "update_check_las
 SKIP_LAST_PATH               = os.path.join(STATE_FOLDER_PATH, "update_skip_last.txt")
 ADMIN_WARNED_PATH            = os.path.join(STATE_FOLDER_PATH, "admin_warned.txt")
 FIRST_RUN_DONE_PATH          = os.path.join(STATE_FOLDER_PATH, "first_run_done.txt")
+DT00_WRITE_ALLOWED_PATH      = os.path.join(STATE_FOLDER_PATH, "dt00_write_allowed.txt")
 
 # Template files
 TEMPLATE_FOLDER_PATH         = os.path.join("Engines", "templates")

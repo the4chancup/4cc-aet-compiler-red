@@ -3,6 +3,10 @@ import re
 import shutil
 import logging
 
+from .cpk_tools import cpk_file_write
+from .fmdl_editing import fmdl_texture_paths_change
+from .utils import COLORS
+from .utils.ftex import ddsToFtex
 from .utils.pausing import pause
 from .utils.zlib_plus import unzlib_file
 from .utils.name_editing import (
@@ -10,11 +14,11 @@ from .utils.name_editing import (
     normalize_kit_dependent_file,
 )
 from .utils.FILE_INFO import (
+    DT00_WRITE_ALLOWED_PATH,
     REFS_TEMPLATE_PREFOX_PATH,
     REFS_TEMPLATE_FOX_PATH,
     UNIFORM_COMMON_PREFOX_PATH,
 )
-from .fmdl_editing import fmdl_texture_paths_change
 from .utils.file_management import get_files_list
 
 
@@ -410,6 +414,77 @@ def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_pa
             shutil.copytree(src_path, dst_path)
 
 
+def move_marker_to_data(marker_file_path, fox_mode):
+    """Move the marker.dds file to the Data folder."""
+
+    if not os.path.exists(marker_file_path):
+        return
+
+    if not fox_mode:
+
+        # Move the texture to the refscpk_prefox template folder, overwriting the existing file
+        dst_path = os.path.join(
+            REFS_TEMPLATE_PREFOX_PATH,
+            "common", "character1", "model", "character", "parts", "referee", "incom_bsm.dds"
+        )
+        shutil.move(marker_file_path, dst_path)
+
+        return
+
+    # Read the necessary parameters
+    pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
+    move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
+
+    if not move_cpks:
+        print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET} - A marker texture is present in the export folder but")
+        print( "- Move Cpks mode is disabled.")
+        print( "-")
+        print( "- This file will be skipped.")
+        pause()
+        return
+
+    # Check if a dt00_x64.cpk file exists in the Data folder in the PES path
+    dt00_cpk_path = os.path.join(pes_folder_path, "Data", "dt00_x64.cpk")
+    if not os.path.exists(dt00_cpk_path):
+        return
+
+    print( "-")
+    print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET} - A marker texture is present in the export folder but")
+    print( "- a Fox version of PES has been set.")
+    print( "-")
+    print( "- The marker texture will be copied to the dt00_x64 cpk inside the Data folder.")
+    print( "- Make sure to share this cpk together with the referees cpk.")
+    print( "-")
+    print( "- If you don't need to update the marker texture,")
+    print( "- you should delete it from the export folder.")
+
+    if not os.path.exists(DT00_WRITE_ALLOWED_PATH):
+        print("-")
+        print("- Do you want to allow the compiler to overwrite the dt00_x64 system cpk file?")
+        print("- (This won't be asked again if confirmed.)")
+        print("-")
+        response = input("Type Y and press Enter to continue, or just press Enter to skip... ")
+
+        if response.lower() != 'y':
+            return
+
+        with open(DT00_WRITE_ALLOWED_PATH, 'w') as f:
+            f.write("This file tells the program that overwriting the dt00_x64 cpk has been allowed.")
+    else:
+        pause()
+
+    # Convert the texture to ftex
+    marker_file_ftex_path = marker_file_path.replace('.dds', '.ftex')
+    ddsToFtex(marker_file_path, marker_file_ftex_path, None)
+
+    # Write the ftex to the dt00 cpk
+    dst_path = "Asset/model/character/common/sourceimages/#windx11/cup_logo.ftex"
+    cpk_file_write(dt00_cpk_path, marker_file_ftex_path, dst_path)
+
+    # Delete the marker file
+    os.remove(marker_file_path)
+
+
 def error_handle():
     logging.error("- Referee compilation will be skipped")
     pause()
@@ -447,6 +522,9 @@ def referee_export_process(export_destination_path, fox_mode):
         error_handle()
         return True
 
+    # Delete the refs.txt file
+    os.remove(refs_txt_path)
+
     export_players_path = os.path.join(export_destination_path, "Players")
 
     # First pass: Move textures to common subfolders and update paths in source folders
@@ -477,7 +555,10 @@ def referee_export_process(export_destination_path, fox_mode):
     # Delete the Players folder
     shutil.rmtree(export_players_path)
 
-    # Delete the refs.txt file
-    os.remove(refs_txt_path)
+    # Check for a marker.dds file in the export folder
+    marker_file_path = os.path.join(export_destination_path,"ref_marker.dds")
+    if os.path.exists(marker_file_path):
+        # Move the marker file
+        move_marker_to_data(marker_file_path, fox_mode)
 
     return False

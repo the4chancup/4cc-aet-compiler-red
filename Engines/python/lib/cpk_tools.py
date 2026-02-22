@@ -4,7 +4,10 @@ import shutil
 import logging
 import tempfile
 
-from .utils import cpk
+from .utils import (
+    cpk,
+    COLORS,
+)
 from .utils.pausing import pause
 from .utils.dpfl_scan import dpfl_scan
 from .utils.zlib_plus import tryDecompress
@@ -206,13 +209,13 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
         return
 
     if not compulsory:
-        logging.error( "-")
-        logging.error( "- ERROR - CPK name not listed on the DpFileList file")
-        logging.error(f"- CPK name: {cpk_name}")
-        logging.error( "-")
-        logging.error( "- PES probably won't load this CPK if you move it to the PES download folder")
-        logging.error( "- Changing the CPK name in the settings file back to the default name is")
-        logging.error( "- recommended")
+        print( "-")
+        print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET} - CPK name not listed on the DpFileList file")
+        print(f"- CPK name: {cpk_name}")
+        print( "-")
+        print( "- PES probably won't load this CPK if you move it to the PES download folder")
+        print( "- Changing the CPK name in the settings file back to the default name is")
+        print( "- recommended")
         pause()
         return
 

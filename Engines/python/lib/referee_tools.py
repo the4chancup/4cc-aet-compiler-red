@@ -508,9 +508,9 @@ def referee_export_process(export_destination_path, fox_mode):
         return True
 
     # Check for a refs txt
-    refs_txt_path = os.path.join(export_destination_path, "Refs.txt")
+    refs_txt_path = os.path.join(export_destination_path, "refs.txt")
     if not os.path.exists(refs_txt_path):
-        logging.error("- ERROR - Refs.txt not found in referee export")
+        logging.error("- ERROR - refs.txt not found in referee export")
         error_handle()
         return True
 
@@ -518,7 +518,7 @@ def referee_export_process(export_destination_path, fox_mode):
     print("- Processing refs...")
     ref_mappings = refs_list_process(refs_txt_path)
     if not ref_mappings:
-        logging.error("- ERROR - No valid entries found in Refs.txt")
+        logging.error("- ERROR - No valid entries found in refs.txt")
         error_handle()
         return True
 

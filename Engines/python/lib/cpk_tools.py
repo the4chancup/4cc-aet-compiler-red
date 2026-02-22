@@ -25,20 +25,23 @@ def cpk_file_write(cpk_path, file_source_path, file_destination_path):
         temp_cpk_path = temp_file.name
     cpk_writer.open(temp_cpk_path)
 
-    # If the cpk already exists, copy all files except the one we are overwriting
     if os.path.exists(cpk_path):
         cpk_reader = cpk.CpkReader()
         cpk_reader.open(cpk_path)
 
+        # Copy all files except the one we are overwriting
         for file in cpk_reader.files:
-            if file.name != file_destination_path:
+            if file.name == file_destination_path:
+                cpk_writer.writeFile(file.name, new_file_data)
+            else:
                 file_data = cpk_reader.readFile(file)
                 cpk_writer.writeFile(file.name, file_data, file.modificationTime)
 
         cpk_reader.close()
 
-    # Write the new file
-    cpk_writer.writeFile(file_destination_path, new_file_data)
+    else:
+        # Write the new file only
+        cpk_writer.writeFile(file_destination_path, new_file_data)
 
     cpk_writer.close()
 

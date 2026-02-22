@@ -15,6 +15,7 @@ from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 
+from . import COLORS
 from .pausing import pause
 from .version_downloading import version_download
 from .settings_management import settings_transfer
@@ -481,7 +482,7 @@ def update_check(app_owner, app_name, major, minor, patch, minutes_between_check
             return True
 
     print("-")
-    print(f"- <{update_type} update available>")
+    print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET} - {update_type} update available")
     print("-")
     print("- You can still use the current version, but updating is recommended")
     print("- so you can stay up-to-date with the latest features and bugfixes")

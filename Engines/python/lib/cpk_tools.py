@@ -129,6 +129,10 @@ def files_fetch_from_cpks(file_info_list, cpk_names_list, fetch=True):
 
                     cpk_path = os.path.join(pes_download_path, cpk_file)
 
+                    if not os.path.exists(cpk_path):
+                        # Skip any missing cpks
+                        continue
+
                     file_data = cpk_file_search(cpk_path, file_info['source_path'], fetch)
 
                     if file_data is not None:

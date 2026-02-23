@@ -422,3 +422,30 @@ def xml_process(xml_path, team_id):
     # Write back the modified xml
     ET.indent(root, '   ')
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
+
+
+def diff_from_xml(xml_path):
+    """
+    Extracts the diff block from a face xml file and writes it to face_diff.xml.
+
+    Parameters:
+        xml_path (str): Path to the face xml file containing the diff block
+    """
+    folder_path = os.path.dirname(xml_path)
+
+    # Parse the xml file
+    tree = ET.parse(xml_path)
+    root = tree.getroot()
+
+    # Find the diff block
+    diff = root.find('dif')
+    if diff is None:
+        return
+
+    # Create a new tree with the diff element as root
+    diff_copy = copy.deepcopy(diff)
+
+    # Write the diff to face_diff.xml
+    diff_xml_path = os.path.join(folder_path, f"{DIFF_NAME}.xml")
+    diff_tree = ET.ElementTree(diff_copy)
+    diff_tree.write(diff_xml_path, encoding='utf-8', xml_declaration=True)

@@ -5,6 +5,7 @@ import logging
 
 from .cpk_tools import cpk_file_write
 from .fmdl_editing import fmdl_texture_paths_change
+from .xml_editing import diff_from_xml
 from .utils import COLORS
 from .utils.ftex import ddsToFtex
 from .utils.pausing import pause
@@ -49,10 +50,10 @@ def get_ref_ids(ref_num):
 
 def update_file_paths(file_path, ref_name, ref_common_files, common_files):
     """
-    Update paths in XML or MTL file to reference referee-specific Common subfolder.
+    Update paths in MTL file to reference referee-specific Common subfolder.
 
     Args:
-        file_path: Path to the file to update (XML or MTL)
+        file_path: Path to the file to update (MTL)
         ref_name: Name of the referee (for subfolder)
         ref_common_files: List of files that are in the referee's Common folder
         common_files: List of files that are in the export's Common folder (for checking shared files)
@@ -72,8 +73,8 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
         common_player_dir = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/"
         common_dir = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/"
 
-        # Match path="..." or material="..."
-        pattern = re.compile(r'((?:path|material)=")([^"]+)(")')
+        # Match path="..."
+        pattern = re.compile(r'((?:path)=")([^"]+)(")')
 
         def replace_path(match: re.Match):
             prefix = match.group(1)
@@ -130,8 +131,8 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
             return prefix + new_path + suffix
 
         for line in lines:
-            # Check for lines containing path= or material=
-            if not ('path=' in line or 'material=' in line):
+            # Check for lines containing path=
+            if 'path=' not in line:
                 new_lines.append(line)
                 continue
 
@@ -153,10 +154,10 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
 
 def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
     """
-    Update paths in all XML, MTL and FMDL files in a folder.
+    Update paths in all MTL and FMDL files in a folder.
 
     Args:
-        folder_path: Path to the folder containing XML, MTL or FMDL files
+        folder_path: Path to the folder containing MTL or FMDL files
         ref_name: Name of the referee (for subfolder)
         ref_common_files: List of files that are in the referee's Common folder
         common_files: List of files that are in the export's Common folder
@@ -165,7 +166,7 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
     for file_path_rel in files:
         file_path = os.path.join(folder_path, file_path_rel)
 
-        if file_path_rel.endswith('.xml') or file_path_rel.endswith('.mtl'):
+        if file_path_rel.endswith('.mtl'):
             update_file_paths(file_path, ref_name, ref_common_files, common_files)
 
         if file_path_rel.endswith('.fmdl'):
@@ -328,6 +329,13 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
     """
     pes_version = int(os.environ.get('PES_VERSION', '19'))
     ref_name = os.path.basename(ref_folder_path)
+
+    face_xml_path = os.path.join(ref_folder_path, 'face', 'face.xml')
+    if os.path.exists(face_xml_path):
+        # Extract the diff data into a new face_diff.xml file
+        diff_from_xml(face_xml_path)
+        # Delete the original face.xml file
+        os.remove(face_xml_path)
 
     # Auto-move files to common subfolders
     logging.debug(f"Auto-moving files to common subfolders for {ref_name}")

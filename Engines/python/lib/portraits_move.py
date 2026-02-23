@@ -89,6 +89,8 @@ def portraits_move(exportfolder_path, team_id):
         # logging.error the list of portrait conflicts
         for portrait in portrait_conflicts:
             logging.error(f"- {portrait}")
+        logging.error( "- (Or their face folders are repeated)")
+        logging.error( "-")
         logging.error( "- The entire export will be skipped")
 
         pause()

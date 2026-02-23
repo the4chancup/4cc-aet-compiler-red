@@ -92,18 +92,18 @@ def find_mtl_file(main_folder_path, model_folder_path, model_file_name_core):
 
 def find_model_files_recursive(folder_path):
     """
-    Recursively find all .model files (including .common markers) in a folder and its subfolders.
+    Recursively find all .model files (including .common links) in a folder and its subfolders.
 
     Parameters:
         folder_path (str): The root folder to search
 
     Returns:
-        list: List of tuples (relative_path, full_path) for each .model file or marker found
+        list: List of tuples (relative_path, full_path) for each .model file or link found
     """
     model_files = []
     for root, dirs, files in os.walk(folder_path):
         for file in files:
-            # Find .model files and .model.common / .model.common.txt markers
+            # Find .model files and .model.common / .model.common.txt links
             if (
                 file.lower().endswith(".model") or
                 file.lower().endswith(".model.common") or
@@ -211,7 +211,7 @@ def xml_create(model_folder_path, model_folder_type):
                 model_file_name_full = "oral_" + model_file_name.replace(".model", "_win32.model")
 
                 if model_file_name_resolved_test is None:
-                    # Rename the file if it's not a marker
+                    # Rename the file if it's not a link
                     new_full_path = os.path.join(model_dir_full, model_file_name_full)
                     os.rename(model_full_path, new_full_path)
                     model_full_path = new_full_path
@@ -303,7 +303,7 @@ def xml_create(model_folder_path, model_folder_type):
 
             root_new.append(model)
 
-        # Delete all the common file markers and any remaining empty subfolders
+        # Delete all the common file links and any remaining empty subfolders
         for root, dirs, files in os.walk(model_folder_path, topdown=False):
             for file_name in files:
                 if ".common" in file_name:

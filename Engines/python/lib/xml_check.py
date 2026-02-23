@@ -7,7 +7,10 @@ import xml.parsers.expat
 from .cpk_tools import files_fetch_from_cpks
 from .utils.zlib_plus import unzlib_file
 from .utils.elements import dummy_element
-from .utils.name_editing import path_id_change
+from .utils.name_editing import (
+    path_id_change,
+    normalize_kit_dependent_file,
+)
 from .utils.pausing import pause
 from .utils.FILE_INFO import (
     UNIFORM_COMMON_PREFOX_PATH,
@@ -103,9 +106,10 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         file_subpath = listed_file_path[2:]
         file_path = os.path.join(os.path.dirname(xml_path), file_subpath)
 
-        # Replace * in the path with "win32"
-        file_path_real = file_path.replace('*', 'win32')
+        # Denormalize the path and replace * with "win32"
+        file_path_real = normalize_kit_dependent_file(file_path.replace('*', 'win32'), reverse=True)
 
+        # Check if the file exists in the path's folder
         if file_exists(file_path_real):
             return False
 
@@ -143,16 +147,20 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         common_folder_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))), "Common")
         file_path = os.path.join(common_folder_path, file_subpath)
 
-        # Replace * in the path with "win32"
-        file_path_real = file_path.replace('*', 'win32')
+        # Denormalize the path and replace * with "win32"
+        file_path_real = normalize_kit_dependent_file(file_path.replace('*', 'win32'), reverse=True)
 
+        # Check if the file exists in the export's Common folder
         if file_exists(file_path_real):
             return False
 
         # Search for the file in every midcup cpk and the faces cpk in the download folder
-        listed_file_path_real = "common/character1/" + path_id_change(listed_file_path, team_id).replace('p0', 'p1')
+        listed_file_path_real = path_id_change(
+            normalize_kit_dependent_file(listed_file_path.replace('*', 'win32'), reverse=True), team_id
+        )
+        listed_file_path_full = "common/character1/" + listed_file_path_real
         file_info_list = [
-            {'source_path': listed_file_path_real},
+            {'source_path': listed_file_path_full},
         ]
         cpk_names_list = ['midcup', 'uniform', 'faces']
 

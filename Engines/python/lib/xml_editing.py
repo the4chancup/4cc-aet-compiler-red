@@ -35,95 +35,59 @@ TYPES_LIST = [
 TYPE_DEFAULT = "parts"
 
 
-def find_mtl_file(model_folder_path, model_dir_full, model_file_name_core):
+def find_mtl_file(main_folder_path, model_folder_path, model_file_name_core):
     """
     Find an appropriate .mtl file for a given model file.
 
     Parameters:
-        model_folder_path (str): Path to the main model folder
-        model_dir_full (str): Path to the directory containing the model file
+        main_folder_path (str): Path to the main model folder (e.g. XXX12)
+        model_folder_path (str): Path to the directory containing the model file (e.g. XXX12/kit3, common)
         model_file_name_core (str): Core name of the model file (without .model extension)
 
     Returns:
-        tuple: (mtl_file_name, mtl_in_model_file_dir) where mtl_file_name is the filename
-            and mtl_in_model_file_dir indicates if it's in the model's directory
+        tuple: (mtl_file_name, mtl_in_model_folder) where mtl_file_name is the filename
+            and mtl_in_model_folder indicates if it's in the model's directory
     """
-    def check_mtl_file_name(file_name_raw, match_name=True):
+    def check_mtl_file_name(file_name_raw, model_file_name, match_name=True):
         file_name_resolved_test = resolve_link_to_common(file_name_raw)
         if file_name_resolved_test is not None:
-            file_name_resolved = file_name_resolved_test
+            file_name = file_name_resolved_test.lower()
         else:
-            file_name_resolved = file_name_raw
-        # Check if the model name starts with the file name
+            file_name = file_name_raw.lower()
+        # Check if the file is an MTL file and if the model name starts with the file name
         if (
-            model_file_name_core.startswith(os.path.splitext(file_name_resolved)[0]) or
-            not match_name
+            file_name.endswith(".mtl")
         ) and (
-            file_name_resolved.endswith(".mtl")
+            model_file_name.startswith(os.path.splitext(file_name)[0]) or
+            not match_name
         ):
             return True
         return False
 
-    mtl_file_name_raw = None
-
-    model_dir_file_name_list = [
-        f for f in os.listdir(model_dir_full) if
-        os.path.isfile(os.path.join(model_dir_full, f))
-    ]
-    # Find matching .mtl file in the same directory as the model file
-    for file_name_raw in model_dir_file_name_list:
-        if check_mtl_file_name(file_name_raw):
-            mtl_file_name_raw = file_name_raw
-            mtl_in_model_file_dir = True
-            break
-
-    if not mtl_file_name_raw:
-        # Find a default .mtl file in the same directory as the model file
-        default_mtl_file_path = os.path.join(model_dir_full, MTL_NAME_DEFAULT)
-        if os.path.isfile(default_mtl_file_path):
-            mtl_file_name_raw = MTL_NAME_DEFAULT
-            mtl_in_model_file_dir = True
-
-    if not mtl_file_name_raw:
-        # Find any .mtl file in the same directory as the model file
-        for file_name_raw in model_dir_file_name_list:
-            if check_mtl_file_name(file_name_raw, match_name=False):
-                mtl_file_name_raw = file_name_raw
-                mtl_in_model_file_dir = True
-                break
-
-    if not mtl_file_name_raw:
-        mtl_in_model_file_dir = False
-
-        model_dir_file_name_list = [
-            f for f in os.listdir(model_folder_path) if
-            os.path.isfile(os.path.join(model_folder_path, f))
+    # Search in the model's directory first and then in the main model folder
+    for search_folder_path, in_model_folder in [(model_folder_path, True), (main_folder_path, False)]:
+        file_name_list = [
+            f for f in os.listdir(search_folder_path) if
+            os.path.isfile(os.path.join(search_folder_path, f))
         ]
-        # Find matching .mtl file in the main model folder
-        for file_name_raw in model_dir_file_name_list:
-            if check_mtl_file_name(file_name_raw):
-                mtl_file_name_raw = file_name_raw
-                break
 
-    if not mtl_file_name_raw:
-        # Find a default .mtl file in the main model folder
-        default_mtl_file_path = os.path.join(model_folder_path, MTL_NAME_DEFAULT)
-        if os.path.isfile(default_mtl_file_path):
-            mtl_file_name_raw = MTL_NAME_DEFAULT
-            mtl_in_model_file_dir = False
+        # Find matching .mtl file
+        for file_name in file_name_list:
+            if check_mtl_file_name(file_name, model_file_name_core):
+                return file_name, in_model_folder
 
-    if not mtl_file_name_raw:
-        # Find any .mtl file in the main model folder
-        for file_name_raw in model_dir_file_name_list:
-            if check_mtl_file_name(file_name_raw, match_name=False):
-                mtl_file_name_raw = file_name_raw
-                break
+        # Find a default .mtl file
+        for file_name in file_name_list:
+            if check_mtl_file_name(file_name, os.path.splitext(MTL_NAME_DEFAULT)[0]):
+                return file_name, in_model_folder
 
-    if not mtl_file_name_raw:
-        # Fall back to default
-        mtl_file_name_raw = MTL_NAME_DEFAULT
+        # Find any .mtl file
+        for file_name in file_name_list:
+            if check_mtl_file_name(file_name, "", match_name=False):
+                return file_name, in_model_folder
 
-    return mtl_file_name_raw, mtl_in_model_file_dir
+    # Fall back to default
+    return MTL_NAME_DEFAULT, False
 
 
 def find_model_files_recursive(folder_path):

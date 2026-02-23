@@ -233,8 +233,14 @@ def export_move(exportfolder_path, team_id, team_name):
                         if char_team_type != b'u':
                             continue
 
-                        # Update the team ID and kit char and number in the texture filename
-                        file.write(f"{team_id_full}{kit_char}{kit_num}".encode('utf-8'))
+                        if line == 0:
+                            # Update the team ID and kit char and number in the main texture filename
+                            kit_data = f"{team_id_full}{kit_char}{kit_num}".encode('utf-8')
+                        else:
+                            # Update the team ID in the other texture filenames
+                            kit_data = f"{team_id_full}".encode('utf-8')
+
+                        file.write(kit_data)
 
                 if pes_15:
                     change_pattern(file_path)

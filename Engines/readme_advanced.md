@@ -5,12 +5,26 @@ compiler to its full potential.
 Make sure to also read the settings file for further customization options.
 
 - Compiling Referees
+  - ref_marker File
+  - refs.txt Template
+- First Run Wizard
 - Scripts
   - 1_exports_to_extracted
   - 2_extracted_to_contents
   - 3_contents_to_patches
   - 0_all_in_one
+- XML-less Face Folders
+  - Common Folder Links
+- Texture Handling
+- Dummy Kit Replacement
+- Special Files and Folders
+  - NO_USE File
+  - Sideload Folder
+  - Other Folder
 - Message Types
+- Log Username Cleaning
+- Automatic Updates
+- Dependency Self-Healing
 
 
 ## Compiling Referees
@@ -19,15 +33,16 @@ will be introduced in the future for team exports.
 Here's an example:
 
 refs  
-│   Refs.txt  
+│   refs.txt  
+│   ref_marker.dds (optional)  
 │  
 └───Players  
-    ├───primal  
+    ├───coolguy  
     │   ├───boots  
     │   ├───common  
     │   ├───face  
     │   └───gloves  
-    └───senturion  
+    └───robocop  
         ├───boots  
         ├───common  
         ├───face  
@@ -39,19 +54,77 @@ refs as "player folders", each of which is named after the ref's name and may
 contain "boots", "common", "face" and "gloves" folders as needed.  
 This allows each ref folder to be modular and independent of the others.
 
-The Refs.txt file must list the refs in the format "[slot number] [ref name]".  
-For example: 01 primal 02 primal 03 senturion 04 senturion 05 senturion  
-Remember that there are always 35 slots, though some of them may not be used.  
-PES 17 and latter seem not to use slots 11-15 nor 26-30 at all.
+The refs.txt file must list the refs in the format "[slot number] [ref name]".  
+See the next paragraph for an example.
 
-Once the compiler recognizes a refs export, it first processes it to convert it
-into a regular team export, by reading the Refs.txt file and copying and
-splitting the referee folders across the Faces, Boots and Gloves folders.  
+Once the compiler recognizes a refs export, it first preprocesses each referee
+folder by automatically moving textures and models to common subfolders named
+after the referee. This means that when the same referee is assigned to multiple
+slots, the textures and models are shared between them instead of being
+duplicated, keeping the cpk size down.
+
+After preprocessing, the compiler reads the refs.txt file and copies and splits
+the referee folders across the Faces, Boots, Gloves and Common folders.  
 Then, it compiles the resulting team export in the same way as any other, with
 the exception that it is extracted to the "extracted_refs" folder instead of
 "extracted_teams", then moved to a "Refscpk" folder (in the "patches_contents"
 folder), instead of "Singlecpk" or "Facescpk", and finally packed into a cpk
 file with the name listed for the Refs Cpk Name setting in the settings file.
+
+### refs.txt Template
+
+A template refs.txt file is included in the "Engines/templates" folder. It lists
+all 35 referee slots with example referee names, and can be used as a starting
+point when creating a new referee export.
+
+Copy it into your referee export folder, then edit it to match your referee
+assignments. The format is "[slot number] [ref name]", one per line, for
+example:  
+1 coolguy  
+2 robocop  
+3 coolguy  
+
+Remember that there are always 35 slots, though some of them may not be used.  
+PES 17 and latter seem not to use slots 11-15 nor 26-30 at all.  
+You can assign the same referee to multiple slots.
+
+### ref_marker File
+
+When compiling a referee export, you can include a file called "ref_marker.dds"
+in the root of the export folder (next to the refs.txt and Players folder).
+This is the marker texture that appears in-game on the ground, below the
+referees' feet (the cup logo, or a simplified version of it, is usually used).
+
+How it's handled depends on the PES version:
+
+- **Pre-Fox (PES 15-17):** The marker texture is moved directly into the refs
+  CPK template folder, overwriting the existing marker texture. It will be
+  included in the refs CPK when it's packed.
+
+- **Fox (PES 18+):** The marker texture needs to be written into the dt00_x64
+  system CPK inside PES's Data folder. The compiler will ask for your
+  confirmation before overwriting this system file (only on the first time).
+  Move Cpks mode must be enabled for this to work. If Move Cpks is disabled,
+  the marker file will be skipped with a Notice.
+  If you share the refs CPK, you'll need to share the dt00_x64 CPK as well.
+
+If you don't need to update the marker texture, it's better to avoid including
+the ref_marker.dds file in the export folder.
+
+
+## First Run Wizard
+
+The first time you run the compiler, a first run wizard will guide you through
+the initial setup. It will:
+
+1. Ask you to confirm or change the PES version.
+2. Show you the current PES folder path and check if it exists.
+3. If the path doesn't exist and Move Cpks is enabled, it will ask you to set
+   the correct path in the settings file.
+
+The wizard creates a state file ("Engines/state/first_run_done.txt") so it
+won't run again on subsequent launches. If you want to re-trigger it (e.g.
+after a fresh setup), delete that file.
 
 
 ## Scripts
@@ -131,17 +204,22 @@ It also moves the content from the other "Kits", "Boots", "Gloves", "Collars",
 "Singlecpk", "Facescpk" or "Uniformcpk" (or "Refscpk") folder inside the
 "patches_contents" folder.  
 
-If the PES Version is 18 or later, the contents of the "Common" folder will be
+If the PES Version is 17 or earlier, the contents of the "Common" folder will be
 moved to  
-  model/character/uniform/common/---/ (where --- is the team name),  
+  common/character1/model/character/uniform/common/XXX/ (where XXX is the team
+  ID),  
 otherwise they will be moved to  
-  Assets/model/character/common/XXX/sourceimages/#windx11 (where XXX is the
+  Asset/model/character/common/XXX/sourceimages/#windx11 (where XXX is the
   team ID).
 
-Also, if "Bins Update" is enabled, the team color and kit color entries from the
-txt files are added to the "UniColor" and "TeamColor" bin files in other_stuff,
-plus (if PES>=18) the kit configs are copied to the "UniformParameter"
-bin file. Then the bins are copied to the "Singlecpk" or "Binscpk" folder.
+For referee exports, the Common folder contains subfolders named after each
+referee. These subfolders are preserved in the output, so that repeated
+referees across multiple slots share the same textures and models.
+
+Also, if "Bins Updating" is enabled, the team color and kit color entries from
+the txt files are added to the "UniColor" and "TeamColor" bin files, plus
+(if PES>=18) the kit configs are added to the "UniformParameter" bin file.
+Then the bins are copied to the "Singlecpk" or "Binscpk" folder.
 
 When compiling team exports, the choice of using a "Singlecpk" folder or
 multiple folders depends on whether the Multi Cpk mode is enabled. This mode
@@ -184,6 +262,179 @@ It's the best choice if you just have a few clean exports and want to compile
 them quickly into a cpk.
 
 
+## XML-less Face Folders
+
+On Pre-Fox versions of PES (PES 15-17), face folders normally require a face.xml
+configuration file that lists the models and materials used by the face.
+However, the compiler can handle face folders that don't have an xml file at
+all, by automatically generating one.
+
+When the compiler encounters a face folder without a face.xml file, it will:
+
+1. Scan the folder (and any subfolders) for all .model files.
+2. Determine the type of each model from its filename.
+  The compiler can recognize the following types from the beginning of the
+  filename:
+    - face_neck
+    - handL
+    - handR
+    - gloveL
+    - gloveR
+    - uniform
+    - shirt
+    - pants_nocloth
+    - eye
+    - mouth
+3. If the type is not in the previous list, look in the model name for
+   "model_type_" followed by any type name. If found, that type will be used.
+   Failing both checks, the model will be assigned the default "parts" type.
+4. Find a matching .mtl material file for each model. It first looks for an mtl
+   file whose name matches the model's name, then for a "materials.mtl" file,
+   then for any .mtl file in the same directory or the parent face folder.
+5. If no face_neck model is found, a dummy face_neck model will be automatically
+   added to ensure the player rotates properly in Edit mode.
+6. If a face_diff.bin or face_diff.xml file is present, its data will be
+   included in the generated xml as the diff block.
+7. Model files that don't follow the "oral_{name}_win32.model" naming convention
+   will be automatically renamed to match it.
+
+The same xml auto-generation also works for glove folders. If a glove folder
+doesn't have a glove.xml file, the compiler will generate one by looking for
+left and right glove model files (glove_l.model and glove_r.model exactly).
+
+Additionally, the compiler supports a "ratio_" keyword in model filenames. If a
+model file's name contains "ratio_" followed by a number (e.g.
+"tv_ratio_1.806.model"), the ratio value will be added as an attribute in the
+generated xml. This is required for models using the "DigitalSignage" shader.
+
+This feature is only relevant for pre-Fox PES versions (15-17), since Fox
+versions (18+) use fmdl files and fpk packing instead of xml configuration and
+are XML-less by design.
+
+Note: Boots folders on Pre-Fox versions don't use xml files, but the compiler
+still checks that their .model files have allowed names (boots.model,
+boots_edit.model). Model files with other names will cause an error.
+
+### Common Folder Links
+
+On Pre-Fox PES versions (except 16), models can be loaded from the team's Common
+folder instead of the face folder. To indicate that a model should be loaded
+from Common, you can place a "link" file in the face folder instead of the
+actual model file.
+
+A link file is an empty file with the model's name plus a ".common" or
+".common.txt" extension. For example, if you want to load "shirt.model"
+from Common, place a file called "shirt.model.common" (or
+"shirt.model.common.txt") in the face folder.
+
+When the compiler encounters a link file during xml generation, it will:
+- Use the Common folder path in the xml instead of the local "./" path.
+- Look for the corresponding .mtl file in the Common folder as well.
+- Delete the link files after the xml has been generated.
+
+This allows face folders to reference shared models and materials without
+duplicating them, keeping the export size smaller.
+
+
+## Texture Handling
+
+The compiler performs several automatic texture conversions depending on the
+target PES version:
+
+### DDS to FTEX (Fox versions, PES 18+)
+All .dds textures in face, boots, gloves, common and kit texture folders are
+automatically converted to .ftex format when compiling for Fox PES versions.
+
+### DX10 to DXT5
+If the version of PES is 18 or earlier, DDS textures using the DX10 format
+(BC7 compression) are automatically converted to DXT5 format for compatibility.
+On Windows this uses the DirectXTex texconv tool (included in the compiler),
+on Linux it uses ImageMagick, which must be installed manually.
+
+### FTEX version check (PES 18 only)
+When compiling for PES 18, ftex files with version 2.04 are reconverted through
+DDS to ensure compatibility. A warning is logged if the conversion fails.
+
+### DDS zlib compression (PES 17 and earlier)
+If the DDS Compression setting is enabled, all DDS textures will be zlib
+compressed after processing. This is mainly useful when making cup DLC for
+Pre-Fox versions.
+
+### Kit mask textures (Pre-Fox)
+On Pre-Fox versions, if a kit texture (e.g. u0XXXp1.dds) doesn't have a
+corresponding "_mask" texture, the compiler will automatically copy a default
+kit mask from the templates folder.
+
+### Portraits
+Portrait textures are always kept in DDS format regardless of the PES version,
+since PES expects portraits as DDS files even on Fox versions.
+
+
+## Dummy Kit Replacement
+
+On Fox PES versions (18+), if a team has a Common folder with "dummy_kit"
+textures (dummy_kit.ftex, dummy_kit_back.ftex, etc.), the compiler will
+automatically replace them with the team's actual kit 1 textures after
+processing the export.
+
+This means you don't have to manually update the dummy textures in the Common
+folder every time you change the team's first kit. The compiler handles it
+automatically by copying the kit 1 textures (u0XXXp1.ftex, etc.) over the
+dummy files.
+
+If the team doesn't have a corresponding kit 1 texture for a dummy file, a
+message will be printed and that particular dummy texture will be left as-is.
+
+
+## Special Files and Folders
+
+### NO_USE File
+
+If you want to temporarily exclude an export from compilation without removing
+it from the "exports_to_add" folder, you can place a file called "NO_USE" (or
+"NO_USE.txt") inside the export's folder.
+
+When the compiler finds a NO_USE file inside an export folder, it will skip that
+export entirely and print a message saying it was skipped. This only works for
+folder exports, not for zip or 7z archives.
+
+
+### Sideload Folder
+
+The "sideload" folder allows you to inject arbitrary files directly into the
+output cpk without going through the normal export pipeline. Any files and
+folders placed inside the "sideload" folder will be copied as-is into the
+Singlecpk folder during the contents preparation step, overwriting any
+conflicting files from the exports.
+
+Key points:
+- The sideload folder has **higher priority** than the exports folder: if both
+  contain a file at the same path, the sideload version wins.
+- No checks or modifications are performed on sideloaded files, so make sure
+  you know what you're putting in there.
+- The sideload folder will be used in **every compilation** until you remove it.
+- The sideload folder is **not used** when Multi Cpk mode is enabled.
+- The first time the compiler detects a sideload folder, it will show a Notice
+  explaining the above. This notice will not be shown again afterwards.
+
+This is useful when you need to include files that don't fit the standard AET
+export format, such as custom stadium files, audio files, or any other content
+that needs to go into the cpk.
+
+
+### Other Folder
+
+If an export contains folders that don't match any of the known folder names
+(Faces, Kit Configs, Kit Textures, Logo, Portraits, Boots, Gloves, Collars,
+Common), those folders will be moved to an "Other" folder in the extracted
+directory, inside a subfolder named after the team ID and name.
+
+After all exports have been processed, if there are any files in the Other
+folder, the compiler will show a Notice asking you to check its contents. This
+allows you to manually handle any non-standard files that were included in the
+exports.
+
+
 ## Message Types
 
 Here is a more detailed list of the types of message the compiler can output,
@@ -199,6 +450,23 @@ work but isn't ideal, and which you can look into to improve your aesthetics.
 List:
 - Texture file without mipmaps (dds)
 - Non-recommended MTL state values for alphablend/zwrite
+
+### Notice
+
+These are informational messages that pause the program to make sure you see
+them, but are **not logged** to any file. They are used for situations that
+require your attention or acknowledgment but aren't errors or warnings about
+the exports themselves.
+
+[-Shown on screen-] [Not written to any log]
+
+List:
+- Update available (major, minor, or bugfix)
+- Sideload folder present (first time only)
+- CPK name not listed on the DpFileList (when Move Cpks is disabled)
+- Referee marker texture present but Move Cpks is disabled
+- Referee marker texture present on a Fox PES version (dt00 overwrite notice)
+- Files found in the Other folder after processing
 
 ### Warning
 
@@ -277,7 +545,7 @@ List:
 - Invalid PES version selected
 - PES download folder not found
 - DpFileList not found in PES download folder
-- CPK name not listed on DpFileList
+- CPK name not listed on DpFileList (when Move Cpks is enabled)
 - "patches_contents" folder not found
 - No folders found in "patches_contents"
 - Error removing old cpk (permissions)
@@ -302,3 +570,65 @@ developer, so please report it by posting the crash.log file from the folder.
 List:
 - Any unhandled exception during runtime (unexpected error in any script)
 - We just don't know [🐦?]
+
+
+## Log Username Cleaning
+
+When sharing log files (issues.log, crash.log) with others for troubleshooting,
+your Windows username may appear in file paths inside the logs. The compiler
+includes a log cleaner that replaces your username with a placeholder before you
+share the files.
+
+You can run it by passing the "-1" argument to compiler_main.py. On the Windows
+release, this is done automatically by the bat scripts after the compiler
+finishes. The username is replaced with "<username>" (or a truncated version if
+your username is short) in both issues.log and crash.log.
+
+
+## Automatic Updates
+
+The compiler checks for updates automatically on startup (if the Updates
+Checking setting has not been disabled). It queries the GitHub repository for
+the latest release and compares it against the current version.
+
+To avoid slowing down every run, the compiler only checks once per hour. The
+time of the last check is stored in the "Engines/state" folder.
+
+If an update is available, a Notice will be shown with the following options:
+- **up** - Downloads the new version automatically, transfers your settings and
+  teams list, moves your exports over, and opens the new folder.
+- **info** - Opens the GitHub releases page in your browser so you can read the
+  changelog and decide whether to update manually.
+- **skip** - Skips this specific version and won't warn again until a newer one
+  comes out.
+- **fuckoff** - Disables update checking entirely (not recommended).
+- **Enter** - Continues normally without updating.
+
+During a major update, the settings file may be overhauled. The compiler will
+transfer your settings to the new format automatically, and will show you which
+settings were added, removed, or renamed. If the teams list has changed, a
+side-by-side diff will be shown so you can choose whether to keep your current
+list or use the new one.
+
+The old compiler folder is always preserved after an update, so you can go back
+to it if you find any issues with the new version.
+
+
+## Dependency Self-Healing
+
+When running the compiler from source (not from a compiled release), the
+compiler can automatically detect and install missing Python dependencies.
+
+On startup, it checks if all required packages are installed and at the correct
+version. If any are missing, it will:
+1. List the missing dependencies.
+2. Offer to install them automatically via pip.
+3. Close the program after installation so you can restart it cleanly.
+
+On Linux, it also checks for ImageMagick (used for texture conversion) and
+warns if it's not found.
+
+Additionally, if a library file from the compiler's own codebase is missing,
+the compiler will attempt to recover it automatically before giving up with a
+fatal error. This "self-healing" mechanism helps keep the compiler running even
+if individual files get accidentally deleted.

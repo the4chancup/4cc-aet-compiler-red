@@ -213,8 +213,13 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
         os.makedirs(dst_folder_path, exist_ok=True)
 
         dst_path = os.path.join(dst_folder_path, os.path.basename(texture_path_rel))
-        shutil.move(src_path, dst_path)
-        logging.debug(f"Moved texture {texture_path_rel} to common/")
+        if "hair_parts" in texture_path_rel:
+            # Copy hair_parts textures instead of moving them
+            shutil.copy(src_path, dst_path)
+            logging.debug(f"Copied texture {texture_path_rel} to common/")
+        else:
+            shutil.move(src_path, dst_path)
+            logging.debug(f"Moved texture {texture_path_rel} to common/")
 
     return texture_files
 
@@ -298,6 +303,10 @@ def move_models_to_common(ref_folder_path, model_folder_name):
 
     # Move models
     for model_path_rel in model_files:
+        if "hair_high_win32.model" in model_path_rel or "hair.mtl" in model_path_rel:
+            # Skip hair_high models and hair mtl files
+            continue
+
         src_path = os.path.join(src_folder, os.path.normpath(model_path_rel))
 
         # Create destination folder including any subdirectories

@@ -13,6 +13,10 @@ from .utils.dpfl_scan import dpfl_scan
 from .utils.zlib_plus import tryDecompress
 from .utils.logging_tools import logger_stop
 from .utils.file_management import file_critical_check
+from .utils.FILE_INFO import (
+    SIDELOAD_PATH,
+    SIDELOAD_WARNED_PATH,
+)
 
 
 # Write a file to a cpk
@@ -243,3 +247,32 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
 
     # Exit the script
     sys.exit()
+
+
+def sideload_folder_check():
+    '''Check if a sideload folder is present and give a notice'''
+
+    if not os.path.exists(SIDELOAD_PATH):
+        return
+
+    if os.path.exists(SIDELOAD_WARNED_PATH):
+        print( "-")
+        print(f"- {COLORS.DARK_MAGENTA}Sideload folder{COLORS.RESET} in use")
+        return
+
+    print( "-")
+    print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET} - Sideload folder present")
+    print( "-")
+    print( "- The contents of this folder will be copied directly to the output CPK")
+    print( "- without any checks nor modifications, so make sure you know what's inside")
+    print( "-")
+    print( "- It will be used in every compilation until you remove it,")
+    print( "- and it will have higher priority than the exports folder")
+    print( "-")
+    print( "- This message will not be shown again")
+    pause()
+
+    with open(SIDELOAD_WARNED_PATH, "w") as f:
+        f.write("This file tells the program that you know how the sideload folder is used.")
+
+    return

@@ -45,7 +45,7 @@ while True:
         from python.extracted_from_exports import extracted_from_exports
         from python.contents_from_extracted import contents_from_extracted
         from python.patches_from_contents import patches_from_contents
-        from python.lib.cpk_tools import pes_download_path_check, cpk_name_check
+        from python.lib.cpk_tools import pes_download_path_check, cpk_name_check, sideload_folder_check
         from python.lib.utils import COLORS
         from python.lib.utils.admin_tools import admin_check, admin_request
         from python.lib.utils.app_tools import app_title, pes_title
@@ -143,10 +143,15 @@ def main(run_type):
     move_cpks = int(os.environ.get('MOVE_CPKS', '0'))
     pes_folder_path = os.environ.get('PES_FOLDER_PATH', 'unknown')
     run_pes = int(os.environ.get('RUN_PES', '0'))
+    multi_cpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     admin_mode = int(os.environ.get('ADMIN_MODE', '0'))
     pes_download_path = os.path.join(pes_folder_path, "download")
 
-    # If patches_from_contents_run is active and move_cpks mode is enabled
+    if contents_from_extracted_run and not multi_cpk_mode:
+
+        # Check if a sideload folder is present and give a notice
+        sideload_folder_check()
+
     if patches_from_contents_run and move_cpks:
 
         # Check the PES download folder

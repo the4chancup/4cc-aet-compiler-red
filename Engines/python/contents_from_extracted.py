@@ -5,6 +5,7 @@ import logging
 
 from .lib.bins_update import bins_pack
 from .lib.contents_packing import contents_pack
+from .lib.utils import COLORS
 from .lib.utils.app_tools import app_title
 from .lib.utils.file_management import remove_readonly
 from .lib.utils.logging_tools import logger_stop
@@ -13,6 +14,7 @@ from .lib.utils.FILE_INFO import (
     EXTRACTED_TEAMS_PATH,
     EXTRACTED_REFEREES_PATH,
     PATCHES_CONTENTS_PATH,
+    SIDELOAD_PATH,
     REFS_TEMPLATE_PREFOX_PATH,
     REFS_TEMPLATE_FOX_PATH,
 )
@@ -25,11 +27,13 @@ def contents_from_extracted():
     multicpk_mode = int(os.environ.get('MULTICPK_MODE', '0'))
     bins_updating = int(os.environ.get('BINS_UPDATING', '0'))
 
-    # Verify that the input folder exists, stop the program otherwise
-    if all([
-        not os.path.exists(EXTRACTED_TEAMS_PATH),
-        not os.path.exists(EXTRACTED_REFEREES_PATH)
-    ]):
+    # Check the presence of the input folders
+    refs_present = os.path.exists(EXTRACTED_REFEREES_PATH)
+    teams_present = os.path.exists(EXTRACTED_TEAMS_PATH)
+    sideload_present = os.path.exists(SIDELOAD_PATH) and not multicpk_mode
+
+    # Stop the program if no input folders are found
+    if not any([teams_present, refs_present, sideload_present]):
 
         logging.critical( "-")
         logging.critical( "- FATAL ERROR - No \"extracted\" input folder found")
@@ -40,10 +44,6 @@ def contents_from_extracted():
         pause("Press any key to exit... ", force=True)
 
         sys.exit()
-
-    # Check the presence of the folders
-    refs_present = os.path.exists(EXTRACTED_REFEREES_PATH)
-    teams_present = os.path.exists(EXTRACTED_TEAMS_PATH)
 
     # Set the name for the folders to put stuff into
     if not multicpk_mode:
@@ -95,7 +95,7 @@ def contents_from_extracted():
             logging.error( "- ERROR - Refs template folder not found")
             logging.error(f"- Folder path: {refs_template_path}")
 
-    if teams_present:
+    if teams_present or sideload_present:
         # Create folders just in case
         faces_folder_path = os.path.join(PATCHES_CONTENTS_PATH, faces_folder_name)
         uniform_folder_path = os.path.join(PATCHES_CONTENTS_PATH, uniform_folder_name)
@@ -129,6 +129,18 @@ def contents_from_extracted():
         # Delete the "extracted" folder
         if os.path.exists(EXTRACTED_REFEREES_PATH):
             shutil.rmtree(EXTRACTED_REFEREES_PATH, onerror=remove_readonly)
+
+    if sideload_present:
+        # Copy the contents of the sideload folder to the singlecpk folder
+        print( "-")
+        print(f"- Copying the contents of the {COLORS.DARK_MAGENTA}sideload folder{COLORS.RESET} to the singlecpk folder")
+        for item in os.listdir(SIDELOAD_PATH):
+            src_path = os.path.join(SIDELOAD_PATH, item)
+            dst_path = os.path.join(faces_folder_path, item)
+            if os.path.isdir(src_path):
+                shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src_path, dst_path)
 
 
     if 'all_in_one' in os.environ:

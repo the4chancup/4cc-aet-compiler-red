@@ -495,14 +495,23 @@ def mtl_check(mtl_path, team_id):
                 logging.error(f"- State value:    {state_value}")
                 error = True
 
-            # Check that the value of blendmode is 0
-            if state_name == 'blendmode' and state_value != '0':
+            # Check that the value of blendmode is 0 or 1
+            if state_name == 'blendmode' and state_value not in ['0', '1']:
                 logging.error( "-")
-                logging.error( "- ERROR - Value of state \"blendmode\" must be 0")
+                logging.error( "- ERROR - Value of state \"blendmode\" must be 0 or 1")
                 logging.error(f"- MTL name:       {mtl_name}")
                 logging.error(f"- Material:       \"{material_name}\"")
                 logging.error(f"- State value:    {state_value}")
                 error = True
+
+            # Check that the value of blendmode is 0
+            elif state_name == 'blendmode' and state_value != '0':
+                logging.warning( "-")
+                logging.warning( "- Warning - Value of state \"blendmode\" should be 0")
+                logging.warning(f"- MTL name:       {mtl_name}")
+                logging.warning(f"- Material:       \"{material_name}\"")
+                logging.warning(f"- State value:    {state_value}")
+                logging.warning( "- If the model looks fine, you can ignore this warning")
 
             # Check that the value of alphablend is 0 or 1
             if state_name == 'alphablend' and state_value not in ['0', '1']:

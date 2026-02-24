@@ -208,7 +208,7 @@ def faces_check(exportfolder_path, team_name, team_id):
             else:
                 log_level = logging.INFO
                 level_text = "Info"
-                action_text = "Consider removing these files for better compatibility"
+                action_text = "Consider removing these files to save some space"
 
             allowed_file_types = ", ".join(file_type_allowed_list_filtered)
 
@@ -625,7 +625,7 @@ def common_check(exportfolder_path, team_name):
         else:
             log_level = logging.INFO
             level_text = "Info"
-            action_text = "Consider removing these files for better compatibility"
+            action_text = "Consider removing these files to save some space"
 
         allowed_file_types = ", ".join(file_type_allowed_list_filtered)
 
@@ -781,7 +781,7 @@ def boots_check(exportfolder_path, team_name, team_id):
             else:
                 log_level = logging.INFO
                 level_text = "Info"
-                action_text = "Consider removing these files for better compatibility"
+                action_text = "Consider removing these files to save some space"
 
             allowed_file_types = ", ".join(file_type_allowed_list_filtered)
 
@@ -954,7 +954,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
             else:
                 log_level = logging.INFO
                 level_text = "Info"
-                action_text = "Consider removing these files for better compatibility"
+                action_text = "Consider removing these files to save some space"
 
             allowed_file_types = ", ".join(file_type_allowed_list_filtered)
 

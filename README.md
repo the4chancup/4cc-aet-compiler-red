@@ -16,7 +16,9 @@ you're going to compile a full DLC for a cup.
 
 ## Setting Up
 
-Just open the settings.ini file on notepad and set the following:
+On the first run, a wizard will ask you to confirm the PES version and check
+the PES folder path. If you need to change anything later, open the settings.ini
+file on notepad and set the following:
 - PES Version:  
   Set the PES version you're compiling exports for.
 - PES Folder Path:  
@@ -65,7 +67,12 @@ Only written to logs:
 - Warning (issues.log)  
   These warn about stuff which -might- break things.
 
-Written to logs and shown on screen:
+Shown on screen only:
+- Notice  
+  These pause the program to make sure you see them, but are not logged to any
+  file. They are used for situations that need your attention but aren't errors.
+
+Shown on screen and written to logs:
 - Error (issues.log)  
   Something in an export is broken in such a way that it can't be used, so it
   will be discarded. Fix it and compile the export again.
@@ -82,10 +89,9 @@ You can find a slightly more detailed explanation in the advanced readme.
 ## Troubleshooting
 
 Q: Why wasn't the cpk created at all? It's not in the downloads folder.  
-  A: You probably have PES installed in a system folder not listed in the
-  admin_check file. Enable Force Admin Mode in the settings file and try again.
-  If that still doesn't help, disable Move Cpks and copy it yourself from the
-  patches_output folder.
+  A: You probably have PES installed in a system folder. Enable Admin Forcing
+  in the settings file and try again. If that still doesn't help, disable Move
+  Cpks and copy the cpk yourself from the patches_output folder.
 
 Q: Why is the script crashing?  
   A: There could be many reasons. If you got a Fatal Error, follow the

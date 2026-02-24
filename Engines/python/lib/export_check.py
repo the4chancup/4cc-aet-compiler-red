@@ -599,6 +599,58 @@ def common_check(exportfolder_path, team_name):
         shutil.rmtree(itemfolder_path)
         return
 
+    # Read the necessary parameters
+    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
+    strict_file_type_check = int(os.environ.get('FILETYPE_CHECK_STRICT', '1'))
+
+    folder_error_file_disallowed_list = []
+
+    # Make a list with the allowed and disallowed file types
+    file_type_disallowed_list = PREFOX_FILE_TYPE_DISALLOWED_LIST if not fox_mode else FOX_FILE_TYPE_DISALLOWED_LIST
+    file_type_allowed_list_filtered = [
+        file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
+    ]
+    # Check if any file is disallowed
+    for file_name in [f for f in os.listdir(itemfolder_path) if os.path.isfile(os.path.join(itemfolder_path, f))]:
+        file_type = os.path.splitext(file_name)[1].lower()
+        if file_type not in file_type_allowed_list_filtered:
+            folder_error_file_disallowed_list.append(file_name)
+
+    if folder_error_file_disallowed_list:
+        # Determine log level based on the parameter
+        if strict_file_type_check:
+            log_level = logging.ERROR
+            level_text = "ERROR"
+            action_text = "These files will be discarded"
+        else:
+            log_level = logging.INFO
+            level_text = "Info"
+            action_text = "Consider removing these files for better compatibility"
+
+        allowed_file_types = ", ".join(file_type_allowed_list_filtered)
+
+        logging.log(log_level, "-")
+        logging.log(log_level, f"- {level_text} - Disallowed files")
+        logging.log(log_level, f"- Team name:          {team_name}")
+        logging.log(log_level, f"- Main folder:        {itemfolder_path}")
+        for file_name in folder_error_file_disallowed_list:
+            logging.log(log_level, f"- File name:          {file_name}")
+        logging.log(log_level, f"- Allowed file types: {allowed_file_types}")
+        logging.log(log_level, "-")
+        logging.log(log_level, f"- {action_text}")
+
+        # If strict file type check is disabled, clear the list
+        if not strict_file_type_check:
+            folder_error_file_disallowed_list = []
+
+    if folder_error_file_disallowed_list:
+        # Skip the files
+        if not pass_through:
+            for file_name in folder_error_file_disallowed_list:
+                os.remove(os.path.join(itemfolder_path, file_name))
+
+        pause()
+
     file_error_any = False
 
     # Check every texture

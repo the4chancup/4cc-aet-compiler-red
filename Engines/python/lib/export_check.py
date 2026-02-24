@@ -3,6 +3,7 @@ import os
 import shutil
 import logging
 
+from .utils.file_management import get_files_list
 from .utils.pausing import pause
 from .texture_check import texture_check
 from .xml_check import mtl_check
@@ -174,16 +175,16 @@ def faces_check(exportfolder_path, team_name, team_id):
                 folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
 
         # Check every texture
-        for texture_name in os.listdir(subfolder_path):
-            texture_path = os.path.join(subfolder_path, texture_name)
+        for texture_path_rel in get_files_list(subfolder_path):
+            texture_path = os.path.join(subfolder_path, texture_path_rel)
 
             if texture_check(texture_path):
                 folder_error_tex_format = True
 
         # Check every mtl file
         if not fox_mode:
-            for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                mtl_path = os.path.join(subfolder_path, mtl_name)
+            for mtl_path_rel in [f for f in get_files_list(subfolder_path) if f.endswith(".mtl")]:
+                mtl_path = os.path.join(subfolder_path, mtl_path_rel)
 
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
@@ -194,10 +195,10 @@ def faces_check(exportfolder_path, team_name, team_id):
             file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
         ]
         # Check if any file is disallowed
-        for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
-            file_type = os.path.splitext(file_name)[1].lower()
+        for file_path_rel in get_files_list(subfolder_path):
+            file_type = os.path.splitext(file_path_rel)[1].lower()
             if file_type not in file_type_allowed_list_filtered:
-                folder_error_file_disallowed_list.append(file_name)
+                folder_error_file_disallowed_list.append(file_path_rel)
 
         if folder_error_file_disallowed_list:
             # Determine log level based on the parameter
@@ -611,10 +612,10 @@ def common_check(exportfolder_path, team_name):
         file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
     ]
     # Check if any file is disallowed
-    for file_name in [f for f in os.listdir(itemfolder_path) if os.path.isfile(os.path.join(itemfolder_path, f))]:
-        file_type = os.path.splitext(file_name)[1].lower()
+    for file_path_rel in get_files_list(itemfolder_path):
+        file_type = os.path.splitext(file_path_rel)[1].lower()
         if file_type not in file_type_allowed_list_filtered:
-            folder_error_file_disallowed_list.append(file_name)
+            folder_error_file_disallowed_list.append(file_path_rel)
 
     if folder_error_file_disallowed_list:
         # Determine log level based on the parameter
@@ -633,8 +634,8 @@ def common_check(exportfolder_path, team_name):
         logging.log(log_level, f"- {level_text} - Disallowed files")
         logging.log(log_level, f"- Team name:          {team_name}")
         logging.log(log_level, f"- Main folder:        {itemfolder_path}")
-        for file_name in folder_error_file_disallowed_list:
-            logging.log(log_level, f"- File name:          {file_name}")
+        for file_path_rel in folder_error_file_disallowed_list:
+            logging.log(log_level, f"- File name:          {file_path_rel}")
         logging.log(log_level, f"- Allowed file types: {allowed_file_types}")
         logging.log(log_level, "-")
         logging.log(log_level, f"- {action_text}")
@@ -646,16 +647,16 @@ def common_check(exportfolder_path, team_name):
     if folder_error_file_disallowed_list:
         # Skip the files
         if not pass_through:
-            for file_name in folder_error_file_disallowed_list:
-                os.remove(os.path.join(itemfolder_path, file_name))
+            for file_path_rel in folder_error_file_disallowed_list:
+                os.remove(os.path.join(itemfolder_path, file_path_rel))
 
         pause()
 
     file_error_any = False
 
     # Check every texture
-    for file_name in os.listdir(itemfolder_path):
-        file_path = os.path.join(itemfolder_path, file_name)
+    for file_path_rel in get_files_list(itemfolder_path):
+        file_path = os.path.join(itemfolder_path, file_path_rel)
 
         file_error_tex_format = texture_check(file_path)
 
@@ -669,11 +670,11 @@ def common_check(exportfolder_path, team_name):
                 logging.error( "- ERROR - Bad common textures")
                 logging.error(f"- Team name:      {team_name}")
 
-            logging.error(f"- Texture name:   {file_name}")
+            logging.error(f"- Texture name:   {file_path_rel}")
 
             # And skip it
             if not pass_through:
-                os.remove(os.path.join(itemfolder_path, file_name))
+                os.remove(os.path.join(itemfolder_path, file_path_rel))
 
     # If the team has bad common textures close the previously opened message
     if file_error_any:
@@ -739,14 +740,14 @@ def boots_check(exportfolder_path, team_name, team_id):
 
         if not fox_mode:
             # If there's no xml, check that all of the .model files are allowed
-            model_files = [file for file in os.listdir(subfolder_path) if file.endswith('.model')]
-            for model_file in model_files:
-                if model_file not in MODEL_ALLOWED_LIST:
-                    folder_error_model_disallowed_list.append(model_file)
+            model_file_path_rel_list = [file for file in get_files_list(subfolder_path) if file.endswith('.model')]
+            for model_file_path_rel in model_file_path_rel_list:
+                if os.path.basename(model_file_path_rel) not in MODEL_ALLOWED_LIST:
+                    folder_error_model_disallowed_list.append(model_file_path_rel)
 
         # Check every texture
-        for file_name in os.listdir(subfolder_path):
-            file_path = os.path.join(subfolder_path, file_name)
+        for file_path_rel in get_files_list(subfolder_path):
+            file_path = os.path.join(subfolder_path, file_path_rel)
 
             folder_error_tex_format = texture_check(file_path)
 
@@ -755,8 +756,8 @@ def boots_check(exportfolder_path, team_name, team_id):
 
         # Check every mtl file
         if not fox_mode:
-            for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                mtl_path = os.path.join(subfolder_path, mtl_name)
+            for mtl_path_rel in [f for f in get_files_list(subfolder_path) if f.endswith(".mtl")]:
+                mtl_path = os.path.join(subfolder_path, mtl_path_rel)
 
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
@@ -767,10 +768,10 @@ def boots_check(exportfolder_path, team_name, team_id):
             file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
         ]
         # Check if any file is disallowed
-        for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
-            file_type = os.path.splitext(file_name)[1].lower()
+        for file_path_rel in get_files_list(subfolder_path):
+            file_type = os.path.splitext(file_path_rel)[1].lower()
             if file_type not in file_type_allowed_list_filtered:
-                folder_error_file_disallowed_list.append(file_name)
+                folder_error_file_disallowed_list.append(file_path_rel)
 
         if folder_error_file_disallowed_list:
             # Determine log level based on the parameter
@@ -912,14 +913,14 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 folder_error_xml_format = xml_check(glove_xml_path, team_id)
             else:
                 # If there's no xml, check that all of the .model files are allowed
-                model_files = [file for file in os.listdir(subfolder_path) if file.endswith('.model')]
-                for model_file in model_files:
-                    if model_file not in MODEL_ALLOWED_LIST:
-                        folder_error_model_disallowed_list.append(model_file)
+                model_file_path_rel_list = [file for file in get_files_list(subfolder_path) if file.endswith('.model')]
+                for model_file_path_rel in model_file_path_rel_list:
+                    if os.path.basename(model_file_path_rel) not in MODEL_ALLOWED_LIST:
+                        folder_error_model_disallowed_list.append(model_file_path_rel)
 
         # Check every texture
-        for file_name in os.listdir(subfolder_path):
-            file_path = os.path.join(subfolder_path, file_name)
+        for file_path_rel in get_files_list(subfolder_path):
+            file_path = os.path.join(subfolder_path, file_path_rel)
 
             folder_error_tex_format = texture_check(file_path)
 
@@ -928,8 +929,8 @@ def gloves_check(exportfolder_path, team_name, team_id):
 
         # Check every mtl file
         if not fox_mode:
-            for mtl_name in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                mtl_path = os.path.join(subfolder_path, mtl_name)
+            for mtl_path_rel in [f for f in get_files_list(subfolder_path) if f.endswith(".mtl")]:
+                mtl_path = os.path.join(subfolder_path, mtl_path_rel)
 
                 if mtl_check(mtl_path, team_id):
                     folder_error_mtl_format = True
@@ -940,10 +941,10 @@ def gloves_check(exportfolder_path, team_name, team_id):
             file_type for file_type in FILE_TYPE_ALLOWED_LIST if file_type not in file_type_disallowed_list
         ]
         # Check if any file is disallowed
-        for file_name in [f for f in os.listdir(subfolder_path) if os.path.isfile(os.path.join(subfolder_path, f))]:
-            file_type = os.path.splitext(file_name)[1].lower()
+        for file_path_rel in get_files_list(subfolder_path):
+            file_type = os.path.splitext(file_path_rel)[1].lower()
             if file_type not in file_type_allowed_list_filtered:
-                folder_error_file_disallowed_list.append(file_name)
+                folder_error_file_disallowed_list.append(file_path_rel)
 
         if folder_error_file_disallowed_list:
             # Determine log level based on the parameter

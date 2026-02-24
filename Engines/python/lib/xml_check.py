@@ -526,17 +526,15 @@ def mtl_check(mtl_path, team_id):
         missing_state_names = [state_name for state_name in REQUIRED_STATE_NAMES if state_name not in state_name_dict]
 
         if missing_state_names:
-            ##TODO: Convert to error once the templates have been updated
-            ##print("- ERROR - Missing state names")
-            logging.warning( "-")
-            logging.warning( "- Warning - Missing state names")
-            logging.warning(f"- Folder:         {mtl_folder_name}")
-            logging.warning(f"- MTL name:       {mtl_name}")
-            logging.warning(f"- Material:       \"{material_name}\"")
-            # Log the list of missing required state names
+            logging.info( "-")
+            logging.info( "- Info - Missing state names")
+            logging.info(f"- Folder:         {mtl_folder_name}")
+            logging.info(f"- MTL name:       {mtl_name}")
+            logging.info(f"- Material:       \"{material_name}\"")
+            # Log the list of missing state names
             for missing_state_name in missing_state_names:
-                logging.warning(f"- State name:     \"{missing_state_name}\"")
-            ##error = True
+                logging.info(f"- State name:     \"{missing_state_name}\"")
+            logging.info( "- These states will use the default values")
 
         else:
             warning_nonrecvals = False

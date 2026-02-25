@@ -98,6 +98,7 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
         return False
 
     file_path_short = None
+    file_path_real = None
 
     # Check if the file path is a relative path and the file exists in the path indicated
     if listed_file_path.startswith('./'):
@@ -175,14 +176,14 @@ def listed_file_check(xml_path, xml_name, xml_folder_name, listed_file_path, lis
     else:
         file_path_short = "Unknown"
 
-    if not file_path_short:
+    if file_path_short is None and file_path_real is not None:
         # Find the path of the extracted folder
         extracted_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(xml_path))))
         # Remove the extracted folder path and / from the path
         extracted_path_length = len(extracted_path)
-        file_path_short = file_path[(extracted_path_length+1):]
+        file_path_short = file_path_real[(extracted_path_length+1):]
 
-    ##TODO: Make error-only and merge once the templates have been updated
+    ##TODO: Make error-only and merge once .model analysis has been integrated
     type_string = type_string_get(listed_file_type)
     if listed_file_type == "Texture":
         logging.warning( "-")

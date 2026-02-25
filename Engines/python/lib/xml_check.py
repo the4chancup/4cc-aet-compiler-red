@@ -273,7 +273,7 @@ def xml_check(xml_path, team_id):
     """
 
     # Read the necessary parameters
-    pes_15 = (int(os.environ.get('PES_VERSION', '19')) == 15)
+    pes_version = int(os.environ.get('PES_VERSION', '19'))
 
     # Store the name of the file and its parent folder
     xml_name = os.path.basename(xml_path)
@@ -342,7 +342,7 @@ def xml_check(xml_path, team_id):
             model_type_error = True
 
         else:
-            if pes_15 and model_type == "uniform":
+            if pes_version == 15 and model_type == "uniform":
                 # Replace with "uniform_sub" in the xml file
                 model_type_final = "uniform_sub"
                 model.set('type', model_type_final)
@@ -353,8 +353,20 @@ def xml_check(xml_path, team_id):
 
             model_type_list.append(model_type_final)
 
-        # Check that the model path corresponds to a file in the folder indicated
-        model_path_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model", team_id)
+        if all([
+            pes_version != 17 and "face_high_*.model" not in model_path,
+            "oral_" not in model_path or "_*.model" not in model_path
+        ]):
+            logging.error( "- ERROR - Model name does not contain both \"oral_\" and \"_*\"")
+            logging.error(f"- Folder:         {xml_folder_name}")
+            logging.error(f"- xml name:       {xml_name}")
+            logging.error(f"- Model path:     {model_path}")
+            logging.error(f"- These are necessary in PES {pes_version} to ensure proper model loading")
+
+            model_path_error = True
+        else:
+            # Check that the model path corresponds to a file in the folder indicated
+            model_path_error = listed_file_check(xml_path, xml_name, xml_folder_name, model_path, "Model", team_id)
 
         # Check that the mtl path corresponds to a file in the folder indicated, if not checked previously
         if (not model_material_path) or (model_material_path not in model_material_path_list):

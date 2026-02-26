@@ -3,14 +3,22 @@ import sys
 import logging
 import subprocess
 
-from .file_management import file_critical_check
-from .file_management import get_files_list
-from .zlib_plus import get_bytes_hex
-from .zlib_plus import get_bytes_ascii
-from .zlib_plus import unzlib_file
-from .ftex import ftexToDds
-from .ftex import ddsToFtex
+from .file_management import (
+    file_critical_check,
+    get_files_list,
+)
+from .zlib_plus import (
+    get_bytes_hex,
+    get_bytes_ascii,
+    unzlib_file,
+)
+from .ftex import (
+    DecodeError,
+    ftexToDds,
+    ddsToFtex,
+)
 from .FILE_INFO import TEXCONV_PATH
+from .pausing import pause
 
 
 def dds_dxt5_conv(tex_path):
@@ -84,7 +92,32 @@ def textures_convert(folder_path, fox_mode=False, fox_19=False):
         if fox_mode:
             ftex_path = os.path.splitext(tex_path)[0] + '.ftex'
 
-            ddsToFtex(tex_path, ftex_path, None)
+            try:
+                ddsToFtex(tex_path, ftex_path, None)
+            except DecodeError:
+                # Check if the texture is uncompressed
+                format = get_bytes_ascii(tex_path, 84, 4)
+                format_uncompressed = (format == "\0\0\0\0")
+                if format_uncompressed:
+                    logging.error( "-")
+                    logging.error( "- ERROR: Unsupported uncompressed texture")
+                    logging.error(f"- Folder:         {os.path.dirname(tex_path)}")
+                    logging.error(f"- Texture name:   {os.path.basename(tex_path)}")
+                    logging.error( "- This texture will be skipped")
+                    logging.error( "-")
+                    logging.error( "- Resave it in the proper ARGB format, or a DXT format")
+                    logging.error( "- If using Photoshop, update your DDS plugin and resave it")
+                    pause()
+                else:
+                    logging.error( "-")
+                    logging.error( "- ERROR: Unsupported texture codec")
+                    logging.error(f"- Folder:         {os.path.dirname(tex_path)}")
+                    logging.error(f"- Texture name:   {os.path.basename(tex_path)}")
+                    logging.error( "- This texture will be skipped")
+                    logging.error( "-")
+                    logging.error( "- Make sure you are using an updated DDS plugin and resave it")
+                    pause()
+
             os.remove(tex_path)
 
     if fox_19 or not fox_mode:

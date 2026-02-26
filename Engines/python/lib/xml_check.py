@@ -333,12 +333,12 @@ def xml_check(xml_path, team_id):
         model_type_error = False
 
         if not model_type:
+            logging.error( "-")
             logging.error( "- ERROR - Missing model type")
             logging.error(f"- Folder:         {xml_folder_name}")
             logging.error(f"- xml name:       {xml_name}")
             if model_path:
                 logging.error(f"- Model path:     {model_path}")
-            logging.error( "-")
 
             model_type_error = True
 
@@ -358,6 +358,7 @@ def xml_check(xml_path, team_id):
             pes_version != 17 and "face_high_*.model" not in model_path,
             "oral_" not in model_path or "_*.model" not in model_path
         ]):
+            logging.error( "-")
             logging.error( "- ERROR - Model name does not contain both \"oral_\" and \"_*\"")
             logging.error(f"- Folder:         {xml_folder_name}")
             logging.error(f"- xml name:       {xml_name}")

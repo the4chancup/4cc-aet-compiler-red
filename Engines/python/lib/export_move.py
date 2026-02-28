@@ -52,9 +52,9 @@ def export_move(exportfolder_path, team_id, team_name):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
-    fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
     pes_15 = (int(os.environ.get('PES_VERSION', '19')) == 15)
+    pes_19_plus = (int(os.environ.get('PES_VERSION', '19')) >= 19)
+    pes_20_plus = (int(os.environ.get('PES_VERSION', '19')) >= 20)
 
     # The main folder path is the parent of the export folder
     mainfolder_path = os.path.dirname(exportfolder_path)
@@ -155,7 +155,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     xml_process(xml_path, team_id)
 
                 # Convert unsupported textures
-                textures_convert(subfolder_path, fox_mode, fox_19)
+                textures_convert(subfolder_path, fox_mode, pes_19_plus)
 
                 # Replace the dummy team ID with the actual one in any files found
                 filenames_id_replace(subfolder_path, team_id)
@@ -269,7 +269,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 kit_masks_check(team_itemfolder_path, file_ext)
 
             # Convert unsupported textures
-            textures_convert(team_itemfolder_path, fox_mode, fox_19)
+            textures_convert(team_itemfolder_path, fox_mode, pes_19_plus)
 
             # Prepare a list of textures
             file_name_list = [f for f in os.listdir(team_itemfolder_path) if f.endswith(f".{file_ext}")]
@@ -299,7 +299,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 file_path = os.path.join(team_itemfolder_path, file_name)
 
                 # Replace the dummy team ID with the actual one
-                if fox_21:
+                if pes_20_plus:
                     file_name_new = f"e_000{team_id}{file_name[11:]}"
                 else:
                     file_name_new = f"emblem_0{team_id}{file_name[11:]}"
@@ -320,7 +320,7 @@ def export_move(exportfolder_path, team_id, team_name):
 
             # Convert unsupported textures
             # Fox mode is forced to False because the portraits need to stay in DDS format
-            textures_convert(team_itemfolder_path, False, fox_19)
+            textures_convert(team_itemfolder_path, False, pes_19_plus)
 
             # For every file
             for file_name in os.listdir(team_itemfolder_path):
@@ -332,7 +332,7 @@ def export_move(exportfolder_path, team_id, team_name):
                 else:
                     player_id = file_name[3:5]
 
-                if fox_19:
+                if pes_19_plus:
                     file_name_new = f"{team_id}{player_id}.dds"
                 else:
                     file_name_new = f"player_{team_id}{player_id}.dds"
@@ -372,7 +372,7 @@ def export_move(exportfolder_path, team_id, team_name):
                         txt_id_change(os.path.join(subfolder_path, mtl_file), team_id)
 
                 # Convert unsupported textures
-                textures_convert(subfolder_path, fox_mode, fox_19)
+                textures_convert(subfolder_path, fox_mode, pes_19_plus)
 
                 # Replace the dummy team ID with the actual one in any files found
                 filenames_id_replace(subfolder_path, team_id)
@@ -417,7 +417,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     xml_process(xml_path, team_id)
 
                 # Convert unsupported textures
-                textures_convert(subfolder_path, fox_mode, fox_19)
+                textures_convert(subfolder_path, fox_mode, pes_19_plus)
 
                 # Replace the dummy team ID with the actual one in any files found
                 filenames_id_replace(subfolder_path, team_id)
@@ -469,7 +469,7 @@ def export_move(exportfolder_path, team_id, team_name):
                         fix_mtl_paths(mtl_path, team_id)
 
                 # Convert unsupported textures
-                textures_convert(team_itemfolder_path, fox_mode, fox_19)
+                textures_convert(team_itemfolder_path, fox_mode, pes_19_plus)
 
                 # Replace the dummy team ID with the actual one in any files found
                 filenames_id_replace(team_itemfolder_path, team_id)

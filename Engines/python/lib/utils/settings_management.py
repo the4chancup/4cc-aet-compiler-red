@@ -17,6 +17,8 @@ from .FILE_INFO import (
     VER_MISMATCH_WARNED_PATH,
 )
 
+PES_VERSIONS_SUPPORTED = [15, 16, 17, 18, 19, 20, 21]
+
 
 def set_pes_version(allow_keep=True):
     """
@@ -31,7 +33,7 @@ def set_pes_version(allow_keep=True):
 
     while True:
         print("-")
-        print("- Valid PES versions are: 15, 16, 17, 18, 19, 21")
+        print("- Valid PES versions are: " + ", ".join(map(str, PES_VERSIONS_SUPPORTED)))
         response = input(prompt)
 
         if response == "" and allow_keep:
@@ -39,7 +41,7 @@ def set_pes_version(allow_keep=True):
             print("-")
             print("- Version kept")
             return
-        elif response in ['15', '16', '17', '18', '19', '21']:
+        elif response in map(str, PES_VERSIONS_SUPPORTED):
             break
         else:
             print("-")
@@ -330,7 +332,7 @@ def settings_init():
 
     # Check if the PES version is supported
     pes_version = int(os.environ.get("PES_VERSION", '19'))
-    if pes_version not in [15, 16, 17, 18, 19, 21]:
+    if pes_version not in PES_VERSIONS_SUPPORTED:
         logging.critical("-")
         logging.critical("- FATAL ERROR - Invalid PES version")
         logging.critical(f"- PES version: {pes_version}")

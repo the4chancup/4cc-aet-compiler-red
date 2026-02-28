@@ -374,7 +374,7 @@ def bins_pack(bins_foldername):
 
     # Read the necessary parameters
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
+    pes_19_plus = (int(os.environ.get('PES_VERSION', '19')) >= 19)
 
     # Set the paths
     COMMON_ETC_PATH = "common/etc"
@@ -405,7 +405,7 @@ def bins_pack(bins_foldername):
 
     if fox_mode:
         # Set the filename depending on pes version
-        UNIPARAM_TEMP_NAME = UNIPARAM_19_NAME if fox_19 else UNIPARAM_18_NAME
+        UNIPARAM_TEMP_NAME = UNIPARAM_19_NAME if pes_19_plus else UNIPARAM_18_NAME
         UNIPARAM_BIN_TEMP_PATH = os.path.join(BINS_TEMP_FOLDER_PATH, UNIPARAM_TEMP_NAME)
 
         bin_info_list.append(

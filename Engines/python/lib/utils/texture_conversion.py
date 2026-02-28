@@ -43,10 +43,10 @@ def dds_dxt5_conv(tex_path):
         # Rename the dummy texture
         os.rename(dummy_tex_path, tex_path)
 
-def textures_convert(folder_path, fox_mode=False, fox_19=False):
+def textures_convert(folder_path, fox_mode=False, pes_19_plus=False):
     '''If fox_mode is True, convert all .dds files in the folder and subfolders to .ftex files
 
-    If fox_19 is False, convert all DX10 files in the folder and subfolders to DXT5 files'''
+    If pes_19_plus is False, convert all DX10 files in the folder and subfolders to DXT5 files'''
 
     file_list_rel = get_files_list(folder_path, recursive=True)
 
@@ -120,7 +120,7 @@ def textures_convert(folder_path, fox_mode=False, fox_19=False):
 
             os.remove(tex_path)
 
-    if fox_19 or not fox_mode:
+    if pes_19_plus or not fox_mode:
         return
 
     for tex_file_rel in [f for f in file_list_rel if f.endswith(".ftex")]:

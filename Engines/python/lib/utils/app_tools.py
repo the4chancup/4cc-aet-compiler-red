@@ -53,6 +53,8 @@ def pes_title(pes_version, colorize=True):
             pes_color = color_bright_cyan
         case 19:
             pes_color = color_bright_blue
+        case 20:
+            pes_color = color_bright_green
         case 21:
             pes_color = color_bright_green
         case _:

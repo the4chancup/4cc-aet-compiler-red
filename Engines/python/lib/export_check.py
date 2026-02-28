@@ -1047,10 +1047,7 @@ def other_check(exportfolder_path, team_name):
 def export_check(exportfolder_path, team_name, team_id):
 
     # Read the necessary parameters
-    global fox_mode, fox_19, fox_21, pass_through
-    fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
-    fox_19 = (int(os.environ.get('PES_VERSION', '19')) >= 19)
-    fox_21 = (int(os.environ.get('PES_VERSION', '19')) >= 21)
+    global pass_through
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
 
     nested_folders_fix(exportfolder_path, team_name)

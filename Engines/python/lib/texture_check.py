@@ -25,106 +25,125 @@ def get_image_type(image_path):
 
     return "Unknown"
 
-def dimensions_check(dds_path):
+def texture_dimensions_check(dds_file_path):
 
     fox_mode = (int(os.environ.get('PES_VERSION', '19')) >= 18)
 
-    dds_name = os.path.basename(dds_path)
-    dds_folder_path = os.path.dirname(dds_path)
-    dds_folder = os.path.basename(dds_folder_path)
+    dds_file_name = os.path.basename(dds_file_path)
+    dds_folder_path = os.path.dirname(dds_file_path)
+    dds_folder_name = os.path.basename(dds_folder_path)
 
-    error = False
+    dds_file_stream = open(dds_file_path, 'rb')
 
-    inputStream = open(dds_path, 'rb')
+    dds_file_stream.seek(12)
+    height = struct.unpack("<I", dds_file_stream.read(4))[0]
+    dds_file_stream.seek(16)
+    width = struct.unpack("<I", dds_file_stream.read(4))[0]
+    dds_file_stream.seek(28)
+    mips_count = struct.unpack("<I", dds_file_stream.read(4))[0]
 
-    inputStream.seek(12)
-    height = struct.unpack("<I", inputStream.read(4))[0]
-    inputStream.seek(16)
-    width = struct.unpack("<I", inputStream.read(4))[0]
-    inputStream.seek(28)
-    mips_count = struct.unpack("<I", inputStream.read(4))[0]
+    dds_file_stream.close()
 
-    inputStream.close()
+    mips_present = not (mips_count == 0 or mips_count == 1)
 
-    mips_missing = (mips_count == 0 or mips_count == 1)
-
-    format = get_bytes_ascii(dds_path, 84, 4)
+    format = get_bytes_ascii(dds_file_path, 84, 4)
     format_uncompressed = (format == "\0\0\0\0")
+
+    # Divisible by 4 check
+    height_divisible_by_4 = (height % 4 == 0)
+    width_divisible_by_4 = (width % 4 == 0)
 
     # Power of 2 check
     # 2^n will always have exactly 1 bit set, (2^n)-1 will always have all but 1 bit set, & cancels them out
-    height_bad = not ((height & (height-1) == 0) and height != 0)
-    width_bad = not ((width & (width-1) == 0) and width != 0)
-
-    # Check if the texture is a main kit texture
-    texture_type_kit = dds_folder.lower() == "kit textures" and dds_name.startswith('u0') and len(dds_name) == 11
+    height_power_two = ((height & (height-1) == 0) and height != 0)
+    width_power_two = ((width & (width-1) == 0) and width != 0)
 
     # Check if the texture is a portrait
-    texture_type_portrait = dds_folder.lower() == "portraits"
+    type_portrait = (dds_folder_name.lower() == "portraits")
 
-    if texture_type_portrait:
-        if (height_bad or width_bad):
+    type_regular = not type_portrait
 
-            logging.error( "-")
-            logging.error(f"- ERROR: Portrait Texture file with invalid dimensions ({str(width)}x{str(height)})")
-            logging.error(f"- Folder:         {dds_folder}")
-            logging.error(f"- Texture name:   {dds_name}")
-            logging.error( "- This texture will crash the game")
-            logging.error( "- Resize it so that both sizes are powers of 2")
+    # Check if the texture is a main kit texture
+    type_kit = (dds_folder_name.lower() == "kit textures" and dds_file_name.startswith('u0') and len(dds_file_name) == 11)
 
-            error = True
-
-    else:
-        if (height_bad or width_bad) and not mips_missing:
-
-            logging.warning( "-")
-            logging.warning(f"- Warning: Texture file with irregular dimensions ({str(width)}x{str(height)})")
-            logging.warning(f"- Folder:         {dds_folder}")
-            logging.warning(f"- Texture name:   {dds_name}")
-            logging.warning( "- This texture might not work, in which case:")
-            logging.warning( "- Resize it so that both sizes are powers of 2, or resave it without mipmaps")
-
-        if mips_missing:
-
-            logging.info( "-")
-            logging.info( "- Info: Texture file without mipmaps")
-            logging.info(f"- Folder:         {dds_folder}")
-            logging.info(f"- Texture name:   {dds_name}")
-            logging.info( "- This texture will work, but it will look better if you resave it with mipmaps")
+    error = False
 
     if height < 4 or width < 4:
-
         logging.error( "-")
         logging.error(f"- ERROR - Texture file with invalid dimensions ({str(width)}x{str(height)})")
-        logging.error(f"- Folder:         {dds_folder}")
-        logging.error(f"- Texture name:   {dds_name}")
+        logging.error(f"- Folder:         {dds_folder_name}")
+        logging.error(f"- Texture name:   {dds_file_name}")
         logging.error( "- This texture will not work")
+        logging.error( "-")
         logging.error( "- Resize it so that both sizes are 4 or higher")
 
         error = True
 
-    if (
-        not fox_mode and texture_type_kit and
-        (height > 2048 or width > 2048 or height_bad or width_bad)
-    ):
-        logging.error( "-")
-        logging.error(f"- ERROR - Main Kit Texture file with invalid dimensions ({str(width)}x{str(height)})")
-        logging.error(f"- Folder:         {dds_folder}")
-        logging.error(f"- Texture name:   {dds_name}")
-        logging.error( "- This texture will crash the game")
-        logging.error( "- Resize it so that both sizes are 2048x2048 or less, and powers of 2")
+    if type_portrait:
+        if not (height_power_two and width_power_two):
+            logging.error( "-")
+            logging.error(f"- ERROR - Portrait Texture file with invalid dimensions ({str(width)}x{str(height)})")
+            logging.error(f"- Folder:         {dds_folder_name}")
+            logging.error(f"- Texture name:   {dds_file_name}")
+            logging.error( "- This texture will crash the game")
+            logging.error( "-")
+            logging.error( "- Resize it so that both sizes are powers of 2")
 
-        error = True
+            error = True
 
-    if (not fox_mode and texture_type_kit and format_uncompressed):
-        logging.error( "-")
-        logging.error( "- ERROR - Main Kit Texture file in uncompressed format")
-        logging.error(f"- Folder:         {dds_folder}")
-        logging.error(f"- Texture name:   {dds_name}")
-        logging.error( "- This texture will crash the game")
-        logging.error( "- Resave it with a valid format like DXT5")
+    if type_regular:
+        if not (height_power_two or width_power_two) and mips_present and fox_mode:
+            logging.error( "-")
+            logging.error(f"- ERROR - Texture file with invalid dimensions ({str(width)}x{str(height)})")
+            logging.error(f"- Folder:         {dds_folder_name}")
+            logging.error(f"- Texture name:   {dds_file_name}")
+            logging.error( "- This texture will not work")
+            logging.error( "-")
+            logging.error( "- Resize it so that at least one size is a power of 2,")
+            logging.error( "- or resave it without mipmaps")
 
-        error = True
+            error = True
+
+        if not (height_divisible_by_4 and width_divisible_by_4) and not fox_mode:
+            logging.error( "-")
+            logging.error(f"- ERROR - Texture file with invalid dimensions ({str(width)}x{str(height)})")
+            logging.error(f"- Folder:         {dds_folder_name}")
+            logging.error(f"- Texture name:   {dds_file_name}")
+            logging.error( "- This texture will not work")
+            logging.error( "-")
+            logging.error( "- Resize it so that both sizes are divisible by 4")
+
+            error = True
+
+        if not mips_present:
+            logging.info( "-")
+            logging.info( "- Info - Texture file without mipmaps")
+            logging.info(f"- Folder:         {dds_folder_name}")
+            logging.info(f"- Texture name:   {dds_file_name}")
+            logging.info( "- This texture will work, but it will look better if you resave it with mipmaps")
+
+    if type_kit and not fox_mode:
+        if height > 2048 or width > 2048 or not (height_power_two and width_power_two):
+            logging.error( "-")
+            logging.error(f"- ERROR - Main Kit Texture file with invalid dimensions ({str(width)}x{str(height)})")
+            logging.error(f"- Folder:         {dds_folder_name}")
+            logging.error(f"- Texture name:   {dds_file_name}")
+            logging.error( "- This texture will crash the game")
+            logging.error( "-")
+            logging.error( "- Resize it so that both sizes are 2048x2048 or less, and powers of 2")
+
+            error = True
+
+        if format_uncompressed:
+            logging.error( "-")
+            logging.error( "- ERROR - Main Kit Texture file in uncompressed format")
+            logging.error(f"- Folder:         {dds_folder_name}")
+            logging.error(f"- Texture name:   {dds_file_name}")
+            logging.error( "- This texture will crash the game")
+            logging.error( "-")
+            logging.error( "- Resave it in a compressed format like DXT1 or DXT5")
+
+            error = True
 
     return error
 
@@ -182,7 +201,7 @@ def texture_check(tex_path):
         if not error:
 
             # Make sure the dimensions are powers of 2
-            error = dimensions_check(tex_check_path)
+            error = texture_dimensions_check(tex_check_path)
 
         if not tex_zlibbed:
             return error

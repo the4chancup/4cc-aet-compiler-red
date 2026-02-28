@@ -17,10 +17,28 @@ from .FILE_INFO import (
 )
 
 
-def set_pes_version(version):
+def set_pes_version():
     """
     Set the PES version in the settings file.
     """
+
+    while True:
+        print("-")
+        print("- Valid PES versions are: 15, 16, 17, 18, 19, 21")
+        response = input("Type in the PES version you want to compile for, or just press Enter to continue... ")
+
+        if response == "":
+            # Keep current version
+            print("-")
+            print("- Version kept")
+            return
+        elif response in ['15', '16', '17', '18', '19', '21']:
+            break
+        else:
+            print("-")
+            print("- Invalid version")
+            print("-")
+
     # Update PES version in settings.ini
     with open(SETTINGS_PATH, "r", encoding='utf-8') as f:
         lines = f.readlines()
@@ -28,11 +46,14 @@ def set_pes_version(version):
     with open(SETTINGS_PATH, "w", encoding='utf-8') as f:
         for line in lines:
             if line.startswith("pes_version"):
-                line = f"pes_version = {version}\n"
+                line = f"pes_version = {response}\n"
             f.write(line)
 
     # Set the PES version environment variable
-    os.environ['PES_VERSION'] = str(version)
+    os.environ['PES_VERSION'] = str(response)
+
+    print("-")
+    print("- Version switched")
 
 def first_run_wizard():
     """
@@ -49,25 +70,7 @@ def first_run_wizard():
     print( "-")
     print(f"- The compiler is currently set to compile for {pes_title(pes_version)}")
 
-    while True:
-        print("-")
-        print("- Valid PES versions are: 15, 16, 17, 18, 19, 21")
-        response = input("Type in the PES version you want to compile for, or just press Enter to continue... ")
-
-        if response == "":
-            # Keep current version
-            print("-")
-            print("- Version kept")
-            break
-        elif response in ['15', '16', '17', '18', '19', '21']:
-            set_pes_version(response)
-            print("-")
-            print("- Version switched")
-            break
-        else:
-            print("-")
-            print("- Invalid version")
-            print("-")
+    set_pes_version()
 
     pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')
     if "**" in pes_folder_path:

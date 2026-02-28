@@ -449,7 +449,10 @@ work but isn't ideal, and which you can look into to improve your aesthetics.
 
 List:
 - Texture file without mipmaps (dds)
+- Missing MTL state names
 - Non-recommended MTL state values for alphablend/zwrite
+- Disallowed files found in model folders or common folder
+  (when Strict File Type Check is disabled)
 
 ### Notice
 
@@ -462,6 +465,7 @@ the exports themselves.
 
 List:
 - Update available (major, minor, or bugfix)
+- PES version mismatch (exe found doesn't match settings)
 - Sideload folder present (first time only)
 - CPK name not listed on the DpFileList (when Move Cpks is disabled)
 - Referee marker texture present but Move Cpks is disabled
@@ -482,7 +486,7 @@ List:
 - Texture with irregular dimensions (non-portrait)
 - Texture file without mipmaps (ftex)
 - Texture listed in XML does not exist
-- Missing MTL state names
+- Non-recommended MTL state value for blendmode (should be 0)
 - No texture paths with IDs found in .fmdl
 - Converting texture failed (2.04 or BC7)
 - No face folder found for referee
@@ -500,30 +504,42 @@ List:
 - Missing path to listed file in XML
 - Invalid Common folder path (missing three-character subfolder)
 - Model file loaded from Common on PES16
+- Model name does not contain both "oral_" and "_*"
 - Listed file does not exist (non-Texture types)
 - Invalid XML file (parse error)
 - Invalid root tag in config XML
 - Missing model type in config XML
+- Missing texture path in MTL
 - Invalid MTL file (parse error)
 - Material listed more than once
-- Invalid MTL state value
-- Portrait DDS with invalid dimensions or too small
-- Main Kit Texture invalid dimensions or too large
+- Invalid MTL state values
+  (ztest must be 1, blendmode must be 0 or 1, alphablend must be 0 or 1)
+- Texture file with invalid dimensions (too small, less than 4x4)
+- Portrait DDS with invalid dimensions (not powers of 2)
+- Regular texture with invalid dimensions
+  (not power of 2 on at least one side, Fox only)
+- Regular texture with invalid dimensions (not divisible by 4, pre-Fox only)
+- Main Kit Texture invalid dimensions
+  (larger than 2048 or not powers of 2, pre-Fox only)
 - Main Kit Texture in uncompressed format
+- Unsupported uncompressed texture format
+- Unsupported texture codec
 - Texture is not a real DDS/FTEX file
-- FTEX on pre-Fox PES versions
+- Conflicting portraits (in both face folder and Portraits folder)
 - No usable files found in team export
 - Duplicate Note file found
 - Unusable team name (not in teams list)
 - Team ID out of range
-- Disallowed files in model folders
+- Disallowed files found in model folders or common folder
+  (unless Strict File Type Check is disabled)
 - Bad face folders (number/repeated/unsupported XML/bad textures/broken MTL)
 - Wrong kit config names (or duplicates)
 - Bad kit textures (name/invalid texture)
 - Wrong logo filenames
 - Bad portrait (name/id/format)
 - Bad common textures (invalid texture)
-- Boots folders invalid (name/repeated/bad textures/broken MTL)
+- Boots folders invalid (name/repeated/invalid texture/broken MTL)
+- Gloves folders invalid (name/repeated/invalid texture/broken MTL)
 - No team ID found during bins update
 - Referee template folder not found
 - Refs.txt not found in referee export

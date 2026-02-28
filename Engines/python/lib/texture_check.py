@@ -2,9 +2,11 @@ import os
 import struct
 import logging
 
-from .utils.zlib_plus import get_bytes_hex
-from .utils.zlib_plus import get_bytes_ascii
-from .utils.zlib_plus import unzlib_file
+from .utils.ftex import ftexToDds
+from .utils.zlib_plus import (
+    get_bytes_ascii,
+    unzlib_file,
+)
 
 
 def get_image_type(image_path):
@@ -151,11 +153,8 @@ def texture_dimensions_check(dds_file_path):
 # Check if the texture is a proper dds or ftex and unzlib if needed
 def texture_check(tex_path):
 
-    if tex_path.lower().endswith("dds"):
-        tex_type = "DDS"
-    elif tex_path.lower().endswith("ftex"):
-        tex_type = "FTEX"
-    else:
+    tex_type = os.path.splitext(tex_path)[1][1:].upper()
+    if tex_type not in ["DDS", "FTEX"]:
         return False
 
     # Read the necessary parameters
@@ -168,11 +167,10 @@ def texture_check(tex_path):
     # Store the name of the texture and its parent folder
     tex_name = os.path.join(tex_folder, os.path.basename(tex_path))
 
-    # DDS
-    if tex_type == "DDS":
+    error = False
+    tex_zlibbed = False
 
-        error = False
-        tex_zlibbed = False
+    if tex_type == "DDS":
 
         # Prepare a temporary file path
         tex_unzlibbed_path = f"{tex_path}.unzlib"
@@ -182,73 +180,75 @@ def texture_check(tex_path):
 
         if tex_zlibbed:
             # Set the unzlibbed file as file to check
-            tex_check_path = tex_unzlibbed_path
+            tex_type_check_path = tex_unzlibbed_path
         else:
             # Set the original file as file to check
-            tex_check_path = tex_path
+            tex_type_check_path = tex_path
 
-        # Check if it is a real dds
-        tex_header_type = get_image_type(tex_check_path)
-        if not (tex_header_type == "DDS"):
-            logging.error( "-")
-            logging.error(f"- ERROR - Texture is not a real {tex_type} file")
-            logging.error(f"- Folder:         {tex_folder}")
-            logging.error(f"- Texture name:   {tex_name}")
-            logging.error(f"- Real type:      {tex_header_type}")
-            logging.error( "- The file will be deleted, please save it properly")
-            error = True
+    elif tex_type == "FTEX":
+        # Set the original file as file to check
+        tex_type_check_path = tex_path
 
-        if not error:
+    # Check if the type is correct
+    tex_header_type = get_image_type(tex_type_check_path)
+    if tex_header_type != tex_type:
+        logging.error( "-")
+        logging.error(f"- ERROR - Texture is not a real {tex_type.lower()} file")
+        logging.error(f"- Folder:         {tex_folder}")
+        logging.error(f"- Texture name:   {tex_name}")
+        logging.error(f"- Real type:      {tex_header_type.lower()}")
+        logging.error( "- This texture will not work")
+        logging.error( "-")
+        logging.error( "- Resave it properly, renaming a texture's extension won't change its type")
 
-            # Make sure the dimensions are powers of 2
-            error = texture_dimensions_check(tex_check_path)
+        if tex_zlibbed:
+            os.remove(tex_unzlibbed_path)
 
-        if not tex_zlibbed:
-            return error
+        return True
 
-        # If it was zlibbed
+    if tex_type == "DDS":
+        tex_check_path = tex_type_check_path
+
+    elif tex_type == "FTEX":
+        # Prepare a texture path with dds extension
+        tex_converted_path = os.path.splitext(tex_path)[0] + ".dds"
+
+        # Convert the file to dds
+        ftexToDds(tex_type_check_path, tex_converted_path)
+
+        # Set the converted file as file to check
+        tex_check_path = tex_converted_path
+
+    # Check the texture dimensions
+    error = texture_dimensions_check(tex_check_path)
+
+    if tex_type == "FTEX":
         if fox_mode:
+            # Delete the converted file
+            os.remove(tex_converted_path)
+
+        else:
             # Delete the original file
             os.remove(tex_path)
 
-            # Rename the unzlibbed file
-            os.rename(tex_unzlibbed_path, tex_path)
-
-        else:
-            # Delete the unzlibbed file
-            os.remove(tex_unzlibbed_path)
+            # Rename the converted file
+            os.rename(tex_converted_path, tex_path)
 
         return error
 
-    # FTEX
+    if not tex_zlibbed:
+        return error
 
-    # If fox mode is disabled, reject the texture
-    if not fox_mode:
-        logging.error( "-")
-        logging.error(f"- ERROR - Texture is an {tex_type} file")
-        logging.error(f"- Folder:         {tex_folder}")
-        logging.error(f"- Texture name:   {tex_name}")
-        logging.error(f"- ftex textures are not supported on Pre-Fox PES versions ({pes_version} chosen)")
-        return True
+    # If it was zlibbed
+    if fox_mode:
+        # Delete the original file
+        os.remove(tex_path)
 
-    # Check if it is a real ftex
-    tex_header_type = get_image_type(tex_path)
-    if not (tex_header_type == "FTEX"):
-        logging.error( "-")
-        logging.error(f"- ERROR - Texture is not a real {tex_type} file")
-        logging.error(f"- Folder:         {tex_folder}")
-        logging.error(f"- Texture name:   {tex_name}")
-        logging.error(f"- Real type:      {tex_header_type}")
-        logging.error( "- The file will be deleted, please save it properly")
-        return True
+        # Rename the unzlibbed file
+        os.rename(tex_unzlibbed_path, tex_path)
 
-    # Check if it has mipmaps (index 16)
-    ftex_mipmaps = get_bytes_hex(tex_path, 16, 1)
-    if (ftex_mipmaps == "00"):
-        logging.warning( "-")
-        logging.warning( "- Warning: Texture file without mipmaps")
-        logging.warning(f"- Folder:         {tex_folder}")
-        logging.warning(f"- Texture name:   {tex_name}")
-        logging.warning( "- This texture will probably not work, please resave it with mipmaps")
+    else:
+        # Delete the unzlibbed file
+        os.remove(tex_unzlibbed_path)
 
-    return False
+    return error

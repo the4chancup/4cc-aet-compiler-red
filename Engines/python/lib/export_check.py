@@ -175,10 +175,10 @@ def faces_check(exportfolder_path, team_name, team_id):
                 folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
 
         # Check every texture
-        for texture_path_rel in get_files_list(subfolder_path):
-            texture_path = os.path.join(subfolder_path, texture_path_rel)
+        for file_path_rel in get_files_list(subfolder_path):
+            file_path = os.path.join(subfolder_path, file_path_rel)
 
-            if texture_check(texture_path):
+            if texture_check(file_path):
                 folder_error_tex_format = True
 
         # Check every mtl file

@@ -14,6 +14,7 @@ from .FILE_INFO import (
     SETTINGS_PATH,
     SETTINGS_DEFAULT_PATH,
     FIRST_RUN_DONE_PATH,
+    VER_MISMATCH_WARNED_PATH,
 )
 
 
@@ -346,10 +347,86 @@ def settings_init():
         sys.exit()
 
     # Check if the PES download folder location contains the magic number ** and replace it with the pes version
-    pes_folder_path = os.environ.get("PES_FOLDER_PATH", 'unknown')
-    if "**" in pes_folder_path:
-        os.environ["PES_FOLDER_PATH"] = pes_folder_path.replace("**", os.environ["PES_VERSION"])
+    pes_folder_path_raw = os.environ.get("PES_FOLDER_PATH", 'unknown')
+    if "**" in pes_folder_path_raw:
+        pes_folder_path = pes_folder_path_raw.replace("**", os.environ["PES_VERSION"])
+        os.environ["PES_FOLDER_PATH"] = pes_folder_path
+    else:
+        pes_folder_path = pes_folder_path_raw
 
     # Prepare the path to the PES exe in the parent folder of the PES download folder
-    pes_exe_name = "PES20" + os.environ["PES_VERSION"] + ".exe"
-    os.environ["PES_EXE_PATH"] = os.path.join(os.environ["PES_FOLDER_PATH"], pes_exe_name)
+    pes_version = os.environ["PES_VERSION"]
+    pes_exe_name = f"PES20{pes_version}.exe"
+    pes_exe_path = os.path.join(pes_folder_path, pes_exe_name)
+    os.environ["PES_EXE_PATH"] = pes_exe_path
+
+    # If Move Cpks is disabled we can skip the rest
+    move_cpk = int(os.environ.get("MOVE_CPKS", '0'))
+    if not move_cpk:
+        return
+
+    # Check if the PES exe exists
+    if os.path.exists(pes_exe_path):
+        return
+
+    # Check if at least the PES folder exists
+    if not os.path.exists(pes_folder_path):
+        # Let pes_download_path_check handle the error
+        return
+
+    if os.path.exists(VER_MISMATCH_WARNED_PATH):
+        print( "-")
+        print(f"- {COLORS.DARK_MAGENTA}Version mismatch{COLORS.RESET}")
+        return
+
+    # Look for the name of the PES exe in the PES folder
+    for file_name in os.listdir(pes_folder_path):
+        if file_name.startswith("PES20") and file_name.endswith(".exe") and len(file_name) == 11:
+            pes_exe_real_name = file_name
+            break
+    else:
+        pes_exe_real_name = None
+
+    print( "-")
+    print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET} - PES version mismatch")
+    if pes_exe_real_name is not None:
+        print(f"- The version set in the settings (PES {pes_version}) does not match the exe found")
+        print(f"- in the {pes_folder_path} folder ({pes_exe_real_name})")
+    else:
+        # This should be very rare
+        print(f"- No PES exe found in the {pes_folder_path} folder")
+    print( "-")
+    print( "- Make sure you have set the proper PES version in the settings")
+
+    while True:
+        print("-")
+        print("- Type one of the following and press Enter...")
+        print("  cv                        Lets you change the PES version")
+        print("  set                       Opens the settings file so you can edit the version or path")
+        print("  off                       Skips this message and doesn't warn again")
+        print("-")
+        response = input("Or just press Enter to continue normally... ")
+
+        if response in ["cv", "set", "off", ""]:
+            break
+        else:
+            print("-")
+            print("- Invalid response")
+            print("-")
+
+    match response:
+        case "cv":
+            set_pes_version()
+
+        case "set":
+            # Open the settings file in an external text editor
+            os.startfile(SETTINGS_PATH)
+
+            sys.exit()
+
+        case "off":
+            with open(VER_MISMATCH_WARNED_PATH, "w") as f:
+                f.write("This file tells the program that you don't want to be warned about version mismatches.")
+
+        case _:
+            pass

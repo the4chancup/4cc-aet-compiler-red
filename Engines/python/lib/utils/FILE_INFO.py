@@ -31,6 +31,7 @@ ADMIN_WARNED_PATH            = os.path.join(STATE_FOLDER_PATH, "admin_warned.txt
 FIRST_RUN_DONE_PATH          = os.path.join(STATE_FOLDER_PATH, "first_run_done.txt")
 DT00_WRITE_ALLOWED_PATH      = os.path.join(STATE_FOLDER_PATH, "dt00_write_allowed.txt")
 SIDELOAD_WARNED_PATH         = os.path.join(STATE_FOLDER_PATH, "sideload_warned.txt")
+VER_MISMATCH_WARNED_PATH     = os.path.join(STATE_FOLDER_PATH, "ver_mismatch_warned.txt")
 
 # Template files
 TEMPLATE_FOLDER_PATH         = os.path.join("Engines", "templates")

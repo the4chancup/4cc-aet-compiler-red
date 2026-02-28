@@ -238,3 +238,44 @@ def get_files_list(folder_path, recursive=False):
                 files_list.append(item)
 
     return files_list
+
+
+def move_files_to_windx11(source_dir: str, target_base_path: str, use_sourceimages: bool = True):
+    """
+    Move files from source directory to target path with windx11 subfolder structure.
+
+    Args:
+        source_dir: Source directory containing files
+        target_base_path: Base target path where files will be moved with #windx11 structure
+        use_sourceimages: Whether the path should include sourceimages or not
+    """
+
+    terminal_name = "sourceimages/#windx11" if use_sourceimages else "#windx11"
+
+    # Create a terminal subfolder for the root
+    subfolder = os.path.join(target_base_path, terminal_name)
+    if not os.path.exists(subfolder):
+        os.makedirs(subfolder)
+
+    # Create a terminal subfolder for every subfolder in the source directory
+    for root, dirs, files in os.walk(source_dir):
+        rel_path = os.path.relpath(root, source_dir)
+        if rel_path != '.':
+            target_subfolder = os.path.join(target_base_path, rel_path, terminal_name)
+            if not os.path.exists(target_subfolder):
+                os.makedirs(target_subfolder)
+
+    # Move the files to their corresponding subfolders
+    for root, dirs, files in os.walk(source_dir):
+        rel_path = os.path.relpath(root, source_dir)
+        if rel_path == '.':
+            target_folder = subfolder
+        else:
+            target_folder = os.path.join(target_base_path, rel_path, terminal_name)
+
+        for file in files:
+            # First delete if it already exists
+            if os.path.exists(os.path.join(target_folder, file)):
+                os.remove(os.path.join(target_folder, file))
+
+            shutil.move(os.path.join(root, file), target_folder)

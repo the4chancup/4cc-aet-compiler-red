@@ -2,7 +2,10 @@ import os
 import shutil
 
 from .model_packing import models_pack
-from .utils.file_management import remove_readonly
+from .utils.file_management import (
+    remove_readonly,
+    move_files_to_windx11,
+)
 from .utils.FILE_INFO import (
     PATCHES_CONTENTS_PATH,
 )
@@ -220,44 +223,20 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
         # Move the team folders to the Faces cpk folder
         for item in os.listdir(main_dir):
 
+            item_path = os.path.join(main_dir, item)
+            item_destination_path = os.path.join(items_folder_path_full, item)
+
+            # If the folder already exists, delete it
+            if os.path.exists(item_destination_path):
+                shutil.rmtree(item_destination_path, onerror=remove_readonly)
+
             if not fox_mode:
-
-                # If the folder already exists, delete it
-                if os.path.exists(os.path.join(items_folder_path_full, item)):
-                    shutil.rmtree(os.path.join(items_folder_path_full, item), onerror=remove_readonly)
-
                 # Move the folder
-                shutil.move(os.path.join(main_dir, item), items_folder_path_full)
+                shutil.move(item_path, item_destination_path)
 
             else:
-
-                # Create a windx11 subfolder for the Common folder
-                subfolder = os.path.join(items_folder_path_full, item, 'sourceimages/#windx11')
-                if not os.path.exists(subfolder):
-                    os.makedirs(subfolder)
-
-                # Create a windx11 subfolder for every subfolder in the Common folder
-                for root, dirs, files in os.walk(os.path.join(main_dir, item)):
-                    rel_path = os.path.relpath(root, os.path.join(main_dir, item))
-                    if rel_path != '.':
-                        target_subfolder = os.path.join(items_folder_path_full, item, rel_path, 'sourceimages/#windx11')
-                        if not os.path.exists(target_subfolder):
-                            os.makedirs(target_subfolder)
-
-                # Move the files to their corresponding subfolders
-                for root, dirs, files in os.walk(os.path.join(main_dir, item)):
-                    rel_path = os.path.relpath(root, os.path.join(main_dir, item))
-                    if rel_path == '.':
-                        target_folder = subfolder
-                    else:
-                        target_folder = os.path.join(items_folder_path_full, item, rel_path, 'sourceimages/#windx11')
-
-                    for file in files:
-                        # First delete if it already exists
-                        if os.path.exists(os.path.join(target_folder, file)):
-                            os.remove(os.path.join(target_folder, file))
-
-                        shutil.move(os.path.join(root, file), target_folder)
+                # Move textures to windx11 subfolder structure
+                move_files_to_windx11(item_path, item_destination_path)
 
         # Then delete the main folder
         shutil.rmtree(main_dir, onerror=remove_readonly)

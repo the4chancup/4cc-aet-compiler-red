@@ -18,17 +18,23 @@ from .FILE_INFO import (
 )
 
 
-def set_pes_version():
+def set_pes_version(allow_keep=True):
     """
     Set the PES version in the settings file.
     """
 
+    prompt_base = "Type in the PES version you want to compile for"
+    if allow_keep:
+        prompt = prompt_base + ", or just press Enter to continue... "
+    else:
+        prompt = prompt_base + "... "
+
     while True:
         print("-")
         print("- Valid PES versions are: 15, 16, 17, 18, 19, 21")
-        response = input("Type in the PES version you want to compile for, or just press Enter to continue... ")
+        response = input(prompt)
 
-        if response == "":
+        if response == "" and allow_keep:
             # Keep current version
             print("-")
             print("- Version kept")
@@ -328,23 +334,8 @@ def settings_init():
         logging.critical("-")
         logging.critical("- FATAL ERROR - Invalid PES version")
         logging.critical(f"- PES version: {pes_version}")
-        logging.critical("- Supported versions: 15, 16, 17, 18, 19, 21")
-        logging.critical("-")
-        logging.critical("- Please edit the settings file as needed and restart the program")
-        logging.critical("-")
 
-        # Stop the loggers
-        logger_stop()
-
-        if sys.platform == "win32":
-            pause("Press any key to open the settings file and exit... ", force=True)
-            # Open the settings file in an external text editor
-            os.startfile(SETTINGS_PATH)
-        else:
-            pause("Press any key to exit... ", force=True)
-
-        # Exit the script
-        sys.exit()
+        set_pes_version(allow_keep=False)
 
     # Check if the PES download folder location contains the magic number ** and replace it with the pes version
     pes_folder_path_raw = os.environ.get("PES_FOLDER_PATH", 'unknown')

@@ -108,7 +108,7 @@ def extracted_from_exports():
             nouse_file_path = os.path.join(export_source_path, "NO_USE")
             nouse_file_txt_path = os.path.join(export_source_path, "NO_USE.txt")
             if os.path.exists(nouse_file_path) or os.path.exists(nouse_file_txt_path):
-                print(f"- \"{export_name}\" has a NO_USE file - Skipped")
+                print(f"- \"{export_name}\" has a {COLORS.DARK_MAGENTA}NO_USE{COLORS.RESET} file - Skipped")
                 print( "-")
                 continue
         else:

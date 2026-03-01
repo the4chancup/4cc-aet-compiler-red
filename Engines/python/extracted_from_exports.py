@@ -3,6 +3,7 @@ import re
 import sys
 import py7zr
 import shutil
+import logging
 
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
@@ -142,11 +143,24 @@ def extracted_from_exports():
             export_destination_path_temp = export_destination_path + "_temp"
             os.makedirs(export_destination_path_temp, exist_ok=True)
 
-            if export_type == ".zip":
-                shutil.unpack_archive(export_source_path, export_destination_path_temp, "zip")
-            elif export_type == ".7z":
-                with py7zr.SevenZipFile(export_source_path, mode='r') as z:
-                    z.extractall(export_destination_path_temp)
+            try:
+                if export_type == ".zip":
+                    shutil.unpack_archive(export_source_path, export_destination_path_temp, "zip")
+                elif export_type == ".7z":
+                    with py7zr.SevenZipFile(export_source_path, mode='r') as z:
+                        z.extractall(export_destination_path_temp)
+
+            except Exception as e:
+                logging.error( "-")
+                logging.error( "- ERROR - Failed to extract export")
+                logging.error(f"- Export name:    {export_name}")
+                logging.error(f"- Error type:     {e}")
+                logging.error( "- This export will be skipped")
+                logging.error( "-")
+                logging.error( "- Try re-downloading the export or asking for it to be re-uploaded")
+                pause()
+                print("-")
+                continue
 
             shutil.copytree(export_destination_path_temp, export_destination_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
             shutil.rmtree(export_destination_path_temp, onerror=remove_readonly)

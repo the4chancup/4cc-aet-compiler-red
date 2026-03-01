@@ -501,6 +501,7 @@ is, but they're still a risk to keep. Fix them anyway.
 [-Shown on screen-] [Written to issues.log]
 
 List:
+- Failed to extract compressed export
 - Missing path to listed file in XML
 - Invalid Common folder path (missing three-character subfolder)
 - Model file loaded from Common on PES16

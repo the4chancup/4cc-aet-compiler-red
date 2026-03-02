@@ -1,3 +1,102 @@
+02/03/26 - Version 4.2.0
+- Important
+  - Added official support for PES20.
+    PES20 mode works the exact same way as PES21 mode.
+  - Automatic face xml generation now supports kit-dependent model files, model
+    files in subfolders, and model and mtl files loaded from the Common folder
+    through common file "links" (files ending in .common / .common.txt).
+    This means there should be no more reason to use custom face xmls. If you
+    can think of any, please let me know.
+  - Extended the support for textures in subfolders of the Common folder to fox
+    PES versions.
+    Creating a subfolder for every player allows sharing textures between their
+    various models (face, boots, gloves) without cluttering the root Common
+    folder.
+  - Improved referee compilation with support for subfolders in model folders
+    and automatic texture and model files migration to the Common folder.
+  - Added automatic conversion of shirt patterns in kit configs for PES15.
+    The widely used patterns 12 and 13 cause strange issues, so they are now
+    converted to 10 and 11 respectively.
+- Useful
+  - Updated the embedded Python from 3.13 to 3.14 (specifically from
+    3.13.7 to 3.14.3). The compiler should now run even even faster.
+  - Added a Sideload folder feature. Placing a "sideload" folder in the
+    compiler's main folder will copy its contents directly to the output CPK
+    without any checks or modifications. It has higher priority than the exports
+    folder. A one-time notice is displayed when first used.
+  - Added support for referee marker textures, the ones shown on the ground
+    below each referee, by adding a "ref_marker.dds" file in the referee export
+    folder. On pre-fox, the marker is packed into the referees cpk. On fox (only
+    with Move Cpks enabled), it is converted to ftex and written directly to the
+    dt00_x64 cpk (with user confirmation on first use).
+  - Added a referee assignments refs.txt template file to the templates folder.
+  - Automatic face xml generation now supports the "ratio" attribute on model
+    files, needed for models using the "DigitalSignage" TV shader. Name the file
+    with "_ratio_" followed by the value (e.g. "tv_ratio_1.806.model") to have
+    it set in the generated xml.
+  - Kit config files now have the kit character and kit number updated in their
+    texture filenames in addition to the team ID, but only for the main
+    texture line (to avoid breaking shared secondary kit textures like shirt
+    name textures). This allows you to add new kits by duplicating and renaming
+    a kit config file, without the need to edit it.
+  - Added .fox and .prefox to the allowed file types list, letting you keep
+    face_diff files meant for the other engine in the folder by appending .fox
+    or .prefox to them.
+  - Added "mouth" and "eye" to the list of recognized pre-fox model types for
+    automatic xml generation.
+  - Made portrait name detection in face folders case-insensitive and allowed
+    optional prefixes, for example "Aniki_Portrait.dds".
+  - Added automatic conversion of ftex files to dds on pre-fox PES versions.
+- Fixes
+  - Fixed "model file not found" errors when compiling midcup exports without a
+    Common folder and featuring face folders whose xml points to the Common
+    folder.
+  - Fixed crash when trying to search for files inside CPK files listed on the
+    DpFileList but which don't exist in the download folder.
+  - Fixed archive extraction failures (zip and 7z) crashing the compiler.
+    Corrupted exports are now skipped with an Error message instead.
+  - Added Error messages for unsupported texture formats during ftex conversion
+    (unsupported uncompressed textures and unsupported codecs), instead of
+    crashing.
+- New checks
+  - Added a check for textures with dimensions not divisible by 4 on pre-fox.
+  - Added a check for textures where neither dimension is a power of 2 and
+    mipmaps are present on fox.
+  - Extended texture dimension checking to also work on ftex files.
+  - Extended file type validation to the Common folder and its subfolders, and
+    to subfolders of model folders.
+  - Added model path validation for face xmls, checking for the required
+    "oral_" prefix and "_*" suffix on PES versions other than 17.
+- Other stuff
+  - When the PES version set in the settings is invalid, the compiler now lets
+    you change it interactively instead of opening the settings file and
+    exiting.
+  - The Pass-through setting now skips deletion of bad files instead of skipping
+    all checks entirely. This means checks are still performed (so you get
+    error messages) but nothing is discarded.
+  - On Windows, the console window title now shows the current compilation step
+    (1, 2, 3) and indicates "Paused" and "Done" status. It also now flashes when
+    the compiler is paused or done, making it easier to notice when interaction
+    is needed.
+  - Created a new "Notice" message type (pauses the compiler but is not logged),
+    now used for the Other folder presence message, the non-compulsory CPK name
+    check, and the update notification.
+  - Added automatic detection of mismatches between the PES version set in the
+    settings and the PES exe found in the PES folder (when Move Cpks is
+    enabled). Shows a Notice with options to change the version, edit settings,
+    disable the warning, or continue.
+  - Changed the missing state names check in mtl files from a Warning to an
+    Info message (since default values are used).
+  - Changed the blendmode value 1 check in mtl files from an Error to a Warning
+    message (value 0 is still recommended but value 1 is now accepted).
+  - Added a note to the portrait conflict Error message stating that it may also
+    be caused by repeated face folders.
+  - Added a blank socks_noguard_high model to the pre-fox referee template,
+    required for proper referee FPC on PES15.
+  - Updated the teams list file with the teams from VGL25.
+  - Updated the advanced readme with all of the recently added features.
+
+
 29/09/25 - Version 4.1.0
 - Important
   - Switched from the compiled exe to a folder containing embeddable Python,

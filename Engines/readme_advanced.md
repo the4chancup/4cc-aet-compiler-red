@@ -505,7 +505,7 @@ List:
 - Missing path to listed file in XML
 - Invalid Common folder path (missing three-character subfolder)
 - Model file loaded from Common on PES16
-- Model name does not contain both "oral_" and "_*"
+- Custom model file name does not start with "oral_" on PES16
 - Listed file does not exist (non-Texture types)
 - Invalid XML file (parse error)
 - Invalid root tag in config XML

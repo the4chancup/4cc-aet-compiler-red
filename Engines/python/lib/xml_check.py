@@ -354,16 +354,20 @@ def xml_check(xml_path, team_id):
 
             model_type_list.append(model_type_final)
 
+        model_name = model_path.split("/")[-1]
+
         if all([
-            pes_version != 17 and "face_high_*.model" not in model_path,
-            "oral_" not in model_path or "_*.model" not in model_path
+            pes_version == 16,
+            not model_name.startswith("face_high_"),
+            not model_name.startswith("hair_high_"),
+            not model_name.startswith("oral_")
         ]):
             logging.error( "-")
-            logging.error( "- ERROR - Model name does not contain both \"oral_\" and \"_*\"")
+            logging.error( "- ERROR - Custom model file name does not start with \"oral_\"")
             logging.error(f"- Folder:         {xml_folder_name}")
             logging.error(f"- xml name:       {xml_name}")
             logging.error(f"- Model path:     {model_path}")
-            logging.error(f"- These are necessary in PES {pes_version} to ensure proper model loading")
+            logging.error(f"- This prefix is necessary on PES {pes_version} to ensure proper model loading")
 
             model_path_error = True
         else:

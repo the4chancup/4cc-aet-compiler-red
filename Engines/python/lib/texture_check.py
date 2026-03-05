@@ -106,7 +106,7 @@ def texture_dimensions_check(dds_file_path):
 
             error = True
 
-        if not (height_divisible_by_4 and width_divisible_by_4) and not fox_mode:
+        if not (height_divisible_by_4 and width_divisible_by_4) and not format_uncompressed and not fox_mode:
             logging.error( "-")
             logging.error(f"- ERROR - Texture file with invalid dimensions ({str(width)}x{str(height)})")
             logging.error(f"- Folder:         {dds_folder_name}")

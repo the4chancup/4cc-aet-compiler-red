@@ -519,7 +519,8 @@ List:
 - Portrait DDS with invalid dimensions (not powers of 2)
 - Regular texture with invalid dimensions
   (not power of 2 on at least one side, Fox only)
-- Regular texture with invalid dimensions (not divisible by 4, pre-Fox only)
+- Regular texture with invalid dimensions
+  (not divisible by 4 and not uncompressed, pre-Fox only)
 - Main Kit Texture invalid dimensions
   (larger than 2048 or not powers of 2, pre-Fox only)
 - Main Kit Texture in uncompressed format

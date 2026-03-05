@@ -30,7 +30,7 @@ def contents_from_extracted():
     # Check the presence of the input folders
     refs_present = os.path.exists(EXTRACTED_REFEREES_PATH)
     teams_present = os.path.exists(EXTRACTED_TEAMS_PATH)
-    sideload_present = os.path.exists(SIDELOAD_PATH) and not multicpk_mode
+    sideload_present = os.path.exists(SIDELOAD_PATH) and os.listdir(SIDELOAD_PATH) and not multicpk_mode
 
     # Stop the program if no input folders are found
     if not any([teams_present, refs_present, sideload_present]):

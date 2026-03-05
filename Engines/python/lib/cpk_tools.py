@@ -256,7 +256,7 @@ def cpk_name_check(settings_name, cpk_name, pes_download_path, compulsory=True):
 def sideload_folder_check():
     '''Check if a sideload folder is present and give a notice'''
 
-    if not os.path.exists(SIDELOAD_PATH):
+    if not os.path.exists(SIDELOAD_PATH) or not os.listdir(SIDELOAD_PATH):
         return
 
     if os.path.exists(SIDELOAD_WARNED_PATH):

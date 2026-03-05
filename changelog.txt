@@ -1,3 +1,18 @@
+05/03/26 - Version 4.2.1
+- Fixes
+  - Made the new custom model filename validation logic only apply to PES16.
+    Several models were being incorrectly rejected by the validation logic.
+  - Fixed the divisible-by-4 texture dimension check on pre-fox incorrectly
+    rejecting uncompressed textures (whose sides don't need to be divisible by
+    4, as it turns out).
+  - Fixed the auto-updater crashing at the end, when failing to move exports
+    from the exports_to_add folder to the new version folder.
+    The updater now retries 3 times with 2 second delays and displays an
+    error message (without crashing) if it still fails.
+- Other stuff
+  - Now the Sideload folder is skipped if it's empty.
+
+
 02/03/26 - Version 4.2.0
 - Important
   - Added official support for PES20.

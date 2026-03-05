@@ -308,10 +308,23 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
                 print("- Invalid response, please try again")
 
     # Move the contents of the exports_to_add folder to the new folder
+    exports_moved = None
     if not os.path.exists(os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH)):
         os.makedirs(os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH))
     for file in os.listdir(EXPORTS_TO_ADD_PATH):
-        shutil.move(os.path.join(EXPORTS_TO_ADD_PATH, file), os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH))
+        src_path = os.path.join(EXPORTS_TO_ADD_PATH, file)
+        dst_path = os.path.join(app_new_folder, EXPORTS_TO_ADD_PATH)
+        for attempt in range(3):
+            try:
+                shutil.move(src_path, dst_path)
+                exports_moved = "Yes"
+                break
+            except Exception:
+                if attempt < 2:
+                    import time
+                    time.sleep(2)
+                else:
+                    exports_moved = "Error"
 
     # Copy the application state files to the new folder
     if not os.path.exists(os.path.join(app_new_folder, STATE_FOLDER_PATH)):
@@ -326,7 +339,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
     EXPORTS_TO_ADD_NAME = os.path.basename(EXPORTS_TO_ADD_PATH)
     print( "-")
     print( "- Successfully downloaded and unpacked the latest version")
-    print(f"- The exports in the \"{EXPORTS_TO_ADD_NAME}\" folder have been moved over")
+    if exports_moved == "Yes":
+        print(f"- The exports in the \"{EXPORTS_TO_ADD_NAME}\" folder have been moved over")
+    elif exports_moved == "Error":
+        print(f"- Failed to move the exports in the \"{EXPORTS_TO_ADD_NAME}\" folder")
     print( "-")
     if not update_major:
         print("- The current settings have also been copied over to the new folder")

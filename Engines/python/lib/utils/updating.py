@@ -23,6 +23,7 @@ from .FILE_INFO import (
     TEAMS_LIST_PATH,
     EXPORTS_TO_ADD_PATH,
     SETTINGS_PATH,
+    SETTINGS_ADVANCED_PATH,
     SETTINGS_TRANSFER_TABLE_PATH,
     CHECK_LAST_PATH,
     SKIP_LAST_PATH,
@@ -274,6 +275,12 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
         settings_transfer(SETTINGS_PATH, settings_new_path, transfer_table_path)
     )
 
+    # Transfer the settings from the old advanced ini to the new one
+    settings_advanced_new_path = os.path.join(app_new_folder, os.path.basename(SETTINGS_ADVANCED_PATH))
+    settings_advanced_added, settings_advanced_removed, settings_advanced_renamed = (
+        settings_transfer(SETTINGS_ADVANCED_PATH, settings_advanced_new_path, transfer_table_path)
+    )
+
     # Check if the teams_list.txt file is different from the new one
     TEAMS_LIST_NAME = os.path.basename(TEAMS_LIST_PATH)
     teams_list_new_path = os.path.join(app_new_folder, TEAMS_LIST_NAME)
@@ -378,10 +385,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 def updates_disable():
     """Disables update checking"""
 
-    with open(SETTINGS_PATH, "r", encoding='utf-8') as f:
+    with open(SETTINGS_ADVANCED_PATH, "r", encoding='utf-8') as f:
         lines = f.readlines()
 
-    with open(SETTINGS_PATH, "w", encoding='utf-8') as f:
+    with open(SETTINGS_ADVANCED_PATH, "w", encoding='utf-8') as f:
         for line in lines:
             if line.startswith("updates_check"):
                 line = "updates_check = 0\n"

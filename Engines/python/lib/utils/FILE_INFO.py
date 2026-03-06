@@ -7,9 +7,11 @@ EXTRACTED_REFEREES_PATH      = "extracted_referees"
 PATCHES_CONTENTS_PATH        = "patches_contents"
 PATCHES_OUTPUT_PATH          = "patches_output"
 SIDELOAD_PATH                = "sideload"
+ENGINES_PATH                 = "Engines"
 
-# Settings file
-SETTINGS_PATH                = os.path.join("settings.ini")
+# Settings files
+SETTINGS_PATH                = "settings.ini"
+SETTINGS_ADVANCED_PATH       = os.path.join(ENGINES_PATH, "settings_advanced.ini")
 
 # Team files
 TEAMS_LIST_PATH              = "teams_list.txt"
@@ -21,10 +23,10 @@ ISSUES_LOG_PATH              = "issues.log"
 CRASH_LOG_PATH               = "crash.log"
 
 # Run batch
-RUN_BATCH_PATH               = os.path.join("Engines", "compiler_run.bat")
+RUN_BATCH_PATH               = os.path.join(ENGINES_PATH, "compiler_run.bat")
 
 # State files
-STATE_FOLDER_PATH            = os.path.join("Engines", "state")
+STATE_FOLDER_PATH            = os.path.join(ENGINES_PATH, "state")
 CHECK_LAST_PATH              = os.path.join(STATE_FOLDER_PATH, "update_check_last.txt")
 SKIP_LAST_PATH               = os.path.join(STATE_FOLDER_PATH, "update_skip_last.txt")
 ADMIN_WARNED_PATH            = os.path.join(STATE_FOLDER_PATH, "admin_warned.txt")
@@ -34,7 +36,7 @@ SIDELOAD_WARNED_PATH         = os.path.join(STATE_FOLDER_PATH, "sideload_warned.
 VER_MISMATCH_WARNED_PATH     = os.path.join(STATE_FOLDER_PATH, "ver_mismatch_warned.txt")
 
 # Template files
-TEMPLATE_FOLDER_PATH         = os.path.join("Engines", "templates")
+TEMPLATE_FOLDER_PATH         = os.path.join(ENGINES_PATH, "templates")
 DUMMY_MTL_NAME               = "dummy.mtl"
 DUMMY_MODEL_NAME             = "oral_dummy_win32.model"
 GENERIC_FPKD_NAME            = "generic.fpkd"
@@ -50,7 +52,7 @@ SETTINGS_DEFAULT_PATH        = os.path.join(TEMPLATE_FOLDER_PATH, "settings_defa
 SETTINGS_TRANSFER_TABLE_PATH = os.path.join(TEMPLATE_FOLDER_PATH, "settings_transfer_table.txt")
 
 # Bin files
-BIN_FOLDER_PATH              = os.path.join("Engines", "bins")
+BIN_FOLDER_PATH              = os.path.join(ENGINES_PATH, "bins")
 TEAMCOLOR_BIN_NAME           = "TeamColor.bin"
 UNICOLOR_BIN_NAME            = "UniColor.bin"
 UNIPARAM_NAME                = "UniformParameter.bin"
@@ -62,7 +64,7 @@ UNIFORM_COMMON_PREFOX_PATH   = 'model/character/uniform/common/'
 UNIFORM_COMMON_FOX_PATH      = '/Assets/pes16/model/character/common/'
 
 # DirectXTex
-TEXCONV_PATH                 = os.path.join("Engines", "directxtex", "texconv.exe")
+TEXCONV_PATH                 = os.path.join(ENGINES_PATH, "directxtex", "texconv.exe")
 
 # Other
 MOVED_CPKS_TXT_NAME          = "these_cpks_were_moved_to_download_folder.txt"

@@ -239,10 +239,6 @@ if __name__ == "__main__":
     # Load the advanced settings into the environment
     settings_advanced_init()
 
-    # Enable the advanced traceback handler
-    from rich.traceback import install
-    install(show_locals=True)
-
     # Enable the loggers
     logger_init()
 

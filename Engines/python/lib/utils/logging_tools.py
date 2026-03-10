@@ -47,42 +47,73 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
         sys.__excepthook__(exc_type, exc_value, exc_traceback)
         return
 
-    # First, display the Rich traceback on console (this is what the user sees)
-    console = Console(stderr=True)
-    traceback_obj = Traceback.from_exception(
-        exc_type, exc_value, exc_traceback,
-        show_locals=True,
-        locals_max_length=None,
-        suppress=[],
-        max_frames=50
-    )
-    console.print(traceback_obj)
+    # Check if Rich traceback is enabled
+    rich_traceback = int(os.environ.get('RICH_TRACEBACK', '1'))
 
-    # Create console for file output (no color codes, no fancy characters)
-    file_console = Console(
-        file=None, width=120, legacy_windows=False, force_terminal=False,
-        no_color=True, safe_box=True
-    )
+    if rich_traceback:
+        # Display the Rich traceback on console (this is what the user sees)
+        console = Console(stderr=True)
+        traceback_obj = Traceback.from_exception(
+            exc_type, exc_value, exc_traceback,
+            word_wrap=True,
+            show_locals=True,
+            locals_max_length=None,
+            locals_max_string=None,
+            suppress=[],
+            max_frames=50
+        )
+        console.print(traceback_obj)
+    else:
+        # Use standard Python traceback
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
 
-    # Write to crash.log
-    try:
-        with open(CRASH_LOG_PATH, 'a', encoding='utf-8') as crash_file:
-            crash_file.write("\nUNHANDLED EXCEPTION:\n")
-            file_console.file = crash_file
-            file_console.print(traceback_obj)
-            file_console.file = None
-    except Exception:
-        pass  # Don't let logging errors crash the program
+    # Write to log files (only if Rich traceback is enabled)
+    if rich_traceback:
+        # Create console for file output (no color codes, no fancy characters)
+        file_console = Console(
+            file=None,
+            width=120,
+            legacy_windows=False,
+            force_terminal=False,
+            no_color=True,
+            safe_box=True
+        )
 
-    # Write to issues.log
-    try:
-        with open(ISSUES_LOG_PATH, 'a', encoding='utf-8') as issues_file:
-            issues_file.write("\nUNHANDLED EXCEPTION:\n")
-            file_console.file = issues_file
-            file_console.print(traceback_obj)
-            file_console.file = None
-    except Exception:
-        pass  # Don't let logging errors crash the program
+        # Write to crash.log
+        try:
+            with open(CRASH_LOG_PATH, 'a', encoding='utf-8') as crash_file:
+                crash_file.write("\nUNHANDLED EXCEPTION:\n")
+                file_console.file = crash_file
+                file_console.print(traceback_obj)
+                file_console.file = None
+        except Exception:
+            pass  # Don't let logging errors crash the program
+
+        # Write to issues.log
+        try:
+            with open(ISSUES_LOG_PATH, 'a', encoding='utf-8') as issues_file:
+                issues_file.write("\nUNHANDLED EXCEPTION:\n")
+                file_console.file = issues_file
+                file_console.print(traceback_obj)
+                file_console.file = None
+        except Exception:
+            pass  # Don't let logging errors crash the program
+    else:
+        # Write standard traceback to log files
+        import traceback as tb
+        try:
+            with open(CRASH_LOG_PATH, 'a', encoding='utf-8') as crash_file:
+                crash_file.write("\nUNHANDLED EXCEPTION:\n")
+                tb.print_exception(exc_type, exc_value, exc_traceback, file=crash_file)
+        except Exception:
+            pass  # Don't let logging errors crash the program
+
+        try:
+            with open(ISSUES_LOG_PATH, 'a', encoding='utf-8') as issues_file:
+                issues_file.write("\nUNHANDLED EXCEPTION:\n")
+                tb.print_exception(exc_type, exc_value, exc_traceback, file=issues_file)
+        except Exception:
+            pass  # Don't let logging errors crash the program
 
 
 def log_store(log_path):

@@ -831,7 +831,7 @@ def boots_check(exportfolder_path, team_name, team_id):
                 for model_name in folder_error_model_disallowed_list:
                     logging.error(f"- ({model_name} is not allowed)")
             if folder_error_tex_format:
-                logging.error(f"- ({file_name} is a bad texture)")
+                logging.error( "- (bad textures)")
             if folder_error_mtl_format:
                 logging.error( "- (broken mtl files)")
             if folder_error_file_disallowed_list:
@@ -1007,7 +1007,7 @@ def gloves_check(exportfolder_path, team_name, team_id):
                 for model_name in folder_error_model_disallowed_list:
                     logging.error(f"- ({model_name} is not allowed)")
             if folder_error_tex_format:
-                logging.error(f"- ({file_name} is a bad texture)")
+                logging.error( "- (bad textures)")
             if folder_error_mtl_format:
                 logging.error( "- (broken mtl files)")
             if folder_error_file_disallowed_list:

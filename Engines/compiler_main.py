@@ -45,13 +45,21 @@ while True:
         from python.extracted_from_exports import extracted_from_exports
         from python.contents_from_extracted import contents_from_extracted
         from python.patches_from_contents import patches_from_contents
-        from python.lib.cpk_tools import pes_download_path_check, cpk_name_check, sideload_folder_check
+        from python.lib.cpk_tools import (
+            pes_download_path_check,
+            cpk_name_check,
+            sideload_folder_check,
+        )
         from python.lib.utils import COLORS
         from python.lib.utils.admin_tools import admin_check, admin_request
         from python.lib.utils.app_tools import app_title, pes_title
         from python.lib.utils.logging_tools import logger_init, logger_stop
         from python.lib.utils.pausing import pause
-        from python.lib.utils.settings_management import settings_init, first_run_wizard
+        from python.lib.utils.settings_management import (
+            settings_init,
+            settings_advanced_init,
+            first_run_wizard,
+        )
         from python.lib.utils.FILE_INFO import (
             SETTINGS_PATH,
             RUN_BATCH_PATH,
@@ -227,6 +235,9 @@ if __name__ == "__main__":
     print("- " + app_title())
     print("-")
     print("-")
+
+    # Load the advanced settings into the environment
+    settings_advanced_init()
 
     # Enable the advanced traceback handler
     from rich.traceback import install

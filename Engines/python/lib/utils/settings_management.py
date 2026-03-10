@@ -12,6 +12,7 @@ from .logging_tools import logger_stop
 from .pausing import pause
 from .FILE_INFO import (
     SETTINGS_PATH,
+    SETTINGS_ADVANCED_PATH,
     SETTINGS_DEFAULT_PATH,
     FIRST_RUN_DONE_PATH,
     VER_MISMATCH_WARNED_PATH,
@@ -423,3 +424,19 @@ def settings_init():
 
         case _:
             pass
+
+
+def settings_advanced_init():
+
+    # Check if the file exists
+    if not os.path.isfile(SETTINGS_ADVANCED_PATH):
+        return
+
+    # Read the advanced settings file
+    config = configparser.ConfigParser()
+    config.read(SETTINGS_ADVANCED_PATH)
+
+    # Load the settings into the environment
+    for section in config.sections():
+        for key, value in config.items(section):
+            os.environ[key.upper()] = value

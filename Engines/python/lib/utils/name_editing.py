@@ -83,29 +83,32 @@ def model_names_fix(folder_path, include_subfolders=True):
 def filenames_id_replace(folder_path, team_id, include_subfolders=True):
     '''Replace the dummy team ID with the actual one in any filenames found in the folder and its subfolders'''
 
-    for file_name in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, file_name)
+    for item_name in os.listdir(folder_path):
+        item_path = os.path.join(folder_path, item_name)
 
-        if not os.path.isfile(file_path):
+        if not (os.path.isfile(item_path) or include_subfolders):
             continue
 
-        # Look for u0XXXp and u0XXXg and replace them with the actual team ID
-        file_path_new = path_id_change(file_path, team_id, common_replace=False)
+        # Look for u0XXXp and u0XXXg in the filename and replace them with the actual team ID
+        item_name_new = path_id_change(item_name, team_id, common_replace=False)
 
-        if file_path_new == file_path:
+        if item_name_new == item_name:
             continue
 
-        if os.path.exists(file_path_new):
-            os.remove(file_path_new)
-        os.rename(file_path, file_path_new)
+        item_path_new = os.path.join(folder_path, item_name_new)
+
+        if os.path.exists(item_path_new):
+            os.remove(item_path_new)
+        os.rename(item_path, item_path_new)
 
     if not include_subfolders:
         return
 
     for subfolder_name in os.listdir(folder_path):
         subfolder_path = os.path.join(folder_path, subfolder_name)
-        if os.path.isdir(subfolder_path):
-            filenames_id_replace(subfolder_path, team_id, include_subfolders)
+        if not os.path.isdir(subfolder_path):
+            continue
+        filenames_id_replace(subfolder_path, team_id, include_subfolders)
 
 
 def fix_mtl_paths(file_path, team_id):

@@ -1,5 +1,6 @@
 ## Reads team and kit color entries from Note files and adds them to bin files
 import os
+import re
 import sys
 import shutil
 import logging
@@ -23,33 +24,45 @@ from .utils.FILE_INFO import (
 )
 
 
-def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
+def bytes_from_color(color_entry, colors_type_hex=False):
 
     if colors_type_hex:
-        # Split the RRGGBB string into its three components, by removing the # at the start and copying two characters into each component
-        color = [color_entry_parts[index][i:i+2] for i in range(1, len(color_entry_parts[index]), 2)]
-
+        # Remove the # at the start
+        color_entry = color_entry.strip('#')
         # Check that each component is a valid hexadecimal number in the range 00-FF
-        for component in color:
+        color = []
+        # Split the RRGGBB string into its three components, by copying two characters into each component
+        for component_start_index in [0, 2, 4]:
+            part = color_entry[component_start_index:component_start_index+2]
             try:
-                if len(component) != 2 or int(component, 16) < 0 or int(component, 16) > 255:
-                    raise ValueError
+                # Sanity check: ensure the part is a valid hexadecimal number
+                int(part, 16)
+
+                part_hex = part.upper()
+                color.append(part_hex)
+
             except ValueError:
                 # If a part is not a valid hexadecimal number or is out of range, reject the whole entry
-                print(f"- Color entry {color_entry_parts} has invalid RGB component {component}.")
+                print(f"- Color entry {color_entry} has invalid RGB component {part}.")
                 return []
     else:
-        # Convert the three decimal RGB components to hex, removing the resulting "0x" prefix and filling with a leading zero if necessary
+        # Convert the three decimal RGB components to hex
         color = []
-        for i in range(index, index + 3):
+        for part in color_entry:
             try:
-                value = int(color_entry_parts[i])
-                if value < 0 or value > 255:
+                # Sanity check: ensure the part is a valid decimal number
+                part_int = int(part)
+                if part_int < 0 or part_int > 255:
                     raise ValueError
-                color.append(hex(value).replace("0x", "").zfill(2).upper())
+
+                # Convert the decimal RGB component to hex, removing the resulting "0x" prefix
+                # and filling with a leading zero if necessary
+                part_hex = hex(part_int).replace("0x", "").zfill(2).upper()
+                color.append(part_hex)
+
             except ValueError:
                 # If a part is not a valid decimal number or is out of range, reject the whole entry
-                print(f"- Color entry {color_entry_parts} has invalid RGB component {color_entry_parts[i]}.")
+                print(f"- Color entry {color_entry} has invalid RGB component {part}.")
                 return []
 
     return color
@@ -57,40 +70,43 @@ def bytes_from_color(color_entry_parts, index, colors_type_hex=False):
 def bytes_from_color_entry(color_entry, type_kits = False):
 
     # Split the color entry into its components
-    color_entry_parts = color_entry.split()
-
-    # If the color entry is for kits
-    if type_kits:
-        # Remove the first part from the color entry to keep the indices consistent
-        color_entry_parts = color_entry_parts[1:]
+    color_entry_parts = re.findall(r"#?[\dA-Fa-f]{1,6}", re.split(r":\s?", color_entry)[-1])
 
     # Check if the colors are hex or decimal
-    colors_type_hex = color_entry_parts[2].startswith("#")
+    colors_type_hex = color_entry_parts[0].startswith("#")
 
     # Assign the colors
-    color1_index = 2
-    color1 = bytes_from_color(color_entry_parts, color1_index, colors_type_hex)
-
     # Kit color entries have two colors and might have an icon number
     if type_kits:
         if colors_type_hex:
-            color2_index = 4
-            icon_index = 6
+            icon_length_check_threshold = 2
+            color1 = bytes_from_color(color_entry_parts[0], colors_type_hex)
+            color2 = bytes_from_color(color_entry_parts[1], colors_type_hex)
         else:
-            color2_index = 6
-            icon_index = 10
-        color2 = bytes_from_color(color_entry_parts, color2_index, colors_type_hex)
+            icon_length_check_threshold = 6
+            color1 = bytes_from_color(color_entry_parts[0:3], colors_type_hex)
+            color2 = bytes_from_color(color_entry_parts[3:6], colors_type_hex)
 
         # Check if there is an icon number between 0 and 23
-        if icon_index < len(color_entry_parts) and 0 <= int(color_entry_parts[icon_index]) <= 23:
-            # Convert the icon number to hex
-            icon = hex(int(color_entry_parts[icon_index])).replace("0x", "").zfill(2).upper()
+        if len(color_entry_parts) > icon_length_check_threshold:
+            try:
+                icon_number = int(color_entry_parts[-1])
+                if 0 <= icon_number <= 23:
+                    # Convert the icon number to hex
+                    icon = hex(icon_number).replace("0x", "").zfill(2).upper()
+                else:
+                    icon = None
+            except ValueError:
+                icon = None
         else:
             icon = None
 
         return color1, color2, icon
     else:
-        return color1
+        if colors_type_hex:
+            return bytes_from_color(color_entry_parts[0], colors_type_hex)
+        else:
+            return bytes_from_color(color_entry_parts[0:3], colors_type_hex)
 
 
 def teamcolor_bin_update(team_id, teamcols, teamcolor_bin):
@@ -148,25 +164,27 @@ def kitcolor_bin_update(team_id, kitcols, kitcolor_bin):
     # For each kit
     for kit in kitcols:
 
-        # Check the kit type
-        if kit[0].lower() == "gk:":
-            # If it is a GK kit, prepare a number with the GK kit number increased by 16
+        # Check the kit type from the stored line
+        type_gk = "gk:" in kit[0].lower()
+
+        if type_gk:
+            # Prepare a number with the GK kit number increased by 0x10
             kit_number = gk_kits + 16
 
-            # Increment the GK kit number
+            # Increment the GK kit counter
             gk_kits += 1
         else:
-            # If it is a player kit, prepare a number with the player kit number
+            # Prepare a number with the player kit number
             kit_number = player_kits
 
-            # Increment the player kit number
+            # Increment the player kit counter
             player_kits += 1
 
         # Convert the kit number to hexadecimal
         kit_number_hex = hex(kit_number).replace("0x", "").zfill(2).upper()
 
         # Check if the kit has an icon
-        if kit[3]:
+        if kit[3] is not None:
             # Store the icon number
             kit_icon_hex = kit[3]
         else:
@@ -308,8 +326,8 @@ def bins_update(teamcolor_bin_path, kitcolor_bin_path):
 
                         if kitcol[1] and kitcol[2]:
 
-                            # Store the kit type
-                            kitcol[0] = data[2]
+                            # Store the full line to get the kit type later
+                            kitcol[0] = line
 
                             # Add the entry to the kit color list
                             kitcols.append(kitcol)

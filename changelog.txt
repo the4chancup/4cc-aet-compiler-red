@@ -1,3 +1,14 @@
+14/03/26 - Version 4.2.2
+- Fixes
+  - Fixed crash when "bad texture format" errors come up during the checking of
+    boots and gloves folders.
+- Other stuff
+  - Expanded the renaming of team IDs to cover the names of any subfolders of
+    the Common folder and model folders.
+  - Improved the parsing of Note txts, making the compiler support slightly
+    malformed color entries.
+
+
 05/03/26 - Version 4.2.1
 - Fixes
   - Made the new custom model filename validation logic only apply to PES16.

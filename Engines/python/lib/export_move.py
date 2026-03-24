@@ -443,7 +443,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     os.remove(file_destination_path)
 
                 # Move the file to the main folder
-                os.replace(file_path, main_itemfolder_path)
+                shutil.move(file_path, main_itemfolder_path)
 
         # Common folder
         if team_itemfolder_name.lower() == "common":

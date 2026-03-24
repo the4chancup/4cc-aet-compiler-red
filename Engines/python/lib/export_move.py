@@ -393,7 +393,19 @@ def export_move(exportfolder_path, team_id, team_name):
 
             # For each subfolder
             for subfolder_name in subfolder_list:
-                subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
+                subfolder_path_raw = os.path.join(team_itemfolder_path, subfolder_name)
+
+                # Check if the folder name has a 3-digit ID (e.g., "g567" instead of "g0567")
+                id = subfolder_name[1:5]
+                if len(id) == 3:
+                    # Rename to 4-digit format by adding leading zero
+                    new_subfolder_name = f"g0{subfolder_name[1:]}"
+                    new_subfolder_path = os.path.join(team_itemfolder_path, new_subfolder_name)
+                    os.rename(subfolder_path_raw, new_subfolder_path)
+                    subfolder_name = new_subfolder_name
+                    subfolder_path = new_subfolder_path
+                else:
+                    subfolder_path = subfolder_path_raw
 
                 # Get the ID
                 subfolder_id = subfolder_name[:5]

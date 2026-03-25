@@ -139,6 +139,10 @@ def contents_pack(extracted_path: str, faces_folder_name: str, uniform_folder_na
 
         # Move the collars to the Faces cpk folder
         for item in os.listdir(main_dir):
+            # First delete if it already exists
+            if os.path.exists(os.path.join(items_folder_path_full, item)):
+                os.remove(os.path.join(items_folder_path_full, item))
+
             shutil.move(os.path.join(main_dir, item), items_folder_path_full)
 
         # Then delete the main folder

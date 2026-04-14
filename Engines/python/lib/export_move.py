@@ -143,8 +143,10 @@ def export_move(exportfolder_path, team_id, team_name):
 
                 else:
                     # Change the texture IDs inside each mtl file
-                    for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                        txt_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+                    for root, dirs, files in os.walk(subfolder_path):
+                        for mtl_file in [f for f in files if f.endswith(".mtl")]:
+                            mtl_path = os.path.join(root, mtl_file)
+                            txt_id_change(mtl_path, team_id)
 
                     object_type = "face"
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
@@ -368,8 +370,10 @@ def export_move(exportfolder_path, team_id, team_name):
 
                 else:
                     # Change the texture IDs inside each mtl file
-                    for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                        txt_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+                    for root, dirs, files in os.walk(subfolder_path):
+                        for mtl_file in [f for f in files if f.endswith(".mtl")]:
+                            mtl_path = os.path.join(root, mtl_file)
+                            txt_id_change(mtl_path, team_id)
 
                 # Convert unsupported textures
                 textures_convert(subfolder_path, fox_mode, pes_19_plus)
@@ -417,8 +421,10 @@ def export_move(exportfolder_path, team_id, team_name):
 
                 else:
                     # Change the texture IDs inside each mtl file
-                    for mtl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".mtl")]:
-                        txt_id_change(os.path.join(subfolder_path, mtl_file), team_id)
+                    for root, dirs, files in os.walk(team_itemfolder_path):
+                        for mtl_file in [f for f in files if f.endswith(".mtl")]:
+                            mtl_path = os.path.join(root, mtl_file)
+                            txt_id_change(mtl_path, team_id)
 
                     object_type = "glove"
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
@@ -471,14 +477,15 @@ def export_move(exportfolder_path, team_id, team_name):
                 os.makedirs(main_itemfolder_team_path)
 
                 if not fox_mode:
-                    for mtl_file in [f for f in os.listdir(team_itemfolder_path) if f.endswith(".mtl")]:
-                        mtl_path = os.path.join(team_itemfolder_path, mtl_file)
+                    for root, dirs, files in os.walk(team_itemfolder_path):
+                        for mtl_file in [f for f in files if f.endswith(".mtl")]:
+                            mtl_path = os.path.join(root, mtl_file)
 
-                        # Change the texture IDs inside each mtl file
-                        txt_id_change(mtl_path, team_id)
+                            # Change the texture IDs inside each mtl file
+                            txt_id_change(mtl_path, team_id)
 
-                        # Replace any relative paths with absolute ones
-                        fix_mtl_paths(mtl_path, team_id)
+                            # Replace any relative paths with absolute ones
+                            fix_mtl_paths(mtl_path, team_id)
 
                 # Convert unsupported textures
                 textures_convert(team_itemfolder_path, fox_mode, pes_19_plus)

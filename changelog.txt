@@ -1,3 +1,14 @@
+17/04/26 - Version 4.2.3
+- Fixes
+  - Fixed crash when using custom collar models.
+- Other stuff
+  - Added support for glove folders with the old three-digit ID format, which
+    means there is no need to rename them before compiling some older exports.
+  - Expanded the renaming of team IDs to cover the contents of mtl files inside
+    any subfolders of the Common folder and model folders.
+    This also fixes auto-commonized referees missing their textures.
+
+
 14/03/26 - Version 4.2.2
 - Fixes
   - Fixed crash when "bad texture format" errors come up during the checking of

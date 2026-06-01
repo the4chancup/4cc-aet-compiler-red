@@ -5,7 +5,6 @@ import logging
 
 from .cpk_tools import cpk_file_write
 from .fmdl_editing import fmdl_texture_paths_change
-from .xml_editing import diff_from_xml
 from .utils import COLORS
 from .utils.ftex import ddsToFtex
 from .utils.pausing import pause
@@ -50,10 +49,10 @@ def get_ref_ids(ref_num):
 
 def update_file_paths(file_path, ref_name, ref_common_files, common_files):
     """
-    Update paths in MTL file to reference referee-specific Common subfolder.
+    Update paths in an MTL or XML file to reference referee-specific Common subfolder.
 
     Args:
-        file_path: Path to the file to update (MTL)
+        file_path: Path to the file to update (MTL or XML)
         ref_name: Name of the referee (for subfolder)
         ref_common_files: List of files that are in the referee's Common folder
         common_files: List of files that are in the export's Common folder (for checking shared files)
@@ -73,8 +72,8 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
         common_player_dir = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/{ref_name}/"
         common_dir = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/"
 
-        # Match path="..."
-        pattern = re.compile(r'((?:path)=")([^"]+)(")')
+        # Match path="..." and material="..."
+        pattern = re.compile(r'((?:path|material)=")([^"]+)(")')
 
         def replace_path(match: re.Match):
             prefix = match.group(1)
@@ -102,37 +101,37 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
             else:
                 return match.group(0)
 
-            file_path_rel_denormalized = normalize_kit_dependent_file(file_path_rel, reverse=True)
+            # Models are referenced with a "*" platform wildcard in the xml,
+            # so resolve it to match the actual files on disk
+            file_path_rel_resolved = file_path_rel.replace('*', 'win32')
+            file_path_rel_denormalized = normalize_kit_dependent_file(file_path_rel_resolved, reverse=True)
 
             # Check if this file is in the referee's common folder
             # or in the export's shared common folder
             new_dir = None
-            use_denormalized_name = False
-            if file_path_rel in ref_common_files:
+            file_name_final = file_path_rel
+            if file_path_rel_resolved in ref_common_files:
                 new_dir = common_player_dir
-            elif file_path_rel in common_files:
+            elif file_path_rel_resolved in common_files:
                 new_dir = common_dir
             # (with p1 instead of p0)
             elif file_path_rel_denormalized in ref_common_files:
                 new_dir = common_player_dir
-                use_denormalized_name = True
+                file_name_final = file_path_rel_denormalized.replace('win32', '*')
             elif file_path_rel_denormalized in common_files:
                 new_dir = common_dir
-                use_denormalized_name = True
+                file_name_final = file_path_rel_denormalized.replace('win32', '*')
             else:
                 return match.group(0)
 
-            if use_denormalized_name:
-                new_path = f'{new_dir}{file_path_rel_denormalized}'
-            else:
-                new_path = f'{new_dir}{file_path_rel}'
+            new_path = f'{new_dir}{file_name_final}'
 
             logging.debug(f"Updated path: {path_value} -> {new_path}")
             return prefix + new_path + suffix
 
         for line in lines:
-            # Check for lines containing path=
-            if 'path=' not in line:
+            # Check for lines containing path= or material=
+            if 'path=' not in line and 'material=' not in line:
                 new_lines.append(line)
                 continue
 
@@ -154,10 +153,10 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
 
 def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
     """
-    Update paths in all MTL and FMDL files in a folder.
+    Update paths in all MTL, XML and FMDL files in a folder.
 
     Args:
-        folder_path: Path to the folder containing MTL or FMDL files
+        folder_path: Path to the folder containing MTL, XML or FMDL files
         ref_name: Name of the referee (for subfolder)
         ref_common_files: List of files that are in the referee's Common folder
         common_files: List of files that are in the export's Common folder
@@ -166,7 +165,7 @@ def update_folder_paths(folder_path, ref_name, ref_common_files, common_files):
     for file_path_rel in files:
         file_path = os.path.join(folder_path, file_path_rel)
 
-        if file_path_rel.endswith('.mtl'):
+        if file_path_rel.endswith('.mtl') or file_path_rel.endswith('.xml'):
             update_file_paths(file_path, ref_name, ref_common_files, common_files)
 
         if file_path_rel.endswith('.fmdl'):
@@ -339,13 +338,6 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
     pes_version = int(os.environ.get('PES_VERSION', '19'))
     ref_name = os.path.basename(ref_folder_path)
 
-    face_xml_path = os.path.join(ref_folder_path, 'face', 'face.xml')
-    if os.path.exists(face_xml_path):
-        # Extract the diff data into a new face_diff.xml file
-        diff_from_xml(face_xml_path)
-        # Delete the original face.xml file
-        os.remove(face_xml_path)
-
     # Auto-move files to common subfolders
     logging.debug(f"Auto-moving files to common subfolders for {ref_name}")
     for model_folder_name in ['face', 'boots', 'gloves']:
@@ -353,6 +345,21 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
         if not (fox_mode or pes_version == 16):
             move_links_to_subfolder(ref_folder_path, model_folder_name, common_files)
             move_models_to_common(ref_folder_path, model_folder_name)
+
+    # If the face folder already has a face.xml, .common link files are not needed
+    # since the original XML is kept and its paths are updated directly
+    # Delete them now to avoid unnecessary clutter in the output
+    face_xml_path = os.path.join(ref_folder_path, 'face', 'face.xml')
+    if os.path.exists(face_xml_path):
+        face_folder = os.path.join(ref_folder_path, 'face')
+        for root, dirs, files in os.walk(face_folder, topdown=False):
+            for file_name in files:
+                if '.common' in file_name:
+                    os.remove(os.path.join(root, file_name))
+            for dir_name in dirs:
+                dir_path = os.path.join(root, dir_name)
+                if not os.listdir(dir_path):
+                    os.rmdir(dir_path)
 
     # Get list of files in the referee's common folder
     ref_common_files = get_files_list(os.path.join(ref_folder_path, 'common'), recursive=True)

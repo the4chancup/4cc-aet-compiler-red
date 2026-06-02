@@ -1,6 +1,6 @@
 import sys
 import runpy
-import subprocess
+import shutil
 import importlib.util
 import importlib.metadata
 
@@ -13,7 +13,7 @@ def dependency_check_on_import():
 
     if sys.platform != "win32":
         # Check if imagemagick is installed
-        if not subprocess.check_output(["whereis", "convert"]) != b'convert:\n':
+        if shutil.which("magick") is None:
             print("-")
             print("- ImageMagick was not found.")
             print("- It is required to convert DDS DX10 textures.")

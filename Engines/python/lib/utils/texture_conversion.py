@@ -37,7 +37,7 @@ def dds_dxt5_conv(tex_path):
         # Prepare a dummy path to save the converted texture
         dummy_tex_path = os.path.join(tex_folder_path, '_dummy_.dds')
         # Convert the texture with imagemagick
-        os.system(f"convert -format dds -define dds:compression=dxt5 {tex_path} {dummy_tex_path}")
+        os.system(f"magick -format dds -define dds:compression=dxt5 {tex_path} {dummy_tex_path}")
         # Delete the original texture
         os.remove(tex_path)
         # Rename the dummy texture

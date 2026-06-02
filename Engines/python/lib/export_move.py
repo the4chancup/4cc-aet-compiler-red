@@ -20,6 +20,7 @@ from .utils.FILE_INFO import (
     KIT_MASK_NAME,
     FACE_DIFF_BIN_NAME,
     GENERIC_KITCONFIG_NAME,
+    BODY_SKL_NAME,
 )
 
 
@@ -434,6 +435,10 @@ def export_move(exportfolder_path, team_id, team_name):
             # Prepare a list of subfolders
             subfolder_list = [subfolder for subfolder in os.listdir(team_itemfolder_path) if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]
 
+            if fox_mode:
+                BODY_SKL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, BODY_SKL_NAME)
+                file_critical_check(BODY_SKL_PATH)
+
             # For each subfolder
             for subfolder_name in subfolder_list:
                 subfolder_path = os.path.join(team_itemfolder_path, subfolder_name)
@@ -445,6 +450,11 @@ def export_move(exportfolder_path, team_id, team_name):
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
+
+                    # If boots.skl doesn't exist, copy the template body.skl as boots.skl
+                    boots_skl_path = os.path.join(subfolder_path, "boots.skl")
+                    if not os.path.exists(boots_skl_path):
+                        shutil.copy(BODY_SKL_PATH, boots_skl_path)
 
                 else:
                     # Change the texture IDs inside each mtl file

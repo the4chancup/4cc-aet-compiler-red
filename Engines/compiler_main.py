@@ -71,12 +71,14 @@ while True:
 
 def run_type_request():
     print("Usage:")
-    print("  compiler_main <run type>")
+    print("  compiler_main <run type> [--no-pause]")
     print("run type:")
     print("  0                         all-in-one mode, runs every step")
     print("  1                         extracted_from_exports mode, unpacks and checks exports")
     print("  2                         contents_from_extracted mode, prepares the contents folder")
     print("  3                         patches_from_contents mode, packs the patches")
+    print("")
+    print("  --no-pause                disable pausing regardless of settings")
     print("")
 
     # Ask the user for a run type, read a single character input
@@ -114,7 +116,7 @@ def get_main_folder():
     # Return the folder containing the Engines folder
     return os.path.dirname(current_folder_path)
 
-def main(run_type):
+def main(run_type, no_pause=False):
 
     # Set the working folder to the main compiler folder
     os.chdir(get_main_folder())
@@ -127,6 +129,10 @@ def main(run_type):
 
     # Load the settings into the environment
     settings_init()
+
+    # Force pausing off if requested
+    if no_pause:
+        os.environ['PAUSE_ALLOW'] = '0'
 
     # Check for updates
     updates_check = int(os.environ.get('UPDATES_CHECK', '1'))
@@ -241,5 +247,8 @@ if __name__ == "__main__":
     else:
         run_type = run_type_request()
 
+    # Check for --no-pause flag
+    no_pause = "--no-pause" in sys.argv
+
     # Run the main function
-    main(run_type)
+    main(run_type, no_pause=no_pause)

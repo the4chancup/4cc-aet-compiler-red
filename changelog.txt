@@ -1,3 +1,64 @@
+02/06/26 - Version 4.3.0
+- Important
+  - Added support for fcl_hair fmdl files, which allow loading FBMs from face
+    folders in Fox PES versions. You can use them by simply copying a boots fmdl
+    (and its textures) to a face folder and (optionally) renaming it to whatever
+    you want. It just works™.
+- Useful
+  - Added automatic fixing of texture paths in fmdl files that were copied
+    between a boots folder and a face folder. Boots texture paths found in face
+    folder fmdls are now rewritten to face folder paths, and face texture paths
+    found in boots folder fmdls are rewritten to boots folder paths, so you no
+    longer need to edit them in blender.
+  - Added automatic validation and renaming of fmdl files on Fox PES versions.
+    Fmdl files are now checked against the allowed base names (face_high,
+    hair_high, oral and fcl_hair for faces; boots for boots; glove_l and glove_r
+    for gloves), and any prefix gets stripped automatically (for example
+    "kit_boots.fmdl" becomes "boots.fmdl"). Invalid or duplicate fmdl names now
+    give an Error.
+    For face folders, a single arbitrarily-named fmdl is allowed if no fcl_hair
+    file is present, and it gets automatically renamed to fcl_hair.
+  - Added automatic copying of a template body.skl as boots.skl when a Fox boots
+    folder doesn't have one, so you don't need to include it manually.
+  - Added automatic copying of template fcl_hair_sim.skl and fcl_hair_sim.fclo
+    files to Fox face folders which have an fcl_hair.fmdl but are missing those
+    files, needed for fcl_hair to work properly.
+  - Added .fclo to the list of allowed file types on Fox versions.
+  - Added automatic filling of missing kit configs. The compiler now creates any
+    missing kit config files based on the kit color entries in the Note txt,
+    using a generic template. This means you no longer strictly need to include
+    every kit config in your export, as long as the kit colors are listed in the
+    Note txt and your export has a Kit Configs folder, even if empty.
+  - The teamnotes.txt file now only collects the "Other Notes" section from each
+    team's Note txt, instead of the entire file, making it much shorter to read.
+    Teams with an empty or dash-only Other Notes section are skipped, and a
+    Notice is now shown (during both the first and third steps) when any team
+    has notes.
+- Fixes
+  - Improved referee compilation on Pre-fox PES versions to update any existing
+    referee face.xml files directly instead of regenerating them. This keeps
+    custom properties defined on referee face xmls intact, allowing some complex
+    folders to work properly.
+- Other stuff
+  - Kit config checks now only verify the filenames. The old check comparing the
+    number of kit configs with the number of kit color entries in the Note txt
+    has been removed, since any missing configs are now auto-filled.
+  - Added a --no-pause command line flag to compiler_main.py, which disables
+    pausing regardless of the settings (useful for automated testing).
+  - Added the missing additional referee kit config variants (ACL, CL, LB and
+    SDA) to the Fox referees template.
+  - Removed "Texture file without mipmaps" info message.
+  - Added support for additional DDS pixel formats when converting to ftex on
+    Fox PES versions: R8 unorm, BC4 (ATI1), BC5 (ATI2 / BC5U) and B8G8R8A8
+    unorm. This means more textures are now accepted without manual conversion.
+  - Removed conversion of DX10 DDS textures to DXT5 when compiling for PES 19 or
+    later.
+  - Updated the texture conversion call with ImageMagick (used on Linux systems)
+    to use the 'magick' command instead of 'convert'. This is required for
+    ImageMagick v7+ to work properly.
+  - Updated the teams list file with the teams from VGL26.
+
+
 17/04/26 - Version 4.2.3
 - Fixes
   - Fixed crash when using custom collar models.

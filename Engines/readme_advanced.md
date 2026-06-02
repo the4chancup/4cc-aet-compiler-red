@@ -15,7 +15,9 @@ Make sure to also read the settings file for further customization options.
   - 0_all_in_one
 - XML-less Face Folders
   - Common Folder Links
+- Fox Model File Handling
 - Texture Handling
+- Kit Config Auto-Filling
 - Dummy Kit Replacement
 - Special Files and Folders
   - NO_USE File
@@ -155,8 +157,9 @@ before moving its content into folders shared by all the teams:
   (like cpks) in it.
 - Checks that the kit config files and the kit texture files follow the proper
   naming convention as described on the "Kits" wikipage.
-- Check that the amount of kit config files is consistent with what's listed on
-  the team txt.
+- On Fox PES versions, checks that the fmdl files in face, boots and gloves
+  folders have valid names (see the "Fox Model File Handling" section). Invalid
+  or duplicate fmdl names cause an error.
 - Checks that all of the dds files for face textures, kit textures and
   portraits are proper dds files to avoid stuff like renamed pngs.
 - Checks that the png files in the "Logo" folder are three and are
@@ -185,9 +188,16 @@ proper team ID it finds by looking for the team name on the teams_list file.
 Thanks to this, you can use old exports from previous invitationals without
 renaming anything manually.
 
-It also copies the contents from all of the Note txt files into a single file
-called "teamnotes.txt", allowing you to read them all quickly without having
-to open multiple files.
+It also collects the "Other Notes" section from every team's Note txt into a
+single file called "teamnotes.txt", allowing you to read them all quickly
+without having to open multiple files. Teams whose Other Notes section is empty
+or contains only a dash are skipped, so the file only contains actual notes.
+If any team had notes, a Notice is shown (during both the first and the third
+step) reminding you to check the teamnotes.txt file.
+
+Note: you can pass the "--no-pause" argument to compiler_main.py to disable all
+pausing regardless of the "pause_allow" setting. This is mainly useful for
+automated testing and unattended runs.
 
 Use this script on its own if you only want to check the exports for
 correctness and/or prepare the "extracted" folders for the next step.
@@ -336,6 +346,42 @@ This allows face folders to reference shared models and materials without
 duplicating them, keeping the export size smaller.
 
 
+## Fox Model File Handling
+
+On Fox PES versions (18+), models are stored as .fmdl files. The compiler
+applies some automatic validation and fixing to these files when processing
+face, boots and gloves folders.
+
+### Fmdl name validation and renaming
+
+Each fmdl file is checked against a list of allowed base names, depending on the
+folder type:
+- Face folders: face_high, hair_high, oral, fcl_hair
+- Boots folders: boots
+- Gloves folders: glove_l, glove_r
+
+An fmdl name is accepted if it's exactly one of those base names, or one of them
+preceded by a prefix and an underscore (for example "kit_boots.fmdl" matches
+"boots"). When a prefix is present, it's automatically stripped during the move
+(so "kit_boots.fmdl" becomes "boots.fmdl").
+
+Any fmdl file that doesn't match an allowed name is reported as an error, and so
+is any file whose name resolves to one that's already in use (a duplicate).
+
+There's one exception for face folders: if there's no fcl_hair file present and
+there's exactly one fmdl with an unrecognized name, that single file is assumed
+to be the fcl_hair model and is automatically renamed to fcl_hair.fmdl instead
+of being rejected.
+
+### Automatic skeleton and sim files
+
+- In boots folders, if there's no boots.skl file, a template body.skl is copied
+  in as boots.skl automatically, so you don't need to include it manually.
+- In face folders, if an fcl_hair.fmdl is present but the matching hair physics
+  files (fcl_hair_sim.skl and fcl_hair_sim.fclo) are missing, template versions
+  of them are copied in automatically.
+
+
 ## Texture Handling
 
 The compiler performs several automatic texture conversions depending on the
@@ -368,6 +414,25 @@ kit mask from the templates folder.
 ### Portraits
 Portrait textures are always kept in DDS format regardless of the PES version,
 since PES expects portraits as DDS files even on Fox versions.
+
+
+## Kit Config Auto-Filling
+
+Kit config files are required for a team's kits to show up correctly, but you do
+not have to include every single one in your export, nor any at all. If a kit
+config file is missing, the compiler will create it automatically from a generic
+template.
+
+When processing the Kit Configs folder, the compiler reads the kit color entries
+listed in the team's Note txt and works out which kit config files should exist
+(for example XXX_DEF_1st_realUni.bin for the first outfielder kit,
+XXX_DEF_GK1st_realUni.bin for the goalkeeper kit, and so on). For every entry
+that doesn't already have a matching kit config file, a generic kit config is
+copied in with the correct name.
+
+Note: This only works if the export has a Note txt with the kit color entries,
+since that's what tells the compiler how many kits there are and which are GK
+kits, and a Kit Configs folder, even if empty.
 
 
 ## Dummy Kit Replacement
@@ -482,7 +547,6 @@ should come back and look into them.
 
 List:
 - Nested folders detected in export; auto-fix attempted
-- Missing kit configs or Note txt kit color entries mismatch
 - Texture with irregular dimensions (non-portrait)
 - Texture file without mipmaps (ftex)
 - Texture listed in XML does not exist
@@ -534,6 +598,8 @@ List:
 - Team ID out of range
 - Disallowed files found in model folders or common folder
   (unless Strict File Type Check is disabled)
+- Invalid fmdl file name for fox mode (doesn't match an allowed base name)
+- Duplicate fmdl file (name resolves to one already in use)
 - Bad face folders (number/repeated/unsupported XML/bad textures/broken MTL)
 - Wrong kit config names (or duplicates)
 - Bad kit textures (name/invalid texture)

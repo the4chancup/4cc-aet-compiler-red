@@ -22,6 +22,7 @@ from .utils.FILE_INFO import (
     FACE_DIFF_BIN_NAME,
     GENERIC_KITCONFIG_NAME,
     BODY_SKL_NAME,
+    FCL_HAIR_SIM_FCLO_NAME,
     FOX_FACE_FMDL_NAMES,
     FOX_BOOTS_FMDL_NAMES,
     FOX_GLOVES_FMDL_NAMES,
@@ -228,6 +229,10 @@ def export_move(exportfolder_path, team_id, team_name):
             if fox_mode:
                 FACE_DIFF_BIN_TEMPLATE_PATH = os.path.join(TEMPLATE_FOLDER_PATH, FACE_DIFF_BIN_NAME)
                 file_critical_check(FACE_DIFF_BIN_TEMPLATE_PATH)
+                BODY_SKL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, BODY_SKL_NAME)
+                file_critical_check(BODY_SKL_PATH)
+                FCL_HAIR_SIM_FCLO_TEMPLATE_PATH = os.path.join(TEMPLATE_FOLDER_PATH, FCL_HAIR_SIM_FCLO_NAME)
+                file_critical_check(FCL_HAIR_SIM_FCLO_TEMPLATE_PATH)
 
             # Prepare a list of subfolders
             subfolder_list = [subfolder for subfolder in os.listdir(team_itemfolder_path) if os.path.isdir(os.path.join(team_itemfolder_path, subfolder))]
@@ -258,6 +263,16 @@ def export_move(exportfolder_path, team_id, team_name):
                     face_diff_path = os.path.join(subfolder_path, FACE_DIFF_BIN_NAME)
                     if not os.path.exists(face_diff_path):
                         shutil.copyfile(FACE_DIFF_BIN_TEMPLATE_PATH, face_diff_path)
+
+                    # If fcl_hair.fmdl exists, ensure fcl_hair_sim.skl and fcl_hair_sim.fclo are present
+                    fcl_hair_fmdl_path = os.path.join(subfolder_path, "fcl_hair.fmdl")
+                    if os.path.exists(fcl_hair_fmdl_path):
+                        fcl_hair_sim_skl_path = os.path.join(subfolder_path, "fcl_hair_sim.skl")
+                        if not os.path.exists(fcl_hair_sim_skl_path):
+                            shutil.copy(BODY_SKL_PATH, fcl_hair_sim_skl_path)
+                        fcl_hair_sim_fclo_path = os.path.join(subfolder_path, FCL_HAIR_SIM_FCLO_NAME)
+                        if not os.path.exists(fcl_hair_sim_fclo_path):
+                            shutil.copyfile(FCL_HAIR_SIM_FCLO_TEMPLATE_PATH, fcl_hair_sim_fclo_path)
 
                 else:
                     # Change the texture IDs inside each mtl file

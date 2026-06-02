@@ -9,6 +9,7 @@ patches_contents_refs
 patches_output
 sideload
 temp
+info
 exports_to_add
 !exports_to_add/delete_me.txt
 Engines/embed

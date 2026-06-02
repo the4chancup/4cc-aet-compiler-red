@@ -46,7 +46,9 @@ def dds_dxt5_conv(tex_path):
 def textures_convert(folder_path, fox_mode=False, pes_19_plus=False):
     '''If fox_mode is True, convert all .dds files in the folder and subfolders to .ftex files
 
-    If pes_19_plus is False, convert all DX10 files in the folder and subfolders to DXT5 files'''
+    If pes_19_plus is False, convert all DX10 files in the folder and subfolders to DXT5 files
+
+    fox_mode is forced to false when processing portraits'''
 
     file_list_rel = get_files_list(folder_path, recursive=True)
 
@@ -68,12 +70,14 @@ def textures_convert(folder_path, fox_mode=False, pes_19_plus=False):
             # Set the original file as file to check
             tex_check_path = tex_path
 
-        # Check if it is a DX10 file (DX10 label starting from index 84)
-        tex_reconvert_needed = get_bytes_ascii(tex_check_path, 84, 4) == 'DX10'
+        if not pes_19_plus:
 
-        if tex_reconvert_needed:
-            # Convert it to DXT5
-            dds_dxt5_conv(tex_check_path)
+            # Check if it is a DX10 file (DX10 label starting from index 84)
+            tex_reconvert_needed = get_bytes_ascii(tex_check_path, 84, 4) == 'DX10'
+
+            if tex_reconvert_needed:
+                # Convert it to DXT5
+                dds_dxt5_conv(tex_check_path)
 
         # If it was zlibbed
         if tex_zlibbed:

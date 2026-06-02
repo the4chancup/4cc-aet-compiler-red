@@ -13,6 +13,146 @@ from .utils.name_editing import (
 )
 
 
+def _read_fmdl_strings(fmdl):
+    """
+    Parse all strings from an FMDL's string descriptors (segment0 block 12) and
+    string data (segment1 block 3).
+
+    Args:
+        fmdl: An FmdlContainer that has block 12 and segment1 block 3.
+
+    Returns:
+        (strings, string_block) where strings is the list of decoded strings and
+        string_block is the raw segment1 block 3 bytes, needed to preserve any
+        trailing extension header data when rebuilding.
+    """
+    string_block = fmdl.segment1Blocks[3]
+    strings = []
+    for definition in fmdl.segment0Blocks[12]:
+        (block_id, length, offset) = struct.unpack('< H H I', definition)
+        strings.append(string_block[offset : offset + length].decode('utf-8'))
+    return strings, string_block
+
+
+def _write_fmdl_strings(fmdl, strings, original_string_block):
+    """
+    Rebuild an FMDL's string data (segment1 block 3) and string descriptors
+    (segment0 block 12) from a list of strings.
+
+    Any extension header data that followed the original last string is preserved.
+
+    Args:
+        fmdl: The FmdlContainer to update (its block 12 must still hold the
+            original descriptors when this is called).
+        strings: The list of strings to write.
+        original_string_block: The original segment1 block 3 bytes, used to
+            recover trailing extension header data.
+    """
+    new_string_data = bytearray()
+    new_descriptors = []
+    for string in strings:
+        encoded = string.encode('utf-8')
+        offset = len(new_string_data)
+        new_string_data += encoded + b'\0'
+        new_descriptors.append(bytearray(struct.pack('< H H I', 3, len(encoded), offset)))
+
+    # Preserve any extension header data that may follow the last string
+    if fmdl.segment0Blocks[12]:
+        last_desc = fmdl.segment0Blocks[12][-1]
+        (_, last_len, last_offset) = struct.unpack('< H H I', last_desc)
+        original_strings_end = last_offset + last_len + 1  # +1 for null terminator
+        if original_strings_end < len(original_string_block):
+            new_string_data += original_string_block[original_strings_end:]
+
+    fmdl.segment1Blocks[3] = new_string_data
+    fmdl.segment0Blocks[12] = new_descriptors
+
+
+def _convert_model_folder_path(texture_dir: str, target_type: str, model_id: str):
+    """
+    Convert a texture directory path between the boots and face folder structures.
+
+    When an fmdl is copied from a boots folder to a face folder (or vice versa),
+    its texture directory paths still point to the original folder type. This
+    rewrites such a path so that it points to the folder the fmdl now lives in.
+
+        boots structure: <prefix>/character/boots/<id>/
+        face structure:  <prefix>/character/face/real/<id>/sourceimages/
+
+    Args:
+        texture_dir: The texture directory string stored in the fmdl
+        target_type: The folder the fmdl now lives in ("face" or "boots")
+        model_id:    The correct ID for the new folder
+
+    Returns:
+        The converted path, or None if no conversion applies.
+    """
+    if target_type == "face":
+        # A boots path found inside a face folder -> convert to a face path
+        match = re.fullmatch(r'(.*/character)/boots/[^/]+/', texture_dir)
+        if match:
+            return f"{match.group(1)}/face/real/{model_id}/sourceimages/"
+    elif target_type == "boots":
+        # A face path found inside a boots folder -> convert to a boots path
+        match = re.fullmatch(r'(.*/character)/face/real/[^/]+/sourceimages/', texture_dir)
+        if match:
+            return f"{match.group(1)}/boots/{model_id}/"
+    return None
+
+
+def fmdl_model_folder_paths_fix(file_path: str, target_type: str, model_id: str):
+    """
+    Fix texture directory paths in an FMDL that was copied between a boots folder
+    and a face folder.
+
+    Such an fmdl keeps texture paths pointing to its original folder type, which
+    would no longer resolve. This rewrites any boots paths to face paths (when the
+    fmdl is now in a face folder) or any face paths to boots paths (when in a boots
+    folder).
+
+    Unlike fmdl_id_change, the path length changes, so the string block and its
+    descriptors are rebuilt instead of being overwritten in place.
+
+    Args:
+        file_path:   Path to the .fmdl file
+        target_type: The folder the fmdl now lives in ("face" or "boots")
+        model_id:    The correct ID for the new folder
+    """
+    if not os.path.exists(file_path):
+        return
+
+    if target_type not in ("face", "boots"):
+        return
+
+    fmdl = FmdlContainer()
+    fmdl.readFile(file_path)
+
+    # Need block 12 (string descriptors) and segment1 block 3 (string data)
+    if 12 not in fmdl.segment0Blocks or 3 not in fmdl.segment1Blocks:
+        return
+
+    # Parse all strings
+    strings, string_block = _read_fmdl_strings(fmdl)
+
+    # Convert any cross-folder directory paths
+    modified = False
+    for i, string in enumerate(strings):
+        converted = _convert_model_folder_path(string, target_type, model_id)
+        if converted is not None and converted != string:
+            logging.debug(f"  {string} -> {converted}")
+            strings[i] = converted
+            modified = True
+
+    if not modified:
+        return
+
+    # Rebuild string data (segment1 block 3) and descriptors (segment0 block 12)
+    _write_fmdl_strings(fmdl, strings, string_block)
+
+    fmdl.writeFile(file_path)
+    logging.debug(f"Fixed cross-folder texture paths in: {file_path}")
+
+
 def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
 
     # Make sure the file exists
@@ -26,6 +166,14 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
 
     file_name = os.path.basename(file_path)
     file_folder = os.path.dirname(file_path)
+
+    # If this fmdl was copied between a boots folder and a face folder, its
+    # texture directory paths still point to the original folder type. Fix them
+    # before processing the IDs. (boots <-> face only)
+    if re.fullmatch(r'[0-9]{5}', model_id):
+        fmdl_model_folder_paths_fix(file_path, "face", model_id)
+    elif re.fullmatch(r'k[0-9]{4}', model_id):
+        fmdl_model_folder_paths_fix(file_path, "boots", model_id)
 
     file_binary = open(file_path, 'rb')
 
@@ -231,12 +379,7 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
         return
 
     # Parse all strings
-    string_block = fmdl.segment1Blocks[3]
-    strings = []
-    for definition in fmdl.segment0Blocks[12]:
-        (block_id, length, offset) = struct.unpack('< H H I', definition)
-        bytestring = string_block[offset : offset + length]
-        strings.append(bytestring.decode('utf-8'))
+    strings, string_block = _read_fmdl_strings(fmdl)
 
     # Build filename sets for quick lookup
     # Extensions are removed because PES ignores them in texture paths
@@ -317,24 +460,7 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
     fmdl.segment0Blocks[6] = new_block6
 
     # Rebuild string data (segment1 block 3) and descriptors (segment0 block 12)
-    new_string_data = bytearray()
-    new_descriptors = []
-    for string in strings:
-        encoded = string.encode('utf-8')
-        offset = len(new_string_data)
-        new_string_data += encoded + b'\0'
-        new_descriptors.append(bytearray(struct.pack('< H H I', 3, len(encoded), offset)))
-
-    # Preserve any extension header data that may follow the last string
-    if fmdl.segment0Blocks[12]:
-        last_desc = fmdl.segment0Blocks[12][-1]
-        (_, last_len, last_offset) = struct.unpack('< H H I', last_desc)
-        original_strings_end = last_offset + last_len + 1  # +1 for null terminator
-        if original_strings_end < len(string_block):
-            new_string_data += string_block[original_strings_end:]
-
-    fmdl.segment1Blocks[3] = new_string_data
-    fmdl.segment0Blocks[12] = new_descriptors
+    _write_fmdl_strings(fmdl, strings, string_block)
 
     fmdl.writeFile(file_path)
     logging.debug(f"Updated texture directory paths in: {file_path}")

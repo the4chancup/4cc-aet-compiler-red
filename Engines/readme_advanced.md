@@ -16,6 +16,9 @@ Make sure to also read the settings file for further customization options.
 - XML-less Face Folders
   - Common Folder Links
 - Fox Model File Handling
+  - Fmdl name validation and renaming
+  - Automatic skeleton and sim files
+  - Cross-folder texture path fixing
 - Texture Handling
 - Kit Config Auto-Filling
 - Dummy Kit Replacement
@@ -380,6 +383,28 @@ of being rejected.
 - In face folders, if an fcl_hair.fmdl is present but the matching hair physics
   files (fcl_hair_sim.skl and fcl_hair_sim.fclo) are missing, template versions
   of them are copied in automatically.
+
+### Cross-folder texture path fixing
+
+The texture paths stored inside an fmdl point to the folder type the model was
+originally made for, using one of these structures:
+- Boots: `/Assets/pes16/model/character/boots/<id>/`
+- Face: `/Assets/pes16/model/character/face/real/<id>/sourceimages/`
+
+This means that if you copy an fmdl from a boots folder into a face folder (or
+vice versa), its texture paths would keep pointing to the wrong folder type and
+the textures would fail to load.
+
+The compiler fixes this automatically. When processing each fmdl, it rewrites
+any texture paths that point to the wrong folder type so they match the folder
+the fmdl now lives in:
+- Boots texture paths found in face folder fmdls become face folder paths.
+- Face texture paths found in boots folder fmdls become boots folder paths.
+
+The correct model ID is filled in as part of the conversion, so you can just
+copy a model across and rename it without editing any paths by hand. This is
+what makes the fcl_hair workflow (copying a boots fmdl into a face folder) work
+out of the box.
 
 
 ## Texture Handling

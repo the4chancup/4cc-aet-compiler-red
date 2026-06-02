@@ -15,13 +15,14 @@ def dummy_element(folder_path):
     DUMMY_MODEL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, DUMMY_MODEL_NAME)
     DUMMY_MTL_PATH = os.path.join(TEMPLATE_FOLDER_PATH, DUMMY_MTL_NAME)
 
-    dummy_model_destination = os.path.join(folder_path, DUMMY_MODEL_NAME)
+    dummy_model_name_oral = "oral_dummy_win32.model"
+    dummy_model_destination = os.path.join(folder_path, dummy_model_name_oral)
     if not os.path.isfile(dummy_model_destination):
         file_critical_check(DUMMY_MODEL_PATH)
-        # Copy the oral_dummy_win32.model file from the templates folder to the xml folder
+        # Copy the dummy.model file from the templates folder as oral_dummy_win32.model
         shutil.copyfile(DUMMY_MODEL_PATH, dummy_model_destination)
 
-    dummy_model_path_xml = f"./{DUMMY_MODEL_NAME.replace('win32', '*')}"
+    dummy_model_path_xml = f"./{dummy_model_name_oral.replace('win32', '*')}"
 
     dummy_mtl_destination = os.path.join(folder_path, DUMMY_MTL_NAME)
     if not os.path.isfile(dummy_mtl_destination):

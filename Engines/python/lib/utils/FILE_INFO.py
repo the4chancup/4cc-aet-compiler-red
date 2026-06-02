@@ -36,7 +36,7 @@ VER_MISMATCH_WARNED_PATH     = os.path.join(STATE_FOLDER_PATH, "ver_mismatch_war
 # Template files
 TEMPLATE_FOLDER_PATH         = os.path.join("Engines", "templates")
 DUMMY_MTL_NAME               = "dummy.mtl"
-DUMMY_MODEL_NAME             = "oral_dummy_win32.model"
+DUMMY_MODEL_NAME             = "dummy.model"
 GENERIC_FPKD_NAME            = "generic.fpkd"
 KIT_MASK_NAME                = "kit_mask.dds"
 FACE_DIFF_BIN_NAME           = "face_diff.bin"

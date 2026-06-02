@@ -513,7 +513,6 @@ work but isn't ideal, and which you can look into to improve your aesthetics.
 [Not shown on screen] [Written to suggestions.log]
 
 List:
-- Texture file without mipmaps (dds)
 - Missing MTL state names
 - Non-recommended MTL state values for alphablend/zwrite
 - Disallowed files found in model folders or common folder

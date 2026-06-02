@@ -117,13 +117,6 @@ def texture_dimensions_check(dds_file_path):
 
             error = True
 
-        if not mips_present:
-            logging.info( "-")
-            logging.info( "- Info - Texture file without mipmaps")
-            logging.info(f"- Folder:         {dds_folder_name}")
-            logging.info(f"- Texture name:   {dds_file_name}")
-            logging.info( "- This texture will work, but it will look better if you resave it with mipmaps")
-
     if type_kit and not fox_mode:
         if height > 2048 or width > 2048 or not (height_power_two and width_power_two):
             logging.error( "-")

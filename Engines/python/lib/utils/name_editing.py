@@ -5,6 +5,33 @@ from .zlib_plus import unzlib_file
 from .FILE_INFO import UNIFORM_COMMON_PREFOX_PATH
 
 
+def strip_fmdl_prefix(file_name, allowed_base_names):
+    """
+    Get the allowed base name of an fmdl file, ignoring an optional prefix.
+
+    A name matches if it is exactly an allowed base name, or an allowed base name
+    preceded by a prefix and an underscore (e.g. "kit_boots" -> "boots").
+
+    Parameters:
+        file_name (str): The filename to check
+        allowed_base_names (list): The allowed base names to match against
+
+    Returns:
+        str: The matched base name, or None if the file is not a matching fmdl
+    """
+    if not file_name.lower().endswith(".fmdl"):
+        return None
+
+    name_without_ext = file_name[:-5].lower()
+
+    # Match an exact base name or a base name preceded by a prefix and underscore
+    for base_name in allowed_base_names:
+        if name_without_ext == base_name or name_without_ext.endswith(f"_{base_name}"):
+            return base_name
+
+    return None
+
+
 def normalize_kit_dependent_file(file_name, reverse=False):
     """
     Check if a file is kit-dependent (u0XXXp1-9) and return the normalized p0 version.

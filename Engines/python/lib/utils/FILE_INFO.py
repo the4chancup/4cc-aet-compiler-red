@@ -68,3 +68,8 @@ TEXCONV_PATH                 = os.path.join("Engines", "directxtex", "texconv.ex
 
 # Other
 MOVED_CPKS_TXT_NAME          = "these_cpks_were_moved_to_download_folder.txt"
+
+# Allowed fmdl base names for fox mode
+FOX_FACE_FMDL_NAMES         = ["face_high", "hair_high", "oral", "fcl_hair"]
+FOX_BOOTS_FMDL_NAMES        = ["boots"]
+FOX_GLOVES_FMDL_NAMES       = ["glove_l", "glove_r"]

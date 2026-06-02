@@ -5,10 +5,16 @@ import logging
 
 from .utils.file_management import get_files_list
 from .utils.pausing import pause
+from .utils.name_editing import strip_fmdl_prefix
 from .texture_check import texture_check
 from .xml_check import mtl_check
 from .xml_check import xml_check
 from .xml_check import face_diff_xml_check
+from .utils.FILE_INFO import (
+    FOX_FACE_FMDL_NAMES,
+    FOX_BOOTS_FMDL_NAMES,
+    FOX_GLOVES_FMDL_NAMES,
+)
 
 
 FILE_TYPE_ALLOWED_LIST = [
@@ -125,6 +131,8 @@ def faces_check(exportfolder_path, team_name, team_id):
         folder_error_tex_format = False
         folder_error_mtl_format = False
         folder_error_file_disallowed_list = []
+        folder_error_fmdl_invalid_list = []
+        folder_error_fmdl_duplicate_list = []
 
         # Check player numbers differently for referee exports
         if team_name == "/refs/":
@@ -157,6 +165,26 @@ def faces_check(exportfolder_path, team_name, team_id):
             folder_error_num_repeated = True
 
         player_num_list.append(player_num)
+
+        if fox_mode:
+            # Check fmdl file names for fox mode
+            fmdl_files = [f for f in get_files_list(subfolder_path) if f.endswith(".fmdl")]
+            fmdl_base_names_found = set()
+            invalid_fmdl_files = []
+
+            for fmdl_file in fmdl_files:
+                base_name = strip_fmdl_prefix(fmdl_file, FOX_FACE_FMDL_NAMES)
+                if base_name is None:
+                    invalid_fmdl_files.append(fmdl_file)
+                elif base_name in fmdl_base_names_found:
+                    folder_error_fmdl_duplicate_list.append(fmdl_file)
+                else:
+                    fmdl_base_names_found.add(base_name)
+
+            # If fcl_hair is not present, allow one arbitrary fmdl name (renamed to fcl_hair later)
+            # Otherwise the arbitrary fmdl files are errors
+            if not ("fcl_hair" not in fmdl_base_names_found and len(invalid_fmdl_files) == 1):
+                folder_error_fmdl_invalid_list = invalid_fmdl_files
 
         if not fox_mode:
             # Check if the folder has a face.xml or the unsupported face_edithair.xml and hair.xml
@@ -236,6 +264,8 @@ def faces_check(exportfolder_path, team_name, team_id):
             folder_error_tex_format,
             folder_error_mtl_format,
             folder_error_file_disallowed_list,
+            folder_error_fmdl_invalid_list,
+            folder_error_fmdl_duplicate_list,
         ))
 
         # If the face folder has something wrong
@@ -268,6 +298,12 @@ def faces_check(exportfolder_path, team_name, team_id):
             if folder_error_file_disallowed_list:
                 for file_name in folder_error_file_disallowed_list:
                     logging.error(f"- ({file_name} is not allowed)")
+            if folder_error_fmdl_invalid_list:
+                for file_name in folder_error_fmdl_invalid_list:
+                    logging.error(f"- ({file_name} is not a valid fmdl name for fox mode)")
+            if folder_error_fmdl_duplicate_list:
+                for file_name in folder_error_fmdl_duplicate_list:
+                    logging.error(f"- ({file_name} resolves to an fmdl name already in use)")
 
             # And skip it
             if not pass_through:
@@ -693,6 +729,8 @@ def boots_check(exportfolder_path, team_name, team_id):
         folder_error_tex_format = False
         folder_error_mtl_format = False
         folder_error_file_disallowed_list = []
+        folder_error_fmdl_invalid_list = []
+        folder_error_fmdl_duplicate_list = []
 
         # Check that its name starts with a k and that the 4 characters after it are digits
         folder_num = subfolder_name[1:5]
@@ -704,7 +742,19 @@ def boots_check(exportfolder_path, team_name, team_id):
 
         folder_num_list.append(folder_num)
 
-        if not fox_mode:
+        if fox_mode:
+            # Check fmdl file names for fox mode
+            fmdl_files = [f for f in get_files_list(subfolder_path) if f.endswith(".fmdl")]
+            fmdl_base_names_found = set()
+            for fmdl_file in fmdl_files:
+                base_name = strip_fmdl_prefix(fmdl_file, FOX_BOOTS_FMDL_NAMES)
+                if base_name is None:
+                    folder_error_fmdl_invalid_list.append(fmdl_file)
+                elif base_name in fmdl_base_names_found:
+                    folder_error_fmdl_duplicate_list.append(fmdl_file)
+                else:
+                    fmdl_base_names_found.add(base_name)
+        else:
             # If there's no xml, check that all of the .model files are allowed
             model_file_path_rel_list = [file for file in get_files_list(subfolder_path) if file.endswith('.model')]
             for model_file_path_rel in model_file_path_rel_list:
@@ -774,6 +824,8 @@ def boots_check(exportfolder_path, team_name, team_id):
             folder_error_tex_format,
             folder_error_mtl_format,
             folder_error_file_disallowed_list,
+            folder_error_fmdl_invalid_list,
+            folder_error_fmdl_duplicate_list,
         ))
 
         # If the folder has something wrong
@@ -803,6 +855,12 @@ def boots_check(exportfolder_path, team_name, team_id):
             if folder_error_file_disallowed_list:
                 for file_name in folder_error_file_disallowed_list:
                     logging.error(f"- ({file_name} is not allowed)")
+            if folder_error_fmdl_invalid_list:
+                for file_name in folder_error_fmdl_invalid_list:
+                    logging.error(f"- ({file_name} is not a valid fmdl name for fox mode)")
+            if folder_error_fmdl_duplicate_list:
+                for file_name in folder_error_fmdl_duplicate_list:
+                    logging.error(f"- ({file_name} resolves to an fmdl name already in use)")
 
             # And skip it
             if not pass_through:
@@ -861,6 +919,8 @@ def gloves_check(exportfolder_path, team_name, team_id):
         folder_error_tex_format = False
         folder_error_mtl_format = False
         folder_error_file_disallowed_list = []
+        folder_error_fmdl_invalid_list = []
+        folder_error_fmdl_duplicate_list = []
 
         # Check that its name starts with a g and that the 4 characters after it are digits
         folder_num = subfolder_name[1:5]
@@ -872,7 +932,19 @@ def gloves_check(exportfolder_path, team_name, team_id):
 
         folder_num_list.append(folder_num)
 
-        if not fox_mode:
+        if fox_mode:
+            # Check fmdl file names for fox mode
+            fmdl_files = [f for f in get_files_list(subfolder_path) if f.endswith(".fmdl")]
+            fmdl_base_names_found = set()
+            for fmdl_file in fmdl_files:
+                base_name = strip_fmdl_prefix(fmdl_file, FOX_GLOVES_FMDL_NAMES)
+                if base_name is None:
+                    folder_error_fmdl_invalid_list.append(fmdl_file)
+                elif base_name in fmdl_base_names_found:
+                    folder_error_fmdl_duplicate_list.append(fmdl_file)
+                else:
+                    fmdl_base_names_found.add(base_name)
+        else:
             # Check if the folder has an xml
             glove_xml_path = os.path.join(subfolder_path, "glove.xml")
             if os.path.isfile(glove_xml_path):
@@ -948,6 +1020,8 @@ def gloves_check(exportfolder_path, team_name, team_id):
             folder_error_tex_format,
             folder_error_mtl_format,
             folder_error_file_disallowed_list,
+            folder_error_fmdl_invalid_list,
+            folder_error_fmdl_duplicate_list,
         ))
 
         # If the folder has something wrong
@@ -979,6 +1053,12 @@ def gloves_check(exportfolder_path, team_name, team_id):
             if folder_error_file_disallowed_list:
                 for file_name in folder_error_file_disallowed_list:
                     logging.error(f"- ({file_name} is not allowed)")
+            if folder_error_fmdl_invalid_list:
+                for file_name in folder_error_fmdl_invalid_list:
+                    logging.error(f"- ({file_name} is not a valid fmdl name for fox mode)")
+            if folder_error_fmdl_duplicate_list:
+                for file_name in folder_error_fmdl_duplicate_list:
+                    logging.error(f"- ({file_name} resolves to an fmdl name already in use)")
 
             # And skip it
             if not pass_through:

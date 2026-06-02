@@ -14,6 +14,7 @@ from .utils.name_editing import (
     filenames_id_replace,
     fix_mtl_paths,
     txt_id_change,
+    strip_fmdl_prefix,
 )
 from .utils.FILE_INFO import (
     TEMPLATE_FOLDER_PATH,
@@ -21,7 +22,52 @@ from .utils.FILE_INFO import (
     FACE_DIFF_BIN_NAME,
     GENERIC_KITCONFIG_NAME,
     BODY_SKL_NAME,
+    FOX_FACE_FMDL_NAMES,
+    FOX_BOOTS_FMDL_NAMES,
+    FOX_GLOVES_FMDL_NAMES,
 )
+
+
+def rename_fmdl_files(folder_path, allowed_base_names, rename_to_fcl_hair=False):
+    """
+    Rename fmdl files in a folder by stripping prefixes.
+    If rename_to_fcl_hair is True, there's no fcl_hair file present, and there's
+    exactly one fmdl file that doesn't match any allowed base name, rename that
+    single arbitrary file to fcl_hair.fmdl.
+    Returns the number of files renamed.
+    """
+    fmdl_files = [f for f in os.listdir(folder_path) if f.endswith(".fmdl")]
+
+    # Map each file to its stripped base name (None if arbitrary)
+    base_name_map = {f: strip_fmdl_prefix(f, allowed_base_names) for f in fmdl_files}
+    invalid_files = [f for f, base_name in base_name_map.items() if base_name is None]
+    fcl_hair_present = "fcl_hair" in base_name_map.values()
+
+    # Only rename a single arbitrary file to fcl_hair if fcl_hair isn't already present
+    allow_fcl_hair_rename = (
+        rename_to_fcl_hair and not fcl_hair_present and len(invalid_files) == 1
+    )
+
+    renamed_count = 0
+
+    for fmdl_file, base_name in base_name_map.items():
+
+        if base_name:
+            # Strip the prefix and rename
+            new_name = f"{base_name}.fmdl"
+        elif allow_fcl_hair_rename:
+            # Single arbitrary fmdl file without fcl_hair present - rename to fcl_hair
+            new_name = "fcl_hair.fmdl"
+        else:
+            continue
+
+        if new_name != fmdl_file.lower():
+            old_path = os.path.join(folder_path, fmdl_file)
+            new_path = os.path.join(folder_path, new_name)
+            os.rename(old_path, new_path)
+            renamed_count += 1
+
+    return renamed_count
 
 
 def kit_masks_check(team_itemfolder_path, file_ext):
@@ -201,6 +247,9 @@ def export_move(exportfolder_path, team_id, team_name):
                     subfolder_id = subfolder_id_withname[:5]
 
                 if fox_mode:
+                    # Rename fmdl files by stripping prefixes, and rename single arbitrary fmdl to fcl_hair if needed
+                    rename_fmdl_files(subfolder_path, FOX_FACE_FMDL_NAMES, rename_to_fcl_hair=True)
+
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
@@ -447,6 +496,9 @@ def export_move(exportfolder_path, team_id, team_name):
                 subfolder_id = subfolder_name[:5]
 
                 if fox_mode:
+                    # Rename fmdl files by stripping prefixes
+                    rename_fmdl_files(subfolder_path, FOX_BOOTS_FMDL_NAMES)
+
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
@@ -503,6 +555,9 @@ def export_move(exportfolder_path, team_id, team_name):
                 subfolder_id = subfolder_name[:5]
 
                 if fox_mode:
+                    # Rename fmdl files by stripping prefixes
+                    rename_fmdl_files(subfolder_path, FOX_GLOVES_FMDL_NAMES)
+
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)

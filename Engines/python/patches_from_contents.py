@@ -13,6 +13,7 @@ from .lib.utils.FILE_INFO import (
     PATCHES_CONTENTS_PATH,
     PATCHES_OUTPUT_PATH,
     MOVED_CPKS_TXT_NAME,
+    TEAMNOTES_PATH,
 )
 
 
@@ -199,6 +200,12 @@ def patches_from_contents():
     if all_in_one:
         if not log_presence_warn_done:
             log_presence_warn()
+
+        # Check if teamnotes.txt exists, if so print a message
+        if os.path.exists(TEAMNOTES_PATH) and os.path.getsize(TEAMNOTES_PATH) > 0:
+            print( "-")
+            print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET}: Some teams have special notes")
+            print( "- Please check teamnotes.txt to read them")
 
         print( "-")
         print( "-")

@@ -35,14 +35,37 @@ def note_txt_append(team_name, export_destination_path):
     note_path = os.path.join(export_destination_path, f"{team_name_clean} Note.txt")
 
     if not os.path.exists(note_path):
-        return
+        return False
+
+    with open(note_path, "r", encoding="utf8") as f:
+        content = f.read()
+
+    # Extract the Other Notes section
+    other_notes_lines = []
+    in_other_notes = False
+    for line in content.splitlines():
+        if line.startswith("Other Notes:"):
+            in_other_notes = True
+            continue
+        if in_other_notes:
+            other_notes_lines.append(line)
+
+    other_notes = "\n".join(other_notes_lines)
+
+    # If the Other Notes section is empty or contains only "-", don't append anything
+    if not other_notes or other_notes.strip() == "-":
+        return False
+
+    # Write the header if this is the first entry
+    if not os.path.exists(TEAMNOTES_PATH):
+        with open(TEAMNOTES_PATH, "w", encoding="utf8") as f:
+            f.write("--- 4cc Other Notes compilation ---\n")
 
     with open(TEAMNOTES_PATH, "a", encoding="utf8") as f2:
         f2.write(f". \n- \n-- {team_name}'s note file: \n- \n")
-    with open(note_path, "r", encoding="utf8") as f:
-        teamnotes = f.read()
-        with open(TEAMNOTES_PATH, "a", encoding="utf8") as f2:
-            f2.write(f"{teamnotes}\n")
+        f2.write(f"{other_notes}\n")
+
+    return True
 
 
 def extracted_from_exports():
@@ -74,8 +97,8 @@ def extracted_from_exports():
         shutil.rmtree(referees_destination_path, onerror=remove_readonly)
 
     # Reset the notes compilation
-    with open(TEAMNOTES_PATH, "w", encoding="utf8") as f:
-        f.write("--- 4cc txt notes compilation ---\n")
+    if os.path.exists(TEAMNOTES_PATH):
+        os.remove(TEAMNOTES_PATH)
 
     EXPORT_FILE_TYPES_LIST = [".zip", ".7z"]
 
@@ -209,7 +232,7 @@ def extracted_from_exports():
         # Check the export for all kinds of errors
         export_check(export_destination_path, team_name, team_id)
 
-        # If the export has a Note.txt file, append it to the teamnotes.txt file
+        # If the export has a Note.txt file, append its Other Notes section to the teamnotes.txt file
         note_txt_append(team_name, export_destination_path)
 
         # Move the contents of the export to the root of "extracted"
@@ -237,6 +260,12 @@ def extracted_from_exports():
         log_presence_warn()
         print("-")
 
+        # Check if teamnotes.txt exists, if so print a message
+        if os.path.exists(TEAMNOTES_PATH) and os.path.getsize(TEAMNOTES_PATH) > 0:
+            print( "-")
+            print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET}: Some teams have special notes")
+            print( "- Please check teamnotes.txt to read them")
+
     # Check if the Other folder exists and there are files in it, if there are print a warning
     teams_other_path = os.path.join(EXTRACTED_TEAMS_PATH, "Other")
     referees_other_path = os.path.join(EXTRACTED_REFEREES_PATH, "Other")
@@ -248,4 +277,7 @@ def extracted_from_exports():
         print(f"- {COLORS.DARK_MAGENTA}Notice{COLORS.RESET}: There are files in the Other folder")
         print( "- Please open it and check its contents")
 
-        pause()
+        if all_in_one:
+            pause()
+
+    print("-")

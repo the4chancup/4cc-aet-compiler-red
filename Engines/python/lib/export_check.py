@@ -9,7 +9,6 @@ from .texture_check import texture_check
 from .xml_check import mtl_check
 from .xml_check import xml_check
 from .xml_check import face_diff_xml_check
-from .txt_kits_count import txt_kits_count
 
 
 FILE_TYPE_ALLOWED_LIST = [
@@ -286,7 +285,7 @@ def faces_check(exportfolder_path, team_name, team_id):
         pause()
 
 
-# If a Kit Configs folder exists and is not empty, check that the amount of kit config files is correct
+# If a Kit Configs folder exists and is not empty, check that the kit config files have the correct names
 def kitconfigs_check(exportfolder_path, team_name):
     itemfolder_path = os.path.join(exportfolder_path, "Kit Configs")
 
@@ -294,9 +293,8 @@ def kitconfigs_check(exportfolder_path, team_name):
     if not os.path.isdir(itemfolder_path):
         return
 
-    # If the folder is empty, delete it
+    # If the folder is empty, skip it
     if not os.listdir(itemfolder_path):
-        shutil.rmtree(itemfolder_path)
         return
 
     # Initialize the error flag
@@ -314,9 +312,6 @@ def kitconfigs_check(exportfolder_path, team_name):
             # And delete the now empty folder
             shutil.rmtree(subitem_path)
 
-    config_count = len(os.listdir(itemfolder_path))
-    config_list = []
-
     # For every file
     for file_name in os.listdir(itemfolder_path):
 
@@ -329,16 +324,6 @@ def kitconfigs_check(exportfolder_path, team_name):
         if not file_name[-12:].lower() == "_realuni.bin":#realUni?
             file_error = True
             break
-
-        # Prepare the name without the team ID
-        config_name_base = file_name[3:].lower()
-
-        # Check if the name is in the list
-        if config_name_base in config_list:
-            file_error = True
-            break
-
-        config_list.append(file_name[3:].lower())
 
     # If any file was wrong
     if file_error:
@@ -360,25 +345,6 @@ def kitconfigs_check(exportfolder_path, team_name):
         pause()
 
         return
-
-    # Prepare a clean version of the team name without slashes
-    team_name_clean = team_name.replace("/", "").replace("\\", "").upper()
-
-    # Path to the txt file with the team"s name
-    note_path = os.path.join(exportfolder_path, f"{team_name_clean} Note.txt")
-
-    # Check if the txt file exists
-    if os.path.exists(note_path):
-
-        # Check that the number of kit configs and kit color entries in the Note txt are the same
-        config_count_note = txt_kits_count(note_path)
-        if config_count_note != config_count:
-
-            logging.warning( "-")
-            logging.warning( "- Warning - Missing kit configs or txt kit color entries")
-            logging.warning(f"- Team name:      {team_name}")
-            logging.warning(f"- The number of kit config files ({config_count}) is not equal to")
-            logging.warning(f"- the number of kit color entries ({config_count_note}) in the Note txt file")
 
 
 # If a Kit Textures folder exists and is not empty, check that the kit textures' filenames and type are correct

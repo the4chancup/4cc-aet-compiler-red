@@ -5,6 +5,7 @@ import shutil
 from .fmdl_editing import fmdl_id_change
 from .xml_editing import xml_create
 from .xml_editing import xml_process
+from .bins_update import bytes_from_color_entry
 from .utils.file_management import file_critical_check
 from .utils.texture_conversion import textures_convert
 from .utils.zlib_plus import unzlib_file
@@ -18,6 +19,7 @@ from .utils.FILE_INFO import (
     TEMPLATE_FOLDER_PATH,
     KIT_MASK_NAME,
     FACE_DIFF_BIN_NAME,
+    GENERIC_KITCONFIG_NAME,
 )
 
 
@@ -45,6 +47,72 @@ def kit_masks_check(team_itemfolder_path, file_ext):
             kit_texture_mask_destination = os.path.join(team_itemfolder_path, kit_texture_mask)
             file_critical_check(KIT_MASK_TEMPLATE_PATH)
             shutil.copy(KIT_MASK_TEMPLATE_PATH, kit_texture_mask_destination)
+
+
+def kitconfigs_fill_missing(folder_path, team_name_clean, team_id, team_itemfolder_path):
+    """Check if the export has a Note txt and fill in missing kit configs using the generic template."""
+
+    note_path = os.path.join(folder_path, f"{team_name_clean} Note.txt")
+    if not os.path.exists(note_path):
+        return
+
+    player_kits = 0
+    gk_kits = 0
+    kitcols_search = False
+
+    with open(note_path, 'r', encoding="utf8") as file:
+        for line in file:
+
+            if not line.strip():
+                continue
+
+            data = line.split()
+
+            if data[0].lower() == "kit" and data[1][0:2].lower() == "co":
+                kitcols_search = True
+                continue
+
+            if any(line.lower().startswith(word) for word in ["player", "other", "notes"]):
+                break
+
+            if not (kitcols_search and data[0][0] == "-"):
+                continue
+
+            color1, color2, icon = bytes_from_color_entry(line, type_kits=True)
+
+            if not (color1 and color2):
+                continue
+
+            type_gk = "gk:" in line.lower()
+
+            if type_gk:
+                gk_kits += 1
+                kit_num = gk_kits
+                kit_prefix = "GK"
+            else:
+                player_kits += 1
+                kit_num = player_kits
+                kit_prefix = ""
+
+            if kit_num == 1:
+                kit_suffix = "1st"
+            elif kit_num == 2:
+                kit_suffix = "2nd"
+            elif kit_num == 3:
+                kit_suffix = "3rd"
+            else:
+                kit_suffix = f"{kit_num}th"
+
+            kit_name = f"{kit_prefix}{kit_suffix}"
+            expected_file_name = f"{team_id}_DEF_{kit_name}_realUni.bin"
+            expected_file_path = os.path.join(team_itemfolder_path, expected_file_name)
+
+            if os.path.exists(expected_file_path):
+                continue
+
+            generic_template_path = os.path.join(TEMPLATE_FOLDER_PATH, GENERIC_KITCONFIG_NAME)
+            file_critical_check(generic_template_path)
+            shutil.copy(generic_template_path, expected_file_path)
 
 
 def export_move(exportfolder_path, team_id, team_name):
@@ -182,6 +250,9 @@ def export_move(exportfolder_path, team_id, team_name):
         # Kit Configs folder
         if team_itemfolder_name.lower() == "kit configs":
 
+            # Check if the export has a Note txt and fill in missing kit configs
+            kitconfigs_fill_missing(mainfolder_path, team_name_clean, team_id, team_itemfolder_path)
+
             # Delete the team folder in the main folder if already present
             if os.path.exists(main_itemfolder_team_path):
                 shutil.rmtree(main_itemfolder_team_path)
@@ -235,8 +306,15 @@ def export_move(exportfolder_path, team_id, team_name):
                         if char_team_type != b'u':
                             continue
 
-                        if line == 0:
-                            # Update the team ID and kit char and number in the main texture filename
+                        # Check if the texture name has the generic "p0" placeholder
+                        # Texture names follow the format u0XXXp0_... so p0 is at position + 5
+                        file.seek(position + 5)
+                        kit_placeholder = file.read(2)
+                        has_p0 = (kit_placeholder == b'p0')
+
+                        file.seek(position + 1)
+                        if line == 0 or has_p0:
+                            # Update the team ID and kit char and number in the texture filename
                             kit_data = f"{team_id_full}{kit_char}{kit_num}".encode('utf-8')
                         else:
                             # Update the team ID in the other texture filenames

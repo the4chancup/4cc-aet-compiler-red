@@ -40,6 +40,7 @@ DUMMY_MODEL_NAME             = "dummy.model"
 GENERIC_FPKD_NAME            = "generic.fpkd"
 KIT_MASK_NAME                = "kit_mask.dds"
 FACE_DIFF_BIN_NAME           = "face_diff.bin"
+GENERIC_KITCONFIG_NAME       = "XXX_DEF_xxx_realUni.bin"
 
 # Refs template paths
 REFS_TEMPLATE_PREFOX_PATH    = os.path.join(TEMPLATE_FOLDER_PATH, "refscpk_prefox")

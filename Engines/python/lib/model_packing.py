@@ -84,8 +84,8 @@ def models_pack(models_type, models_source_path, models_destination_folder, cpk_
         if not os.path.exists(models_destination_path):
             os.makedirs(models_destination_path)
 
-        # Make a list files allowed in the fpk
-        FILE_TYPE_ALLOWED_LIST = [".bin", ".fmdl", ".skl"]
+        # Make a list of files allowed in the fpk
+        FILE_TYPE_ALLOWED_LIST = [".bin", ".fmdl", ".skl", ".fclo"]
 
         # For every folder in the source directory
         for model_folder_name in os.listdir(models_source_path):

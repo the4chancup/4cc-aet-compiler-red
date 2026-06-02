@@ -26,6 +26,7 @@ FILE_TYPE_ALLOWED_LIST = [
     ".dds",
     ".ftex",
     ".skl",
+    ".fclo",
     ".common",
     ".txt",
     ".fox",
@@ -36,6 +37,7 @@ PREFOX_FILE_TYPE_DISALLOWED_LIST = [
     ".fmdl",
     ".ftex",
     ".skl",
+    ".fclo",
 ]
 
 FOX_FILE_TYPE_DISALLOWED_LIST = [

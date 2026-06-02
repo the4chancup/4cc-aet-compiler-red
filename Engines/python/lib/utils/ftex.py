@@ -450,6 +450,14 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 			and ddsABitMask == 0xff000000
 		):
 			ftexPixelFormat = 0
+		elif (
+					(ddsFormatFlags & 0x20000) > 0  # red only
+				and ddsRBitMask == 0xff
+				and ddsGBitMask == 0x0
+				and ddsBBitMask == 0x0
+				and ddsABitMask == 0x0
+		):
+			ftexPixelFormat = 1
 		else:
 			raise DecodeError("Unsupported dds codec")
 	elif ddsFourCC == b'DX10':
@@ -462,7 +470,9 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 			# ddsOther,
 		) = struct.unpack('< I 16x', extensionHeader)
 
-		if ddsExtensionFormat == 61: # DXGI_FORMAT_R8_UNORM
+		if ddsExtensionFormat == 87: # DXGI_FORMAT_B8G8R8A8_UNORM
+			ftexPixelFormat = 0
+		elif ddsExtensionFormat == 61: # DXGI_FORMAT_R8_UNORM
 			ftexPixelFormat = 1
 		elif ddsExtensionFormat == 71: # DXGI_FORMAT_BC1_UNORM ["DXT1"]
 			ftexPixelFormat = 2
@@ -496,6 +506,12 @@ def ddsToFtexBuffer(ddsBuffer, colorSpace):
 		ftexPixelFormat = 3
 	elif ddsFourCC == b'DXT5':
 		ftexPixelFormat = 4
+	elif ddsFourCC == b"ATI1":
+		ftexPixelFormat = 8
+	elif ddsFourCC == b"ATI2":
+		ftexPixelFormat = 9
+	elif ddsFourCC == b"BC5U":
+		ftexPixelFormat = 9
 	else:
 		raise DecodeError("Unsupported dds codec")
 

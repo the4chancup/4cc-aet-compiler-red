@@ -1,3 +1,18 @@
+04/06/26 - Version 4.3.1
+- Useful
+  - Extended the automatic fmdl texture path fixing to glove folders and
+    simplified how it works. When processing a face, boots or glove fmdl, any
+    texture path that doesn't point to a common folder is now rewritten to the
+    fmdl's own model folder path.
+- Fixes
+  - Improved the automatic filling of missing kit configs to prevent crashes
+    when the team has kit configs with a team ID which doesn't match the current
+    one.
+- New checks
+  - Made the kit configs filename checking include the numbering part (1st, 2nd,
+    GK1st, and so on).
+
+
 02/06/26 - Version 4.3.0
 - Important
   - Added support for fcl_hair fmdl files, which allow loading FBMs from face

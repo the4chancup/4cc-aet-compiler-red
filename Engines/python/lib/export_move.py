@@ -97,7 +97,7 @@ def kit_masks_check(team_itemfolder_path, file_ext):
             shutil.copy(KIT_MASK_TEMPLATE_PATH, kit_texture_mask_destination)
 
 
-def kitconfigs_fill_missing(folder_path, team_name_clean, team_id, team_itemfolder_path):
+def kitconfigs_fill_missing(folder_path, team_name_clean, team_itemfolder_path):
     """Check if the export has a Note txt and fill in missing kit configs using the generic template."""
 
     note_path = os.path.join(folder_path, f"{team_name_clean} Note.txt")
@@ -107,6 +107,14 @@ def kitconfigs_fill_missing(folder_path, team_name_clean, team_id, team_itemfold
     player_kits = 0
     gk_kits = 0
     kitcols_search = False
+
+    # Collect the existing kit config names without their 3-char team ID prefix,
+    # since the prefix can be anything (XXX, the current ID, or an old ID)
+    existing_config_suffixes = [
+        f[3:].lower()
+        for f in os.listdir(team_itemfolder_path)
+        if f.endswith(".bin")
+    ]
 
     with open(note_path, 'r', encoding="utf8") as file:
         for line in file:
@@ -152,15 +160,21 @@ def kitconfigs_fill_missing(folder_path, team_name_clean, team_id, team_itemfold
                 kit_suffix = f"{kit_num}th"
 
             kit_name = f"{kit_prefix}{kit_suffix}"
-            expected_file_name = f"{team_id}_DEF_{kit_name}_realUni.bin"
-            expected_file_path = os.path.join(team_itemfolder_path, expected_file_name)
+            config_suffix = f"_DEF_{kit_name}_realUni.bin".lower()
 
-            if os.path.exists(expected_file_path):
+            # Skip if a config for this kit already exists, regardless of its team ID prefix
+            if config_suffix in existing_config_suffixes:
                 continue
+
+            placeholder_file_name = f"XXX_DEF_{kit_name}_realUni.bin"
+            placeholder_file_path = os.path.join(team_itemfolder_path, placeholder_file_name)
 
             generic_template_path = os.path.join(TEMPLATE_FOLDER_PATH, GENERIC_KITCONFIG_NAME)
             file_critical_check(generic_template_path)
-            shutil.copy(generic_template_path, expected_file_path)
+            shutil.copy(generic_template_path, placeholder_file_path)
+
+            # Track the newly added config to avoid duplicates within this run
+            existing_config_suffixes.append(config_suffix)
 
 
 def export_move(exportfolder_path, team_id, team_name):
@@ -316,7 +330,7 @@ def export_move(exportfolder_path, team_id, team_name):
         if team_itemfolder_name.lower() == "kit configs":
 
             # Check if the export has a Note txt and fill in missing kit configs
-            kitconfigs_fill_missing(mainfolder_path, team_name_clean, team_id, team_itemfolder_path)
+            kitconfigs_fill_missing(mainfolder_path, team_name_clean, team_itemfolder_path)
 
             # Delete the team folder in the main folder if already present
             if os.path.exists(main_itemfolder_team_path):

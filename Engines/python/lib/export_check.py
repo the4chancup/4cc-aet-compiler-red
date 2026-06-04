@@ -335,8 +335,9 @@ def kitconfigs_check(exportfolder_path, team_name):
     if not os.listdir(itemfolder_path):
         return
 
-    # Initialize the error flag
+    # Initialize the error flag and list for bad filenames
     file_error = False
+    file_error_bad_names = []
 
     # Check if the files are in an inner folder
     for subitem_name in os.listdir(itemfolder_path):
@@ -357,11 +358,23 @@ def kitconfigs_check(exportfolder_path, team_name):
         # Check the DEF part of the name
         if not file_name[3:8].lower() == "_def_":#DEF?
             file_error = True
-            break
+            file_error_bad_names.append(file_name)
+            continue
+        # Check the numbering part (e.g. _1st_, _2nd_, _GK1st_ etc.)
+        kit_name_part = file_name[7:-11].lower()
+        valid_kit_names = [
+            f"_{infix}_"
+            for infix in ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th", "9th", "gk1st"]
+        ]
+        if kit_name_part not in valid_kit_names:
+            file_error = True
+            file_error_bad_names.append(file_name)
+            continue
         # Check the realUni part
         if not file_name[-12:].lower() == "_realuni.bin":#realUni?
             file_error = True
-            break
+            file_error_bad_names.append(file_name)
+            continue
 
     # If any file was wrong
     if file_error:
@@ -374,6 +387,8 @@ def kitconfigs_check(exportfolder_path, team_name):
         logging.error( "-")
         logging.error( "- ERROR - Wrong kit config names")
         logging.error(f"- Team name:      {team_name}")
+        for bad_name in file_error_bad_names:
+            logging.error(f"- ({bad_name})")
         if pass_through:
             logging.error( "- The Kit Configs folder has problems but will be kept (pass through mode)")
         else:

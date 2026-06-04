@@ -68,80 +68,97 @@ def _write_fmdl_strings(fmdl, strings, original_string_block):
     fmdl.segment0Blocks[12] = new_descriptors
 
 
-def _convert_model_folder_path(texture_dir: str, target_type: str, model_id: str):
+def _model_folder_path(target_type: str, model_id: str):
     """
-    Convert a texture directory path between the boots and face folder structures.
+    Build the in-game texture directory path for a model folder type.
 
-    When an fmdl is copied from a boots folder to a face folder (or vice versa),
-    its texture directory paths still point to the original folder type. This
-    rewrites such a path so that it points to the folder the fmdl now lives in.
+        face:  <prefix>/character/face/real/<id>/sourceimages/
+        boots: <prefix>/character/boots/<id>/
+        glove: <prefix>/character/glove/<id>/
 
-        boots structure: <prefix>/character/boots/<id>/
-        face structure:  <prefix>/character/face/real/<id>/sourceimages/
+    The prefix is taken from UNIFORM_COMMON_FOX_PATH so it stays consistent with
+    the rest of the compiler.
 
     Args:
-        texture_dir: The texture directory string stored in the fmdl
-        target_type: The folder the fmdl now lives in ("face" or "boots")
-        model_id:    The correct ID for the new folder
+        target_type: The model folder type ("face", "boots" or "glove")
+        model_id:    The correct ID for the folder
 
     Returns:
-        The converted path, or None if no conversion applies.
+        The texture directory path, or None for an unknown target_type.
     """
+    character_path = UNIFORM_COMMON_FOX_PATH.rsplit('character/', 1)[0] + 'character/'
     if target_type == "face":
-        # A boots path found inside a face folder -> convert to a face path
-        match = re.fullmatch(r'(.*/character)/boots/[^/]+/', texture_dir)
-        if match:
-            return f"{match.group(1)}/face/real/{model_id}/sourceimages/"
-    elif target_type == "boots":
-        # A face path found inside a boots folder -> convert to a boots path
-        match = re.fullmatch(r'(.*/character)/face/real/[^/]+/sourceimages/', texture_dir)
-        if match:
-            return f"{match.group(1)}/boots/{model_id}/"
+        return f"{character_path}face/real/{model_id}/sourceimages/"
+    if target_type == "boots":
+        return f"{character_path}boots/{model_id}/"
+    if target_type == "glove":
+        return f"{character_path}glove/{model_id}/"
     return None
 
 
 def fmdl_model_folder_paths_fix(file_path: str, target_type: str, model_id: str):
     """
-    Fix texture directory paths in an FMDL that was copied between a boots folder
-    and a face folder.
+    Fix texture directory paths in an FMDL located in a face, boots or glove
+    folder.
 
-    Such an fmdl keeps texture paths pointing to its original folder type, which
-    would no longer resolve. This rewrites any boots paths to face paths (when the
-    fmdl is now in a face folder) or any face paths to boots paths (when in a boots
-    folder).
+    A model fmdl should only reference textures from either the shared common
+    folder (UNIFORM_COMMON_FOX_PATH) or its own model folder. When an fmdl is
+    copied between model folders (e.g. a boots fmdl dropped into a face folder),
+    its own-folder texture paths still point to the original folder type and
+    would no longer resolve.
+
+    This rewrites every texture directory path that does not point to the common
+    folder so that it points to the folder the fmdl now lives in. Common folder
+    paths are left untouched.
 
     Unlike fmdl_id_change, the path length changes, so the string block and its
     descriptors are rebuilt instead of being overwritten in place.
 
     Args:
         file_path:   Path to the .fmdl file
-        target_type: The folder the fmdl now lives in ("face" or "boots")
-        model_id:    The correct ID for the new folder
+        target_type: The folder the fmdl now lives in ("face", "boots" or "glove")
+        model_id:    The correct ID for the folder
     """
     if not os.path.exists(file_path):
         return
 
-    if target_type not in ("face", "boots"):
+    target_dir = _model_folder_path(target_type, model_id)
+    if target_dir is None:
         return
 
     fmdl = FmdlContainer()
     fmdl.readFile(file_path)
 
-    # Need block 12 (string descriptors) and segment1 block 3 (string data)
-    if 12 not in fmdl.segment0Blocks or 3 not in fmdl.segment1Blocks:
+    # Need block 12 (string descriptors), segment1 block 3 (string data) and
+    # block 6 (texture definitions, used to tell directory strings apart)
+    if (
+        12 not in fmdl.segment0Blocks
+        or 3 not in fmdl.segment1Blocks
+        or 6 not in fmdl.segment0Blocks
+    ):
         return
 
     # Parse all strings
     strings, string_block = _read_fmdl_strings(fmdl)
 
-    # Convert any cross-folder directory paths
+    # Collect the string indices used as texture directories (block 6 holds
+    # filename_id, directory_id pairs)
+    directory_ids = set()
+    for definition in fmdl.segment0Blocks[6]:
+        (_filename_id, directory_id) = struct.unpack('< H H', definition)
+        if directory_id < len(strings):
+            directory_ids.add(directory_id)
+
+    # Rewrite any directory that isn't a common folder path to the model's own
+    # folder path
     modified = False
-    for i, string in enumerate(strings):
-        converted = _convert_model_folder_path(string, target_type, model_id)
-        if converted is not None and converted != string:
-            logging.debug(f"  {string} -> {converted}")
-            strings[i] = converted
-            modified = True
+    for directory_id in directory_ids:
+        tex_dir = strings[directory_id]
+        if tex_dir.startswith(UNIFORM_COMMON_FOX_PATH) or tex_dir == target_dir:
+            continue
+        logging.debug(f"  {tex_dir} -> {target_dir}")
+        strings[directory_id] = target_dir
+        modified = True
 
     if not modified:
         return
@@ -150,7 +167,7 @@ def fmdl_model_folder_paths_fix(file_path: str, target_type: str, model_id: str)
     _write_fmdl_strings(fmdl, strings, string_block)
 
     fmdl.writeFile(file_path)
-    logging.debug(f"Fixed cross-folder texture paths in: {file_path}")
+    logging.debug(f"Fixed model folder texture paths in: {file_path}")
 
 
 def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
@@ -167,13 +184,16 @@ def fmdl_id_change(file_path: str, model_id: str, team_id: str = ""):
     file_name = os.path.basename(file_path)
     file_folder = os.path.dirname(file_path)
 
-    # If this fmdl was copied between a boots folder and a face folder, its
-    # texture directory paths still point to the original folder type. Fix them
-    # before processing the IDs. (boots <-> face only)
+    # If this fmdl was copied between model folders (face, boots, glove), its
+    # texture directory paths may still point to a different folder type. Fix any
+    # non-common texture paths so they point to this fmdl's own folder before
+    # processing the IDs.
     if re.fullmatch(r'[0-9]{5}', model_id):
         fmdl_model_folder_paths_fix(file_path, "face", model_id)
     elif re.fullmatch(r'k[0-9]{4}', model_id):
         fmdl_model_folder_paths_fix(file_path, "boots", model_id)
+    elif re.fullmatch(r'g[0-9]{4}', model_id):
+        fmdl_model_folder_paths_fix(file_path, "glove", model_id)
 
     file_binary = open(file_path, 'rb')
 

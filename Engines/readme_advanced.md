@@ -386,25 +386,26 @@ of being rejected.
 
 ### Cross-folder texture path fixing
 
-The texture paths stored inside an fmdl point to the folder type the model was
-originally made for, using one of these structures:
-- Boots: `/Assets/pes16/model/character/boots/<id>/`
+A model fmdl should only reference textures from two places: the shared common
+folder, or its own model folder. The own-folder texture paths point to the
+folder type the model was originally made for, using one of these structures:
 - Face: `/Assets/pes16/model/character/face/real/<id>/sourceimages/`
+- Boots: `/Assets/pes16/model/character/boots/<id>/`
+- Glove: `/Assets/pes16/model/character/glove/<id>/`
 
-This means that if you copy an fmdl from a boots folder into a face folder (or
-vice versa), its texture paths would keep pointing to the wrong folder type and
-the textures would fail to load.
+This means that if you copy an fmdl from one model folder into another (for
+example a boots fmdl into a face folder), its texture paths would keep pointing
+to the wrong folder type and the textures would fail to load.
 
-The compiler fixes this automatically. When processing each fmdl, it rewrites
-any texture paths that point to the wrong folder type so they match the folder
-the fmdl now lives in:
-- Boots texture paths found in face folder fmdls become face folder paths.
-- Face texture paths found in boots folder fmdls become boots folder paths.
+The compiler fixes this automatically. When processing each fmdl in a face,
+boots or glove folder, it rewrites every texture directory path that doesn't
+already point to the common folder so it points to the folder the fmdl now
+lives in, with the correct model ID filled in. Common folder paths are left
+untouched.
 
-The correct model ID is filled in as part of the conversion, so you can just
-copy a model across and rename it without editing any paths by hand. This is
-what makes the fcl_hair workflow (copying a boots fmdl into a face folder) work
-out of the box.
+So you can just copy a model across and rename it without editing any paths by
+hand. This is what makes the fcl_hair workflow (copying a boots fmdl into a face
+folder) work out of the box.
 
 
 ## Texture Handling

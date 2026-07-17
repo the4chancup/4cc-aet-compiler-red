@@ -95,7 +95,7 @@ def contents_from_extracted():
             logging.error( "- ERROR - Refs template folder not found")
             logging.error(f"- Folder path: {refs_template_path}")
 
-    if teams_present or sideload_present:
+    if teams_present:
         # Create folders just in case
         faces_folder_path = os.path.join(PATCHES_CONTENTS_PATH, faces_folder_name)
         uniform_folder_path = os.path.join(PATCHES_CONTENTS_PATH, uniform_folder_name)
@@ -131,12 +131,24 @@ def contents_from_extracted():
             shutil.rmtree(EXTRACTED_REFEREES_PATH, onerror=remove_readonly)
 
     if sideload_present:
-        # Copy the contents of the sideload folder to the singlecpk folder
+        # Determine the target folder for the sideload files
+        refs_folder_path = os.path.join(PATCHES_CONTENTS_PATH, refs_folder_name)
+        if not teams_present and os.path.exists(refs_folder_path):
+            # If there's a Refscpk folder but no Singlecpk folder, copy to Refscpk
+            sideload_target_path = refs_folder_path
+        else:
+            # Otherwise, copy to the singlecpk folder
+            sideload_target_path = os.path.join(PATCHES_CONTENTS_PATH, faces_folder_name)
+            os.makedirs(sideload_target_path, exist_ok=True)
+
         print( "-")
-        print(f"- Copying the contents of the {COLORS.DARK_MAGENTA}sideload folder{COLORS.RESET} to the singlecpk folder")
+        print(
+            f"- Copying the contents of the {COLORS.DARK_MAGENTA}sideload folder{COLORS.RESET} "
+            f"to the {os.path.basename(sideload_target_path)} folder"
+        )
         for item in os.listdir(SIDELOAD_PATH):
             src_path = os.path.join(SIDELOAD_PATH, item)
-            dst_path = os.path.join(faces_folder_path, item)
+            dst_path = os.path.join(sideload_target_path, item)
             if os.path.isdir(src_path):
                 shutil.copytree(src_path, dst_path, dirs_exist_ok=True)
             else:

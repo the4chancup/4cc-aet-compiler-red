@@ -21,12 +21,26 @@ from .FILE_INFO import TEXCONV_PATH
 from .pausing import pause
 
 
+def dds_is_bc5(tex_path):
+    four_cc = get_bytes_ascii(tex_path, 84, 4)
+    if four_cc in ("ATI2", "BC5U"):
+        return True
+    if four_cc == "DX10":
+        # dxgiFormat at offset 128 (start of DX10 extension header)
+        # 83 = DXGI_FORMAT_BC5_UNORM
+        if get_bytes_hex(tex_path, 128, 4) == "53000000":
+            return True
+    return False
+
 def dds_dxt5_conv(tex_path):
     tex_folder_path = os.path.dirname(tex_path)
+    tex_format = "DX5nm" if dds_is_bc5(tex_path) else "DXT5"
     if sys.platform == "win32":
         # Convert the texture and store into its parent folder
         file_critical_check(TEXCONV_PATH)
-        texconv_args = [TEXCONV_PATH, "-f", "DXT5", "-nologo", "-srgb", "-y", "-o", tex_folder_path, tex_path]
+        texconv_args = [
+            TEXCONV_PATH, "-f", tex_format, "-nologo", "-srgb", "-y", "-o", tex_folder_path, tex_path
+        ]
         try:
             result = subprocess.run(texconv_args, capture_output=True, text=True)
             if result.returncode != 0:

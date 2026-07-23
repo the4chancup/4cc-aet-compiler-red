@@ -39,15 +39,14 @@ def dds_dxt5_conv(tex_path):
     if sys.platform == "win32":
         # Convert the texture and store into its parent folder
         file_critical_check(TEXCONV_PATH)
+        srgb_args = [] if is_bc5 else ["-srgbi", "-srgbo"]
         texconv_args = [
-            TEXCONV_PATH, "-f", tex_format, "-nologo", "-y", "-o", tex_folder_path, tex_path
+            TEXCONV_PATH, "-f", tex_format, *srgb_args, "-nologo", "-y", "-o", tex_folder_path, tex_path
         ]
-        if not is_bc5:
-            texconv_args.insert(2, "-srgb")
         try:
             result = subprocess.run(texconv_args, capture_output=True, text=True)
             if result.returncode != 0:
-                print("- Error converting the texture: ", result.stderr)
+                print("- Error converting the texture: ", result.stderr or result.stdout)
         except Exception as e:
             print("- Exception converting the texture: ", str(e))
     else:

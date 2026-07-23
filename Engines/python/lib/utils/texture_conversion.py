@@ -34,13 +34,16 @@ def dds_is_bc5(tex_path):
 
 def dds_dxt5_conv(tex_path):
     tex_folder_path = os.path.dirname(tex_path)
-    tex_format = "DX5nm" if dds_is_bc5(tex_path) else "DXT5"
+    is_bc5 = dds_is_bc5(tex_path)
+    tex_format = "DX5nm" if is_bc5 else "DXT5"
     if sys.platform == "win32":
         # Convert the texture and store into its parent folder
         file_critical_check(TEXCONV_PATH)
         texconv_args = [
-            TEXCONV_PATH, "-f", tex_format, "-nologo", "-srgb", "-y", "-o", tex_folder_path, tex_path
+            TEXCONV_PATH, "-f", tex_format, "-nologo", "-y", "-o", tex_folder_path, tex_path
         ]
+        if not is_bc5:
+            texconv_args.insert(2, "-srgb")
         try:
             result = subprocess.run(texconv_args, capture_output=True, text=True)
             if result.returncode != 0:

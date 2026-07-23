@@ -35,18 +35,21 @@ TYPES_LIST = [
 TYPE_DEFAULT = "parts"
 
 
-def find_mtl_file(main_folder_path, model_folder_path, model_file_name_core):
+def find_mtl_file(main_folder_path, model_folder_path, model_file_name_core, common_folder_path=None):
     """
     Find an appropriate .mtl file for a given model file.
 
     Parameters:
         main_folder_path (str): Path to the main model folder (e.g. XXX12)
-        model_folder_path (str): Path to the directory containing the model file (e.g. XXX12/kit3, common)
+        model_folder_path (str): Path to the directory containing the model file or link
         model_file_name_core (str): Core name of the model file (without .model extension)
+        common_folder_path (str, optional): Path to the corresponding folder in Common
+            (where the actual model file lives). Only provided when the model is a common link.
 
     Returns:
-        tuple: (mtl_file_name, mtl_in_model_folder) where mtl_file_name is the filename
-            and mtl_in_model_folder indicates if it's in the model's directory
+        tuple: (mtl_file_name, mtl_source) where mtl_file_name is the filename
+            and mtl_source indicates where it was found: "link_folder", "common_folder",
+            "main_folder", or "fallback"
     """
     def check_mtl_file_name(file_name_raw, model_file_name, match_name=True):
         file_name_resolved_test = resolve_link_to_common(file_name_raw)
@@ -64,30 +67,55 @@ def find_mtl_file(main_folder_path, model_folder_path, model_file_name_core):
             return True
         return False
 
-    # Search in the model's directory first and then in the main model folder
-    for search_folder_path, in_model_folder in [(model_folder_path, True), (main_folder_path, False)]:
+    def search_folder_for_mtl(search_folder_path, matching_only=False):
+        """Search a single folder for an MTL file. Returns filename or None."""
+        if not os.path.isdir(search_folder_path):
+            return None
         file_name_list = [
             f for f in os.listdir(search_folder_path) if
             os.path.isfile(os.path.join(search_folder_path, f))
         ]
-
         # Find matching .mtl file
         for file_name in file_name_list:
             if check_mtl_file_name(file_name, model_file_name_core):
-                return file_name, in_model_folder
-
+                return file_name
+        if matching_only:
+            return None
         # Find a default .mtl file
         for file_name in file_name_list:
             if check_mtl_file_name(file_name, os.path.splitext(MTL_NAME_DEFAULT)[0]):
-                return file_name, in_model_folder
-
+                return file_name
         # Find any .mtl file
         for file_name in file_name_list:
             if check_mtl_file_name(file_name, "", match_name=False):
-                return file_name, in_model_folder
+                return file_name
+        return None
+
+    # When common_folder_path is provided (model is a common link):
+    #   1. Check link's folder for a matching MTL only (override)
+    #   2. If not found, follow usual order: common, link, main
+    if common_folder_path is not None:
+        result = search_folder_for_mtl(model_folder_path, matching_only=True)
+        if result is not None:
+            return result, "link_folder"
+        search_locations = [
+            (common_folder_path, "common_folder"),
+            (model_folder_path, "link_folder"),
+            (main_folder_path, "main_folder"),
+        ]
+    else:
+        search_locations = [
+            (model_folder_path, "link_folder"),
+            (main_folder_path, "main_folder"),
+        ]
+
+    for search_folder_path, source_name in search_locations:
+        result = search_folder_for_mtl(search_folder_path)
+        if result is not None:
+            return result, source_name
 
     # Fall back to default
-    return MTL_NAME_DEFAULT, False
+    return MTL_NAME_DEFAULT, "fallback"
 
 
 def find_model_files_recursive(folder_path):
@@ -159,7 +187,7 @@ def diff_data_decode(folder_path, diff_bin_path_default=None):
     return diff
 
 
-def xml_create(model_folder_path, model_folder_type):
+def xml_create(model_folder_path, model_folder_type, team_id=None):
 
     DIFF_BIN_PATH_DEFAULT = os.path.join("Engines", "templates", f"{DIFF_NAME}.bin")
     file_critical_check(DIFF_BIN_PATH_DEFAULT)
@@ -240,26 +268,43 @@ def xml_create(model_folder_path, model_folder_type):
 
             model_file_path_list.append(model_file_path_xml)
 
-            mtl_file_name_raw, mtl_in_model_file_dir = (
-                find_mtl_file(model_folder_path, model_dir_full, model_file_name_core)
+            # If the model is a common link, compute the common folder path for MTL search
+            # The common folder is always processed before faces/gloves in export_move
+            # (alphabetical ordering of os.listdir on NTFS), so it's already at
+            # extracted/common/XXX/ by the time xml_create is called
+            common_model_dir = None
+            if model_file_name_resolved_test is not None and team_id is not None:
+                extracted_folder_path = os.path.dirname(os.path.dirname(os.path.dirname(model_folder_path)))
+                common_folder_root = os.path.join(extracted_folder_path, "common", team_id)
+                if model_dir_rel:
+                    common_model_dir = os.path.join(common_folder_root, model_dir_rel)
+                else:
+                    common_model_dir = common_folder_root
+                if not os.path.isdir(common_model_dir):
+                    common_model_dir = None
+
+            mtl_file_name_raw, mtl_source = (
+                find_mtl_file(model_folder_path, model_dir_full, model_file_name_core, common_model_dir)
             )
 
-            # Check if the mtl file is a common file
-            mtl_file_name_resolved = resolve_link_to_common(mtl_file_name_raw)
-
-            # Build the mtl path for XML
-            if mtl_file_name_resolved is not None:
+            # Build the mtl path for XML based on where the MTL was found
+            if mtl_source == "common_folder":
                 mtl_base_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/"
-                mtl_file_name = mtl_file_name_resolved
-            else:
-                mtl_base_path = "./"
-                mtl_file_name = mtl_file_name_raw
-
-            # If the mtl file is in the same directory as the model file, use the model directory
-            if mtl_in_model_file_dir:
+                mtl_file_name_resolved = resolve_link_to_common(mtl_file_name_raw)
+                mtl_file_name = mtl_file_name_resolved if mtl_file_name_resolved is not None else mtl_file_name_raw
                 mtl_dir_xml = model_dir_xml
             else:
-                mtl_dir_xml = ""
+                mtl_file_name_resolved = resolve_link_to_common(mtl_file_name_raw)
+                if mtl_file_name_resolved is not None:
+                    mtl_base_path = f"{UNIFORM_COMMON_PREFOX_PATH}XXX/"
+                    mtl_file_name = mtl_file_name_resolved
+                else:
+                    mtl_base_path = "./"
+                    mtl_file_name = mtl_file_name_raw
+                if mtl_source == "link_folder":
+                    mtl_dir_xml = model_dir_xml
+                else:
+                    mtl_dir_xml = ""
 
             mtl_file_name_xml = mtl_file_name
             mtl_file_path_xml = f"{mtl_base_path}{mtl_dir_xml}{mtl_file_name_xml}"

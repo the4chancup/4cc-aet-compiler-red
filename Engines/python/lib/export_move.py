@@ -299,7 +299,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
                     if not os.path.exists(xml_path):
                         # Create the xml file
-                        xml_create(subfolder_path, object_type)
+                        xml_create(subfolder_path, object_type, team_id)
                     # Process the xml file
                     xml_process(xml_path, team_id)
 
@@ -602,7 +602,7 @@ def export_move(exportfolder_path, team_id, team_name):
                     xml_path = os.path.join(subfolder_path, f"{object_type}.xml")
                     if not os.path.exists(xml_path):
                         # Create the xml file
-                        xml_create(subfolder_path, object_type)
+                        xml_create(subfolder_path, object_type, team_id)
                     # Process the xml file
                     xml_process(xml_path, team_id)
 

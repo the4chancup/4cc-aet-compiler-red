@@ -5,6 +5,7 @@ import shutil
 from .fmdl_editing import fmdl_id_change
 from .xml_editing import xml_create
 from .xml_editing import xml_process
+from .xml_editing import update_xml_for_renamed_common_models
 from .bins_update import bytes_from_color_entry
 from .utils.file_management import file_critical_check
 from .utils.texture_conversion import textures_convert
@@ -666,7 +667,11 @@ def export_move(exportfolder_path, team_id, team_name):
                 filenames_id_replace(team_itemfolder_path, team_id)
 
                 # Add oral_ and _win32 to any lacking model file names found in the folder
-                model_names_fix(team_itemfolder_path)
+                renamed_models = model_names_fix(team_itemfolder_path)
+
+                # Update any face xml files that reference the renamed common
+                # models by explicit paths, so the paths stay in sync
+                update_xml_for_renamed_common_models(exportfolder_path, renamed_models)
 
                 # Move everything to the team folder inside the main folder
                 for file in os.listdir(team_itemfolder_path):

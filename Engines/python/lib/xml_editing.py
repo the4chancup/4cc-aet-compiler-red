@@ -399,6 +399,83 @@ def xml_create(model_folder_path, model_folder_type, team_id=None):
     return
 
 
+def _update_single_xml_common_paths(xml_path, renamed_models):
+    """Update common-folder model paths in a single xml file."""
+
+    try:
+        tree = ET.parse(xml_path)
+    except ET.ParseError:
+        return
+
+    root = tree.getroot()
+    modified = False
+
+    for model in root.findall('model'):
+        model_path = model.get('path', '')
+
+        # Only update paths that point to the uniform common folder
+        if not model_path.startswith(UNIFORM_COMMON_PREFOX_PATH):
+            continue
+
+        # Extract the filename from the path
+        model_filename = model_path.split('/')[-1]
+        model_name_noext = os.path.splitext(model_filename)[0]
+
+        # Strip a trailing _win32 or _* suffix to get the core name
+        core_name = model_name_noext
+        if core_name.endswith('_win32'):
+            core_name = core_name[:-6]
+        elif core_name.endswith('_*'):
+            core_name = core_name[:-2]
+
+        if core_name not in renamed_models:
+            continue
+
+        # Build the new filename, using * instead of win32 (xml convention)
+        new_name_xml = renamed_models[core_name].replace('win32', '*')
+        new_filename = f"{new_name_xml}.model"
+
+        path_parts = model_path.split('/')
+        path_parts[-1] = new_filename
+        model.set('path', '/'.join(path_parts))
+        modified = True
+
+    if modified:
+        tree.write(xml_path, encoding='UTF-8', xml_declaration=True)
+
+
+def update_xml_for_renamed_common_models(exportfolder_path, renamed_models):
+    """
+    Update model paths in face xml files to reflect renamed common model files.
+
+    When model files in the Common folder are renamed (e.g. male_base.model ->
+    oral_male_base_win32.model), face xml files that reference those models by
+    explicit common-folder paths need to be updated to match, otherwise the
+    models won't be found in game.
+
+    Only paths pointing to the uniform common folder are considered. The
+    ``_win32`` suffix in the new filename is converted to ``_*`` in the xml
+    path, following the same convention used by xml_create.
+
+    Parameters:
+        exportfolder_path (str): Path to the team's export folder
+        renamed_models (dict): Mapping of old basename (without extension) to
+            new basename (without extension), as returned by model_names_fix
+    """
+    if not renamed_models:
+        return
+
+    # Look for xml files in all model folders
+    for folder_name in ("Faces", "Boots", "Gloves"):
+        folder_path = os.path.join(exportfolder_path, folder_name)
+        if not os.path.isdir(folder_path):
+            continue
+
+        for root, dirs, files in os.walk(folder_path):
+            for xml_file in [f for f in files if f.endswith(".xml")]:
+                _update_single_xml_common_paths(os.path.join(root, xml_file), renamed_models)
+
+
 def xml_process(xml_path, team_id):
     """
     Process a face xml file by updating IDs and merging any existing face_diff data.

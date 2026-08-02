@@ -1,3 +1,11 @@
+xx/08/26 - Version 4.x.x
+- Fixes
+  - Fixed players missing models when their face folder had an xml which loaded
+    them from the Common folder and the models didn't have the oral_ _win32
+    parts. The paths in the face xmls are updated to match the filenames with
+    the added parts.
+
+
 04/06/26 - Version 4.3.1
 - Useful
   - Extended the automatic fmdl texture path fixing to glove folders and

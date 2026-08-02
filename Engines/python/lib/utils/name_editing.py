@@ -80,7 +80,13 @@ def resolve_link_to_common(file_name):
 
 
 def model_names_fix(folder_path, include_subfolders=True):
-    '''Add "oral_" and "_win32" to any model names found in the folder and its subfolders'''
+    '''Add "oral_" and "_win32" to any model names found in the folder and its subfolders.
+
+    Returns a dict mapping the old basename (without extension) to the new
+    basename (without extension) for every file that was renamed.
+    '''
+
+    renamed = {}
 
     for file_name in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file_name)
@@ -93,18 +99,22 @@ def model_names_fix(folder_path, include_subfolders=True):
         if file_name_noext.startswith("oral_") and file_name_noext.endswith("_win32"):
             continue
 
-        file_path_new = os.path.join(folder_path, f"oral_{file_name_noext}_win32.model")
+        new_name_noext = f"oral_{file_name_noext}_win32"
+        file_path_new = os.path.join(folder_path, f"{new_name_noext}.model")
         if os.path.exists(file_path_new):
             os.remove(file_path_new)
         os.rename(file_path, file_path_new)
+        renamed[file_name_noext] = new_name_noext
 
     if not include_subfolders:
-        return
+        return renamed
 
     for subfolder_name in os.listdir(folder_path):
         subfolder_path = os.path.join(folder_path, subfolder_name)
         if os.path.isdir(subfolder_path):
-            model_names_fix(subfolder_path, include_subfolders)
+            renamed.update(model_names_fix(subfolder_path, include_subfolders))
+
+    return renamed
 
 
 def filenames_id_replace(folder_path, team_id, include_subfolders=True):

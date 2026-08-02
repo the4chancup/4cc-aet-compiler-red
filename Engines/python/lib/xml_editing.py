@@ -57,11 +57,13 @@ def find_mtl_file(main_folder_path, model_folder_path, model_file_name_core, com
             file_name = file_name_resolved_test.lower()
         else:
             file_name = file_name_raw.lower()
-        # Check if the file is an MTL file and if the model name starts with the file name
+        # Check if the file is an MTL file and if the model name starts or ends with the file name
+        mtl_name_noext = os.path.splitext(file_name)[0]
         if (
             file_name.endswith(".mtl")
         ) and (
-            model_file_name.startswith(os.path.splitext(file_name)[0]) or
+            model_file_name.startswith(mtl_name_noext) or
+            model_file_name.endswith(mtl_name_noext) or
             not match_name
         ):
             return True
@@ -306,7 +308,7 @@ def xml_create(model_folder_path, model_folder_type, team_id=None):
                 else:
                     mtl_dir_xml = ""
 
-            mtl_file_name_xml = mtl_file_name
+            mtl_file_name_xml = normalize_kit_dependent_file(mtl_file_name)
             mtl_file_path_xml = f"{mtl_base_path}{mtl_dir_xml}{mtl_file_name_xml}"
 
             # Check if any of the types in the list are in the start of the model name's core

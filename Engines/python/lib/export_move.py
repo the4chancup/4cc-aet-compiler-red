@@ -6,6 +6,7 @@ from .fmdl_editing import fmdl_id_change
 from .xml_editing import xml_create
 from .xml_editing import xml_process
 from .xml_editing import update_xml_for_renamed_common_models
+from .xml_editing import diff_xml_to_bin
 from .bins_update import bytes_from_color_entry
 from .utils.file_management import file_critical_check
 from .utils.texture_conversion import textures_convert
@@ -273,6 +274,9 @@ def export_move(exportfolder_path, team_id, team_name):
                     # Change the texture IDs inside each fmdl file
                     for fmdl_file in [f for f in os.listdir(subfolder_path) if f.endswith(".fmdl")]:
                         fmdl_id_change(os.path.join(subfolder_path, fmdl_file), subfolder_id, team_id)
+
+                    # If a face_diff.xml is present, convert it to face_diff.bin
+                    diff_xml_to_bin(subfolder_path)
 
                     # If the face_diff.bin doesn't exist, copy the template one
                     face_diff_path = os.path.join(subfolder_path, FACE_DIFF_BIN_NAME)

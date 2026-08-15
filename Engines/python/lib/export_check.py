@@ -203,6 +203,13 @@ def faces_check(exportfolder_path, team_name, team_id):
             elif os.path.isfile(face_diff_xml_path):
                 folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
 
+        else:
+            # In fox mode, a face_diff.xml will be converted to face_diff.bin
+            # during export_move, so validate it here as well
+            face_diff_xml_path = os.path.join(subfolder_path, "face_diff.xml")
+            if os.path.isfile(face_diff_xml_path):
+                folder_error_xml_format = face_diff_xml_check(face_diff_xml_path)
+
         # Check every texture
         for file_path_rel in get_files_list(subfolder_path):
             file_path = os.path.join(subfolder_path, file_path_rel)

@@ -1,6 +1,7 @@
 import os
 import copy
 import base64
+import logging
 import xml.etree.ElementTree as ET
 
 from .utils.file_management import file_critical_check
@@ -11,6 +12,7 @@ from .utils.name_editing import (
     resolve_link_to_common,
     txt_id_change,
 )
+from .utils.zlib_plus import unzlib_file
 from .utils.FILE_INFO import UNIFORM_COMMON_PREFOX_PATH
 
 
@@ -187,6 +189,97 @@ def diff_data_decode(folder_path, diff_bin_path_default=None):
             os.remove(diff_bin_path)
 
     return diff
+
+
+def diff_xml_to_bin(folder_path):
+    """
+    Converts a face_diff.xml file in the given folder to a face_diff.bin file.
+
+    This is used in fox mode, where face_diff.bin is the expected format. The
+    face_diff.xml file must contain a <dif> element with base64-encoded binary
+    data as its text content, which is the same encoding that diff_data_decode
+    produces when reading a .bin file, and that diff_from_xml produces when
+    extracting the dif block from a face.xml.
+
+    If a face_diff.bin already exists in the folder, it takes priority and the
+    face_diff.xml is left untouched (mirroring the bin-first priority of
+    diff_data_decode).
+
+    After a successful conversion, the face_diff.xml file is deleted.
+
+    Parameters:
+        folder_path (str): Path to the folder containing the face_diff.xml file
+
+    Returns:
+        bool: True if a face_diff.xml was found (regardless of whether the
+            conversion succeeded), False if no face_diff.xml was present
+    """
+    diff_xml_path = os.path.join(folder_path, f"{DIFF_NAME}.xml")
+    diff_bin_path = os.path.join(folder_path, f"{DIFF_NAME}.bin")
+
+    if not os.path.isfile(diff_xml_path):
+        return False
+
+    # A face_diff.bin already takes priority, leave the xml alone
+    if os.path.isfile(diff_bin_path):
+        return True
+
+    folder_name = os.path.basename(folder_path)
+
+    # Unzlib the file in-place if needed
+    unzlib_file(diff_xml_path)
+
+    # Parse the XML
+    try:
+        tree = ET.parse(diff_xml_path)
+    except ET.ParseError as e:
+        logging.error("-")
+        logging.error("- ERROR - Could not convert face_diff.xml to face_diff.bin")
+        logging.error(f"- Folder:         {folder_name}")
+        logging.error(f"- Issue:          Invalid XML: {e}")
+        return True
+
+    root = tree.getroot()
+
+    # Check that the root tag is 'dif'
+    if root.tag != 'dif':
+        logging.error("-")
+        logging.error("- ERROR - Could not convert face_diff.xml to face_diff.bin")
+        logging.error(f"- Folder:         {folder_name}")
+        logging.error(f"- Root tag:       <{root.tag}>")
+        logging.error("- Must be:        <dif>")
+        return True
+
+    # The dif element must contain base64-encoded binary as its text content
+    text = (root.text or "").strip()
+
+    if not text:
+        # The dif element has no text content - it likely has structured XML
+        # children, which cannot be converted to the binary format
+        logging.error("-")
+        logging.error("- ERROR - Could not convert face_diff.xml to face_diff.bin")
+        logging.error(f"- Folder:         {folder_name}")
+        logging.error("- The <dif> element has no base64 text content to decode.")
+        logging.error("- Structured XML diff data cannot be converted to the binary format.")
+        return True
+
+    try:
+        bin_data = base64.b64decode(text)
+    except Exception as e:
+        logging.error("-")
+        logging.error("- ERROR - Could not convert face_diff.xml to face_diff.bin")
+        logging.error(f"- Folder:         {folder_name}")
+        logging.error(f"- Issue:          Invalid base64 data: {e}")
+        return True
+
+    # Write the decoded binary data to face_diff.bin
+    with open(diff_bin_path, 'wb') as f:
+        f.write(bin_data)
+
+    # Delete the face_diff.xml file
+    os.remove(diff_xml_path)
+
+    return True
 
 
 def xml_create(model_folder_path, model_folder_type, team_id=None):

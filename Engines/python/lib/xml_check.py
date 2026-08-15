@@ -1,5 +1,6 @@
 import os
 import re
+import base64
 import logging
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
@@ -15,6 +16,7 @@ from .utils.pausing import pause
 from .utils.FILE_INFO import (
     UNIFORM_COMMON_PREFOX_PATH,
 )
+from .utils.diff_data import diff_bin_validate, diff_xml_extract_text
 
 
 def type_string_get(listed_file_type):
@@ -211,6 +213,10 @@ def face_diff_xml_check(xml_path):
     """
     Checks the given face_diff.xml file.
 
+    This validates both the XML structure (or plain base64 text) and the
+    decoded binary data (FACE magic, length), using the same helpers as the
+    pre-fox and fox-mode conversion routes.
+
     Parameters:
         xml_path (str): The path to the .xml file.
 
@@ -223,37 +229,41 @@ def face_diff_xml_check(xml_path):
     xml_folder_path = os.path.dirname(xml_path)
     xml_folder_name = os.path.basename(xml_folder_path)
 
-    # Try to unzlib the file
-    unzlib_file(xml_path)
-
-    # Parse the file
-    try:
-        tree = ET.parse(xml_path)
-    except ET.ParseError as e:
-
-        error_string = xml.parsers.expat.ErrorString(e.code)
-        line, column = e.position
-        logging.error( "-")
-        logging.error( "- ERROR - Invalid .xml file")
+    # Extract base64 text from the file (handles both <dif> XML and plain base64)
+    text, error = diff_xml_extract_text(xml_path)
+    if error:
+        logging.error("-")
+        logging.error("- ERROR - Invalid face_diff.xml")
         logging.error(f"- Folder:         {xml_folder_name}")
         logging.error(f"- xml name:       {xml_name}")
-        logging.error(f"- Issue:          \"{error_string}\"")
-        logging.error(f"- Location:       At or before line {line}, column {column}")
+        logging.error(f"- Issue:          {error}")
 
         pause()
 
         return True
 
-    root = tree.getroot()
-
-    # Check that the root tag is 'dif'
-    if root.tag != 'dif':
-        logging.error( "-")
-        logging.error( "- ERROR - Invalid root tag on the second line")
+    # Decode the base64 text
+    try:
+        bin_data = base64.b64decode(text)
+    except Exception as e:
+        logging.error("-")
+        logging.error("- ERROR - Invalid face_diff.xml")
         logging.error(f"- Folder:         {xml_folder_name}")
         logging.error(f"- xml name:       {xml_name}")
-        logging.error(f"- Root tag:       <{root.tag}>")
-        logging.error( "- Must be:        <dif>")
+        logging.error(f"- Issue:          Invalid base64 data: {e}")
+
+        pause()
+
+        return True
+
+    # Validate the binary data
+    valid, validation_error = diff_bin_validate(bin_data)
+    if not valid:
+        logging.error("-")
+        logging.error("- ERROR - Invalid face_diff.xml")
+        logging.error(f"- Folder:         {xml_folder_name}")
+        logging.error(f"- xml name:       {xml_name}")
+        logging.error(f"- Issue:          {validation_error}")
 
         pause()
 

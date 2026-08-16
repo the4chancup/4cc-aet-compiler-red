@@ -1,9 +1,26 @@
-xx/08/26 - Version 4.x.x
+16/08/26 - Version 4.4.0
+- Useful
+  - The xml generator now applies kit normalization to mtl paths in generated
+    face xmls, so kit-dependent mtls (e.g. u0884p1.mtl) are written with the
+    normalized p0 ID (e.g. u0884p0.mtl). This allows using separate MTL files
+    on kit-dependent models.
+  - The XML generator's mtl matching now checks both the start and end of the
+    model filenames instead of only the start, so mtls named with the kit ID
+    are found correctly as matches for models which have the kit ID as suffix.
+    (e.g. u0884p1.mtl matches hand_l_u0884p1.model)
+  - face_diff xml files are now also accepted on Fox PES versions, and get
+    converted to a face_diff bin during compilation.
+  - face_diff xml files can now contain just the base64 string with no <dif>
+    tags, or maintain the existing format with tags.
 - Fixes
   - Fixed players missing models when their face folder had an xml which loaded
     them from the Common folder and the models didn't have the oral_ _win32
     parts. The paths in the face xmls are updated to match the filenames with
     the added parts.
+- New checks
+  - face_diff xml and bin files are now validated (FACE magic string and length
+    are checked) during the export check. Invalid files give an Error and the
+    face folder is discarded.
 
 
 04/06/26 - Version 4.3.1

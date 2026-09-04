@@ -7,6 +7,12 @@ Make sure to also read the settings file for further customization options.
 - Compiling Referees
   - ref_marker File
   - refs.txt Template
+- Pre-Studio Format (Preview)
+  - Player Folders and Roster
+  - Shared Folders and Link Files
+  - Kits Folder
+  - Boots/Gloves IDs and the Savefile
+  - The Export Upgrader
 - First Run Wizard
 - Scripts
   - 1_exports_to_extracted
@@ -33,8 +39,8 @@ Make sure to also read the settings file for further customization options.
 
 
 ## Compiling Referees
-You first need a "refs export", which follows the next-generation format that
-will be introduced in the future for team exports.
+You first need a "refs export", which uses the same unified player-folder format
+that team exports can now also use (see the "Pre-Studio Format" section below).
 Here's an example:
 
 refs  
@@ -61,6 +67,10 @@ This allows each ref folder to be modular and independent of the others.
 
 The refs.txt file must list the refs in the format "[slot number] [ref name]".  
 See the next paragraph for an example.
+
+Alternatively, the export can use a "players.txt" file (same grammar) with flat
+player folders holding all of the ref's files together, exactly like team
+exports in the Pre-Studio format. The two roster files are mutually exclusive.
 
 Once the compiler recognizes a refs export, it first preprocesses each referee
 folder by automatically moving textures and models to common subfolders named
@@ -117,6 +127,97 @@ If you don't need to update the marker texture, it's better to avoid including
 the ref_marker.dds file in the export folder.
 
 
+## Pre-Studio Format (Preview)
+
+Team exports can use a new format where all of a player's models live in one
+flat folder (Players/01 - Name/) instead of being split across Faces/, Boots/
+and Gloves/. The old format keeps working unchanged, and both can be mixed in
+the same compilation run. The export-format view is in the "Pre-Studio format
+(preview)" section of info/AET.wikitext; this section describes how the
+compiler processes it.
+
+Internally, the compiler normalizes a Players/ export into the old item-folder
+layout right after extraction (a generalized version of the referee
+preprocessing), and then runs the exact same pipeline as any other export.
+Everything downstream (XML creation, FMDL ID rewriting, texture conversion,
+packing, checks) behaves identically.
+
+### Player Folders and Roster
+
+Each folder in the Players folder is one player. The slot comes from the
+folder name's number ("01 - Messi") or, when a players.txt roster file is
+present, solely from the roster line ("01 Messi"), which is authoritative and
+can also map one folder to several slots. Roster entries match folders by
+their name part: the folder's optional "NN - " number prefix is stripped
+before matching, so "04 Messi" matches both a "Messi" and an "11 - Messi"
+folder.
+
+Portraits are taken from the player folders (one per slot, named
+player_<team id><slot>.dds) and moved to the Portraits folder automatically.
+
+### Shared Folders and Link Files
+
+Root Faces/, Boots/ and Gloves/ folders in a Players/ export are shared-folder
+sources: they are never compiled on their own, but copied into every player
+folder that references them through an empty link file ("<name>.face",
+"<name>.boots" or "<name>.gloves", a stray ".txt" suffix is accepted). The
+link's name matches the shared folder's name with or without its ID prefix
+("Crocs.boots" links "Boots/Crocs" and "Boots/k0101 - Crocs" alike).
+
+On file name collisions between the shared content and the player's own
+files, identical files are deduplicated; different files make the whole
+shared folder compile as the player's own separate ID-based boots/gloves
+folder instead of being merged in (so two same-named textures can coexist).
+A colliding face link discards the player folder.
+
+### Texture Relocation
+
+All of a player's textures are moved to a per-player Common subfolder (keyed
+by the folder's name part) on both Fox and pre-Fox versions, and the model
+files' texture paths are rewritten to match. Textures shared by a player's face
+and boots are packed once.
+
+### Boots/Gloves IDs and the Savefile
+
+Boots and gloves IDs are assigned automatically from the team's MinBootsID/MaxBootsID
+range in teams_list.txt (MinBootsID + player number - 1), replacing the
+hand-picked IDs of the old format. Since the compiler never edits savefiles,
+<u>the assigned IDs must be set in the savefile with 4ccEditor</u>; the IDs
+are deterministic, so recompiling the same export always yields the same
+assignment.
+
+teams_list.txt is now a tab-separated list with ID, Name, MinBootsID and MaxBootsID
+columns. Old space-separated lists are rejected by this version: adopt the
+new list when the updater offers it (ranges must be deliberate, so there is
+no automatic migration). Teams added interactively are written without a
+range on purpose; add the range manually when the team needs boots/gloves.
+
+### Kits Folder
+
+A Kits/ folder with p1-p9 and g1 subfolders replaces the old Kit Configs and
+Kit Textures folders: each subfolder holds the kit config as a binary
+config.bin (the old XXX_DEF_<kit>_realUni.bin content) and textures with the
+generic "kit" prefix (kit.dds, kit_mask.dds, ...). Missing configs are still
+auto-filled from the Note txt, and the root Kit Configs/Kit Textures folders
+can still be used alongside (a kit slot defined in both places discards the
+export).
+
+### The Export Upgrader
+
+The upgrade_exports.bat script converts old-format exports into the new
+format. Place the exports in exports_to_upgrade/ and the cup's current
+EDIT00000000 savefile (PES 19 or 21, auto-detected) in the compiler's folder;
+the upgraded exports land in exports_upgraded/.
+
+The upgrader reads each player's boots/gloves IDs from the savefile and
+builds the player folders: single-wearer boots/gloves folders are merged into
+their player's folder, folders worn by several players are kept as shared
+folders + link files, folders worn by nobody are moved to Other/, and the kit
+folders are mapped back to the Kits/ layout. It also prints each player's
+savefile IDs next to the new range, since the savefile must be updated to the
+new IDs for the models to show up in-game. Referee exports are not upgraded.
+
+
 ## First Run Wizard
 
 The first time you run the compiler, a first run wizard will guide you through
@@ -146,12 +247,15 @@ in the settings file.
 
 Here's a list of the stuff that the script checks after extracting an export,
 before moving its content into folders shared by all the teams:
+- Checks that the teams list file uses the tab-separated format (ID, Name,
+  MinBootsID, MaxBootsID); old space-separated lists are rejected.
 - Checks that the team name is in the "teams_list" file (if there's none, it
   uses the first word on the export's folder name as team name), and looks for
   the team name on the "teams_list" txt, to find the corresponding team ID.
 - Checks for nested folders with repeated names (e.g. GD export/Faces/Faces),
   excluding the "Other" or "Common" folder, and tries to fix them by moving the
-  folders down by one layer.
+  folders down by one layer. This fix now also runs before the new-format
+  processing, so Players/Players/ exports are fixed in time.
 - Checks that the 4th and 5th characters of each face folder is in the 01-23
   range for player numbers.
 - Checks that none of the face folders have the unsupported "face_edithair.xml"
@@ -201,6 +305,12 @@ step) reminding you to check the teamnotes.txt file.
 Note: you can pass the "--no-pause" argument to compiler_main.py to disable all
 pausing regardless of the "pause_allow" setting. This is mainly useful for
 automated testing and unattended runs.
+
+Exports using the Pre-Studio format (a Players folder, and optionally a Kits
+folder) are normalized into the old item-folder layout at this stage, before
+the checks run on the resulting folders (see the "Pre-Studio Format"
+section). The checks and the ID replacement then run on the produced folders
+exactly as they do for old-format exports.
 
 Use this script on its own if you only want to check the exports for
 correctness and/or prepare the "extracted" folders for the next step.
@@ -579,6 +689,8 @@ List:
 - No texture paths with IDs found in .fmdl
 - Converting texture failed (2.04 or BC7)
 - No face folder found for referee
+- Unreferenced shared folder in a Players export (it will be dropped)
+- Unexpected file in a kit folder (it will be dropped)
 
 ### Error
 
@@ -638,6 +750,22 @@ List:
 - Refs.txt not found in referee export
 - No valid entries found in Refs.txt
 - Referee folder listed in Refs.txt not found in Players folder
+- Bad players roster (duplicate slot, entry matching more than one folder,
+  or two folders sharing the same name part)
+- players.txt slot outside the allowed range (slot skipped)
+- players.txt lists a folder that does not exist (slot skipped)
+- Unnumbered or unlisted folder in the Players folder (folder discarded)
+- Link file points to a shared folder that does not exist (player folder discarded)
+- Link file matches more than one shared folder (player folder discarded)
+- Face link present in an ingame_face player folder (player folder discarded)
+- ingame_face marker present alongside face content (player folder discarded)
+- Conflicting file names between a shared folder and a player folder
+  (the shared folder compiles as a separate ID-based folder instead)
+- No boots/gloves ID range found for the team in teams_list
+  (the export's boots/gloves folders are discarded)
+- Boots/gloves ID outside the team's range (that player's folders are discarded)
+- Invalid kit slot folder name (kit discarded)
+- Kit slot defined both in the Kits folder and in the root kit folders
 
 ### Fatal Error
 
@@ -652,6 +780,8 @@ List:
 - Missing settings file
 - Missing required settings in settings file
 - Invalid PES version selected
+- Unsupported teams list file (the tab-separated format with ID ranges is required)
+- Malformed row in the teams list file
 - PES download folder not found
 - DpFileList not found in PES download folder
 - CPK name not listed on DpFileList (when Move Cpks is enabled)
@@ -716,8 +846,9 @@ If an update is available, a Notice will be shown with the following options:
 During a major update, the settings file may be overhauled. The compiler will
 transfer your settings to the new format automatically, and will show you which
 settings were added, removed, or renamed. If the teams list has changed, a
-side-by-side diff will be shown so you can choose whether to keep your current
-list or use the new one.
+side-by-side diff will be shown and the new list is adopted: old
+(space-separated) lists are no longer supported by this version, and ranges
+must be deliberate, so there is no option to keep an old list.
 
 The old compiler folder is always preserved after an update, so you can go back
 to it if you find any issues with the new version.

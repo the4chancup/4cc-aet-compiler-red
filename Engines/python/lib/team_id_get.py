@@ -1,10 +1,72 @@
 import os
 import shutil
 import logging
+import sys
 
 from .utils.file_management import file_critical_check
 from .utils.pausing import pause
 from .utils.FILE_INFO import TEAMS_LIST_PATH
+
+
+TEAMS_LIST_HEADER = "ID\tName\tMinBootsID\tMaxBootsID"
+
+
+def teams_list_validate():
+    """Reject old-format (space-separated) teams lists.
+
+    The compiler requires the TSV format with the boots/gloves ID range columns.
+    Exits the program on an unsupported list, since no export can be compiled
+    without a valid one.
+    """
+
+    with open(TEAMS_LIST_PATH, 'r', encoding="utf8") as f:
+        lines = f.readlines()
+
+    if lines and lines[0].rstrip("\r\n") != TEAMS_LIST_HEADER:
+        logging.critical( "-")
+        logging.critical( "- FATAL ERROR - Unsupported teams list file")
+        logging.critical(f"- The file \"{TEAMS_LIST_PATH}\" uses the old space-separated format")
+        logging.critical( "- This version requires the tab-separated format with ID ranges:")
+        logging.critical( "- ID\tName\tMinBootsID\tMaxBootsID")
+        print( "-")
+        print( "- Please update your teams_list.txt (see the release notes)")
+
+        pause(force=True)
+
+        sys.exit()
+
+    for line in lines[1:]:
+        if line.strip() and len(line.rstrip("\r\n").split('\t')) < 2:
+            logging.critical( "-")
+            logging.critical( "- FATAL ERROR - Malformed teams list file")
+            logging.critical(f"- The file \"{TEAMS_LIST_PATH}\" has a row without an ID and a name column")
+            print( "-")
+            print( "- The program will now close")
+
+            pause(force=True)
+
+            sys.exit()
+
+
+def teams_list_range_get(team_id):
+    """Get the boots/gloves ID range of a team as (min_id, max_id).
+
+    Returns None when the team has no row or the row carries no usable range
+    (newly added teams are written rangeless on purpose).
+    """
+
+    with open(TEAMS_LIST_PATH, 'r', encoding="utf8") as f:
+        for line in f.readlines()[1:]:
+            parts = line.rstrip("\r\n").split('\t')
+            if len(parts) < 4:
+                continue
+            if parts[0] == team_id:
+                try:
+                    return int(parts[2]), int(parts[3])
+                except ValueError:
+                    return None
+
+    return None
 
 
 def id_search(team_name):
@@ -36,15 +98,18 @@ def export_files_present(directory_path: str) -> bool:
         os.path.exists(f"{directory_path}/Collars"),
         os.path.exists(f"{directory_path}/Logo"),
         os.path.exists(f"{directory_path}/Common"),
-        os.path.exists(f"{directory_path}/Other")
+        os.path.exists(f"{directory_path}/Other"),
+        os.path.exists(f"{directory_path}/Players"),
+        os.path.exists(f"{directory_path}/Kits"),
     ])
 
 
 # Function for finding the team ID after receiving the foldername as parameter
 def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_max):
 
-    # Check if the teams list file exists
+    # Check if the teams list file exists and uses the supported format
     file_critical_check(TEAMS_LIST_PATH)
+    teams_list_validate()
 
     root_found = None
     not_root = None
@@ -167,8 +232,9 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
             # Search for the line with the team ID on the list of team names and print it
             with open(TEAMS_LIST_PATH, 'r', encoding="utf8") as f:
                 for line in f.readlines()[1:]:
-                    if line.split()[0] == team_id_new:
-                        team_name_old = ' '.join(line.split()[1:])
+                    parts = line.rstrip("\r\n").split('\t')
+                    if parts and parts[0] == team_id_new:
+                        team_name_old = parts[1] if len(parts) > 1 else ""
                         print(f"- Team ID {team_id_new} is already in use by {team_name_old}")
                         response = input("- Do you want to overwrite it? (Enter to confirm, \"no\" to try again): ")
                         break
@@ -178,15 +244,20 @@ def team_id_get(exportfolder_path, team_name_folder: str, team_id_min, team_id_m
             if response.strip().lower() == "no":
                 continue
 
-            # Add the new team ID to teams_list.txt
+            # Add the new team ID to teams_list.txt, replacing only the name column
+            # when the line already carries an ID range
             with open(TEAMS_LIST_PATH, 'r+', encoding="utf8") as f:
                 lines = f.readlines()
                 for i, line in enumerate(lines):
-                    if line.startswith(f"{team_id_new} "):
-                        lines[i] = f"{team_id_new} {team_name}\n"
+                    parts = line.rstrip("\r\n").split('\t')
+                    if parts and parts[0] == team_id_new:
+                        if len(parts) >= 4:
+                            lines[i] = f"{team_id_new}\t{team_name}\t{parts[2]}\t{parts[3]}\n"
+                        else:
+                            lines[i] = f"{team_id_new}\t{team_name}\n"
                         break
                 else:
-                    lines.append(f"{team_id_new} {team_name}\n")
+                    lines.append(f"{team_id_new}\t{team_name}\n")
                 f.seek(0)
                 f.writelines(lines)
                 f.truncate()

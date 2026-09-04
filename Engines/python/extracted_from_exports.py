@@ -8,6 +8,8 @@ import logging
 from .lib.dummy_kit_replace import dummy_kits_replace
 from .lib.export_check import export_check
 from .lib.export_move import export_move
+from .lib.export_check import nested_folders_fix
+from .lib.players_process import kits_process, players_process
 from .lib.portraits_move import portraits_move
 from .lib.referee_tools import referee_export_process
 from .lib.team_id_get import team_id_get
@@ -206,7 +208,7 @@ def extracted_from_exports():
             refs_error = referee_export_process(export_destination_path, fox_mode)
 
             if refs_error:
-                os.remove(export_destination_path)
+                shutil.rmtree(export_destination_path, onerror=remove_readonly)
                 continue
 
         else:
@@ -218,6 +220,26 @@ def extracted_from_exports():
         # If the teamID was not found, proceed to the next export
         if not team_id:
             continue
+
+        # Fix nested folders before the new-format processing (moved here from
+        # export_check so Players/Players/ is fixed in time)
+        nested_folders_fix(export_destination_path, team_name)
+
+        # Convert a Players/ export into the item-folder layout
+        if os.path.exists(os.path.join(export_destination_path, "Players")):
+            players_deleted = players_process(export_destination_path, team_id, team_name, fox_mode)
+
+            # If the export was discarded, proceed to the next export
+            if players_deleted:
+                continue
+
+        # Convert a Kits/ folder into the item-folder kit layout
+        if os.path.exists(os.path.join(export_destination_path, "Kits")):
+            kits_deleted = kits_process(export_destination_path)
+
+            # If the export was discarded, proceed to the next export
+            if kits_deleted:
+                continue
 
         # If the export has a Faces folder
         if os.path.exists(os.path.join(export_destination_path, "Faces")):

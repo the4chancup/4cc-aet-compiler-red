@@ -1120,7 +1120,6 @@ def export_check(exportfolder_path, team_name, team_id):
     global pass_through
     pass_through = int(os.environ.get('PASS_THROUGH', '0'))
 
-    nested_folders_fix(exportfolder_path, team_name)
     faces_check(exportfolder_path, team_name, team_id)
     kitconfigs_check(exportfolder_path, team_name)
     kittextures_check(exportfolder_path, team_name)

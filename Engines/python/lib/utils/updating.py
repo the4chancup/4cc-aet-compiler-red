@@ -282,6 +282,10 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
 
         print("-")
         print("- A new Teams list is available in the new version")
+        if update_major:
+            print("- The new list replaces the current one")
+        else:
+            print("- The new list will be used if you choose to update")
 
         pause("Press any key to see the differences... ", force=True)
 
@@ -294,18 +298,21 @@ def update_get(app_owner, app_name, version_latest, update_major=False):
                 title_right="New list",
             )
 
-        while True:
-            response = input("Type \"n\" to use the new list, or just press Enter to keep the current one... ")
+        if update_major:
+            pause("Press any key to replace the current list with the new one... ", force=True)
+        else:
+            while True:
+                response = input("Type \"n\" to use the new list, or just press Enter to keep the current one... ")
 
-            if response.lower().replace("\"", "") == "n":
-                break
-            elif response == "":
-                if os.path.exists(teams_list_new_path):
-                    os.remove(teams_list_new_path)
-                shutil.copy(TEAMS_LIST_PATH, app_new_folder)
-                break
-            else:
-                print("- Invalid response, please try again")
+                if response.lower().replace("\"", "") == "n":
+                    break
+                elif response == "":
+                    if os.path.exists(teams_list_new_path):
+                        os.remove(teams_list_new_path)
+                    shutil.copy(TEAMS_LIST_PATH, app_new_folder)
+                    break
+                else:
+                    print("- Invalid response, please try again")
 
     # Move the contents of the exports_to_add folder to the new folder
     exports_moved = None

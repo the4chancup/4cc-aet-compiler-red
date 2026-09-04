@@ -327,16 +327,18 @@ def move_models_to_common(ref_folder_path, model_folder_name):
     return model_files
 
 
-def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
+def ref_folder_preprocess(ref_folder_path, common_files, fox_mode, common_name=None):
     """Preprocess a referee folder by moving textures to common subfolders and updating paths.
 
     Args:
         ref_folder_path: Path to the referee's source folder
         common_files: List of files that are in the export's Common folder
         fox_mode: Whether fox mode is enabled
+        common_name: Name used for the folder's common subfolder in the rewritten
+            paths (defaults to the folder's own name)
     """
     pes_version = int(os.environ.get('PES_VERSION', '19'))
-    ref_name = os.path.basename(ref_folder_path)
+    ref_name = common_name if common_name is not None else os.path.basename(ref_folder_path)
 
     # Auto-move files to common subfolders
     logging.debug(f"Auto-moving files to common subfolders for {ref_name}")
@@ -373,9 +375,16 @@ def ref_folder_preprocess(ref_folder_path, common_files, fox_mode):
             update_folder_paths(folder_src, ref_name, ref_common_files, common_files)
 
 
-def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_path):
-    """Process a referee folder, handling face, boots, gloves and common folders."""
-    face_id, boots_id, gloves_id = get_ref_ids(ref_num)
+def ref_folder_process(ref_folder_path, ids, name, export_destination_path):
+    """Process a referee folder, handling face, boots, gloves and common folders.
+
+    Args:
+        ref_folder_path: Path to the referee's source folder
+        ids: (face_id, boots_id, gloves_id) triple used for the destination folders
+        name: Name used for the destination folder suffixes and the Common subfolder
+        export_destination_path: Path to the extracted export folder
+    """
+    face_id, boots_id, gloves_id = ids
 
     # Configuration for each model folder type
     model_folder_configs = {
@@ -403,7 +412,7 @@ def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_pa
             folder_dst = os.path.join(
                 export_destination_path,
                 config['destination_parent'],
-                f"{config['id']} - {ref_name}"
+                f"{config['id']} - {name}"
             )
             os.makedirs(folder_dst)
 
@@ -416,11 +425,11 @@ def ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_pa
                 elif os.path.isdir(src_path):
                     shutil.copytree(src_path, dst_path)
         elif config['required']:
-            logging.warning(f"- Warning - No {folder_name} folder found for referee {ref_name}")
+            logging.warning(f"- Warning - No {folder_name} folder found for referee {name}")
 
     # Process common folder
     src_folder = os.path.join(ref_folder_path, 'common')
-    dst_folder = os.path.join(export_destination_path, 'Common', ref_name)
+    dst_folder = os.path.join(export_destination_path, 'Common', name)
     if not os.path.exists(src_folder):
         return
 
@@ -531,25 +540,91 @@ def referee_export_process(export_destination_path, fox_mode):
         error_handle()
         return True
 
-    # Check for a refs txt
+    # Check for a refs txt or a players txt (both present is an error)
     refs_txt_path = os.path.join(export_destination_path, "refs.txt")
-    if not os.path.exists(refs_txt_path):
-        logging.error("- ERROR - refs.txt not found in referee export")
+    players_txt_path = os.path.join(export_destination_path, "players.txt")
+    if os.path.exists(refs_txt_path) and os.path.exists(players_txt_path):
+        logging.error("- ERROR - Both refs.txt and players.txt found in referee export")
         error_handle()
         return True
-
-    # Process refs
-    print("- Processing refs...")
-    ref_mappings = refs_list_process(refs_txt_path)
-    if not ref_mappings:
-        logging.error("- ERROR - No valid entries found in refs.txt")
-        error_handle()
-        return True
-
-    # Delete the refs.txt file
-    os.remove(refs_txt_path)
 
     export_players_path = os.path.join(export_destination_path, "Players")
+    staging_path = os.path.join(export_destination_path, "Staging")
+
+    if os.path.exists(players_txt_path):
+
+        # New flat format: roster from players.txt, then staging, link resolution
+        # and the flat-folder split; the existing passes run unchanged afterwards.
+        # (Imported here: players_process imports this module's preprocess helpers)
+        from .players_process import roster_build, links_resolve, player_folder_split
+
+        print("- Processing refs...")
+
+        folders, roster_error = roster_build(export_destination_path, slots_max=35)
+        if roster_error:
+            logging.error(f"- ERROR - {roster_error}")
+            error_handle()
+            return True
+
+        if not folders:
+            logging.error("- ERROR - No valid entries found in players.txt")
+            error_handle()
+            return True
+
+        # Delete the players.txt file
+        os.remove(players_txt_path)
+
+        ref_mappings = {slot: folder_name for folder_name, info in folders.items()
+                        for slot in info["slots"]}
+
+        # Stage the root shared-folder sources away, then resolve links and split
+        # every distinct folder
+        consumed_staging = set()
+        for folder_name in folders:
+            folder_path = os.path.join(export_players_path, folder_name)
+            marker = os.path.exists(os.path.join(folder_path, "ingame_face")) or \
+                     os.path.exists(os.path.join(folder_path, "ingame_face.txt"))
+
+            for itemfolder_name in ("Faces", "Boots", "Gloves"):
+                itemfolder_path = os.path.join(export_destination_path, itemfolder_name)
+                if os.path.isdir(itemfolder_path):
+                    os.makedirs(staging_path, exist_ok=True)
+                    shutil.move(itemfolder_path, os.path.join(staging_path, itemfolder_name))
+
+            links_resolve(folder_path, staging_path, marker, consumed_staging)
+            player_folder_split(folder_path, fox_mode)
+
+        if os.path.isdir(staging_path):
+            for category_folder in ("Faces", "Boots", "Gloves"):
+                category_path = os.path.join(staging_path, category_folder)
+                if os.path.isdir(category_path):
+                    for shared_name in os.listdir(category_path):
+                        if os.path.join(category_folder, shared_name) in consumed_staging:
+                            continue
+                        logging.warning( "-")
+                        logging.warning( "- Warning - Unreferenced shared folder")
+                        logging.warning(f"- Folder:   {category_folder}/{shared_name}")
+                        logging.warning( "- It will be dropped")
+            shutil.rmtree(staging_path)
+
+    else:
+
+        # Old per-referee subfolder layout
+        if not os.path.exists(refs_txt_path):
+            logging.error("- ERROR - refs.txt not found in referee export")
+            error_handle()
+            return True
+
+        # Process refs
+        print("- Processing refs...")
+        ref_mappings = refs_list_process(refs_txt_path)
+        if not ref_mappings:
+            logging.error("- ERROR - No valid entries found in refs.txt")
+            error_handle()
+            return True
+
+        # Delete the refs.txt file
+        os.remove(refs_txt_path)
 
     # First pass: Move textures to common subfolders and update paths in source folders
     common_files = get_files_list(os.path.join(export_destination_path, 'Common'), recursive=True)
@@ -571,7 +646,7 @@ def referee_export_process(export_destination_path, fox_mode):
             error_present = True
             continue
 
-        ref_folder_process(ref_folder_path, ref_num, ref_name, export_destination_path)
+        ref_folder_process(ref_folder_path, get_ref_ids(ref_num), ref_name, export_destination_path)
 
     if error_present:
         pause()

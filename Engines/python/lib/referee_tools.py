@@ -19,7 +19,7 @@ from .utils.FILE_INFO import (
     REFS_TEMPLATE_FOX_PATH,
     UNIFORM_COMMON_PREFOX_PATH,
 )
-from .utils.file_management import get_files_list
+from .utils.file_management import get_files_list, remove_readonly
 
 
 def refs_list_process(refs_txt_path):
@@ -193,6 +193,8 @@ def move_textures_to_common(ref_folder_path, model_folder_name):
     texture_files = []
     src_files = get_files_list(src_folder, recursive=True)
     for item_path_rel in src_files:
+        if item_path_rel.split("/")[0].lower() == "common":
+            continue  # already inside a common subfolder
         if any(item_path_rel.lower().endswith(ext) for ext in TEXTURE_EXTENSIONS):
             texture_files.append(item_path_rel)
 
@@ -556,7 +558,8 @@ def referee_export_process(export_destination_path, fox_mode):
         # New flat format: roster from players.txt, then staging, link resolution
         # and the flat-folder split; the existing passes run unchanged afterwards.
         # (Imported here: players_process imports this module's preprocess helpers)
-        from .players_process import roster_build, links_resolve, player_folder_split
+        from .players_process import (roster_build, links_resolve, player_folder_split,
+                                      player_folder_validate)
 
         print("- Processing refs...")
 
@@ -591,8 +594,16 @@ def referee_export_process(export_destination_path, fox_mode):
                     os.makedirs(staging_path, exist_ok=True)
                     shutil.move(itemfolder_path, os.path.join(staging_path, itemfolder_name))
 
-            links_resolve(folder_path, staging_path, marker, consumed_staging)
-            player_folder_split(folder_path, fox_mode)
+            # Reserved-subfolder conflicts discard the referee folder
+            if player_folder_validate(folder_path, marker):
+                pass
+            else:
+                links_resolve(folder_path, staging_path, marker, consumed_staging)
+                if not player_folder_split(folder_path, fox_mode):
+                    continue
+            shutil.rmtree(folder_path, onerror=remove_readonly)
+            ref_mappings = {slot: ref_name for slot, ref_name in ref_mappings.items()
+                            if ref_name != folder_name}
 
         if os.path.isdir(staging_path):
             for category_folder in ("Faces", "Boots", "Gloves"):

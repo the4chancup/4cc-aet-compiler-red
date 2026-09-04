@@ -170,6 +170,30 @@ shared folder compile as the player's own separate ID-based boots/gloves
 folder instead of being merged in (so two same-named textures can coexist).
 A colliding face link discards the player folder.
 
+### Reserved Subfolders
+
+Inside a player folder, the subfolder names "face", "boots" and "gloves" are
+reserved. When present, a subfolder's contents are used wholesale as that
+category's content: its files skip the automatic categorization, and its
+textures are relocated to the per-player common subfolder like any other
+texture. A "common" subfolder is reserved too: its contents are copied into
+the per-player common subfolder as they are.
+
+An empty face/ subfolder still emits an (empty) face folder; empty boots/ and
+gloves/ subfolders are ignored entirely (no folder is emitted, no ID is
+consumed, and a link file or loose same-category files still work, merging
+into the empty subfolder).
+
+Reserved subfolders cannot be combined with the other ways of defining the
+same category. These conflicts discard the player folder:
+- a face/, boots/ or gloves/ subfolder and a link file of the same category
+  are both present;
+- a face/ subfolder and loose face files in the player folder root are both
+  present;
+- a non-empty boots/ or gloves/ subfolder and loose same-category files in the
+  player folder root are both present;
+- an ingame_face marker and a face/ subfolder are both present.
+
 ### Texture Relocation
 
 All of a player's textures are moved to a per-player Common subfolder (keyed
@@ -759,6 +783,11 @@ List:
 - Link file matches more than one shared folder (player folder discarded)
 - Face link present in an ingame_face player folder (player folder discarded)
 - ingame_face marker present alongside face content (player folder discarded)
+- A face/boots/gloves subfolder and a link file of the same category both
+  present (player folder discarded)
+- A face/boots/gloves subfolder and loose same-category files both present
+  (player folder discarded; empty boots/gloves subfolders are ignored instead)
+- ingame_face marker present alongside a face subfolder (player folder discarded)
 - Conflicting file names between a shared folder and a player folder
   (the shared folder compiles as a separate ID-based folder instead)
 - No boots/gloves ID range found for the team in teams_list

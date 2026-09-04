@@ -258,6 +258,47 @@ def links_resolve(folder_path, staging_path, ingame_face, consumed=None):
     return set_asides, False
 
 
+def player_folder_validate(folder_path, marker):
+    """Check a player folder's reserved subfolders against link files and the
+    ingame_face marker.
+
+    A face/boots/gloves subfolder claims its category wholesale, so a link file
+    of the same category is a conflict (an empty face/ subfolder counts as
+    present; empty boots/gloves subfolders are ignored). Under ingame_face a
+    face subfolder is a conflict too. Returns True when the player folder must
+    be discarded, else False.
+    """
+    folder_name = os.path.basename(folder_path)
+
+    for category in ("face", "boots", "gloves"):
+        subfolder_path = os.path.join(folder_path, category)
+        if not os.path.isdir(subfolder_path):
+            continue
+        if category != "face" and not os.listdir(subfolder_path):
+            continue  # empty boots/gloves subfolders are ignored
+        suffix = "." + category
+        for file_name in get_files_list(folder_path):
+            lower_name = file_name.lower()
+            if lower_name.endswith(suffix) or lower_name.endswith(suffix + ".txt"):
+                logging.error( "-")
+                logging.error(f"- ERROR - A {category} subfolder and a {category} link file are both present")
+                logging.error(f"- Player folder: {folder_name}")
+                logging.error(f"- Link file:     {file_name}")
+                logging.error( "- This player folder will be discarded")
+                pause()
+                return True
+
+    if marker and os.path.isdir(os.path.join(folder_path, "face")):
+        logging.error( "-")
+        logging.error( "- ERROR - An ingame_face marker is present alongside a face subfolder")
+        logging.error(f"- Player folder: {folder_name}")
+        logging.error( "- This player folder will be discarded")
+        pause()
+        return True
+
+    return False
+
+
 def player_folder_split(folder_path, fox_mode):
     """Categorize a player folder's files into face/, boots/ and gloves/ subfolders.
 
@@ -336,6 +377,20 @@ def player_folder_split(folder_path, fox_mode):
         pause()
         return "ingame_face with face content"
 
+    # A reserved subfolder claims its category wholesale: root files that would
+    # land in the same category are a conflict (empty boots/gloves subfolders
+    # are ignored and merely receive the files instead)
+    for file_name, category in moves:
+        subfolder_path = os.path.join(folder_path, category)
+        if os.path.isdir(subfolder_path) and (category == "face" or os.listdir(subfolder_path)):
+            logging.error( "-")
+            logging.error(f"- ERROR - A {category} subfolder and files that belong in it are both present")
+            logging.error(f"- Player folder: {os.path.basename(folder_path)}")
+            logging.error(f"- File:          {file_name}")
+            logging.error( "- This player folder will be discarded")
+            pause()
+            return "reserved subfolder conflict"
+
     # Move the categorized files into their subfolders
     for file_name, category in moves:
         src_path = os.path.join(folder_path, file_name)
@@ -347,7 +402,12 @@ def player_folder_split(folder_path, fox_mode):
 
 
 def player_folder_preprocess(folder_path, fox_mode, common_name, export_path):
-    """Relocate a player folder's textures to its per-player common subfolder."""
+    """Relocate a player folder's textures to its per-player common subfolder.
+
+    Textures inside face/boots/gloves subfolders relocate too (flat, like the
+    referee folders); a pre-supplied common/ subfolder's contents are kept."""
+    for category in ("face", "boots", "gloves"):
+        move_textures_to_common(folder_path, category)
     move_textures_to_common(folder_path, "")
 
     common_files = get_files_list(os.path.join(folder_path, "common"), recursive=True)
@@ -504,6 +564,10 @@ def players_process(export_path, team_id, team_name, fox_mode):
         folder_path = os.path.join(players_path, folder_name)
         marker = os.path.exists(os.path.join(folder_path, "ingame_face")) or \
                  os.path.exists(os.path.join(folder_path, "ingame_face.txt"))
+
+        if player_folder_validate(folder_path, marker):
+            discarded_folders.add(folder_name)
+            continue
 
         set_asides, link_error = links_resolve(folder_path, staging_path, marker, consumed_staging)
         if link_error:

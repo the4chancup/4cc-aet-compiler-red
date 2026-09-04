@@ -248,6 +248,134 @@ def test_split_marker_with_face_content_error(tmp_path):
     assert error == "ingame_face with face content"
 
 
+# --- reserved subfolders -----------------------------------------------------
+
+def test_labelled_subfolders_wholesale_fox(tmp_path, monkeypatch):
+    # face/ and boots/ subfolders are used wholesale; the root texture still
+    # relocates to the per-player common folder
+    folder = make_folder(tmp_path, "01 - Messi", {"tex.dds": b"t"})
+    os.makedirs(os.path.join(folder, "face"))
+    with open(os.path.join(folder, "face", "face_high.fmdl"), "wb") as f:
+        f.write(REAL_FMDL)
+    os.makedirs(os.path.join(folder, "boots"))
+    with open(os.path.join(folder, "boots", "boots.fmdl"), "wb") as f:
+        f.write(REAL_FMDL)
+    run_players_process(tmp_path, monkeypatch)
+    assert os.path.isfile(os.path.join(tmp_path, "Faces", "XXX01 - Messi", "face_high.fmdl"))
+    assert os.path.isfile(os.path.join(tmp_path, "Boots", "k0101 - Messi", "boots.fmdl"))
+    assert os.path.isfile(os.path.join(tmp_path, "Common", "Messi", "tex.dds"))
+
+
+def test_labelled_subfolder_textures_to_common(tmp_path, monkeypatch):
+    # Textures inside a labelled subfolder relocate to the per-player common
+    # folder (flat, like the referee folders)
+    folder = make_folder(tmp_path, "01 - Messi")
+    os.makedirs(os.path.join(folder, "face"))
+    with open(os.path.join(folder, "face", "face_high.fmdl"), "wb") as f:
+        f.write(REAL_FMDL)
+    with open(os.path.join(folder, "face", "kit.dds"), "wb") as f:
+        f.write(b"t")
+    run_players_process(tmp_path, monkeypatch)
+    assert os.path.isfile(os.path.join(tmp_path, "Common", "Messi", "kit.dds"))
+    assert not os.path.exists(os.path.join(folder, "face", "kit.dds"))
+
+
+def test_labelled_subfolder_link_conflict(tmp_path):
+    folder = make_folder(tmp_path, "01 - P", {"Crocs.boots": b""})
+    os.makedirs(os.path.join(folder, "boots"))
+    with open(os.path.join(folder, "boots", "boots.fmdl"), "wb") as f:
+        f.write(b"b")
+    assert pp.player_folder_validate(str(folder), False) is True
+
+
+def test_labelled_subfolder_root_file_conflict(tmp_path):
+    folder = make_folder(tmp_path, "01 - P", {"face_high.fmdl": b"f"})
+    os.makedirs(os.path.join(folder, "face"))
+    assert pp.player_folder_split(str(folder), fox_mode=True) is not None
+
+
+def test_marker_face_subfolder_conflict(tmp_path):
+    folder = make_folder(tmp_path, "01 - P", {"ingame_face": b""})
+    os.makedirs(os.path.join(folder, "face"))
+    assert pp.player_folder_validate(str(folder), True) is True
+
+
+def test_face_subfolder_empty_link_conflict(tmp_path):
+    # An empty face/ subfolder is still present, so a face link conflicts
+    folder = make_folder(tmp_path, "01 - P", {"Longhair.face": b""})
+    os.makedirs(os.path.join(folder, "face"))
+    assert pp.player_folder_validate(str(folder), False) is True
+
+
+def test_empty_face_subfolder_emitted(tmp_path, monkeypatch):
+    folder = make_folder(tmp_path, "01 - P")
+    os.makedirs(os.path.join(folder, "face"))
+    run_players_process(tmp_path, monkeypatch)
+    assert os.path.isdir(os.path.join(tmp_path, "Faces", "XXX01 - P"))
+
+
+def test_empty_labelled_boots_ignored(tmp_path, monkeypatch):
+    # Empty boots/gloves subfolders are ignored: no emission, no ID consumption
+    folder = make_folder(tmp_path, "01 - P", {"face_high.fmdl": b"f"})
+    os.makedirs(os.path.join(folder, "boots"))
+    os.makedirs(os.path.join(folder, "gloves"))
+    run_players_process(tmp_path, monkeypatch)
+    assert os.path.isfile(os.path.join(tmp_path, "Faces", "XXX01 - P", "face_high.fmdl"))
+    assert not os.path.exists(os.path.join(tmp_path, "Boots"))
+    assert not os.path.exists(os.path.join(tmp_path, "Gloves"))
+
+
+def test_empty_boots_subfolder_link_resolves(tmp_path, monkeypatch):
+    # An empty boots/ subfolder is ignored, so a boots link resolves normally
+    # and its files merge into the subfolder
+    export = tmp_path / "export"
+    shared = export / "Boots" / "Crocs"
+    shared.mkdir(parents=True)
+    (shared / "boots.fmdl").write_bytes(b"A")
+    folder = make_folder(str(export), "01 - P", {"Crocs.boots": b""})
+    os.makedirs(os.path.join(folder, "boots"))
+    run_players_process(str(export), monkeypatch)
+    assert os.path.isfile(os.path.join(export, "Boots", "k0101 - P", "boots.fmdl"))
+
+
+def test_labelled_subfolders_prefox(tmp_path, monkeypatch):
+    # Labelled boots/gloves subfolders are honored on pre-Fox too, no marker needed
+    folder = make_folder(tmp_path, "01 - P", {"face_high_win32.model": b"m"})
+    os.makedirs(os.path.join(folder, "boots"))
+    with open(os.path.join(folder, "boots", "boots.model"), "wb") as f:
+        f.write(b"b")
+    run_players_process(tmp_path, monkeypatch, fox_mode=False)
+    assert os.path.isfile(os.path.join(tmp_path, "Faces", "XXX01 - P", "face_high_win32.model"))
+    assert os.path.isfile(os.path.join(tmp_path, "Boots", "k0101 - P", "boots.model"))
+
+
+def test_common_subfolder_merge(tmp_path, monkeypatch):
+    # A pre-supplied common/ subfolder merges into the per-player common folder
+    folder = make_folder(tmp_path, "01 - Messi", {"tex.dds": b"t"})
+    with open(os.path.join(folder, "face_high.fmdl"), "wb") as f:
+        f.write(REAL_FMDL)
+    os.makedirs(os.path.join(folder, "common"))
+    with open(os.path.join(folder, "common", "extra.dds"), "wb") as f:
+        f.write(b"e")
+    run_players_process(tmp_path, monkeypatch)
+    assert os.path.isfile(os.path.join(tmp_path, "Common", "Messi", "tex.dds"))
+    assert os.path.isfile(os.path.join(tmp_path, "Common", "Messi", "extra.dds"))
+
+
+def test_referee_flat_labelled_conflict_discarded(tmp_path, monkeypatch):
+    from python.lib.referee_tools import referee_export_process
+
+    export = tmp_path / "refs export"
+    export.mkdir()
+    folder = make_folder(export, "RefA", {"hair_high.fmdl": b"f"})
+    os.makedirs(os.path.join(folder, "face"))
+    write_players_txt(export, ["1 RefA"])
+    assert referee_export_process(str(export), fox_mode=True) is False
+    # The conflicting referee folder was discarded
+    assert not os.path.exists(os.path.join(export, "Faces", "referee001 - RefA"))
+    assert not os.path.exists(os.path.join(export, "Players"))
+
+
 # --- end to end -------------------------------------------------------------
 
 # A real FMDL: the Fox texture-path rewrite parses model files, so the e2e tests

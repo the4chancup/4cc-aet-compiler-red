@@ -15,9 +15,8 @@ ROOT = os.path.dirname(os.path.dirname(TOOLS_DIR))
 sys.path.insert(0, os.path.join(ROOT, "Engines"))
 
 from python.lib.players_process import KIT_SUFFIX_SLOTS, folder_name_part
+from python.lib.savefile import ParseError, load_players, player_boots_gloves, player_name
 from python.lib.team_id_get import id_search, teams_list_range_get
-
-import savefile
 
 EXPORTS_SOURCE = "exports_to_upgrade"
 EXPORTS_OUTPUT = "exports_upgraded"
@@ -103,7 +102,7 @@ def upgrade_export(source_path, output_path, team_id, players, version):
         record = players.get(int(team_id) * 100 + nn)
         if record is None:
             continue
-        boots_id, gloves_id = savefile.player_boots_gloves(record, version)
+        boots_id, gloves_id = player_boots_gloves(record, version)
         team_players[f"{nn:02d}"] = {"record": record, "boots_id": boots_id, "gloves_id": gloves_id}
 
     def wearer_count(worn_key, folder_id):
@@ -118,7 +117,7 @@ def upgrade_export(source_path, output_path, team_id, players, version):
         # then NN alone
         folder_name = None
         if player_record is not None:
-            name = sanitize_name(savefile.player_name(player_record["record"], version).decode("utf8", "replace"))
+            name = sanitize_name(player_name(player_record["record"], version).decode("utf8", "replace"))
             if name:
                 folder_name = f"{nn} - {name}"
         if folder_name is None and face_name is not None:
@@ -294,8 +293,8 @@ def main():
         pause_exit()
 
     try:
-        version, players = savefile.load_players(savefile_path)
-    except savefile.ParseError as e:
+        version, players = load_players(savefile_path)
+    except ParseError as e:
         print(f"- FATAL ERROR - Could not read the savefile: {e}")
         pause_exit()
     print(f"- Savefile loaded: PES {version} ({len(players)} players)")

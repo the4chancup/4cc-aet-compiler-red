@@ -241,6 +241,16 @@ folders are mapped back to the Kits/ layout. It also prints each player's
 savefile IDs next to the new range, since the savefile must be updated to the
 new IDs for the models to show up in-game. Referee exports are not upgraded.
 
+Without an EDIT00000000 in the upgrader's folder, the upgrader offers loose
+mode: each Boots/ and Gloves/ folder is linked to the player at its position
+inside the team's 25-slot ID block (the block is inferred from the first
+folder found; 0126 -> player 01, 0128 -> player 03), with no cross-check
+against the save. An ID landing on a slot without a face folder still makes
+up a player folder: it carries an ingame_face marker (a stray boots/gloves
+folder means the player uses the ingame face), is named after the worn
+folder, and keeps the boots/gloves as shared folders + link files. Only IDs
+on the spare slot positions end in Other/.
+
 
 ## First Run Wizard
 

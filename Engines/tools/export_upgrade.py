@@ -3,7 +3,9 @@
 Converts old-format team exports from exports_to_upgrade/ into the Pre-Studio
 unified player-folder format in exports_upgraded/, using an EDIT00000000
 savefile to resolve each player's boots/gloves IDs. Fox savefiles only (PES 19
-and 21, auto-detected); referee exports are not upgraded.
+and 21, auto-detected); referee exports are not upgraded. Without a savefile,
+loose mode links each Boots/Gloves folder to the player at its position inside
+the team's 25-slot ID block instead.
 """
 import os
 import re
@@ -14,9 +16,9 @@ TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(TOOLS_DIR))
 sys.path.insert(0, os.path.join(ROOT, "Engines"))
 
-from python.lib.players_process import KIT_SUFFIX_SLOTS, folder_name_part
-from python.lib.savefile import ParseError, load_players, player_boots_gloves, player_name
-from python.lib.team_id_get import id_search, teams_list_range_get
+from python.lib.players_process import KIT_SUFFIX_SLOTS, folder_name_part  # noqa: E402 (path setup above)
+from python.lib.savefile import ParseError, load_players, player_boots_gloves, player_name  # noqa: E402
+from python.lib.team_id_get import id_search, teams_list_range_get  # noqa: E402
 
 EXPORTS_SOURCE = "exports_to_upgrade"
 EXPORTS_OUTPUT = "exports_upgraded"
@@ -67,7 +69,7 @@ def move_folder_contents(src_folder, dest_folder, skip=()):
             shutil.move(src_path, dest_path)
 
 
-def upgrade_export(source_path, output_path, team_id, players, version):
+def upgrade_export(source_path, output_path, team_id, players, version, loose=False):
     shutil.rmtree(output_path, ignore_errors=True)
     shutil.copytree(source_path, output_path)
 
@@ -99,14 +101,31 @@ def upgrade_export(source_path, output_path, team_id, players, version):
             if match:
                 gloves_folders[int(match.group(1))] = name
 
-    # Each player's worn IDs, from the savefile records
+    # Each player's worn IDs: from the savefile records, or, in loose mode, from
+    # the boots/gloves IDs' position inside the team's 25-slot block (101 + 25*n,
+    # inferred from the first folder found): 0126 -> player 01, 0128 -> player 03,
+    # with no cross-check against the save. IDs landing on the spare slots
+    # (positions 24-25) are worn by nobody and end in Other/.
     team_players = {}
-    for nn in range(1, 24):
-        record = players.get(int(team_id) * 100 + nn)
-        if record is None:
-            continue
-        boots_id, gloves_id = player_boots_gloves(record, version)
-        team_players[f"{nn:02d}"] = {"record": record, "boots_id": boots_id, "gloves_id": gloves_id}
+    if loose:
+        worn = {}
+        for category, folder_map in (("boots", boots_folders), ("gloves", gloves_folders)):
+            if not folder_map:
+                continue
+            range_start = 101 + 25 * ((min(folder_map) - 101) // 25)
+            for folder_id in folder_map:
+                slot_number = folder_id - range_start + 1
+                if 1 <= slot_number <= 23:
+                    worn.setdefault(f"{slot_number:02d}", {})[category] = folder_id
+        for nn, ids in worn.items():
+            team_players[nn] = {"record": None, "boots_id": ids.get("boots"), "gloves_id": ids.get("gloves")}
+    else:
+        for nn in range(1, 24):
+            record = players.get(int(team_id) * 100 + nn)
+            if record is None:
+                continue
+            boots_id, gloves_id = player_boots_gloves(record, version)
+            team_players[f"{nn:02d}"] = {"record": record, "boots_id": boots_id, "gloves_id": gloves_id}
 
     def wearer_count(worn_key, folder_id):
         return sum(1 for player in team_players.values() if player[worn_key] == folder_id)
@@ -116,13 +135,27 @@ def upgrade_export(source_path, output_path, team_id, players, version):
         player_record = team_players.get(nn)
         face_name = face_folders.get(nn)
 
-        # Folder name: the old face folder's suffix (the author's name), then
-        # the savefile player name (medal colour codes stripped), then NN alone
+        boots_id = player_record["boots_id"] if player_record else None
+        gloves_id = player_record["gloves_id"] if player_record else None
+        boots_name = boots_folders.get(boots_id) if boots_id else None
+        gloves_name = gloves_folders.get(gloves_id) if gloves_id else None
+
+        # Folder name: the old face folder's suffix (the author's name), then a
+        # worn folder's suffix (a stray boots/gloves folder without a face
+        # folder), then the savefile player name (medal colour codes stripped),
+        # then NN alone
         folder_name = None
         if face_name is not None:
             suffix = sanitize_name(face_name[5:].strip(" -_"))
             if suffix:
                 folder_name = f"{nn} - {suffix}"
+        if folder_name is None:
+            for worn_name in (boots_name, gloves_name):
+                if worn_name is not None:
+                    suffix = sanitize_name(folder_name_part(worn_name))
+                    if suffix:
+                        folder_name = f"{nn} - {suffix}"
+                    break
         if folder_name is None and player_record is not None:
             name = sanitize_name(player_name(player_record["record"], version).decode("utf8", "replace"))
             if name:
@@ -131,11 +164,6 @@ def upgrade_export(source_path, output_path, team_id, players, version):
             folder_name = nn
 
         player_path = os.path.join(players_path, folder_name)
-
-        boots_id = player_record["boots_id"] if player_record else None
-        gloves_id = player_record["gloves_id"] if player_record else None
-        boots_name = boots_folders.get(boots_id) if boots_id else None
-        gloves_name = gloves_folders.get(gloves_id) if gloves_id else None
 
         # Resolve the boots/gloves disposition: merged in, or kept as a shared
         # folder + link file (multi-wearer, ingame_face players, or file name
@@ -165,6 +193,11 @@ def upgrade_export(source_path, output_path, team_id, players, version):
 
         if has_face(face_folders, nn) or dispositions:
             os.makedirs(player_path, exist_ok=True)
+            # Boots/gloves without a face folder mean the player uses the
+            # ingame face; mark the folder so no face folder is emitted
+            if face_name is None and dispositions:
+                with open(os.path.join(player_path, "ingame_face"), "w"):
+                    pass
 
         if face_name is not None:
             move_folder_contents(os.path.join(faces_path, face_name), player_path)
@@ -205,8 +238,9 @@ def upgrade_export(source_path, output_path, team_id, players, version):
                       f"- Moved to Other/")
 
     # Remove the consumed old item folders
-    if os.path.isdir(faces_path) and not os.listdir(faces_path):
-        os.rmdir(faces_path)
+    for folder in (faces_path, boots_path, gloves_path):
+        if os.path.isdir(folder) and not os.listdir(folder):
+            os.rmdir(folder)
 
     # Kits: inverse of the compiler's slot map
     kit_configs_path = os.path.join(output_path, "Kit Configs")
@@ -246,9 +280,17 @@ def upgrade_export(source_path, output_path, team_id, players, version):
     for nn in sorted(team_players):
         boots_id = team_players[nn]["boots_id"]
         gloves_id = team_players[nn]["gloves_id"]
+        if boots_id is None and gloves_id is None:
+            continue
         new_id = min_id + int(nn) - 1
-        print(f"- Player {nn}: savefile boots k{boots_id:04d} gloves g{gloves_id:04d}"
-              f" -> new ID {new_id} (boots k{new_id:04d} / gloves g{new_id:04d})")
+        if loose:
+            assumed = [f"boots {boots_folders.get(boots_id)}" if boots_id is not None else None,
+                       f"gloves {gloves_folders.get(gloves_id)}" if gloves_id is not None else None]
+            print(f"- Player {nn}: assumed {' / '.join(p for p in assumed if p)}")
+            print(f"  -> new ID {new_id} (boots k{new_id:04d} / gloves g{new_id:04d})")
+        else:
+            print(f"- Player {nn}: savefile boots k{boots_id:04d} gloves g{gloves_id:04d}"
+                  f" -> new ID {new_id} (boots k{new_id:04d} / gloves g{new_id:04d})")
 
 
 def has_face(face_folders, nn):
@@ -291,19 +333,6 @@ def main():
     if not os.path.isdir(exports_source_path):
         print(f"- FATAL ERROR - The {EXPORTS_SOURCE} folder was not found in the upgrader's folder")
         pause_exit()
-    if not os.path.isfile(savefile_path):
-        print("- FATAL ERROR - EDIT00000000 was not found in the upgrader's folder")
-        print("- Place the cup's current savefile in the upgrader's folder and run again")
-        pause_exit()
-
-    try:
-        version, players = load_players(savefile_path)
-    except ParseError as e:
-        print(f"- FATAL ERROR - Could not read the savefile: {e}")
-        pause_exit()
-    print(f"- Savefile loaded: PES {version} ({len(players)} players)")
-
-    os.makedirs(exports_output_path, exist_ok=True)
 
     exports_list = [item for item in os.listdir(exports_source_path)
                     if os.path.isdir(os.path.join(exports_source_path, item))
@@ -311,6 +340,36 @@ def main():
     if not exports_list:
         print(f"- No exports found in {EXPORTS_SOURCE}/")
         pause_exit()
+
+    version = None
+    players = {}
+    loose = False
+
+    if os.path.isfile(savefile_path):
+        try:
+            version, players = load_players(savefile_path)
+        except ParseError as e:
+            print(f"- FATAL ERROR - Could not read the savefile: {e}")
+            pause_exit()
+        print(f"- Savefile loaded: PES {version} ({len(players)} players)")
+    else:
+        print("- No EDIT00000000 savefile found in the upgrader's folder")
+        print("-")
+        print("- Without a savefile, the boots/gloves folders cannot be matched to the")
+        print("- players by ID. Loose mode instead links each Boots/ and Gloves/ folder")
+        print("- to the player at its position inside the team's 25-slot ID block")
+        print("- (e.g. 0126 -> player 01, 0128 -> player 03), without any cross-check")
+        print("- against the save.")
+        print("-")
+        response = input("- Upgrade in loose mode? (Type Y and press Enter, or press Enter to exit): ")
+        if response.strip().lower() != "y":
+            pause_exit()
+        loose = True
+        print("-")
+        print("- Loose mode: the boots/gloves folders are linked to the players by")
+        print("- their position inside the team's ID block")
+
+    os.makedirs(exports_output_path, exist_ok=True)
 
     for export_name in exports_list:
         print("-")
@@ -338,7 +397,7 @@ def main():
         try:
             shutil.rmtree(temp_path, ignore_errors=True)
             extract_export(source_path, temp_path)
-            upgrade_export(temp_path, output_path, team_id, players, version)
+            upgrade_export(temp_path, output_path, team_id, players, version, loose)
             shutil.rmtree(temp_path, ignore_errors=True)
             print(f"- Upgraded export saved to {EXPORTS_OUTPUT}/{export_name_clean}")
         except Exception as e:

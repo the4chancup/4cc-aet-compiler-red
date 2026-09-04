@@ -1,3 +1,29 @@
+XX/09/26 - Version 5.0.0
+- New
+  - Pre-Studio export format (preview): team exports can now use unified player
+    folders (Players/01 - Name/ holding all of a player's face, boots and gloves
+    models together), with an optional players.txt roster, shared model folders
+    pulled in through empty link files (e.g. Crocs.boots), and Kits/p1..p9,g1
+    folders holding a binary config.bin plus generic kit* textures. See the
+    Pre-Studio section of info/AET.wikitext. The old format keeps working
+    unchanged.
+  - Boots/gloves IDs for the new format are assigned automatically from the
+    team's MinBootsID/MaxBootsID range in teams_list.txt (MinBootsID + player number - 1).
+  - New upgrade_exports.bat: converts old-format exports into the new format
+    using an EDIT00000000 savefile (PES 19/21) to resolve each player's
+    boots/gloves. Place exports in exports_to_upgrade/ and the savefile in the
+    compiler's folder.
+- Breaking
+  - teams_list.txt is now a tab-separated list with ID, Name, MinBootsID and MaxBootsID
+    columns. Old space-separated lists are rejected: update to the new list
+    when the updater offers it (ranges must be deliberate, so there is no
+    automatic migration).
+- Useful
+  - The referee export error path no longer crashes when discarding a failed
+    referee export.
+  - portraits_move gained the ability to run on the new-format player folders
+    (one portrait per roster slot, folders never deleted).
+
 16/08/26 - Version 4.4.0
 - Useful
   - The xml generator now applies kit normalization to mtl paths in generated

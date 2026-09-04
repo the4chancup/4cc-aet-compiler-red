@@ -1,0 +1,23 @@
+{
+ "referees/Boots/k9901 - RefA/boots.fmdl": "65115ecface08e1e36b969099390886698d61eb4674f770421add981f1d60e15",
+ "referees/Boots/k9901 - RefA/boots.skl": "1202802a485a728a87fbe672bc83a1bf5acbef6ef2833600d85e75880f949070",
+ "referees/Boots/k9902 - RefA/boots.fmdl": "bafd812112f3307b34f7a872e4b0d97bb91b11036c13eb9d0f67cc470dec38ba",
+ "referees/Boots/k9902 - RefA/boots.skl": "1202802a485a728a87fbe672bc83a1bf5acbef6ef2833600d85e75880f949070",
+ "referees/Common/999/RefA/shared.ftex": "f916da848978d2ec844b6f7f3cf0f50db68a5fa976e39a4a71579c8a8bb2e4e9",
+ "referees/Faces/referee001 - RefA/face_diff.bin": "2b4ce11ce69d54b52fc7869b30b99fab730d20c45c96c0b45f29ce3e1b0503a1",
+ "referees/Faces/referee001 - RefA/hair_high.fmdl": "808629601eb8a622df56a4d8fdb1a72c7c0bddf662c4d70a08a4b218cada608e",
+ "referees/Faces/referee002 - RefA/face_diff.bin": "2b4ce11ce69d54b52fc7869b30b99fab730d20c45c96c0b45f29ce3e1b0503a1",
+ "referees/Faces/referee002 - RefA/hair_high.fmdl": "808629601eb8a622df56a4d8fdb1a72c7c0bddf662c4d70a08a4b218cada608e",
+ "referees/Gloves/g9901 - RefA/glove_l.fmdl": "af2976732457ba65a7658f16cc743eb00e80eaddca141fe083b3350e5ce5d5cc",
+ "referees/Gloves/g9902 - RefA/glove_l.fmdl": "298bd9d6af89311cab58356a069fb90617649f7d30afdb785c61ab1529037296",
+ "teams/A Note.txt": "2777d44fd2b531529d0bd1dce81fc74b9699931103c2d9b79bd0dfa1fadc9977",
+ "teams/Boots/k0101 - Boots/boots.fmdl": "bb443ac76119383ad541f8c27333e3b21ada57201ee3d32a54ec1c50772f9cb2",
+ "teams/Boots/k0101 - Boots/boots.skl": "1202802a485a728a87fbe672bc83a1bf5acbef6ef2833600d85e75880f949070",
+ "teams/Faces/70201 - Alpha/face_diff.bin": "2b4ce11ce69d54b52fc7869b30b99fab730d20c45c96c0b45f29ce3e1b0503a1",
+ "teams/Faces/70201 - Alpha/hair_high.fmdl": "16f3fba35171982d2e5738a45fc29643f802c8a5dc315ccb01e0a3db36879fee",
+ "teams/Gloves/g0101 - Gloves/glove_l.fmdl": "c030676dd2181af0d44b89a3ce8cffa1a63287318972d5ed9d59c90cb60c703a",
+ "teams/Kit Configs/702/702_DEF_1st_realUni.bin": "6b0f202b9e2f39ffeba2253aae02e35225f2ce3e314595ac07abc1ee6bc5434d",
+ "teams/Kit Textures/u0702p1.ftex": "f916da848978d2ec844b6f7f3cf0f50db68a5fa976e39a4a71579c8a8bb2e4e9",
+ "teams/Portraits/70201.dds": "227b3cb7ba6209be8b544015638b8cc3b098dc0399d73d46ff97a3c1001ae8d4",
+ "teams/Portraits/70202.dds": "227b3cb7ba6209be8b544015638b8cc3b098dc0399d73d46ff97a3c1001ae8d4"
+}

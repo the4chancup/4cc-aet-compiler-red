@@ -23,8 +23,11 @@ EXPORTS_OUTPUT = "exports_upgraded"
 
 
 def sanitize_name(name):
-    """Strip the characters Windows rejects in folder names, and trailing dots/spaces."""
-    return re.sub(r'[\\/:*?"<>|]', "", name).rstrip(". ").strip()
+    """Strip medal colour codes (a \\x11c marker followed by 8 hex digits, e.g.
+    '\\x11ce5de00ff' before the actual name), any remaining control characters,
+    the characters Windows rejects in folder names, and trailing dots/spaces."""
+    name = re.sub("\x11c[0-9a-fA-F]{8}", "", name)
+    return re.sub(r'[\\/:*?"<>|\x00-\x1f]', "", name).rstrip(". ").strip()
 
 
 def team_name_folder(export_name):
@@ -113,16 +116,17 @@ def upgrade_export(source_path, output_path, team_id, players, version):
         player_record = team_players.get(nn)
         face_name = face_folders.get(nn)
 
-        # Folder name: savefile player name, then the old face folder's suffix,
-        # then NN alone
+        # Folder name: the old face folder's suffix (the author's name), then
+        # the savefile player name (medal colour codes stripped), then NN alone
         folder_name = None
-        if player_record is not None:
+        if face_name is not None:
+            suffix = sanitize_name(face_name[5:].strip(" -_"))
+            if suffix:
+                folder_name = f"{nn} - {suffix}"
+        if folder_name is None and player_record is not None:
             name = sanitize_name(player_name(player_record["record"], version).decode("utf8", "replace"))
             if name:
                 folder_name = f"{nn} - {name}"
-        if folder_name is None and face_name is not None:
-            suffix = sanitize_name(face_name[5:].strip(" -_"))
-            folder_name = f"{nn} - {suffix}" if suffix else nn
         if folder_name is None:
             folder_name = nn
 

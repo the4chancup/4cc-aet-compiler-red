@@ -19,6 +19,8 @@ XX/09/26 - Version 5.0.0
     when the updater offers it (ranges must be deliberate, so there is no
     automatic migration).
 - Useful
+  - Team names containing a + are no longer split when the team key is read
+    from the export name (the Note txt team name stays authoritative).
   - The referee export error path no longer crashes when discarding a failed
     referee export.
   - portraits_move gained the ability to run on the new-format player folders

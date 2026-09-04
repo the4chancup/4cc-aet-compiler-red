@@ -140,7 +140,7 @@ def extracted_from_exports():
             export_name_clean, export_type = os.path.splitext(export_name)
 
         # Split the words in the export
-        export_name_words = re.findall(r"[^.\s\-\+\_]+", export_name)
+        export_name_words = re.findall(r"[^.\s\-\_]+", export_name)
 
         if not export_name_words:
             raise ValueError

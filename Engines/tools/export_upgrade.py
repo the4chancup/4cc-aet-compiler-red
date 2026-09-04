@@ -32,7 +32,7 @@ def sanitize_name(name):
 
 def team_name_folder(export_name):
     """The /first-word/ team key, same rule as the compiler."""
-    words = re.findall(r"[^.\s\-\+\_]+", export_name)
+    words = re.findall(r"[^.\s\-\_]+", export_name)
     if not words:
         return None
     return f"/{words[0].lower()}/"

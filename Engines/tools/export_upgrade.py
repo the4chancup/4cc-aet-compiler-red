@@ -33,11 +33,32 @@ def sanitize_name(name):
 
 
 def team_name_folder(export_name):
-    """The /first-word/ team key, same rule as the compiler."""
+    """The /first-word/ team key fallback, same rule as the compiler's folder-name key."""
     words = re.findall(r"[^.\s\-\_]+", export_name)
     if not words:
         return None
     return f"/{words[0].lower()}/"
+
+
+def note_team_name(export_path):
+    """The team name from the export's Note txt "Team:" line, read the same way
+    the compiler does: the first Note txt found (root, then one nested folder
+    level), first "Team:" line wins; None when there is no Note or no usable Team
+    line."""
+    folders = [export_path] + [os.path.join(export_path, item) for item in os.listdir(export_path)
+                               if os.path.isdir(os.path.join(export_path, item))]
+    for folder in folders:
+        for file_name in os.listdir(folder):
+            if not os.path.isfile(os.path.join(folder, file_name)):
+                continue
+            lower_name = file_name.lower()
+            if lower_name.endswith(".txt") and "note" in lower_name:
+                with open(os.path.join(folder, file_name), "r", encoding="utf8") as f:
+                    for line in f:
+                        if "Team:" in line:
+                            return line.split(":", 1)[1].strip()
+                return None
+    return None
 
 
 def folder_conflicts(src_folder, dest_folder):
@@ -378,17 +399,9 @@ def main():
         source_path = os.path.join(exports_source_path, export_name)
         export_name_clean = export_name if os.path.isdir(source_path) else os.path.splitext(export_name)[0]
 
-        key = team_name_folder(export_name)
-        if key == "/refs/":
+        folder_key = team_name_folder(export_name)
+        if folder_key == "/refs/":
             print("- Referee exports are not upgraded (the compiler keeps reading the old layout)")
-            continue
-        if key is None:
-            print("- ERROR - Unusable export name - Skipped")
-            continue
-
-        team_id = id_search(key)
-        if team_id is None:
-            print(f"- ERROR - Team {key} not found in teams_list.txt - Skipped")
             continue
 
         output_path = os.path.join(exports_output_path, export_name_clean)
@@ -397,6 +410,20 @@ def main():
         try:
             shutil.rmtree(temp_path, ignore_errors=True)
             extract_export(source_path, temp_path)
+
+            # Team name: the Note txt's "Team:" line first (as the compiler reads
+            # it), then the export name's first word
+            team_name = note_team_name(temp_path) or folder_key
+            if team_name is None:
+                print("- ERROR - Unusable export name and no Note txt team name - Skipped")
+                continue
+            if folder_key is not None and team_name.lower() != folder_key.lower():
+                print(f"- Actual name: {team_name}")
+            team_id = id_search(team_name)
+            if team_id is None:
+                print(f"- ERROR - Team {team_name} not found in teams_list.txt - Skipped")
+                continue
+
             upgrade_export(temp_path, output_path, team_id, players, version, loose)
             shutil.rmtree(temp_path, ignore_errors=True)
             print(f"- Upgraded export saved to {EXPORTS_OUTPUT}/{export_name_clean}")

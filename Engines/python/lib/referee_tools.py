@@ -12,6 +12,7 @@ from .utils.zlib_plus import unzlib_file
 from .utils.name_editing import (
     resolve_link_to_common,
     normalize_kit_dependent_file,
+    path_id_change,
 )
 from .utils.FILE_INFO import (
     DT00_WRITE_ALLOWED_PATH,
@@ -57,6 +58,11 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
         ref_common_files: List of files that are in the referee's Common folder
         common_files: List of files that are in the export's Common folder (for checking shared files)
     """
+    # Normalize the team ID in the file lists to the XXX placeholder
+    # so that files named with the actual team ID are matched too
+    ref_common_files = [path_id_change(f, "XXX", common_replace=False) for f in ref_common_files]
+    common_files = [path_id_change(f, "XXX", common_replace=False) for f in common_files]
+
     try:
         # Unzlib file if needed
         unzlib_file(file_path)
@@ -104,15 +110,16 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
             # Models are referenced with a "*" platform wildcard in the xml,
             # so resolve it to match the actual files on disk
             file_path_rel_resolved = file_path_rel.replace('*', 'win32')
-            file_path_rel_denormalized = normalize_kit_dependent_file(file_path_rel_resolved, reverse=True)
+            file_path_rel_normalized = path_id_change(file_path_rel_resolved, "XXX", common_replace=False)
+            file_path_rel_denormalized = normalize_kit_dependent_file(file_path_rel_normalized, reverse=True)
 
             # Check if this file is in the referee's common folder
             # or in the export's shared common folder
             # (also checking the denormalized p1 name used by the files on disk)
             new_dir = None
-            if file_path_rel_resolved in ref_common_files:
+            if file_path_rel_normalized in ref_common_files:
                 new_dir = common_player_dir
-            elif file_path_rel_resolved in common_files:
+            elif file_path_rel_normalized in common_files:
                 new_dir = common_dir
             elif file_path_rel_denormalized in ref_common_files:
                 new_dir = common_player_dir

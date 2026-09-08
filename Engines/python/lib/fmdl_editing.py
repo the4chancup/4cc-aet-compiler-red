@@ -403,8 +403,16 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
 
     # Build filename sets for quick lookup
     # Extensions are removed because PES ignores them in texture paths
-    player_common_file_names = {os.path.splitext(os.path.basename(f))[0] for f in player_common_files}
-    common_file_names = {os.path.splitext(os.path.basename(f))[0] for f in common_files}
+    # The team ID is normalized to the XXX placeholder so that files named
+    # with the actual team ID are matched too
+    player_common_file_names = {
+        path_id_change(os.path.splitext(os.path.basename(f))[0], "XXX", common_replace=False)
+        for f in player_common_files
+    }
+    common_file_names = {
+        path_id_change(os.path.splitext(os.path.basename(f))[0], "XXX", common_replace=False)
+        for f in common_files
+    }
 
     # New directory for player-specific common textures
     common_player_dir = f"{UNIFORM_COMMON_FOX_PATH}000/{player_name}/sourceimages/"
@@ -426,15 +434,16 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
 
         tex_dir = strings[directory_id]
         tex_name = os.path.splitext(strings[filename_id])[0]
-        tex_name_denormalized = normalize_kit_dependent_file(tex_name, reverse=True)
+        tex_name_lookup = path_id_change(tex_name, "XXX", common_replace=False)
+        tex_name_denormalized = normalize_kit_dependent_file(tex_name_lookup, reverse=True)
 
         # Check if this texture's file is in the player's common folder
         # or in the export's shared common folder
         # (also checking the denormalized p1 name used by the files on disk)
         new_dir = None
-        if tex_name in player_common_file_names:
+        if tex_name_lookup in player_common_file_names:
             new_dir = common_player_dir
-        elif tex_name in common_file_names:
+        elif tex_name_lookup in common_file_names:
             new_dir = common_dir
         elif tex_name_denormalized in player_common_file_names:
             new_dir = common_player_dir

@@ -430,40 +430,29 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
 
         # Check if this texture's file is in the player's common folder
         # or in the export's shared common folder
+        # (also checking the denormalized p1 name used by the files on disk)
         new_dir = None
-        use_denormalized_name = False
         if tex_name in player_common_file_names:
             new_dir = common_player_dir
         elif tex_name in common_file_names:
             new_dir = common_dir
-        # (with p1 instead of p0)
         elif tex_name_denormalized in player_common_file_names:
             new_dir = common_player_dir
-            use_denormalized_name = True
         elif tex_name_denormalized in common_file_names:
             new_dir = common_dir
-            use_denormalized_name = True
         else:
             # Leave this texture's directory unchanged
             new_block6.append(definition)
             continue
 
-        if use_denormalized_name:
-            # Replace the filename with the denormalized version (p0 -> p1)
-            if tex_name_denormalized not in new_string_cache:
-                new_string_cache[tex_name_denormalized] = len(strings)
-                strings.append(tex_name_denormalized)
-            new_filename_idx = new_string_cache[tex_name_denormalized]
-        else:
-            new_filename_idx = filename_id
-
-        if new_dir == tex_dir and new_filename_idx == filename_id:
+        # Keep the normalized p0 filename so the modded exe can replace
+        # the kit number depending on the kit selected before the match
+        if new_dir == tex_dir:
             new_block6.append(definition)
             continue
 
         modified = True
-        new_tex_name = tex_name_denormalized if use_denormalized_name else tex_name
-        logging.debug(f"  {tex_dir}{tex_name} -> {new_dir}{new_tex_name}")
+        logging.debug(f"  {tex_dir}{tex_name} -> {new_dir}{tex_name}")
 
         # Get or create string index for the new directory
         if new_dir not in new_string_cache:
@@ -471,7 +460,7 @@ def fmdl_texture_paths_change(file_path: str, player_name: str, player_common_fi
             strings.append(new_dir)
 
         new_dir_idx = new_string_cache[new_dir]
-        new_block6.append(bytearray(struct.pack('< H H', new_filename_idx, new_dir_idx)))
+        new_block6.append(bytearray(struct.pack('< H H', filename_id, new_dir_idx)))
 
     if not modified:
         return

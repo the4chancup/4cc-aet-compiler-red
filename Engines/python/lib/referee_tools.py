@@ -108,23 +108,22 @@ def update_file_paths(file_path, ref_name, ref_common_files, common_files):
 
             # Check if this file is in the referee's common folder
             # or in the export's shared common folder
+            # (also checking the denormalized p1 name used by the files on disk)
             new_dir = None
-            file_name_final = file_path_rel
             if file_path_rel_resolved in ref_common_files:
                 new_dir = common_player_dir
             elif file_path_rel_resolved in common_files:
                 new_dir = common_dir
-            # (with p1 instead of p0)
             elif file_path_rel_denormalized in ref_common_files:
                 new_dir = common_player_dir
-                file_name_final = file_path_rel_denormalized.replace('win32', '*')
             elif file_path_rel_denormalized in common_files:
                 new_dir = common_dir
-                file_name_final = file_path_rel_denormalized.replace('win32', '*')
             else:
                 return match.group(0)
 
-            new_path = f'{new_dir}{file_name_final}'
+            # Keep the normalized p0 filename so the modded exe can replace
+            # the kit number depending on the kit selected before the match
+            new_path = f'{new_dir}{file_path_rel}'
 
             logging.debug(f"Updated path: {path_value} -> {new_path}")
             return prefix + new_path + suffix

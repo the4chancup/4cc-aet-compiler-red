@@ -10,6 +10,7 @@ the team's 25-slot ID block instead.
 import os
 import re
 import shutil
+import stat
 import sys
 
 TOOLS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -90,8 +91,28 @@ def move_folder_contents(src_folder, dest_folder, skip=()):
             shutil.move(src_path, dest_path)
 
 
+def remove_readonly(func, path, _exc):
+    "Clear the readonly bit and reattempt the removal"
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+def delete_tree(path):
+    "rmtree that survives the Windows read-only attribute (uploads often carry it on the export folder)"
+    if os.path.isdir(path):
+        shutil.rmtree(path, onerror=remove_readonly)
+
+
+def readonly_strip(path):
+    "Clear the Windows read-only attribute on a folder tree"
+    os.chmod(path, stat.S_IWRITE)
+    for base, dirs, files in os.walk(path):
+        for name in dirs + files:
+            os.chmod(os.path.join(base, name), stat.S_IWRITE)
+
+
 def upgrade_export(source_path, output_path, team_id, players, version, loose=False):
-    shutil.rmtree(output_path, ignore_errors=True)
+    delete_tree(output_path)
     shutil.copytree(source_path, output_path)
 
     faces_path = os.path.join(output_path, "Faces")
@@ -321,14 +342,17 @@ def has_face(face_folders, nn):
 def extract_export(source_path, dest_path):
     if os.path.isdir(source_path):
         shutil.copytree(source_path, dest_path, ignore=shutil.ignore_patterns("*.db", "*.ini"))
+        readonly_strip(dest_path)
         return
     ext = os.path.splitext(source_path)[1].lower()
     if ext == ".zip":
         shutil.unpack_archive(source_path, dest_path, "zip")
+        readonly_strip(dest_path)
     elif ext == ".7z":
         import py7zr
         with py7zr.SevenZipFile(source_path, mode="r") as archive:
             archive.extractall(dest_path)
+        readonly_strip(dest_path)
     else:
         raise ValueError(f"Unsupported archive type: {ext}")
 
@@ -408,7 +432,7 @@ def main():
         temp_path = output_path + "_temp"
 
         try:
-            shutil.rmtree(temp_path, ignore_errors=True)
+            delete_tree(temp_path)
             extract_export(source_path, temp_path)
 
             # Team name: the Note txt's "Team:" line first (as the compiler reads
@@ -425,10 +449,10 @@ def main():
                 continue
 
             upgrade_export(temp_path, output_path, team_id, players, version, loose)
-            shutil.rmtree(temp_path, ignore_errors=True)
+            shutil.rmtree(temp_path)
             print(f"- Upgraded export saved to {EXPORTS_OUTPUT}/{export_name_clean}")
         except Exception as e:
-            shutil.rmtree(temp_path, ignore_errors=True)
+            delete_tree(temp_path)
             print(f"- ERROR - Failed to upgrade the export: {e}")
 
     print("-")

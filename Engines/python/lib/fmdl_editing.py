@@ -6,7 +6,8 @@ import fnmatch
 import logging
 
 from .utils.FmdlFile import FmdlContainer
-from .utils.FILE_INFO import UNIFORM_COMMON_FOX_PATH
+from .utils.FILE_INFO import UNIFORM_COMMON_FOX_PATH, UNIFORM_TEXTURE_FOX_PATH
+from .utils.pausing import pause
 from .utils.name_editing import (
     path_id_change,
     normalize_kit_dependent_file,
@@ -109,7 +110,9 @@ def fmdl_model_folder_paths_fix(file_path: str, target_type: str, model_id: str)
 
     This rewrites every texture directory path that does not point to the common
     folder so that it points to the folder the fmdl now lives in. Common folder
-    paths are left untouched.
+    paths are left untouched. Paths into the PES uniform texture folder are
+    reported as errors and left unchanged, since the game's kit textures there
+    are replaced per match and cannot be used directly.
 
     Unlike fmdl_id_change, the path length changes, so the string block and its
     descriptors are rebuilt instead of being overwritten in place.
@@ -152,13 +155,31 @@ def fmdl_model_folder_paths_fix(file_path: str, target_type: str, model_id: str)
     # Rewrite any directory that isn't a common folder path to the model's own
     # folder path
     modified = False
+    invalid_dirs = []
     for directory_id in directory_ids:
         tex_dir = strings[directory_id]
         if tex_dir.startswith(UNIFORM_COMMON_FOX_PATH) or tex_dir == target_dir:
             continue
+
+        # Kit textures are replaced per match, so pointing straight to the
+        # PES uniform texture folder cannot work; report it and leave it as is
+        if tex_dir.startswith(UNIFORM_TEXTURE_FOX_PATH):
+            invalid_dirs.append(tex_dir)
+            continue
+
         logging.debug(f"  {tex_dir} -> {target_dir}")
         strings[directory_id] = target_dir
         modified = True
+
+    if invalid_dirs:
+        logging.error( "-")
+        logging.error( "- ERROR - FMDL texture path points to the PES uniform texture folder")
+        logging.error(f"- File:           {os.path.basename(file_path)}")
+        for tex_dir in invalid_dirs:
+            logging.error(f"- Texture path:   {tex_dir}")
+        logging.error( "- Kit textures must be referenced through the dummy kit or a common folder path")
+        logging.error( "- These paths will be left unchanged")
+        pause()
 
     if not modified:
         return
